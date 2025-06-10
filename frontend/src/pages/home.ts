@@ -33,7 +33,6 @@ return `
   </div>
 
 `;
-
 }
 
 document.addEventListener('DOMContentLoaded', () => {
