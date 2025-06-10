@@ -1,10 +1,6 @@
 export function renderLogin(): string {
 	return `
 	<div class="login-container">
-		<header class="top-header">
-			<h1 class="site-title">Pong</h1>
-		</header>
-		
 		<main class="login-content">
 			<div class="login-form-container">
 				<h2>Connexion</h2>
@@ -18,8 +14,8 @@ export function renderLogin(): string {
 					<button type="submit" class="login-btn">Se connecter</button>
 				</form>
 				<div class="login-options">
-					<a href="#" class="forgot-password">Mot de passe oublié ?</a>
-					<a href="#" class="create-account">Créer un compte</a>
+					<a href="#" id="forgot-password">Mot de passe oublié ?</a>
+					<a href="#" id="create-account">Créer un compte</a>
 				</div>
 			</div>
 		</main>
@@ -37,5 +33,15 @@ document.addEventListener('DOMContentLoaded', () => {
 		
 		// TODO: Implement actual login logic here
 		console.log('Login attempt:', { username, password });
+	});
+	
+	const ForgotPassword = document.getElementById('forgot-password');
+	ForgotPassword?.addEventListener('click', () => {
+		window.location.href = '/forgot-password';
+	});
+
+	const CreateAccount = document.getElementById('create-account');
+	CreateAccount?.addEventListener('click', () => {
+		window.location.href = '/create-account';
 	});
 });
