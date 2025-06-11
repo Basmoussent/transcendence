@@ -40,6 +40,8 @@ html, body {
     animation-iteration-count: infinite;
 }
 
+/* #region nth-schild */
+
 .background span:nth-child(0) {
     color: #FFACAC;
     top: 34%;
@@ -203,10 +205,12 @@ html, body {
     box-shadow: -40vmin 0 5.652544533593144vmin currentColor;
 }
 
+/* #endregion */
+
 /* Container app */
 .home {
   max-width: 900px;
-  margin: 10% auto;
+  margin: 5% auto;
   padding: 2rem;
   background: rgba(255, 255, 255, 0.05);
   border-radius: 20px;
