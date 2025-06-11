@@ -30,19 +30,45 @@ export function renderCreateAccount(): string {
 
 document.addEventListener('DOMContentLoaded', () => {
 	const createAccountForm = document.getElementById('createAccountForm');
-	createAccountForm?.addEventListener('submit', (e) => {
+	
+	createAccountForm?.addEventListener('submit', async (e) => {
 		e.preventDefault();
+
 		const username = (document.getElementById('username') as HTMLInputElement).value;
 		const email = (document.getElementById('email') as HTMLInputElement).value;
 		const password = (document.getElementById('password') as HTMLInputElement).value;
 		const confirmPassword = (document.getElementById('confirmPassword') as HTMLInputElement).value;
 		
 		if (password !== confirmPassword) {
-			alert('Les mots de passe ne correspondent pas');
+			alert('❌ Les mots de passe ne correspondent pas');
 			return;
 		}
-		
-		// TODO: Implement actual account creation logic here
-		console.log('Create account attempt:', { username, email, password });
+
+		try {
+			const response = await fetch('http://localhost:8000/auth/register', {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json'
+				},
+				body: JSON.stringify({
+					username,
+					email,
+					password,
+					confirmPassword
+				})
+			});
+
+			const result = await response.json();
+
+			if (!response.ok) {
+				alert(`❌ Erreur: ${result.error || 'Erreur inconnue'}`);
+			} else {
+				alert('✅ Compte créé avec succès');
+				window.location.href = "/login";
+			}
+		} catch (err) {
+			console.error('Erreur réseau ou serveur', err);
+			alert('❌ Erreur lors de la création du compte');
+		}
 	});
 });

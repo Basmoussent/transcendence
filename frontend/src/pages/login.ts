@@ -26,14 +26,37 @@ export function renderLogin(): string {
 // Add event listener after the DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
 	const loginForm = document.getElementById('loginForm');
-	loginForm?.addEventListener('submit', (e) => {
-		e.preventDefault();
-		const username = (document.getElementById('username') as HTMLInputElement).value;
-		const password = (document.getElementById('password') as HTMLInputElement).value;
-		
-		// TODO: Implement actual login logic here
-		console.log('Login attempt:', { username, password });
+	loginForm?.addEventListener('submit', async (e) => {
+	e.preventDefault();
+
+	const username = (document.getElementById('username') as HTMLInputElement).value;
+	const password = (document.getElementById('password') as HTMLInputElement).value;
+
+	try {
+		const response = await fetch('http://localhost:8000/auth/login', {
+		method: 'POST',
+		headers: { 'Content-Type': 'application/json' },
+		body: JSON.stringify({ username, password }),
+		});
+
+		const result = await response.json();
+
+		if (!response.ok) {
+		alert(`❌ Erreur : ${result.error || 'Identifiants invalides'}`);
+		} else {
+		alert('✅ Connexion réussie !');
+		// Stocker le token JWT qui corresponderas au token user
+		// console.log('Token reçu:', result.token);
+		// localStorage.setItem('jwtToken', result.token);
+		// Puis rediriger vers une page sécuriséema
+		// window.location.href = '/dashboard';
+		}
+	} catch (err) {
+		console.error('Erreur réseau ou serveur', err);
+		alert('❌ Erreur lors de la connexion');
+	}
 	});
+
 	
 	const ForgotPassword = document.getElementById('forgot-password');
 	ForgotPassword?.addEventListener('click', () => {

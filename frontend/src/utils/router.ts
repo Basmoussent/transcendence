@@ -21,9 +21,6 @@ export function router() {
     case '/login':
        view = renderLogin();
        break;
-    case '/login':
-       view = renderLogin();
-       break;
     case '/create-account':
       view = renderCreateAccount();
       break;
