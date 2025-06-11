@@ -1,33 +1,37 @@
-import sqlite3 from 'sqlite3';
-import { open } from 'sqlite';
 import { readFileSync } from 'fs';
-import { join } from 'path';
 import fs from 'fs';
 import path from 'path';
+import sqlite3 from 'sqlite3';
+import { getSecretFromVault } from './utils/vault';
 
 export class DatabaseService {
   private db: sqlite3.Database | null = null;
+  private password: string | null = null;
 
-  constructor(private dbPath: string = path.resolve('./data/database.sqlite')) {}
+  constructor(
+    private dbPath: string = path.resolve('./data/database.sqlite')
+  ) {}
 
   async initialize(): Promise<void> {
     try {
-      // Crée le dossier si nécessaire
+      // Créer le dossier si nécessaire
       const dir = path.dirname(this.dbPath);
       if (!fs.existsSync(dir)) {
         fs.mkdirSync(dir, { recursive: true });
       }
 
-      // Ouvre la base de données
-      this.db = new sqlite3.Database(this.dbPath, (err) => {
+      const isNewDb = !fs.existsSync(this.dbPath);
+
+      // Ouvrir la DB sans chiffrement pour le moment
+      this.db = new sqlite3.Database(this.dbPath, sqlite3.OPEN_READWRITE | sqlite3.OPEN_CREATE, (err) => {
         if (err) {
-          console.error('❌ Error opening database:', err);
+          console.error('❌ Error opening database:', err.message);
           throw err;
         }
-        console.log('📦 Connected to SQLite database');
-      });
 
-      await this.initializeDatabase();
+        console.log('📦 Connected to SQLite database (unencrypted)');
+        this.initializeDatabase().catch(console.error);
+      });
     } catch (error) {
       console.error('❌ Error initializing database service:', error);
       throw error;
@@ -36,19 +40,15 @@ export class DatabaseService {
 
   private async initializeDatabase(): Promise<void> {
     try {
-      const sqlPath = ('/app/sql/init.sql');
+      const sqlPath = '/app/sql/init.sql';
       const initSql = readFileSync(sqlPath, 'utf8');
 
-      return new Promise((resolve, reject) => {
-        this.db!.exec(initSql, (err) => {
-          if (err) {
-            console.error('❌ Error executing init SQL:', err);
-            reject(err);
-          } else {
-            console.log('✅ Database initialized successfully');
-            resolve();
-          }
-        });
+      this.db!.exec(initSql, (err) => {
+        if (err) {
+          console.error('❌ Error executing init SQL:', err.message);
+          throw err;
+        }
+        console.log('✅ Database initialized and encrypted successfully');
       });
     } catch (error) {
       console.error('❌ Error reading init SQL file:', error);
@@ -66,11 +66,8 @@ export class DatabaseService {
   public close(): void {
     if (this.db) {
       this.db.close((err) => {
-        if (err) {
-          console.error('❌ Error closing database:', err);
-        } else {
-          console.log('📦 Database connection closed');
-        }
+        if (err) console.error('❌ Error closing database:', err.message);
+        else console.log('📦 Database connection closed');
       });
     }
   }

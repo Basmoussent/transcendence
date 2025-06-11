@@ -15,11 +15,20 @@ interface RegisterBody {
   confirmPassword: string;
 }
 
+interface User {
+  id: number;
+  username: string;
+  email: string;
+  password_hash: string;
+  avatar_url?: string;
+  language: string;
+  created_at: string;
+}
+
 async function authRoutes(app: FastifyInstance) {
   app.post<{ Body: RegisterBody }>('/register', async (request, reply) => {
     const { username, email, password, confirmPassword } = request.body;
-    // On extrait les valeurs du body de la requete
-    // on faiss quelque check annodins
+    
     if (!username || !email || !password || !confirmPassword) {
       return reply.status(400).send({ error: 'Missing required fields' });
     }
@@ -27,73 +36,71 @@ async function authRoutes(app: FastifyInstance) {
     if (password !== confirmPassword) {
       return reply.status(400).send({ error: 'Passwords do not match' });
     }
-    // on recupere la db pour pouvoir y acceder
+
     const datab = db.getDatabase();
-    // Pour des raisons de securite les valeurs d'identification (MDP, 2FA, etc...)
-    // sont toujours stocke de maniere (hasher)
     const password_hash = await bcrypt.hash(password, 10);
 
-    return new Promise((resolve, reject) => {
+    try {
       const stmt = datab.prepare(
         `INSERT INTO users (username, email, password_hash)
-         VALUES (?, ?, ?)`,
-        function (err) {
-          if (err) {
-            if (err.message.includes('UNIQUE constraint')) {
-              reply.status(409).send({ error: 'Username or email already exists' });
-              return resolve(null);
-            } else {
-              console.error('❌ Error inserting user:', err);
-              reply.status(500).send({ error: 'Internal server error' });
-              return resolve(null);
-            }
-          }
-
-          reply.status(201).send({ message: 'User registered successfully' });
-          return resolve(null);
-        }
+         VALUES (?, ?, ?)`
       );
-
+      
       stmt.run(username, email, password_hash);
-    });
+      
+      return reply.status(201).send({ message: 'User registered successfully' });
+    } catch (err: any) {
+      if (err.message.includes('UNIQUE constraint')) {
+        return reply.status(409).send({ error: 'Username or email already exists' });
+      } else {
+        console.error('❌ Error inserting user:', err);
+        return reply.status(500).send({ error: 'Internal server error' });
+      }
+    }
   });
   
   app.post<{ Body: LoginBody }>('/login', async (request, reply) => {
     const { username, password } = request.body;
 
+    // Validate required fields
+    if (!username || !password) {
+      return reply.status(400).send({ error: 'Username and password are required' });
+    }
+
     const database = db.getDatabase();
 
-    // on vas recupere nos donne via la abse de donnes avec un query
-    // dans ce cas on vas recuperer tout les attributs de la BDD users
-    // la ou user.username et egale a celui de la requete
-    // la fonction nous renvoie un dictionnaire tel que
-    // {user.id, user.username, user.password_hash, ...}
-    const user = await new Promise<any | undefined>((resolve, reject) => {
-      database.get(
-        'SELECT * FROM users WHERE username = ?',
-        [username],
-        (err, row) => {
-          if (err) reject(err);
-          else resolve(row);
-        }
-      );
-    });
+    try {
+      const stmt = database.prepare('SELECT * FROM users WHERE username = ?');
+      const user = stmt.get(username) as unknown as User | undefined;
 
-    if (!user) {
-      return reply.status(401).send({ error: 'Invalid username or password' });
+      console.log('🔍 Debug - Raw user object:', user);
+      console.log('🔍 Debug - User type:', typeof user);
+      console.log('🔍 Debug - User keys:', user ? Object.keys(user) : 'user is null/undefined');
+      console.log('🔍 Debug - password_hash value:', user ? (user as any).password_hash : 'user is null');
+
+      if (!user) {
+        return reply.status(401).send({ error: 'Invalid username or password' });
+      }
+
+      // Validate that password_hash exists
+      if (!user.password_hash) {
+        console.error('❌ User found but password_hash is missing');
+        console.error('❌ Full user object:', JSON.stringify(user, null, 2));
+        return reply.status(500).send({ error: 'Internal server error' });
+      }
+
+      const passwordMatch = await bcrypt.compare(password, user.password_hash);
+
+      if (!passwordMatch) {
+        return reply.status(401).send({ error: 'Invalid username or password' });
+      }
+
+      // const token = app.jwt.sign({ id: user.id, username: user.username });
+      return reply.send("tout est bon bg");
+    } catch (error) {
+      console.error('❌ Error during login:', error);
+      return reply.status(500).send({ error: 'Internal server error' });
     }
-    // on verifie si le mdp que le hash du mot de passe que l'utilisateur a envoye
-    // corresponds a celui stocke dans la base de donnees;
-    const passwordMatch = await bcrypt.compare(password, user.password_hash);
-
-    if (!passwordMatch) {
-      return reply.status(401).send({ error: 'Invalid username or password' });
-    }
-
-    // const token = app.jwt.sign({ id: user.id, username: user.username });
-    // Si tout c'est bien passe on renvoie en generale un token
-    // d'authentification unique a notre utilisateur pour le reconnaitre
-    return reply.send("tout est bon bg");
   });
 }
 

@@ -18,9 +18,7 @@
     "bcrypt": "^6.0.0",
     "better-sqlite3": "^8.0.0",
     "fastify": "^4.0.0",
-    "hashi-vault-js": "^0.5.0",
-    "sqlite": "^3.0.6",
-    "sqlite3": "^5.1.1"
+    "hashi-vault-js": "^0.5.0"
   },
   "devDependencies": {
     "@types/bcrypt": "^5.0.2",

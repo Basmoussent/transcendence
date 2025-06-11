@@ -3,7 +3,6 @@ import Fastify from 'fastify';
 import cors from '@fastify/cors';
 import jwt from '@fastify/jwt';
 import websocket from '@fastify/websocket';
-import Vault from 'hashi-vault-js';
 import { db } from './database';
 import authRoutes from "./routes/authentication"
 
@@ -20,7 +19,7 @@ async function setup() {
   await fastify.register(cors, { 
     origin: '*'
   });
-
+  // on enregistre les routes definis, qui seront chacune sur /auth/nom_de_la_route
   await fastify.register(authRoutes, {prefix: "/auth"});
   
   // Register WebSocket
@@ -44,17 +43,11 @@ async function setup() {
   fastify.get('/health/db', async () => {
     try {
       const datab = db.getDatabase();
-      return new Promise((resolve, reject) => {
-        datab.get('SELECT COUNT(*) as count FROM users', (err, row) => {
-          if (err) {
-            resolve({ status: 'error', error: err.message });
-          } else {
-            resolve({ status: 'ok', users_count: row });
-          }
-        });
-      });
+      const stmt = datab.prepare('SELECT COUNT(*) as count FROM users');
+      const result = stmt.get();
+      return { status: 'ok', users_count: result };
     } catch (error) {
-      return { status: 'error' };
+      return { status: 'error', error: error };
     }
   });
 

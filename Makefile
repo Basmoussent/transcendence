@@ -4,7 +4,8 @@ DOCKER_COMPOSE = docker-compose.yml
 all: build up status
 
 build:
-	docker-compose -f $(DOCKER_COMPOSE) build
+	@mkdir -p docker/vault/data/core
+	docker-compose -f $(DOCKER_COMPOSE) --env-file=.env build
 
 up:
 	docker-compose -f $(DOCKER_COMPOSE) up -d
