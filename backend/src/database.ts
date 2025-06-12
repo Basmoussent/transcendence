@@ -14,7 +14,6 @@ export class DatabaseService {
 
   async initialize(): Promise<void> {
     try {
-      // Créer le dossier si nécessaire
       const dir = path.dirname(this.dbPath);
       if (!fs.existsSync(dir)) {
         fs.mkdirSync(dir, { recursive: true });

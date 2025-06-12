@@ -1,3 +1,4 @@
+import '/src/style.css';
 import { router } from './utils/router.ts';
 
 function init() {

@@ -1,8 +1,11 @@
-import { renderHome } from '../pages/home';
-import { renderLogin } from '../pages/login';
-import { renderCreateAccount } from '../pages/create-account';
-import { renderForgotPassword } from '../pages/forgot-password';
-
+import { renderHome } from '../pages/menu/home';
+import { renderLogin } from '../pages/auth/login';
+import { renderCreateAccount } from '../pages/auth/create-account';
+import { renderForgotPassword } from '../pages/auth/forgot-password';
+import { renderMain } from '../pages/menu/main';
+import { render404 } from '../components/404';
+import { renderSocial } from '../pages/social/social';
+import {renderProfil } from '../pages/social/profil';
 
 export function router() {
   const path = window.location.pathname;
@@ -27,8 +30,17 @@ export function router() {
     case '/forgot-password':
       view = renderForgotPassword();
       break;
+    case '/main':
+      view = renderMain();
+      break;
+    case '/friends':
+      view = renderSocial();
+      break;
+    case '/profil':
+      view = renderProfil();
+      break;
     default:
-      view = `<h2>404 - Page not found</h2>`;
+      view = render404();
   }
   app.innerHTML = view;
 }

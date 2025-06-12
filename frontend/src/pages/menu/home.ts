@@ -1,5 +1,3 @@
-import '../style.css';
-
 export function renderHome(): string {
 
 return `

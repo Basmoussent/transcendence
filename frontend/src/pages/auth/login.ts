@@ -42,15 +42,13 @@ document.addEventListener('DOMContentLoaded', () => {
 		const result = await response.json();
 
 		if (!response.ok) {
-		alert(`❌ Erreur : ${result.error || 'Identifiants invalides'}`);
-		} else {
-		alert('✅ Connexion réussie !');
+			alert(`❌ Erreur : ${result.error || 'Identifiants invalides'}`);
+		}
 		// Stocker le token JWT qui corresponderas au token user
 		// console.log('Token reçu:', result.token);
 		// localStorage.setItem('jwtToken', result.token);
 		// Puis rediriger vers une page sécuriséema
-		// window.location.href = '/dashboard';
-		}
+		window.location.href = '/main';
 	} catch (err) {
 		console.error('Erreur réseau ou serveur', err);
 		alert('❌ Erreur lors de la connexion');
