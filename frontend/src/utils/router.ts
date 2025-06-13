@@ -5,7 +5,9 @@ import { renderForgotPassword } from '../pages/auth/forgot-password';
 import { renderMain } from '../pages/menu/main';
 import { render404 } from '../components/404';
 import { renderSocial } from '../pages/social/social';
-import {renderProfil } from '../pages/social/profil';
+import { renderProfil } from '../pages/social/profil';
+import { renderMultiplayer } from '../pages/game/multiplayer';
+import { renderLocal } from '../pages/game/local';
 
 export function router() {
   const path = window.location.pathname;
@@ -38,6 +40,12 @@ export function router() {
       break;
     case '/profil':
       view = renderProfil();
+      break;
+    case '/multiplayer':
+      view = renderMultiplayer();
+      break;
+    case '/local-game':
+      view = renderLocal();
       break;
     default:
       view = render404();

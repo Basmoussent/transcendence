@@ -1,0 +1,92 @@
+2025/06/13 10:24:45 [warn] 1#1: "ssl_stapling" ignored, issuer certificate not found for certificate "/etc/nginx/conf/server.crt"
+2025/06/13 10:24:45 [notice] 1#1: ModSecurity-nginx v1.0.4 (rules loaded inline/local/remote: 0/811/0)
+2025/06/13 10:24:45 [notice] 1#1: libmodsecurity3 version 3.0.14
+2025/06/13 10:24:49 [error] 548#548: *2 [client 172.18.0.1] ModSecurity: Access denied with code 403 (phase 2). Matched "Operator `Ge' with parameter `5' against variable `TX:BLOCKING_INBOUND_ANOMALY_SCORE' (Value: `5' ) [file "/etc/modsecurity.d/owasp-crs/rules/REQUEST-949-BLOCKING-EVALUATION.conf"] [line "222"] [id "949110"] [rev ""] [msg "Inbound Anomaly Score Exceeded (Total Score: 5)"] [data ""] [severity "0"] [ver "OWASP_CRS/4.15.0"] [maturity "0"] [accuracy "0"] [tag "modsecurity"] [tag "anomaly-evaluation"] [tag "OWASP_CRS"] [hostname "localhost"] [uri "/api"] [unique_id "174981028964.342002"] [ref ""], client: 172.18.0.1, server: localhost, request: "GET /api?query=1%27%20OR%20%271%27=%271 HTTP/1.1", host: "localhost"
+2025/06/13 10:24:49 [error] 548#548: *2 [client 172.18.0.1] ModSecurity: Access denied with code 403 (phase 2). Matched "Operator `Ge' with parameter `5' against variable `TX:BLOCKING_INBOUND_ANOMALY_SCORE' (Value: `5' ) [file "/etc/modsecurity.d/owasp-crs/rules/REQUEST-949-BLOCKING-EVALUATION.conf"] [line "222"] [id "949110"] [rev ""] [msg "Inbound Anomaly Score Exceeded (Total Score: 5)"] [data ""] [severity "0"] [ver "OWASP_CRS/4.15.0"] [maturity "0"] [accuracy "0"] [tag "modsecurity"] [tag "anomaly-evaluation"] [tag "OWASP_CRS"] [hostname "localhost"] [uri "/api"] [unique_id "174981028964.342002"] [ref ""], client: 172.18.0.1, server: localhost, request: "GET /api?query=1%27%20OR%20%271%27=%271 HTTP/1.1", host: "localhost"
+2025/06/13 10:24:49 [error] 548#548: *2 [client 172.18.0.1] ModSecurity: Access denied with code 403 (phase 2). Matched "Operator `Ge' with parameter `5' against variable `TX:BLOCKING_INBOUND_ANOMALY_SCORE' (Value: `5' ) [file "/etc/modsecurity.d/owasp-crs/rules/REQUEST-949-BLOCKING-EVALUATION.conf"] [line "222"] [id "949110"] [rev ""] [msg "Inbound Anomaly Score Exceeded (Total Score: 5)"] [data ""] [severity "0"] [ver "OWASP_CRS/4.15.0"] [maturity "0"] [accuracy "0"] [tag "modsecurity"] [tag "anomaly-evaluation"] [tag "OWASP_CRS"] [hostname "localhost"] [uri "/api"] [unique_id "174981028931.018790"] [ref ""], client: 172.18.0.1, server: localhost, request: "GET /api?query=1%27%20OR%20%271%27=%271 HTTP/1.1", host: "localhost"
+2025/06/13 10:24:49 [error] 548#548: *2 [client 172.18.0.1] ModSecurity: Access denied with code 403 (phase 2). Matched "Operator `Ge' with parameter `5' against variable `TX:BLOCKING_INBOUND_ANOMALY_SCORE' (Value: `5' ) [file "/etc/modsecurity.d/owasp-crs/rules/REQUEST-949-BLOCKING-EVALUATION.conf"] [line "222"] [id "949110"] [rev ""] [msg "Inbound Anomaly Score Exceeded (Total Score: 5)"] [data ""] [severity "0"] [ver "OWASP_CRS/4.15.0"] [maturity "0"] [accuracy "0"] [tag "modsecurity"] [tag "anomaly-evaluation"] [tag "OWASP_CRS"] [hostname "localhost"] [uri "/api"] [unique_id "174981028931.018790"] [ref ""], client: 172.18.0.1, server: localhost, request: "GET /api?query=1%27%20OR%20%271%27=%271 HTTP/1.1", host: "localhost"
+2025/06/13 10:25:59 [error] 551#551: *17 [client 172.18.0.1] ModSecurity: Access denied with code 403 (phase 2). Matched "Operator `Ge' with parameter `5' against variable `TX:BLOCKING_INBOUND_ANOMALY_SCORE' (Value: `5' ) [file "/etc/modsecurity.d/owasp-crs/rules/REQUEST-949-BLOCKING-EVALUATION.conf"] [line "222"] [id "949110"] [rev ""] [msg "Inbound Anomaly Score Exceeded (Total Score: 5)"] [data ""] [severity "0"] [ver "OWASP_CRS/4.15.0"] [maturity "0"] [accuracy "0"] [tag "modsecurity"] [tag "anomaly-evaluation"] [tag "OWASP_CRS"] [hostname "localhost"] [uri "/api"] [unique_id "174981035977.775446"] [ref ""], client: 172.18.0.1, server: localhost, request: "GET /api?query=1%27%20OR%20%271%27=%271 HTTP/1.1", host: "localhost"
+2025/06/13 10:25:59 [error] 551#551: *17 [client 172.18.0.1] ModSecurity: Access denied with code 403 (phase 2). Matched "Operator `Ge' with parameter `5' against variable `TX:BLOCKING_INBOUND_ANOMALY_SCORE' (Value: `5' ) [file "/etc/modsecurity.d/owasp-crs/rules/REQUEST-949-BLOCKING-EVALUATION.conf"] [line "222"] [id "949110"] [rev ""] [msg "Inbound Anomaly Score Exceeded (Total Score: 5)"] [data ""] [severity "0"] [ver "OWASP_CRS/4.15.0"] [maturity "0"] [accuracy "0"] [tag "modsecurity"] [tag "anomaly-evaluation"] [tag "OWASP_CRS"] [hostname "localhost"] [uri "/api"] [unique_id "174981035977.775446"] [ref ""], client: 172.18.0.1, server: localhost, request: "GET /api?query=1%27%20OR%20%271%27=%271 HTTP/1.1", host: "localhost"
+2025/06/13 12:09:02 [emerg] 1#1: unknown directive "modsecurity" in /etc/nginx/nginx.conf:67
+2025/06/13 12:10:09 [emerg] 1#1: "modsecurity_rules_file" directive Failed to open the file: /etc/nginx/modsecurity.conf
+ in /etc/nginx/nginx.conf:70
+2025/06/13 12:11:11 [emerg] 1#1: "modsecurity_rules_file" directive Rules error. File: /etc/nginx/modsecurity.d/modsecurity.conf. Line: 26. Column: 17. Failed to locate the unicode map file from: unicode.mapping Looking at: 'unicode.mapping', 'unicode.mapping', '/etc/nginx/modsecurity.d/unicode.mapping', '/etc/nginx/modsecurity.d/unicode.mapping'.  in /etc/nginx/nginx.conf:70
+2025/06/13 12:11:31 [emerg] 1#1: cannot load certificate "/etc/nginx/ssl/nginx-selfsigned.crt": BIO_new_file() failed (SSL: error:80000002:system library::No such file or directory:calling fopen(/etc/nginx/ssl/nginx-selfsigned.crt, r) error:10000080:BIO routines::no such file)
+2025/06/13 12:12:17 [emerg] 1#1: cannot load certificate "/etc/nginx/ssl/nginx-selfsigned.crt": BIO_new_file() failed (SSL: error:80000002:system library::No such file or directory:calling fopen(/etc/nginx/ssl/nginx-selfsigned.crt, r) error:10000080:BIO routines::no such file)
+2025/06/13 12:13:29 [emerg] 1#1: cannot load certificate "/etc/nginx/ssl/nginx-selfsigned.crt": BIO_new_file() failed (SSL: error:80000002:system library::No such file or directory:calling fopen(/etc/nginx/ssl/nginx-selfsigned.crt, r) error:10000080:BIO routines::no such file)
+2025/06/13 12:14:33 [emerg] 1#1: cannot load certificate "/etc/nginx/ssl/nginx-selfsigned.crt": BIO_new_file() failed (SSL: error:80000002:system library::No such file or directory:calling fopen(/etc/nginx/ssl/nginx-selfsigned.crt, r) error:10000080:BIO routines::no such file)
+2025/06/13 12:17:14 [emerg] 1#1: cannot load certificate "/etc/nginx/ssl/nginx-selfsigned.crt": BIO_new_file() failed (SSL: error:80000002:system library::No such file or directory:calling fopen(/etc/nginx/ssl/nginx-selfsigned.crt, r) error:10000080:BIO routines::no such file)
+2025/06/13 12:18:27 [emerg] 1#1: cannot load certificate "/etc/nginx/certs/cert-selfsigned.crt": BIO_new_file() failed (SSL: error:80000002:system library::No such file or directory:calling fopen(/etc/nginx/certs/cert-selfsigned.crt, r) error:10000080:BIO routines::no such file)
+2025/06/13 12:19:46 [notice] 1#1: ModSecurity-nginx v1.0.4 (rules loaded inline/local/remote: 0/0/0)
+2025/06/13 12:19:46 [notice] 1#1: libmodsecurity3 version 3.0.14
+2025/06/13 12:19:46 [emerg] 1#1: no "ssl_certificate" is defined for the "listen ... ssl" directive in /etc/nginx/nginx.conf:49
+2025/06/13 12:20:23 [notice] 1#1: ModSecurity-nginx v1.0.4 (rules loaded inline/local/remote: 0/0/0)
+2025/06/13 12:20:23 [notice] 1#1: libmodsecurity3 version 3.0.14
+2025/06/13 12:20:23 [emerg] 1#1: no "ssl_certificate" is defined for the "listen ... ssl" directive in /etc/nginx/nginx.conf:49
+2025/06/13 12:20:53 [notice] 1#1: ModSecurity-nginx v1.0.4 (rules loaded inline/local/remote: 0/0/0)
+2025/06/13 12:20:53 [notice] 1#1: libmodsecurity3 version 3.0.14
+2025/06/13 12:22:41 [notice] 1#1: ModSecurity-nginx v1.0.4 (rules loaded inline/local/remote: 0/0/0)
+2025/06/13 12:22:41 [notice] 1#1: libmodsecurity3 version 3.0.14
+2025/06/13 12:24:42 [notice] 1#1: ModSecurity-nginx v1.0.4 (rules loaded inline/local/remote: 0/0/0)
+2025/06/13 12:24:42 [notice] 1#1: libmodsecurity3 version 3.0.14
+2025/06/13 12:26:58 [notice] 1#1: ModSecurity-nginx v1.0.4 (rules loaded inline/local/remote: 0/0/0)
+2025/06/13 12:26:58 [notice] 1#1: libmodsecurity3 version 3.0.14
+2025/06/13 12:27:29 [notice] 1#1: ModSecurity-nginx v1.0.4 (rules loaded inline/local/remote: 0/0/0)
+2025/06/13 12:27:29 [notice] 1#1: libmodsecurity3 version 3.0.14
+2025/06/13 12:29:43 [notice] 1#1: ModSecurity-nginx v1.0.4 (rules loaded inline/local/remote: 0/0/0)
+2025/06/13 12:29:43 [notice] 1#1: libmodsecurity3 version 3.0.14
+2025/06/13 12:30:42 [notice] 1#1: ModSecurity-nginx v1.0.4 (rules loaded inline/local/remote: 0/0/0)
+2025/06/13 12:30:42 [notice] 1#1: libmodsecurity3 version 3.0.14
+2025/06/13 12:36:37 [notice] 1#1: ModSecurity-nginx v1.0.4 (rules loaded inline/local/remote: 0/0/0)
+2025/06/13 12:36:37 [notice] 1#1: libmodsecurity3 version 3.0.14
+2025/06/13 12:37:56 [notice] 1#1: ModSecurity-nginx v1.0.4 (rules loaded inline/local/remote: 0/0/0)
+2025/06/13 12:37:56 [notice] 1#1: libmodsecurity3 version 3.0.14
+2025/06/13 12:40:40 [notice] 1#1: ModSecurity-nginx v1.0.4 (rules loaded inline/local/remote: 0/0/0)
+2025/06/13 12:40:40 [notice] 1#1: libmodsecurity3 version 3.0.14
+2025/06/13 12:44:42 [notice] 1#1: ModSecurity-nginx v1.0.4 (rules loaded inline/local/remote: 0/0/0)
+2025/06/13 12:44:42 [notice] 1#1: libmodsecurity3 version 3.0.14
+2025/06/13 12:48:35 [notice] 1#1: ModSecurity-nginx v1.0.4 (rules loaded inline/local/remote: 0/0/0)
+2025/06/13 12:48:35 [notice] 1#1: libmodsecurity3 version 3.0.14
+2025/06/13 13:00:00 [emerg] 1#1: "modsecurity_rules_file" directive Failed to open the file: /etc/nginx/modsecurity.conf
+ in /etc/nginx/nginx.conf:70
+2025/06/13 13:03:22 [emerg] 1#1: "modsecurity_rules_file" directive Rules error. File: /etc/nginx/modsecurity.conf. Line: 26. Column: 17. Failed to locate the unicode map file from: unicode.mapping Looking at: 'unicode.mapping', 'unicode.mapping', '/etc/nginx/unicode.mapping', '/etc/nginx/unicode.mapping'.  in /etc/nginx/nginx.conf:70
+2025/06/13 13:04:23 [emerg] 1#1: "modsecurity_rules_file" directive Rules error. File: /etc/nginx/modsecurity.conf. Line: 31. Column: 49. Failed to start DebugLog: Failed to open file: /var/log/modsecurity/audit/auditDebug.log  in /etc/nginx/nginx.conf:70
+2025/06/13 13:05:20 [emerg] 1#1: cannot load certificate "/etc/nginx/certs/cert-selfsigned.crt": BIO_new_file() failed (SSL: error:80000002:system library::No such file or directory:calling fopen(/etc/nginx/certs/cert-selfsigned.crt, r) error:10000080:BIO routines::no such file)
+2025/06/13 13:06:13 [notice] 1#1: ModSecurity-nginx v1.0.4 (rules loaded inline/local/remote: 0/8/0)
+2025/06/13 13:06:13 [notice] 1#1: libmodsecurity3 version 3.0.14
+2025/06/13 13:07:26 [notice] 1#1: ModSecurity-nginx v1.0.4 (rules loaded inline/local/remote: 0/8/0)
+2025/06/13 13:07:26 [notice] 1#1: libmodsecurity3 version 3.0.14
+2025/06/13 13:07:57 [notice] 1#1: ModSecurity-nginx v1.0.4 (rules loaded inline/local/remote: 0/8/0)
+2025/06/13 13:07:57 [notice] 1#1: libmodsecurity3 version 3.0.14
+2025/06/13 13:11:49 [notice] 1#1: ModSecurity-nginx v1.0.4 (rules loaded inline/local/remote: 0/8/0)
+2025/06/13 13:11:49 [notice] 1#1: libmodsecurity3 version 3.0.14
+2025/06/13 13:15:14 [notice] 1#1: ModSecurity-nginx v1.0.4 (rules loaded inline/local/remote: 0/8/0)
+2025/06/13 13:15:14 [notice] 1#1: libmodsecurity3 version 3.0.14
+2025/06/13 13:17:07 [notice] 1#1: ModSecurity-nginx v1.0.4 (rules loaded inline/local/remote: 0/8/0)
+2025/06/13 13:17:07 [notice] 1#1: libmodsecurity3 version 3.0.14
+2025/06/13 13:18:11 [notice] 1#1: ModSecurity-nginx v1.0.4 (rules loaded inline/local/remote: 0/8/0)
+2025/06/13 13:18:11 [notice] 1#1: libmodsecurity3 version 3.0.14
+2025/06/13 13:19:30 [emerg] 1#1: cannot load certificate "/etc/nginx/ssl/cert-selfsigned.crt": BIO_new_file() failed (SSL: error:80000002:system library::No such file or directory:calling fopen(/etc/nginx/ssl/cert-selfsigned.crt, r) error:10000080:BIO routines::no such file)
+2025/06/13 13:20:32 [notice] 1#1: ModSecurity-nginx v1.0.4 (rules loaded inline/local/remote: 0/8/0)
+2025/06/13 13:20:32 [notice] 1#1: libmodsecurity3 version 3.0.14
+2025/06/13 13:21:45 [notice] 1#1: ModSecurity-nginx v1.0.4 (rules loaded inline/local/remote: 0/8/0)
+2025/06/13 13:21:45 [notice] 1#1: libmodsecurity3 version 3.0.14
+2025/06/13 13:24:37 [notice] 1#1: ModSecurity-nginx v1.0.4 (rules loaded inline/local/remote: 0/8/0)
+2025/06/13 13:24:37 [notice] 1#1: libmodsecurity3 version 3.0.14
+2025/06/13 13:24:44 [error] 347#347: *5 connect() failed (111: Connection refused) while connecting to upstream, client: 172.18.0.1, server: localhost, request: "GET / HTTP/1.1", upstream: "http://127.0.0.1:5173/", host: "localhost"
+2025/06/13 13:24:44 [warn] 347#347: *5 upstream server temporarily disabled while connecting to upstream, client: 172.18.0.1, server: localhost, request: "GET / HTTP/1.1", upstream: "http://127.0.0.1:5173/", host: "localhost"
+2025/06/13 13:24:44 [error] 347#347: *5 connect() failed (111: Connection refused) while connecting to upstream, client: 172.18.0.1, server: localhost, request: "GET / HTTP/1.1", upstream: "http://127.0.0.1:5173/", host: "localhost"
+2025/06/13 13:24:44 [warn] 347#347: *5 upstream server temporarily disabled while connecting to upstream, client: 172.18.0.1, server: localhost, request: "GET / HTTP/1.1", upstream: "http://127.0.0.1:5173/", host: "localhost"
+2025/06/13 13:24:44 [error] 347#347: *5 no live upstreams while connecting to upstream, client: 172.18.0.1, server: localhost, request: "GET /favicon.ico HTTP/1.1", upstream: "http://localhost/favicon.ico", host: "localhost", referrer: "https://localhost/"
+2025/06/13 13:28:00 [notice] 1#1: ModSecurity-nginx v1.0.4 (rules loaded inline/local/remote: 0/8/0)
+2025/06/13 13:28:00 [notice] 1#1: libmodsecurity3 version 3.0.14
+2025/06/13 13:28:06 [error] 347#347: *5 connect() failed (111: Connection refused) while connecting to upstream, client: 172.18.0.1, server: localhost, request: "GET / HTTP/1.1", upstream: "http://127.0.0.1:5173/", host: "localhost"
+2025/06/13 13:28:06 [warn] 347#347: *5 upstream server temporarily disabled while connecting to upstream, client: 172.18.0.1, server: localhost, request: "GET / HTTP/1.1", upstream: "http://127.0.0.1:5173/", host: "localhost"
+2025/06/13 13:28:06 [error] 347#347: *5 connect() failed (111: Connection refused) while connecting to upstream, client: 172.18.0.1, server: localhost, request: "GET / HTTP/1.1", upstream: "http://127.0.0.1:5173/", host: "localhost"
+2025/06/13 13:28:06 [warn] 347#347: *5 upstream server temporarily disabled while connecting to upstream, client: 172.18.0.1, server: localhost, request: "GET / HTTP/1.1", upstream: "http://127.0.0.1:5173/", host: "localhost"
+2025/06/13 13:28:06 [error] 347#347: *5 no live upstreams while connecting to upstream, client: 172.18.0.1, server: localhost, request: "GET /favicon.ico HTTP/1.1", upstream: "http://localhost/favicon.ico", host: "localhost", referrer: "https://localhost/"
+2025/06/13 13:30:31 [notice] 1#1: ModSecurity-nginx v1.0.4 (rules loaded inline/local/remote: 0/8/0)
+2025/06/13 13:30:31 [notice] 1#1: libmodsecurity3 version 3.0.14
+2025/06/13 13:33:06 [notice] 1#1: ModSecurity-nginx v1.0.4 (rules loaded inline/local/remote: 0/11/0)
+2025/06/13 13:33:06 [notice] 1#1: libmodsecurity3 version 3.0.14
+2025/06/13 13:33:10 [error] 347#347: *5 [client 172.18.0.1] ModSecurity: Access denied with code 403 (phase 2). Matched "Operator `Rx' with parameter `\b(select|union|insert|update|delete|drop|--|;)\b' against variable `REQUEST_HEADERS:Accept-Language' (Value: `fr-FR,fr;q=0.9,en-US;q=0.8,en;q=0.7' ) [file "/etc/nginx/modsecurity.conf"] [line "61"] [id "1001"] [rev ""] [msg "Potential SQL Injection detected"] [data ""] [severity "0"] [ver ""] [maturity "0"] [accuracy "0"] [hostname "localhost"] [uri "/api/"] [unique_id "174982159093.681555"] [ref "o47,1o47,1v388,135o8,1o8,1v678,35"], client: 172.18.0.1, server: localhost, request: "GET /api/?id=1%20OR%201=1 HTTP/1.1", host: "localhost"

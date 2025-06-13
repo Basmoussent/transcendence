@@ -10,7 +10,7 @@ export function renderProfil() {
       <div class="profile-container">
         <div class="profile-header">
           <div class="profile-avatar">
-            <img src="https://via.placeholder.com/150" alt="Profile Avatar" class="avatar-image">
+            <img src="../../public/avatar.png" alt="Profile Avatar" class="avatar-image">
             <button class="change-avatar-btn">
               <i class="fas fa-camera"></i>
             </button>

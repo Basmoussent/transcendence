@@ -1,8 +1,41 @@
 version: '3.8'
 
 services:
+  nginx:
+    build:
+      context: ./docker/nginx
+      dockerfile: Dockerfile
+    ports:
+      - '80:80'
+      - '443:443'
+    volumes:
+      - ./docker/nginx/nginx.conf.template:/etc/nginx/templates/nginx.conf.template:ro
+      - ./docker/nginx/cors.conf.template:/etc/nginx/templates/includes/cors.conf.template:ro
+      - ./docker/nginx/logs:/var/log/nginx
+      - ./docker/nginx/certs:/etc/nginx/certs
+      - ./docker/nginx/modsecurity:/var/log/modsecurity
+    environment:
+      - NGINX_HOST=localhost
+      - NGINX_PORT=80
+      - FRONTEND_HOST=frontend
+      - FRONTEND_PORT=5173
+      - BACKEND_HOST=backend
+      - BACKEND_PORT=8000
+      - MODSECURITY=on
+      - MODSECURITY_RULE_ENGINE=on
+      - MODSECURITY_AUDIT_ENGINE=on
+      - MODSECURITY_AUDIT_LOG=/var/log/modsecurity/audit.log
+      - MODSECURITY_PARANOIA_LEVEL=1
+      - MODSECURITY_ANOMALY_SCORE_THRESHOLD=5
+      - MODSECURITY_CRS_RULES=on
+    depends_on:
+      - backend
+    networks:
+      - app-network
+    user: root
+
   vault:
-    image: hashicorp/vault:latest
+    image: nginx:latest
     ports:
       - "8200:8200"
     volumes:
@@ -112,3 +145,4 @@ volumes:
   frontend_node_modules:
   backend_node_modules:
   vault_data:
+  modsecurity_logs:
