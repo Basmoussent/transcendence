@@ -8,6 +8,7 @@ import { renderSocial } from '../pages/social/social';
 import { renderProfil } from '../pages/social/profil';
 import { renderMultiplayer } from '../pages/game/multiplayer';
 import { renderLocal } from '../pages/game/local';
+import { renderBlock } from '../pages/block/main';
 
 export function router() {
   const path = window.location.pathname;
@@ -52,6 +53,9 @@ export function router() {
       break;
     case '/local-game':
       view = renderLocal();
+      break;
+    case '/block':
+      view = renderBlock();
       break;
     default:
       view = render404();

@@ -35,18 +35,18 @@ services:
     user: root
 
   vault:
-    image: nginx:latest
+    build:
+      context: ./docker/vault
+      dockerfile: Dockerfile
     ports:
       - "8200:8200"
     volumes:
       - vault_data:/vault/data
-      - ./docker/vault/config.hcl:/vault/config/config.hcl
+      - ./docker/vault/config.hcl:/vault/config/config.hcl:ro
     environment:
       - VAULT_ADDR=http://0.0.0.0:8200
-    command: ["sh", "-c", "vault server -config=/vault/config/config.hcl && chmod 777 /data"]
     cap_add:
       - IPC_LOCK
-    user: "0:0"
     networks:
       - app-network
 
@@ -81,7 +81,6 @@ services:
     environment:
       - NODE_ENV=development
       - DATABASE_URL=sqlite:///./database.sqlite
-      - VAULT_ADDR=http://vault:8200
     depends_on:
       - prometheus
       - grafana

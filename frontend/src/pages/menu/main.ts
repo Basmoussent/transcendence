@@ -26,6 +26,11 @@ export function renderMain() {
             <i class="fas fa-user-friends"></i>
             ${t('menu.friends')}
           </button>
+
+          <button class="menu-button block-game-button" onclick="window.location.href='/block'">
+            <i class="fas fa-cube"></i>
+            Block Game
+          </button>
         </div>
       </div>
     </div>
@@ -112,6 +117,10 @@ export function renderMain() {
 
       .friends-button {
         background: linear-gradient(135deg, #9b59b6 0%, #8e44ad 100%);
+      }
+
+      .block-game-button {
+        background: linear-gradient(135deg, #f1c40f 0%, #f39c12 100%);
       }
 
       /* Animation d'entrée */
