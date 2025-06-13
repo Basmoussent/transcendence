@@ -1,50 +1,53 @@
+import { t } from '../../utils/translations';
+
+
 export function renderSocial() {
   return `
     <div class="social-page">
       <div class="social-container">
         <div class="social-header">
-          <h1>Social</h1>
+          <h1>${t('social.title')}</h1>
           <div class="search-bar">
             <i class="fas fa-search"></i>
-            <input type="text" placeholder="Search friends...">
+            <input type="text" placeholder="${t('social.searchPlaceholder')}">
           </div>
         </div>
 
         <div class="social-content">
           <div class="friends-section">
             <div class="section-header">
-              <h2>Friends</h2>
+              <h2>${t('social.friends.title')}</h2>
               <button class="add-friend-btn">
                 <i class="fas fa-user-plus"></i>
-                Add Friend
+                ${t('social.friends.addFriend')}
               </button>
             </div>
             
             <div class="friends-list">
-              <div class="friend-item online">
+              <div class="friend-item ${t('social.friends.online')}">
                 <img src="../../public/avatar.png" alt="Friend Avatar" class="friend-avatar">
                 <div class="friend-info">
                   <span class="friend-name">Player123</span>
-                  <span class="friend-status">Online</span>
+                  <span class="friend-status">${t('social.friends.online')}</span>
                 </div>
                 <div class="friend-actions">
-                  <button class="friend-action-btn message">
+                  <button class="friend-action-btn ${t('social.friends.message')}">
                     <i class="fas fa-comment"></i>
                   </button>
-                  <button class="friend-action-btn play">
+                  <button class="friend-action-btn ${t('social.friends.play')}">
                     <i class="fas fa-gamepad"></i>
                   </button>
                 </div>
               </div>
 
-              <div class="friend-item offline">
+              <div class="friend-item ${t('social.friends.offline')}">
                 <img src="../../public/avatar.png" alt="Friend Avatar" class="friend-avatar">
                 <div class="friend-info">
                   <span class="friend-name">Player456</span>
-                  <span class="friend-status">Offline</span>
+                  <span class="friend-status">${t('social.friends.offline')}</span>
                 </div>
                 <div class="friend-actions">
-                  <button class="friend-action-btn message">
+                  <button class="friend-action-btn ${t('social.friends.message')}">
                     <i class="fas fa-comment"></i>
                   </button>
                   <button class="friend-action-btn play" disabled>
@@ -56,7 +59,7 @@ export function renderSocial() {
           </div>
 
           <div class="invitations-section">
-            <h2>Friend Requests</h2>
+            <h2>${t('social.friendRequests.title')}</h2>
             <div class="invitations-list">
               <div class="invitation-item">
                 <img src="../../public/avatar.png" alt="User Avatar" class="invitation-avatar">
@@ -65,10 +68,10 @@ export function renderSocial() {
                   <span class="invitation-time">2 hours ago</span>
                 </div>
                 <div class="invitation-actions">
-                  <button class="invitation-btn accept">
+                  <button class="invitation-btn ${t('social.friendRequests.accept')}">
                     <i class="fas fa-check"></i>
                   </button>
-                  <button class="invitation-btn decline">
+                  <button class="invitation-btn ${t('social.friendRequests.decline')}">
                     <i class="fas fa-times"></i>
                   </button>
                 </div>
@@ -78,10 +81,10 @@ export function renderSocial() {
 
           <div class="chat-section">
             <div class="chat-header">
-              <h2>Chat</h2>
+              <h2>${t('social.chat.title')}</h2>
               <button class="new-chat-btn">
                 <i class="fas fa-plus"></i>
-                New Chat
+                ${t('social.chat.newChat')}
               </button>
             </div>
             
@@ -92,7 +95,7 @@ export function renderSocial() {
                   <span class="chat-name">Player123</span>
                   <span class="chat-last-message">Hey, want to play a game?</span>
                 </div>
-                <span class="chat-time">2m ago</span>
+                <span class="chat-time">2m</span>
               </div>
 
               <div class="chat-item">
@@ -101,7 +104,7 @@ export function renderSocial() {
                   <span class="chat-name">Player456</span>
                   <span class="chat-last-message">Good game!</span>
                 </div>
-                <span class="chat-time">1h ago</span>
+                <span class="chat-time">1h</span>
               </div>
             </div>
           </div>
