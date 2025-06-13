@@ -14,6 +14,12 @@ export function router() {
   const app = document.getElementById('app');
   if (!app) return;
 
+  // const hostname = window.location.hostname;
+  // const subdomain = hostname.split('.')[0];
+
+  // const supportedLanguages = ['en', 'fr', 'es'];
+  // const language = supportedLanguages.includes(subdomain) ? subdomain : 'en';
+
   let view = '';
 
   switch (path) {

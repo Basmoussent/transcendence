@@ -1,26 +1,28 @@
+import { t } from '../../utils/translations';
+
 export function renderCreateAccount(): string {
 	return `
 	<div class="login-container">
 		<main class="login-content">
 			<div class="login-form-container">
-				<h2>Créer un compte</h2>
+				<h2>${t('auth.createAccount.title')}</h2>
 				<form id="createAccountForm" class="login-form">
 					<div class="form-group">
-						<input type="text" id="username" name="username" placeholder="Nom d'utilisateur" required>
+						<input type="text" id="username" name="username" placeholder="${t('auth.createAccount.username')}" required>
 					</div>
 					<div class="form-group">
-						<input type="email" id="email" name="email" placeholder="Email" required>
+						<input type="email" id="email" name="email" placeholder="${t('auth.createAccount.email')}" required>
 					</div>
 					<div class="form-group">
-						<input type="password" id="password" name="password" placeholder="Mot de passe" required>
+						<input type="password" id="password" name="password" placeholder="${t('auth.createAccount.password')}" required>
 					</div>
 					<div class="form-group">
-						<input type="password" id="confirmPassword" name="confirmPassword" placeholder="Confirmer le mot de passe" required>
+						<input type="password" id="confirmPassword" name="confirmPassword" placeholder="${t('auth.createAccount.confirmPassword')}" required>
 					</div>
-					<button type="submit" class="login-btn">Créer un compte</button>
+					<button type="submit" class="login-btn">${t('auth.createAccount.submit')}</button>
 				</form>
 				<div class="login-options">
-					<a href="/login" class="back-to-login">Retour à la connexion</a>
+					<a href="/login" class="back-to-login">${t('auth.createAccount.backToLogin')}</a>
 				</div>
 			</div>
 		</main>

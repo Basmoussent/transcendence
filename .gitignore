@@ -34,3 +34,5 @@ node_modules/hashi-vault-js/tests/AppRole.test.js
 node_modules
 
 .log
+
+docker/nginx/modsecurity/audit/

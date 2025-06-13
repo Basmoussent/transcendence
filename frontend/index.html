@@ -5,8 +5,58 @@
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Vite + TS</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+      .language-selector {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 1000;
+        display: flex;
+        gap: 10px;
+      }
+
+      .language-btn {
+        width: 40px;
+        height: 40px;
+        border: none;
+        border-radius: 50%;
+        cursor: pointer;
+        transition: transform 0.2s, box-shadow 0.2s;
+        background-size: cover;
+        background-position: center;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+      }
+
+      .language-btn:hover {
+        transform: scale(1.1);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+      }
+
+      .language-btn.active {
+        border: 2px solid #fff;
+        box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+      }
+
+      .fr-flag {
+        background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 600"><rect width="900" height="600" fill="%23ED2939"/><rect width="600" height="600" fill="%23fff"/><rect width="300" height="600" fill="%23002395"/></svg>');
+      }
+
+      .en-flag {
+        background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 30"><clipPath id="a"><path d="M0 0v30h60V0z"/></clipPath><clipPath id="b"><path d="M30 15h30v15zv15H0zH0V0zV0h30z"/></clipPath><g clip-path="url(%23a)"><path d="M0 0v30h60V0z" fill="%23012169"/><path d="M0 0l60 30m0-30L0 30" stroke="%23fff" stroke-width="6"/><path d="M0 0l60 30m0-30L0 30" clip-path="url(%23b)" stroke="%23C8102E" stroke-width="4"/><path d="M30 0v30M0 15h60" stroke="%23fff" stroke-width="10"/><path d="M30 0v30M0 15h60" stroke="%23C8102E" stroke-width="6"/></g></svg>');
+      }
+
+      .es-flag {
+        background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 750 500"><rect width="750" height="500" fill="%23C60B1E"/><rect y="125" width="750" height="250" fill="%23FFC400"/><rect y="250" width="750" height="125" fill="%23C60B1E"/><g transform="translate(375,250) scale(0.6)"><path fill="%23AA151B" d="M0,0v125h62.5v-125z M0,125v125h62.5v-125z M0,250v125h62.5v-125z M0,375v125h62.5v-125z M0,500v125h62.5v-125z M62.5,0v125h62.5v-125z M62.5,125v125h62.5v-125z M62.5,250v125h62.5v-125z M62.5,375v125h62.5v-125z M62.5,500v125h62.5v-125z M125,0v125h62.5v-125z M125,125v125h62.5v-125z M125,250v125h62.5v-125z M125,375v125h62.5v-125z M125,500v125h62.5v-125z M187.5,0v125h62.5v-125z M187.5,125v125h62.5v-125z M187.5,250v125h62.5v-125z M187.5,375v125h62.5v-125z M187.5,500v125h62.5v-125z M250,0v125h62.5v-125z M250,125v125h62.5v-125z M250,250v125h62.5v-125z M250,375v125h62.5v-125z M250,500v125h62.5v-125z"/></g></svg>');
+      }
+    </style>
   </head>
   <body>
+    <div class="language-selector">
+      <button class="language-btn fr-flag" onclick="changeLanguage('fr')" title="Français"></button>
+      <button class="language-btn en-flag" onclick="changeLanguage('en')" title="English"></button>
+      <button class="language-btn es-flag" onclick="changeLanguage('es')" title="Español"></button>
+    </div>
     <div class="background">
       <div id="app"></div>
       <script type="module" src="src/main.ts"></script>
@@ -29,5 +79,25 @@
       <span></span>
       <span></span>
     </div>
+    <script>
+      function changeLanguage(lang) {
+        const hostname = window.location.hostname;
+        const parts = hostname.split('.');
+        const newHostname = `${lang}.${parts.slice(1).join('.')}`;
+        window.location.href = `${window.location.protocol}//${newHostname}${window.location.pathname}${window.location.search}`;
+      }
+
+      // Set active language button
+      document.addEventListener('DOMContentLoaded', () => {
+        const hostname = window.location.hostname;
+        const lang = hostname.split('.')[0];
+        const buttons = document.querySelectorAll('.language-btn');
+        buttons.forEach(btn => {
+          if (btn.classList.contains(`${lang}-flag`)) {
+            btn.classList.add('active');
+          }
+        });
+      });
+    </script>
   </body>
 </html>

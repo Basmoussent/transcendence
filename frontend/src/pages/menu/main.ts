@@ -1,29 +1,30 @@
+import { t } from '../../utils/translations';
 
 export function renderMain() {
   return `
     <div class="main-menu">
       <div class="menu-container">
-        <h1 class="menu-title">Transcendence</h1>
+        <h1 class="menu-title">${t('menu.title')}</h1>
         
         <div class="menu-buttons">
           <button class="menu-button profile-button" onclick="window.location.href='/profil'">
             <i class="fas fa-user"></i>
-            Profile
+            ${t('menu.profile')}
           </button>
           
           <button class="menu-button local-game-button" onclick="window.location.href='/local-game'">
             <i class="fas fa-gamepad"></i>
-            Play Local
+            ${t('menu.playLocal')}
           </button>
           
           <button class="menu-button multiplayer-button" onclick="window.location.href='/multiplayer'">
             <i class="fas fa-users"></i>
-            Multiplayer
+            ${t('menu.multiplayer')}
           </button>
           
           <button class="menu-button friends-button" onclick="window.location.href='/friends'">
             <i class="fas fa-user-friends"></i>
-            Friends
+            ${t('menu.friends')}
           </button>
         </div>
       </div>

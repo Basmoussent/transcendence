@@ -1,21 +1,23 @@
+import { t } from '../../utils/translations';
+
 export function renderLogin(): string {
 	return `
 	<div class="login-container">
 		<main class="login-content">
 			<div class="login-form-container">
-				<h2>Connexion</h2>
+				<h2>${t('auth.login.title')}</h2>
 				<form id="loginForm" class="login-form">
 					<div class="form-group">
-						<input type="text" id="username" name="username" placeholder="Nom d'utilisateur" required>
+						<input type="text" id="username" name="username" placeholder="${t('auth.login.username')}" required>
 					</div>
 					<div class="form-group">
-						<input type="password" id="password" name="password" placeholder="Mot de passe" required>
+						<input type="password" id="password" name="password" placeholder="${t('auth.login.password')}" required>
 					</div>
-					<button type="submit" class="login-btn">Se connecter</button>
+					<button type="submit" class="login-btn">${t('auth.login.submit')}</button>
 				</form>
 				<div class="login-options">
-					<a href="#" id="forgot-password">Mot de passe oublié ?</a>
-					<a href="#" id="create-account">Créer un compte</a>
+					<a href="#" id="forgot-password">${t('auth.login.forgotPassword')}</a>
+					<a href="#" id="create-account">${t('auth.login.createAccount')}</a>
 				</div>
 			</div>
 		</main>
@@ -42,7 +44,7 @@ document.addEventListener('DOMContentLoaded', () => {
 		const result = await response.json();
 
 		if (!response.ok) {
-			alert(`❌ Erreur : ${result.error || 'Identifiants invalides'}`);
+			alert(`❌ Error: ${result.error || 'Invalid credentials'}`);
 		}
 		// Stocker le token JWT qui corresponderas au token user
 		// console.log('Token reçu:', result.token);
@@ -50,8 +52,8 @@ document.addEventListener('DOMContentLoaded', () => {
 		// Puis rediriger vers une page sécuriséema
 		window.location.href = '/main';
 	} catch (err) {
-		console.error('Erreur réseau ou serveur', err);
-		alert('❌ Erreur lors de la connexion');
+		console.error('Network or server error', err);
+		alert('❌ Error during login');
 	}
 	});
 

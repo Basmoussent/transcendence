@@ -1,0 +1,318 @@
+export const translations = {
+  fr: {
+    home: {
+      title: "Pong",
+      subtitle: "Découvrez Pong",
+      description: "Une expérience de jeu classique revisitée",
+      login: "Connexion"
+    },
+    auth: {
+      login: {
+        title: "Connexion",
+        username: "Nom d'utilisateur",
+        password: "Mot de passe",
+        submit: "Se connecter",
+        forgotPassword: "Mot de passe oublié ?",
+        createAccount: "Créer un compte"
+      },
+      createAccount: {
+        title: "Créer un compte",
+        username: "Nom d'utilisateur",
+        email: "Email",
+        password: "Mot de passe",
+        confirmPassword: "Confirmer le mot de passe",
+        submit: "Créer un compte",
+        backToLogin: "Retour à la connexion"
+      },
+      forgotPassword: {
+        title: "Mot de passe oublié",
+        description: "Entrez votre email pour recevoir un lien de réinitialisation",
+        email: "Email",
+        submit: "Envoyer le lien",
+        backToLogin: "Retour à la connexion"
+      }
+    },
+    menu: {
+      title: "Transcendence",
+      profile: "Profil",
+      playLocal: "Jouer en local",
+      multiplayer: "Multijoueur",
+      friends: "Amis"
+    },
+    profile: {
+      title: "Profil",
+      editProfile: "Modifier le profil",
+      changePassword: "Changer le mot de passe",
+      logout: "Déconnexion",
+      stats: {
+        wins: "Victoires",
+        games: "Parties",
+        rating: "Classement"
+      },
+      recentActivity: "Activité récente",
+      wonAgainst: "Victoire contre",
+      addedFriend: "Ajouté un ami",
+      hoursAgo: "heures",
+      daysAgo: "jours"
+    },
+    social: {
+      title: "Social",
+      searchPlaceholder: "Rechercher des amis...",
+      friends: {
+        title: "Amis",
+        addFriend: "Ajouter un ami",
+        online: "En ligne",
+        offline: "Hors ligne",
+        message: "Message",
+        play: "Jouer"
+      },
+      friendRequests: {
+        title: "Demandes d'amis",
+        accept: "Accepter",
+        decline: "Refuser"
+      },
+      chat: {
+        title: "Chat",
+        newChat: "Nouvelle conversation",
+        ago: "il y a"
+      }
+    }
+  },
+  en: {
+    home: {
+      title: "Pong",
+      subtitle: "Discover Pong",
+      description: "A classic gaming experience reimagined",
+      login: "Login"
+    },
+    auth: {
+      login: {
+        title: "Login",
+        username: "Username",
+        password: "Password",
+        submit: "Sign in",
+        forgotPassword: "Forgot password?",
+        createAccount: "Create account"
+      },
+      createAccount: {
+        title: "Create Account",
+        username: "Username",
+        email: "Email",
+        password: "Password",
+        confirmPassword: "Confirm password",
+        submit: "Create account",
+        backToLogin: "Back to login"
+      },
+      forgotPassword: {
+        title: "Forgot Password",
+        description: "Enter your email to receive a reset link",
+        email: "Email",
+        submit: "Send link",
+        backToLogin: "Back to login"
+      }
+    },
+    menu: {
+      title: "Transcendence",
+      profile: "Profile",
+      playLocal: "Play Local",
+      multiplayer: "Multiplayer",
+      friends: "Friends"
+    },
+    profile: {
+      title: "Profile",
+      editProfile: "Edit Profile",
+      changePassword: "Change Password",
+      logout: "Logout",
+      stats: {
+        wins: "Wins",
+        games: "Games",
+        rating: "Rating"
+      },
+      recentActivity: "Recent Activity",
+      wonAgainst: "Won against",
+      addedFriend: "Added friend",
+      hoursAgo: "hours ago",
+      daysAgo: "days ago"
+    },
+    social: {
+      title: "Social",
+      searchPlaceholder: "Search friends...",
+      friends: {
+        title: "Friends",
+        addFriend: "Add Friend",
+        online: "Online",
+        offline: "Offline",
+        message: "Message",
+        play: "Play"
+      },
+      friendRequests: {
+        title: "Friend Requests",
+        accept: "Accept",
+        decline: "Decline"
+      },
+      chat: {
+        title: "Chat",
+        newChat: "New Chat",
+        ago: "ago"
+      }
+    }
+  },
+  es: {
+    home: {
+      title: "Pong",
+      subtitle: "Descubre Pong",
+      description: "Una experiencia de juego clásica reinventada",
+      login: "Iniciar sesión"
+    },
+    auth: {
+      login: {
+        title: "Iniciar sesión",
+        username: "Nombre de usuario",
+        password: "Contraseña",
+        submit: "Iniciar sesión",
+        forgotPassword: "¿Olvidaste tu contraseña?",
+        createAccount: "Crear cuenta"
+      },
+      createAccount: {
+        title: "Crear cuenta",
+        username: "Nombre de usuario",
+        email: "Correo electrónico",
+        password: "Contraseña",
+        confirmPassword: "Confirmar contraseña",
+        submit: "Crear cuenta",
+        backToLogin: "Volver al inicio de sesión"
+      },
+      forgotPassword: {
+        title: "Olvidaste tu contraseña",
+        description: "Ingresa tu correo electrónico para recibir un enlace de restablecimiento",
+        email: "Correo electrónico",
+        submit: "Enviar enlace",
+        backToLogin: "Volver al inicio de sesión"
+      }
+    },
+    menu: {
+      title: "Transcendence",
+      profile: "Perfil",
+      playLocal: "Jugar local",
+      multiplayer: "Multijugador",
+      friends: "Amigos"
+    },
+    profile: {
+      title: "Perfil",
+      editProfile: "Editar perfil",
+      changePassword: "Cambiar contraseña",
+      logout: "Cerrar sesión",
+      stats: {
+        wins: "Victorias",
+        games: "Partidas",
+        rating: "Clasificación"
+      },
+      recentActivity: "Actividad reciente",
+      wonAgainst: "Victoria contra",
+      addedFriend: "Añadido amigo",
+      hoursAgo: "horas",
+      daysAgo: "días"
+    },
+    social: {
+      title: "Social",
+      searchPlaceholder: "Buscar amigos...",
+      friends: {
+        title: "Amigos",
+        addFriend: "Añadir amigo",
+        online: "En línea",
+        offline: "Desconectado",
+        message: "Mensaje",
+        play: "Jugar"
+      },
+      friendRequests: {
+        title: "Solicitudes de amistad",
+        accept: "Aceptar",
+        decline: "Rechazar"
+      },
+      chat: {
+        title: "Chat",
+        newChat: "Nuevo chat",
+        ago: "hace"
+      }
+    }
+  }
+} as const;
+
+type Language = keyof typeof translations;
+type TranslationKeys = 
+  | 'home.title'
+  | 'home.subtitle'
+  | 'home.description'
+  | 'home.login'
+  | 'auth.login.title'
+  | 'auth.login.username'
+  | 'auth.login.password'
+  | 'auth.login.submit'
+  | 'auth.login.forgotPassword'
+  | 'auth.login.createAccount'
+  | 'auth.createAccount.title'
+  | 'auth.createAccount.username'
+  | 'auth.createAccount.email'
+  | 'auth.createAccount.password'
+  | 'auth.createAccount.confirmPassword'
+  | 'auth.createAccount.submit'
+  | 'auth.createAccount.backToLogin'
+  | 'auth.forgotPassword.title'
+  | 'auth.forgotPassword.description'
+  | 'auth.forgotPassword.email'
+  | 'auth.forgotPassword.submit'
+  | 'auth.forgotPassword.backToLogin'
+  | 'menu.title'
+  | 'menu.profile'
+  | 'menu.playLocal'
+  | 'menu.multiplayer'
+  | 'menu.friends'
+  | 'profile.title'
+  | 'profile.editProfile'
+  | 'profile.changePassword'
+  | 'profile.logout'
+  | 'profile.stats.wins'
+  | 'profile.stats.games'
+  | 'profile.stats.rating'
+  | 'profile.recentActivity'
+  | 'profile.wonAgainst'
+  | 'profile.addedFriend'
+  | 'profile.hoursAgo'
+  | 'profile.daysAgo'
+  | 'social.title'
+  | 'social.searchPlaceholder'
+  | 'social.friends.title'
+  | 'social.friends.addFriend'
+  | 'social.friends.online'
+  | 'social.friends.offline'
+  | 'social.friends.message'
+  | 'social.friends.play'
+  | 'social.friendRequests.title'
+  | 'social.friendRequests.accept'
+  | 'social.friendRequests.decline'
+  | 'social.chat.title'
+  | 'social.chat.newChat'
+  | 'social.chat.ago';
+
+export function getLanguage(): Language {
+  const hostname = window.location.hostname;
+  const subdomain = hostname.split('.')[0];
+  const supportedLanguages = ['en', 'fr', 'es'] as const;
+  return supportedLanguages.includes(subdomain as Language) ? subdomain as Language : 'en';
+}
+
+export function t(key: TranslationKeys): string {
+  const lang = getLanguage();
+  const keys = key.split('.');
+  let value: any = translations[lang];
+  
+  for (const k of keys) {
+    if (value && typeof value === 'object') {
+      value = value[k];
+    } else {
+      return key;
+    }
+  }
+  
+  return typeof value === 'string' ? value : key;
+} 

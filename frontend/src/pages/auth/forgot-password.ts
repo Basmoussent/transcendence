@@ -1,18 +1,20 @@
+import { t } from '../../utils/translations';
+
 export function renderForgotPassword(): string {
 	return `
 	<div class="login-container">
 		<main class="login-content">
 			<div class="login-form-container">
-				<h2>Mot de passe oublié</h2>
-				<p class="forgot-password-text">Entrez votre email pour recevoir un lien de réinitialisation</p>
+				<h2>${t('auth.forgotPassword.title')}</h2>
+				<p class="forgot-password-text">${t('auth.forgotPassword.description')}</p>
 				<form id="forgotPasswordForm" class="login-form">
 					<div class="form-group">
-						<input type="email" id="email" name="email" placeholder="Email" required>
+						<input type="email" id="email" name="email" placeholder="${t('auth.forgotPassword.email')}" required>
 					</div>
-					<button type="submit" class="login-btn">Envoyer le lien</button>
+					<button type="submit" class="login-btn">${t('auth.forgotPassword.submit')}</button>
 				</form>
 				<div class="login-options">
-					<a href="/login" class="back-to-login">Retour à la connexion</a>
+					<a href="/login" class="back-to-login">${t('auth.forgotPassword.backToLogin')}</a>
 				</div>
 			</div>
 		</main>
