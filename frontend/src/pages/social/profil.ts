@@ -62,26 +62,6 @@ export function renderProfil() {
             Logout
           </button>
         </div>
-
-        <div class="recent-activity">
-          <h2>Recent Activity</h2>
-          <div class="activity-list">
-            <div class="activity-item">
-              <i class="fas fa-gamepad"></i>
-              <div class="activity-info">
-                <span class="activity-text">Won against Player123</span>
-                <span class="activity-time">2 hours ago</span>
-              </div>
-            </div>
-            <div class="activity-item">
-              <i class="fas fa-user-plus"></i>
-              <div class="activity-info">
-                <span class="activity-text">Added new friend: Player456</span>
-                <span class="activity-time">1 day ago</span>
-              </div>
-            </div>
-          </div>
-        </div>
       </div>
     </div>
 
@@ -89,9 +69,12 @@ export function renderProfil() {
       .profile-page {
         min-height: 100vh;
         background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-        padding: 40px 20px;
+        padding: 20px;
         position: relative;
-        overflow: hidden;
+        overflow: auto;
+        display: flex;
+        justify-content: center;
+        align-items: center;
       }
 
       .background-circles {
@@ -146,15 +129,16 @@ export function renderProfil() {
       .profile-container {
         position: relative;
         z-index: 2;
+        width: 90%;
         max-width: 800px;
-        margin: 0 auto;
         background: rgba(255, 255, 255, 0.1);
         backdrop-filter: blur(10px);
         border-radius: 20px;
-        padding: 40px;
+        padding: 30px;
         box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
         border: 1px solid rgba(255, 255, 255, 0.18);
         animation: fadeIn 0.5s ease-out;
+        overflow: auto;
       }
 
       .profile-header {
@@ -169,8 +153,8 @@ export function renderProfil() {
       }
 
       .avatar-image {
-        width: 150px;
-        height: 150px;
+        width: 120px;
+        height: 120px;
         border-radius: 50%;
         border: 4px solid rgba(255, 255, 255, 0.2);
       }
@@ -182,8 +166,8 @@ export function renderProfil() {
         background: #4a90e2;
         border: none;
         border-radius: 50%;
-        width: 40px;
-        height: 40px;
+        width: 35px;
+        height: 35px;
         color: white;
         cursor: pointer;
         transition: all 0.3s ease;
@@ -198,7 +182,7 @@ export function renderProfil() {
       }
 
       .username {
-        font-size: 2.5em;
+        font-size: 2em;
         margin: 0;
         text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
       }
@@ -225,14 +209,14 @@ export function renderProfil() {
       .profile-stats {
         display: grid;
         grid-template-columns: repeat(3, 1fr);
-        gap: 20px;
-        margin-bottom: 40px;
+        gap: 15px;
+        margin-bottom: 30px;
       }
 
       .stat-card {
         background: rgba(255, 255, 255, 0.05);
         border-radius: 15px;
-        padding: 20px;
+        padding: 15px;
         display: flex;
         align-items: center;
         gap: 15px;
@@ -240,7 +224,7 @@ export function renderProfil() {
       }
 
       .stat-card i {
-        font-size: 2em;
+        font-size: 1.5em;
         color: #4a90e2;
       }
 
@@ -250,7 +234,7 @@ export function renderProfil() {
       }
 
       .stat-value {
-        font-size: 1.5em;
+        font-size: 1.3em;
         font-weight: bold;
       }
 
@@ -262,22 +246,23 @@ export function renderProfil() {
       .profile-actions {
         display: grid;
         grid-template-columns: repeat(3, 1fr);
-        gap: 20px;
-        margin-bottom: 40px;
+        gap: 15px;
+        margin-bottom: 30px;
       }
 
       .action-button {
         display: flex;
         align-items: center;
         justify-content: center;
-        gap: 10px;
-        padding: 12px;
+        gap: 8px;
+        padding: 10px;
         border: none;
         border-radius: 12px;
         color: white;
         cursor: pointer;
         transition: all 0.3s ease;
         font-weight: 600;
+        font-size: 0.9em;
       }
 
       .edit-profile {
@@ -303,7 +288,7 @@ export function renderProfil() {
 
       .recent-activity h2 {
         margin-bottom: 20px;
-        font-size: 1.5em;
+        font-size: 1.3em;
       }
 
       .activity-list {
@@ -348,9 +333,14 @@ export function renderProfil() {
       }
 
       @media (max-width: 768px) {
+        .profile-container {
+          padding: 20px;
+        }
+
         .profile-header {
           flex-direction: column;
           text-align: center;
+          gap: 20px;
         }
 
         .profile-stats {
@@ -359,6 +349,35 @@ export function renderProfil() {
 
         .profile-actions {
           grid-template-columns: 1fr;
+        }
+
+        .username {
+          font-size: 1.8em;
+        }
+
+        .avatar-image {
+          width: 100px;
+          height: 100px;
+        }
+      }
+
+      @media (max-width: 480px) {
+        .profile-container {
+          padding: 15px;
+        }
+
+        .username {
+          font-size: 1.5em;
+        }
+
+        .avatar-image {
+          width: 80px;
+          height: 80px;
+        }
+
+        .change-avatar-btn {
+          width: 30px;
+          height: 30px;
         }
       }
     </style>

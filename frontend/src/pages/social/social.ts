@@ -113,41 +113,48 @@ export function renderSocial() {
       .social-page {
         min-height: 100vh;
         background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-        padding: 40px 20px;
+        padding: 20px;
+        display: flex;
+        justify-content: center;
+        align-items: flex-start;
+        overflow-y: auto;
       }
 
       .social-container {
+        width: 95%;
         max-width: 1200px;
-        margin: 0 auto;
         background: rgba(255, 255, 255, 0.1);
         backdrop-filter: blur(10px);
         border-radius: 20px;
-        padding: 40px;
+        padding: 20px;
         box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
         border: 1px solid rgba(255, 255, 255, 0.18);
         animation: fadeIn 0.5s ease-out;
+        margin: 20px 0;
       }
 
       .social-header {
         display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 40px;
+        flex-direction: column;
+        gap: 15px;
+        margin-bottom: 30px;
       }
 
       .social-header h1 {
-        color: white;
+        font-size: 1.8em;
         margin: 0;
-        font-size: 2em;
+        text-align: center;
       }
 
       .search-bar {
         display: flex;
         align-items: center;
-        background: rgba(255, 255, 255, 0.1);
+        padding: 8px 15px;
         border-radius: 20px;
-        padding: 10px 20px;
-        width: 300px;
+        background: rgba(255, 255, 255, 0.05);
+        width: 100%;
+        max-width: 400px;
+        margin: 0 auto;
       }
 
       .search-bar i {
@@ -159,8 +166,9 @@ export function renderSocial() {
         background: none;
         border: none;
         color: white;
-        width: 100%;
         outline: none;
+        font-size: 0.9em;
+        width: 100%;
       }
 
       .search-bar input::placeholder {
@@ -169,20 +177,20 @@ export function renderSocial() {
 
       .social-content {
         display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 30px;
+        grid-template-columns: 1fr;
+        gap: 20px;
       }
 
       .section-header {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        margin-bottom: 20px;
+        margin-bottom: 15px;
       }
 
       .section-header h2 {
-        color: white;
         margin: 0;
+        font-size: 1.3em;
       }
 
       .add-friend-btn, .new-chat-btn {
@@ -194,8 +202,9 @@ export function renderSocial() {
         border-radius: 10px;
         background: #4a90e2;
         color: white;
-        cursor: pointer;
         transition: all 0.3s ease;
+        font-size: 0.9em;
+        white-space: nowrap;
       }
 
       .add-friend-btn:hover, .new-chat-btn:hover {
@@ -206,14 +215,14 @@ export function renderSocial() {
       .friends-list, .invitations-list, .chat-list {
         display: flex;
         flex-direction: column;
-        gap: 15px;
+        gap: 12px;
       }
 
       .friend-item, .invitation-item, .chat-item {
         display: flex;
         align-items: center;
-        gap: 15px;
-        padding: 15px;
+        gap: 12px;
+        padding: 12px;
         background: rgba(255, 255, 255, 0.05);
         border-radius: 12px;
         color: white;
@@ -223,37 +232,46 @@ export function renderSocial() {
         width: 40px;
         height: 40px;
         border-radius: 50%;
+        object-fit: cover;
       }
 
       .friend-info, .invitation-info, .chat-info {
         flex: 1;
         display: flex;
         flex-direction: column;
+        min-width: 0;
       }
 
       .friend-name, .invitation-name, .chat-name {
         font-weight: 600;
+        font-size: 0.95em;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
       }
 
       .friend-status, .invitation-time, .chat-time {
-        font-size: 0.9em;
+        font-size: 0.85em;
         color: #ccc;
       }
 
-      .friend-actions {
+      .friend-actions, .invitation-actions {
         display: flex;
-        gap: 10px;
+        gap: 8px;
       }
 
-      .friend-action-btn {
-        width: 35px;
-        height: 35px;
+      .friend-action-btn, .invitation-btn {
+        width: 32px;
+        height: 32px;
         border: none;
         border-radius: 50%;
         background: rgba(255, 255, 255, 0.1);
         color: white;
         cursor: pointer;
         transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
       }
 
       .friend-action-btn:hover {
@@ -267,21 +285,6 @@ export function renderSocial() {
 
       .friend-item.online .friend-status {
         color: #2ecc71;
-      }
-
-      .invitation-actions {
-        display: flex;
-        gap: 10px;
-      }
-
-      .invitation-btn {
-        width: 35px;
-        height: 35px;
-        border: none;
-        border-radius: 50%;
-        color: white;
-        cursor: pointer;
-        transition: all 0.3s ease;
       }
 
       .invitation-btn.accept {
@@ -310,8 +313,8 @@ export function renderSocial() {
       }
 
       .chat-last-message {
+        font-size: 0.85em;
         color: #ccc;
-        font-size: 0.9em;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
@@ -329,20 +332,107 @@ export function renderSocial() {
         }
       }
 
-      @media (max-width: 1024px) {
-        .social-content {
-          grid-template-columns: 1fr;
+      /* Desktop Layout */
+      @media (min-width: 1024px) {
+        .social-container {
+          padding: 30px;
         }
-      }
 
-      @media (max-width: 768px) {
         .social-header {
-          flex-direction: column;
-          gap: 20px;
+          flex-direction: row;
+          justify-content: space-between;
+          align-items: center;
+        }
+
+        .social-header h1 {
+          text-align: left;
         }
 
         .search-bar {
+          margin: 0;
+        }
+
+        .social-content {
+          grid-template-columns: 1fr 1fr;
+          gap: 30px;
+        }
+
+        .chat-section {
+          grid-column: 1 / -1;
+        }
+      }
+
+      /* Tablet Layout */
+      @media (min-width: 768px) and (max-width: 1023px) {
+        .social-container {
+          padding: 25px;
+        }
+
+        .social-content {
+          gap: 25px;
+        }
+      }
+
+      /* Mobile Layout */
+      @media (max-width: 767px) {
+        .social-container {
+          padding: 15px;
+        }
+
+        .social-header h1 {
+          font-size: 1.5em;
+        }
+
+        .section-header {
+          flex-direction: column;
+          align-items: flex-start;
+          gap: 10px;
+        }
+
+        .add-friend-btn, .new-chat-btn {
           width: 100%;
+          justify-content: center;
+        }
+
+        .friend-item, .invitation-item, .chat-item {
+          padding: 10px;
+        }
+
+        .friend-avatar, .invitation-avatar, .chat-avatar {
+          width: 35px;
+          height: 35px;
+        }
+
+        .friend-action-btn, .invitation-btn {
+          width: 28px;
+          height: 28px;
+        }
+      }
+
+      /* Small Mobile Layout */
+      @media (max-width: 480px) {
+        .social-page {
+          padding: 10px;
+        }
+
+        .social-container {
+          padding: 12px;
+        }
+
+        .social-header h1 {
+          font-size: 1.3em;
+        }
+
+        .friend-name, .invitation-name, .chat-name {
+          font-size: 0.9em;
+        }
+
+        .friend-status, .invitation-time, .chat-time {
+          font-size: 0.8em;
+        }
+
+        .chat-last-message {
+          max-width: 150px;
         }
       }
     </style>

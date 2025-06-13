@@ -18,4 +18,3 @@
 	# ◦ Minor module: Support on all devices.
 	# ◦ Minor module: Expanding browser compatibility.
 #	# ◦ Minor module: Supports multiple languages.
-	#	### • Server-Side Pong
