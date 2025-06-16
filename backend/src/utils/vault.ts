@@ -28,7 +28,7 @@ export async function getSecretFromVault(
     });
 
     if (!response.ok) {
-      throw new Error(`Vault API request failed: ${response.status} ${response.statusText}`);
+      throw new Error(`Vault API request failed(${url}): ${response.status} ${response.statusText}`);
     }
 
     const data = await response.json() as VaultResponse;

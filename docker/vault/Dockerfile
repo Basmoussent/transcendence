@@ -16,7 +16,12 @@ RUN mkdir -p /vault/data
 EXPOSE 8200
 
 # Définir les variables d'environnement
-ENV VAULT_ADDR=http://0.0.0.0:8200
+ENV VAULT_ADDR=http://vault:8200
 
+
+COPY config.hcl /vault/config.hcl
 # Définir la commande par défaut
-CMD ["vault", "server", "-dev", "-dev-listen-address=0.0.0.0:8200", "-dev-root-token-id=root"]
+RUN vault server -config=/vault/config.hcl
+COPY tools/vault.sh /vault.sh
+RUN chmod +x /vault.sh
+ENTRYPOINT [ "sh","/vault.sh" ]

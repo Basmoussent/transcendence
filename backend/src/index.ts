@@ -5,20 +5,22 @@ import jwt from '@fastify/jwt';
 import websocket from '@fastify/websocket';
 import { db } from './database';
 import authRoutes from "./routes/authentication"
+import { getSecretFromVault } from './utils/vault';
 
 
-const fastify = Fastify({
-  logger: true
-});
+
+const fastify = Fastify({ logger: { level: 'debug' } });
 
 async function setup() {
   // Initialize database first
   await db.initialize();
 
   // Register CORS
-  await fastify.register(cors, { 
-    origin: '*'
-  });
+await fastify.register(cors, {
+  origin: ['http://localhost:3000'],
+  credentials: true,
+});
+
   // on enregistre les routes definis, qui seront chacune sur /auth/nom_de_la_route
   await fastify.register(authRoutes, {prefix: "/auth"});
   
@@ -26,7 +28,7 @@ async function setup() {
   await fastify.register(websocket);
 
   // Register JWT
-  const jwtSecret = process.env.JWT_SECRET || 'your_jwt_secret_here';
+  const jwtSecret =  getSecretFromVault("JWT", "JWT_KEY") || process.env.JWT_SECRET;
   await fastify.register(jwt, {
     secret: jwtSecret,
   });

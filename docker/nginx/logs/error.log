@@ -243,3 +243,82 @@
 2025/06/13 20:02:14 [notice] 1#1: libmodsecurity3 version 3.0.14
 2025/06/13 20:03:16 [notice] 1#1: ModSecurity-nginx v1.0.4 (rules loaded inline/local/remote: 0/10/0)
 2025/06/13 20:03:16 [notice] 1#1: libmodsecurity3 version 3.0.14
+2025/06/16 12:32:02 [notice] 1#1: ModSecurity-nginx v1.0.4 (rules loaded inline/local/remote: 0/10/0)
+2025/06/16 12:32:02 [notice] 1#1: libmodsecurity3 version 3.0.14
+2025/06/16 12:35:16 [notice] 1#1: ModSecurity-nginx v1.0.4 (rules loaded inline/local/remote: 0/10/0)
+2025/06/16 12:35:16 [notice] 1#1: libmodsecurity3 version 3.0.14
+2025/06/16 12:37:45 [notice] 1#1: ModSecurity-nginx v1.0.4 (rules loaded inline/local/remote: 0/10/0)
+2025/06/16 12:37:45 [notice] 1#1: libmodsecurity3 version 3.0.14
+2025/06/16 12:39:23 [notice] 1#1: ModSecurity-nginx v1.0.4 (rules loaded inline/local/remote: 0/10/0)
+2025/06/16 12:39:23 [notice] 1#1: libmodsecurity3 version 3.0.14
+2025/06/16 12:41:13 [emerg] 1#1: unknown directive "SSLEngine" in /etc/nginx/nginx.conf:41
+2025/06/16 12:42:03 [notice] 1#1: ModSecurity-nginx v1.0.4 (rules loaded inline/local/remote: 0/10/0)
+2025/06/16 12:42:03 [notice] 1#1: libmodsecurity3 version 3.0.14
+2025/06/16 13:18:41 [notice] 1#1: ModSecurity-nginx v1.0.4 (rules loaded inline/local/remote: 0/10/0)
+2025/06/16 13:18:41 [notice] 1#1: libmodsecurity3 version 3.0.14
+2025/06/16 13:21:16 [notice] 1#1: ModSecurity-nginx v1.0.4 (rules loaded inline/local/remote: 0/10/0)
+2025/06/16 13:21:16 [notice] 1#1: libmodsecurity3 version 3.0.14
+2025/06/16 13:23:21 [notice] 1#1: ModSecurity-nginx v1.0.4 (rules loaded inline/local/remote: 0/10/0)
+2025/06/16 13:23:21 [notice] 1#1: libmodsecurity3 version 3.0.14
+2025/06/16 13:24:01 [notice] 1#1: ModSecurity-nginx v1.0.4 (rules loaded inline/local/remote: 0/10/0)
+2025/06/16 13:24:01 [notice] 1#1: libmodsecurity3 version 3.0.14
+2025/06/16 13:24:24 [notice] 1#1: ModSecurity-nginx v1.0.4 (rules loaded inline/local/remote: 0/10/0)
+2025/06/16 13:24:24 [notice] 1#1: libmodsecurity3 version 3.0.14
+2025/06/16 13:25:00 [notice] 1#1: ModSecurity-nginx v1.0.4 (rules loaded inline/local/remote: 0/10/0)
+2025/06/16 13:25:00 [notice] 1#1: libmodsecurity3 version 3.0.14
+2025/06/16 13:27:44 [notice] 1#1: ModSecurity-nginx v1.0.4 (rules loaded inline/local/remote: 0/10/0)
+2025/06/16 13:27:44 [notice] 1#1: libmodsecurity3 version 3.0.14
+2025/06/16 13:35:21 [notice] 1#1: ModSecurity-nginx v1.0.4 (rules loaded inline/local/remote: 0/10/0)
+2025/06/16 13:35:21 [notice] 1#1: libmodsecurity3 version 3.0.14
+2025/06/16 13:39:59 [notice] 1#1: ModSecurity-nginx v1.0.4 (rules loaded inline/local/remote: 0/10/0)
+2025/06/16 13:39:59 [notice] 1#1: libmodsecurity3 version 3.0.14
+2025/06/16 13:42:39 [notice] 1#1: ModSecurity-nginx v1.0.4 (rules loaded inline/local/remote: 0/10/0)
+2025/06/16 13:42:39 [notice] 1#1: libmodsecurity3 version 3.0.14
+2025/06/16 13:44:39 [notice] 1#1: ModSecurity-nginx v1.0.4 (rules loaded inline/local/remote: 0/10/0)
+2025/06/16 13:44:39 [notice] 1#1: libmodsecurity3 version 3.0.14
+2025/06/16 13:47:10 [notice] 1#1: ModSecurity-nginx v1.0.4 (rules loaded inline/local/remote: 0/10/0)
+2025/06/16 13:47:10 [notice] 1#1: libmodsecurity3 version 3.0.14
+2025/06/16 14:00:12 [notice] 1#1: ModSecurity-nginx v1.0.4 (rules loaded inline/local/remote: 0/10/0)
+2025/06/16 14:00:12 [notice] 1#1: libmodsecurity3 version 3.0.14
+2025/06/16 14:01:55 [notice] 1#1: ModSecurity-nginx v1.0.4 (rules loaded inline/local/remote: 0/10/0)
+2025/06/16 14:01:55 [notice] 1#1: libmodsecurity3 version 3.0.14
+2025/06/16 14:02:35 [notice] 1#1: ModSecurity-nginx v1.0.4 (rules loaded inline/local/remote: 0/10/0)
+2025/06/16 14:02:35 [notice] 1#1: libmodsecurity3 version 3.0.14
+2025/06/16 14:02:52 [notice] 1#1: ModSecurity-nginx v1.0.4 (rules loaded inline/local/remote: 0/10/0)
+2025/06/16 14:02:52 [notice] 1#1: libmodsecurity3 version 3.0.14
+2025/06/16 14:04:07 [notice] 1#1: ModSecurity-nginx v1.0.4 (rules loaded inline/local/remote: 0/10/0)
+2025/06/16 14:04:07 [notice] 1#1: libmodsecurity3 version 3.0.14
+2025/06/16 14:05:49 [notice] 1#1: ModSecurity-nginx v1.0.4 (rules loaded inline/local/remote: 0/10/0)
+2025/06/16 14:05:49 [notice] 1#1: libmodsecurity3 version 3.0.14
+2025/06/16 14:07:31 [notice] 1#1: ModSecurity-nginx v1.0.4 (rules loaded inline/local/remote: 0/10/0)
+2025/06/16 14:07:31 [notice] 1#1: libmodsecurity3 version 3.0.14
+2025/06/16 14:11:56 [notice] 1#1: ModSecurity-nginx v1.0.4 (rules loaded inline/local/remote: 0/10/0)
+2025/06/16 14:11:56 [notice] 1#1: libmodsecurity3 version 3.0.14
+2025/06/16 14:13:11 [notice] 1#1: ModSecurity-nginx v1.0.4 (rules loaded inline/local/remote: 0/10/0)
+2025/06/16 14:13:11 [notice] 1#1: libmodsecurity3 version 3.0.14
+2025/06/16 14:13:44 [notice] 1#1: ModSecurity-nginx v1.0.4 (rules loaded inline/local/remote: 0/10/0)
+2025/06/16 14:13:44 [notice] 1#1: libmodsecurity3 version 3.0.14
+2025/06/16 14:14:42 [notice] 1#1: ModSecurity-nginx v1.0.4 (rules loaded inline/local/remote: 0/10/0)
+2025/06/16 14:14:42 [notice] 1#1: libmodsecurity3 version 3.0.14
+2025/06/16 14:16:46 [notice] 1#1: ModSecurity-nginx v1.0.4 (rules loaded inline/local/remote: 0/10/0)
+2025/06/16 14:16:46 [notice] 1#1: libmodsecurity3 version 3.0.14
+2025/06/16 14:17:13 [notice] 1#1: ModSecurity-nginx v1.0.4 (rules loaded inline/local/remote: 0/10/0)
+2025/06/16 14:17:13 [notice] 1#1: libmodsecurity3 version 3.0.14
+2025/06/16 14:17:51 [notice] 1#1: ModSecurity-nginx v1.0.4 (rules loaded inline/local/remote: 0/10/0)
+2025/06/16 14:17:51 [notice] 1#1: libmodsecurity3 version 3.0.14
+2025/06/16 14:18:10 [notice] 1#1: ModSecurity-nginx v1.0.4 (rules loaded inline/local/remote: 0/10/0)
+2025/06/16 14:18:10 [notice] 1#1: libmodsecurity3 version 3.0.14
+2025/06/16 14:18:21 [notice] 1#1: ModSecurity-nginx v1.0.4 (rules loaded inline/local/remote: 0/10/0)
+2025/06/16 14:18:21 [notice] 1#1: libmodsecurity3 version 3.0.14
+2025/06/16 14:18:47 [notice] 1#1: ModSecurity-nginx v1.0.4 (rules loaded inline/local/remote: 0/10/0)
+2025/06/16 14:18:47 [notice] 1#1: libmodsecurity3 version 3.0.14
+2025/06/16 14:19:28 [notice] 1#1: ModSecurity-nginx v1.0.4 (rules loaded inline/local/remote: 0/10/0)
+2025/06/16 14:19:28 [notice] 1#1: libmodsecurity3 version 3.0.14
+2025/06/16 14:19:59 [notice] 1#1: ModSecurity-nginx v1.0.4 (rules loaded inline/local/remote: 0/10/0)
+2025/06/16 14:19:59 [notice] 1#1: libmodsecurity3 version 3.0.14
+2025/06/16 14:20:34 [notice] 1#1: ModSecurity-nginx v1.0.4 (rules loaded inline/local/remote: 0/10/0)
+2025/06/16 14:20:34 [notice] 1#1: libmodsecurity3 version 3.0.14
+2025/06/16 14:21:01 [notice] 1#1: ModSecurity-nginx v1.0.4 (rules loaded inline/local/remote: 0/10/0)
+2025/06/16 14:21:01 [notice] 1#1: libmodsecurity3 version 3.0.14
+2025/06/16 14:21:32 [notice] 1#1: ModSecurity-nginx v1.0.4 (rules loaded inline/local/remote: 0/10/0)
+2025/06/16 14:21:32 [notice] 1#1: libmodsecurity3 version 3.0.14

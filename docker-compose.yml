@@ -6,8 +6,8 @@ services:
       context: ./docker/nginx
       dockerfile: Dockerfile
     ports:
-      - '80:80'
-      - '443:443'
+      - '2225:2225'
+      - '2443:2443'
     volumes:
       - ./docker/nginx/nginx.conf.template:/etc/nginx/templates/nginx.conf.template:ro
       - ./docker/nginx/cors.conf.template:/etc/nginx/templates/includes/cors.conf.template:ro
@@ -16,7 +16,7 @@ services:
       - ./docker/nginx/modsecurity:/var/log/modsecurity
     environment:
       - NGINX_HOST=localhost
-      - NGINX_PORT=80
+      - NGINX_PORT=2225
       - FRONTEND_HOST=frontend
       - FRONTEND_PORT=5173
       - BACKEND_HOST=backend
@@ -122,7 +122,7 @@ services:
   node-exporter:
     image: prom/node-exporter:latest
     ports:
-      - "9100:9100"
+      - "9101:9101"
     volumes:
       - /proc:/host/proc:ro
       - /sys:/host/sys:ro

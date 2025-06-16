@@ -21,7 +21,7 @@ export class DatabaseService {
 
       const isNewDb = !fs.existsSync(this.dbPath);
 
-      // Ouvrir la DB sans chiffrement pour le moment
+      // TODO:add database encryption using apasshohrase stored in vault
       this.db = new sqlite3.Database(this.dbPath, sqlite3.OPEN_READWRITE | sqlite3.OPEN_CREATE, (err) => {
         if (err) {
           console.error('❌ Error opening database:', err.message);
