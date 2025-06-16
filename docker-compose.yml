@@ -45,6 +45,8 @@ services:
       - ./docker/vault/config.hcl:/vault/config/config.hcl:ro
     environment:
       - VAULT_ADDR=http://0.0.0.0:8200
+    env_file:
+      - .env
     cap_add:
       - IPC_LOCK
     networks:

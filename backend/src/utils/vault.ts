@@ -10,8 +10,36 @@ export async function getSecretFromVault(
   key: string,
   mountPoint = 'secret'
 ): Promise<string> {
+  const vaultUrl = process.env.VAULT_ADDR || 'http://vault:8200';
+
+  // Attente que Vault soit unsealed
+  while (true) {
+    try {
+      const healthResp = await fetch(`${vaultUrl}/v1/sys/health`, {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' }
+      });
+
+      if (!healthResp.ok) {
+        console.log(`Waiting for Vault... status: ${healthResp.status}`);
+      } else {
+        const healthData = await healthResp.json();
+        if (healthData.sealed === false) {
+          console.log('Vault is unsealed and ready.');
+          break;
+        } else {
+          console.log('Vault is sealed, waiting...');
+        }
+      }
+    } catch (error) {
+      console.log('Error checking Vault health, retrying...', error);
+    }
+
+    await new Promise((res) => setTimeout(res, 1000));
+  }
+
+  // Continue la récupération du secret
   try {
-    const vaultUrl = process.env.VAULT_ADDR || 'http://vault:8200';
     const token = process.env.VAULT_TOKEN;
     
     if (!token) {
@@ -32,7 +60,6 @@ export async function getSecretFromVault(
     }
 
     const data = await response.json() as VaultResponse;
-    console.log('Vault response:', JSON.stringify(data, null, 2));
 
     if (!data?.data?.data || !(key in data.data.data)) {
       throw new Error(`Key "${key}" not found at path "${secretPath}"`);

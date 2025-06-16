@@ -2,7 +2,6 @@ import { readFileSync } from 'fs';
 import fs from 'fs';
 import path from 'path';
 import sqlite3 from 'sqlite3';
-import { getSecretFromVault } from './utils/vault';
 
 export class DatabaseService {
   private db: sqlite3.Database | null = null;

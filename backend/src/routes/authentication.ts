@@ -3,6 +3,8 @@ import Fastify from 'fastify';
 import { FastifyInstance } from 'fastify';
 import jwt from '@fastify/jwt';
 import bcrypt from 'bcrypt';
+import fastify from '../index';
+
 
 // Interfaces pour le typage TypeScript
 interface LoginBody {
@@ -151,8 +153,7 @@ async function authRoutes(app: FastifyInstance) {
             }
 
             const token = fastify.jwt.sign({ user: 'demo' });
-            reply.header('x-access-token', token);
-            resolve(reply.status(200).send({ 
+            resolve(reply.status(200).header('x-access-token', token).send({ 
               message: "Login successful", 
               user: { 
                 id: user.id, 

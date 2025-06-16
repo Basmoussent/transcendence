@@ -46,10 +46,13 @@ document.addEventListener('DOMContentLoaded', () => {
 		if (!response.ok) {
 			alert(`❌ Error: ${result.error || 'Invalid credentials'}`);
 		}
-		// Stocker le token JWT qui corresponderas au token user
-		// console.log('Token reçu:', result.token);
-		// localStorage.setItem('jwtToken', result.token);
-		// Puis rediriger vers une page sécuriséema
+		console.log('headers', response);
+		const token = response.headers.get('x-access-token');
+		if (!token) {
+			alert('❌ Token non reçu');
+		return;
+		}
+		localStorage.setItem('x-access-token', token);
 		window.location.href = '/main';
 	} catch (err) {
 		console.error('Network or server error', err);

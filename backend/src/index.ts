@@ -17,8 +17,8 @@ async function setup() {
 
   // Register CORS
 await fastify.register(cors, {
-  origin: ['http://localhost:3000'],
-  credentials: true,
+  origin: '*',
+  exposedHeaders: ['x-access-token'],
 });
 
   // on enregistre les routes definis, qui seront chacune sur /auth/nom_de_la_route
@@ -28,10 +28,11 @@ await fastify.register(cors, {
   await fastify.register(websocket);
 
   // Register JWT
-  const jwtSecret =  getSecretFromVault("JWT", "JWT_KEY") || process.env.JWT_SECRET;
-  await fastify.register(jwt, {
-    secret: jwtSecret,
-  });
+  const jwtSecret =  await getSecretFromVault("JWT", "JWT_KEY") || "secret";
+  console.log("JWT = ",  jwtSecret);
+  await fastify.register(require('@fastify/jwt'), {
+  secret: jwtSecret
+  })
   
   fastify.get('/', async () => {
     return { message: 'API is up', database: 'connected' };
@@ -67,3 +68,5 @@ process.on('SIGINT', () => {
 });
 
 setup().catch(console.error);
+
+export default fastify;
