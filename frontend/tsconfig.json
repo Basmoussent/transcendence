@@ -23,5 +23,5 @@
       "@/*": ["src/*"]
     }
   },
-  "include": ["src"]
+  "include": ["src", "../backend/src/routes/reset-pwd.ts"]
 }

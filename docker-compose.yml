@@ -6,8 +6,8 @@ services:
       context: ./docker/nginx
       dockerfile: Dockerfile
     ports:
-      - '2225:2225'
-      - '2443:2443'
+      - '80:80'
+      - '443:443'
     volumes:
       - ./docker/nginx/nginx.conf.template:/etc/nginx/templates/nginx.conf.template:ro
       - ./docker/nginx/cors.conf.template:/etc/nginx/templates/includes/cors.conf.template:ro
@@ -16,7 +16,7 @@ services:
       - ./docker/nginx/modsecurity:/var/log/modsecurity
     environment:
       - NGINX_HOST=localhost
-      - NGINX_PORT=2225
+      - NGINX_PORT=80
       - FRONTEND_HOST=frontend
       - FRONTEND_PORT=5173
       - BACKEND_HOST=backend

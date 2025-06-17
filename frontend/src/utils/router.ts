@@ -9,17 +9,28 @@ import { renderProfil } from '../pages/social/profil';
 import { renderMultiplayer } from '../pages/game/multiplayer';
 import { renderLocal } from '../pages/game/local';
 import { renderBlock } from '../pages/block/main';
+import { renderChangePassword } from '../pages/auth/change-password';
+import { renderEditProfil } from '../pages/social/edit-profil';
 
 export function router() {
   const path = window.location.pathname;
   const app = document.getElementById('app');
   if (!app) return;
 
-  // const hostname = window.location.hostname;
-  // const subdomain = hostname.split('.')[0];
+  const publicRoutes = ['/', '/login', '/create-account', '/forgot-password'];
+  const token = localStorage.getItem('x-access-token');
 
-  // const supportedLanguages = ['en', 'fr', 'es'];
-  // const language = supportedLanguages.includes(subdomain) ? subdomain : 'en';
+  if (!publicRoutes.includes(path) && !token) {
+    window.history.pushState({}, '', '/login');
+    app.innerHTML = renderLogin();
+    return;
+  }
+
+  if (path === '/login' && token) {
+    window.history.pushState({}, '', '/main');
+    app.innerHTML = renderMain();
+    return;
+  }
 
   let view = '';
 
@@ -27,12 +38,9 @@ export function router() {
     case '/':
       view = renderHome();
       break;
-    // case '/about':
-    //   view = renderAbout();
-    //   break;
     case '/login':
-       view = renderLogin();
-       break;
+      view = renderLogin();
+      break;
     case '/create-account':
       view = renderCreateAccount();
       break;
@@ -56,6 +64,12 @@ export function router() {
       break;
     case '/block':
       view = renderBlock();
+      break;
+    case '/change-password':
+      view = renderChangePassword();
+      break;
+    case '/edit-profil':
+      view = renderEditProfil();
       break;
     default:
       view = render404();

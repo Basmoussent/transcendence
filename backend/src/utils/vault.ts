@@ -11,32 +11,33 @@ export async function getSecretFromVault(
   mountPoint = 'secret'
 ): Promise<string> {
   const vaultUrl = process.env.VAULT_ADDR || 'http://vault:8200';
+  const VAULT_TOKEN = process.env.VAULT_TOKEN;
 
   // Attente que Vault soit unsealed
   while (true) {
-    try {
-      const healthResp = await fetch(`${vaultUrl}/v1/sys/health`, {
+  try {
+      const healthResp = await fetch(`${vaultUrl}/v1/secret/data/JWT`, {
         method: 'GET',
-        headers: { 'Content-Type': 'application/json' }
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Vault-Token': VAULT_TOKEN
+        }
       });
 
       if (!healthResp.ok) {
         console.log(`Waiting for Vault... status: ${healthResp.status}`);
       } else {
-        const healthData = await healthResp.json();
-        if (healthData.sealed === false) {
-          console.log('Vault is unsealed and ready.');
-          break;
-        } else {
-          console.log('Vault is sealed, waiting...');
-        }
+        const data = await healthResp.json();
+        console.log('✅ Vault responded with JWT data:', data);
+        break;
       }
     } catch (error) {
-      console.log('Error checking Vault health, retrying...', error);
+      console.log('❌ Error checking Vault health, retrying...', error);
     }
 
     await new Promise((res) => setTimeout(res, 1000));
   }
+
 
   // Continue la récupération du secret
   try {

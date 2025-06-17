@@ -383,3 +383,28 @@ export function renderProfil() {
     </style>
   `;
 }
+
+document.addEventListener('DOMContentLoaded', () => {
+  const logoutButton = document.querySelector('.action-button.logout');
+  const editProfileButton = document.querySelector('.action-button.edit-profile');
+  const changePasswordButton = document.querySelector('.action-button.change-password');
+
+  if (logoutButton) {
+    logoutButton.addEventListener('click', () => {
+      localStorage.removeItem('x-access-token');
+      window.location.href = '/login';
+    });
+  }
+  if (editProfileButton) {
+    editProfileButton.addEventListener('click', () => {
+      window.history.pushState({}, '', '/edit-profil');
+      window.dispatchEvent(new PopStateEvent('popstate'));
+    });
+  }
+  if (changePasswordButton) {
+    changePasswordButton.addEventListener('click', () => {
+      window.history.pushState({}, '', '/change-password');
+      window.dispatchEvent(new PopStateEvent('popstate'));
+    });
+  }
+});

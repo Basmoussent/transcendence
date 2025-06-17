@@ -368,3 +368,53 @@
 2025/06/16 17:15:11 [notice] 1#1: libmodsecurity3 version 3.0.14
 2025/06/16 17:17:45 [notice] 1#1: ModSecurity-nginx v1.0.4 (rules loaded inline/local/remote: 0/11/0)
 2025/06/16 17:17:45 [notice] 1#1: libmodsecurity3 version 3.0.14
+2025/06/17 11:37:15 [notice] 1#1: ModSecurity-nginx v1.0.4 (rules loaded inline/local/remote: 0/11/0)
+2025/06/17 11:37:15 [notice] 1#1: libmodsecurity3 version 3.0.14
+2025/06/17 11:38:51 [notice] 1#1: ModSecurity-nginx v1.0.4 (rules loaded inline/local/remote: 0/11/0)
+2025/06/17 11:38:51 [notice] 1#1: libmodsecurity3 version 3.0.14
+2025/06/17 11:39:40 [notice] 1#1: ModSecurity-nginx v1.0.4 (rules loaded inline/local/remote: 0/11/0)
+2025/06/17 11:39:40 [notice] 1#1: libmodsecurity3 version 3.0.14
+2025/06/17 11:42:36 [notice] 1#1: ModSecurity-nginx v1.0.4 (rules loaded inline/local/remote: 0/11/0)
+2025/06/17 11:42:36 [notice] 1#1: libmodsecurity3 version 3.0.14
+2025/06/17 11:42:50 [error] 4856#4856: *4 [client 172.19.0.1] ModSecurity: Access denied with code 403 (phase 2). Matched "Operator `Rx' with parameter `\b(select|union|insert|update|delete|drop|--|;)\b' against variable `REQUEST_HEADERS:Accept' (Value: `text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8' ) [file "/etc/nginx/modsecurity.conf"] [line "62"] [id "1001"] [rev ""] [msg "Potential SQL Injection detected"] [data ""] [severity "0"] [ver ""] [maturity "0"] [accuracy "0"] [hostname "localhost"] [uri "/"] [unique_id "175016057067.301095"] [ref "o8,1o8,1v211,14o47,1o47,1v130,63"], client: 172.19.0.1, server: fr.localhost, request: "GET / HTTP/1.1", host: "localhost"
+2025/06/17 11:42:50 [error] 4856#4856: *4 [client 172.19.0.1] ModSecurity: Access denied with code 403 (phase 2). Matched "Operator `Rx' with parameter `\b(select|union|insert|update|delete|drop|--|;)\b' against variable `REQUEST_HEADERS:Accept-Language' (Value: `en-US,en;q=0.5' ) [file "/etc/nginx/modsecurity.conf"] [line "62"] [id "1001"] [rev ""] [msg "Potential SQL Injection detected"] [data ""] [severity "0"] [ver ""] [maturity "0"] [accuracy "0"] [hostname "localhost"] [uri "/favicon.ico"] [unique_id "175016057090.266948"] [ref "o8,1o8,1v228,14"], client: 172.19.0.1, server: fr.localhost, request: "GET /favicon.ico HTTP/1.1", host: "localhost", referrer: "https://localhost/"
+2025/06/17 11:43:09 [error] 4856#4856: *4 [client 172.19.0.1] ModSecurity: Access denied with code 403 (phase 2). Matched "Operator `Rx' with parameter `\b(select|union|insert|update|delete|drop|--|;)\b' against variable `REQUEST_HEADERS:Accept' (Value: `text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8' ) [file "/etc/nginx/modsecurity.conf"] [line "62"] [id "1001"] [rev ""] [msg "Potential SQL Injection detected"] [data ""] [severity "0"] [ver ""] [maturity "0"] [accuracy "0"] [hostname "localhost"] [uri "/"] [unique_id "175016058979.958135"] [ref "o8,1o8,1v211,14o47,1o47,1v130,63"], client: 172.19.0.1, server: fr.localhost, request: "GET / HTTP/1.1", host: "localhost"
+2025/06/17 11:43:10 [error] 4856#4856: *4 [client 172.19.0.1] ModSecurity: Access denied with code 403 (phase 2). Matched "Operator `Rx' with parameter `\b(select|union|insert|update|delete|drop|--|;)\b' against variable `REQUEST_HEADERS:Accept' (Value: `text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8' ) [file "/etc/nginx/modsecurity.conf"] [line "62"] [id "1001"] [rev ""] [msg "Potential SQL Injection detected"] [data ""] [severity "0"] [ver ""] [maturity "0"] [accuracy "0"] [hostname "localhost"] [uri "/"] [unique_id "175016059026.419813"] [ref "o8,1o8,1v211,14o47,1o47,1v130,63"], client: 172.19.0.1, server: fr.localhost, request: "GET / HTTP/1.1", host: "localhost"
+2025/06/17 11:43:33 [notice] 1#1: ModSecurity-nginx v1.0.4 (rules loaded inline/local/remote: 0/10/0)
+2025/06/17 11:43:33 [notice] 1#1: libmodsecurity3 version 3.0.14
+2025/06/17 12:44:27 [notice] 1#1: ModSecurity-nginx v1.0.4 (rules loaded inline/local/remote: 0/10/0)
+2025/06/17 12:44:27 [notice] 1#1: libmodsecurity3 version 3.0.14
+2025/06/17 12:46:13 [notice] 1#1: ModSecurity-nginx v1.0.4 (rules loaded inline/local/remote: 0/10/0)
+2025/06/17 12:46:13 [notice] 1#1: libmodsecurity3 version 3.0.14
+2025/06/17 12:49:11 [notice] 1#1: ModSecurity-nginx v1.0.4 (rules loaded inline/local/remote: 0/10/0)
+2025/06/17 12:49:11 [notice] 1#1: libmodsecurity3 version 3.0.14
+2025/06/17 12:50:52 [notice] 1#1: ModSecurity-nginx v1.0.4 (rules loaded inline/local/remote: 0/10/0)
+2025/06/17 12:50:52 [notice] 1#1: libmodsecurity3 version 3.0.14
+2025/06/17 12:52:09 [notice] 1#1: ModSecurity-nginx v1.0.4 (rules loaded inline/local/remote: 0/10/0)
+2025/06/17 12:52:09 [notice] 1#1: libmodsecurity3 version 3.0.14
+2025/06/17 12:53:13 [notice] 1#1: ModSecurity-nginx v1.0.4 (rules loaded inline/local/remote: 0/10/0)
+2025/06/17 12:53:13 [notice] 1#1: libmodsecurity3 version 3.0.14
+2025/06/17 12:54:57 [notice] 1#1: ModSecurity-nginx v1.0.4 (rules loaded inline/local/remote: 0/10/0)
+2025/06/17 12:54:57 [notice] 1#1: libmodsecurity3 version 3.0.14
+2025/06/17 12:55:59 [notice] 1#1: ModSecurity-nginx v1.0.4 (rules loaded inline/local/remote: 0/10/0)
+2025/06/17 12:55:59 [notice] 1#1: libmodsecurity3 version 3.0.14
+2025/06/17 12:57:19 [notice] 1#1: ModSecurity-nginx v1.0.4 (rules loaded inline/local/remote: 0/10/0)
+2025/06/17 12:57:19 [notice] 1#1: libmodsecurity3 version 3.0.14
+2025/06/17 12:58:40 [notice] 1#1: ModSecurity-nginx v1.0.4 (rules loaded inline/local/remote: 0/10/0)
+2025/06/17 12:58:40 [notice] 1#1: libmodsecurity3 version 3.0.14
+2025/06/17 13:01:31 [notice] 1#1: ModSecurity-nginx v1.0.4 (rules loaded inline/local/remote: 0/10/0)
+2025/06/17 13:01:31 [notice] 1#1: libmodsecurity3 version 3.0.14
+2025/06/17 13:02:14 [notice] 1#1: ModSecurity-nginx v1.0.4 (rules loaded inline/local/remote: 0/10/0)
+2025/06/17 13:02:14 [notice] 1#1: libmodsecurity3 version 3.0.14
+2025/06/17 13:05:36 [notice] 1#1: ModSecurity-nginx v1.0.4 (rules loaded inline/local/remote: 0/10/0)
+2025/06/17 13:05:36 [notice] 1#1: libmodsecurity3 version 3.0.14
+2025/06/17 13:06:14 [notice] 1#1: ModSecurity-nginx v1.0.4 (rules loaded inline/local/remote: 0/10/0)
+2025/06/17 13:06:14 [notice] 1#1: libmodsecurity3 version 3.0.14
+2025/06/17 13:09:59 [notice] 1#1: ModSecurity-nginx v1.0.4 (rules loaded inline/local/remote: 0/10/0)
+2025/06/17 13:09:59 [notice] 1#1: libmodsecurity3 version 3.0.14
+2025/06/17 14:23:41 [notice] 1#1: ModSecurity-nginx v1.0.4 (rules loaded inline/local/remote: 0/10/0)
+2025/06/17 14:23:41 [notice] 1#1: libmodsecurity3 version 3.0.14
+2025/06/17 14:23:46 [warn] 4855#4855: *2 an upstream response is buffered to a temporary file /var/cache/nginx/proxy_temp/1/00/0000000001 while reading upstream, client: 172.19.0.1, server: fr.localhost, request: "GET /@vite/client HTTP/1.1", upstream: "http://172.19.0.7:5173/@vite/client", host: "localhost", referrer: "https://localhost/profil"
+2025/06/17 14:36:42 [notice] 1#1: ModSecurity-nginx v1.0.4 (rules loaded inline/local/remote: 0/10/0)
+2025/06/17 14:36:42 [notice] 1#1: libmodsecurity3 version 3.0.14
+2025/06/17 14:36:46 [warn] 4855#4855: *2 an upstream response is buffered to a temporary file /var/cache/nginx/proxy_temp/1/00/0000000001 while reading upstream, client: 172.19.0.1, server: fr.localhost, request: "GET /@vite/client HTTP/1.1", upstream: "http://172.19.0.7:5173/@vite/client", host: "localhost", referrer: "https://localhost/change-password"

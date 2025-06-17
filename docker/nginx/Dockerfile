@@ -6,5 +6,5 @@ COPY nginx.conf.template /etc/nginx/nginx.conf
 COPY modsecurity.conf /etc/nginx/modsecurity.conf
 RUN chmod +x /entrypoint.sh
 
-EXPOSE 2225 2443
+EXPOSE 80 243
 ENTRYPOINT ["/entrypoint.sh"]

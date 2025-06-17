@@ -30,6 +30,14 @@ export const translations = {
         email: "Email",
         submit: "Envoyer le lien",
         backToLogin: "Retour à la connexion"
+      },
+      changePassword: {
+        title: "Changer le mot de passe",
+        currentPassword: "Mot de passe actuel",
+        newPassword: "Nouveau mot de passe",
+        confirmNewPassword: "Confirmer le nouveau mot de passe",
+        submit: "Modifier le mot de passe",
+        backToProfile: "Retour au profil"
       }
     },
     menu: {
@@ -53,7 +61,15 @@ export const translations = {
       wonAgainst: "Victoire contre",
       addedFriend: "Ajouté un ami",
       hoursAgo: "heures",
-      daysAgo: "jours"
+      daysAgo: "jours",
+      edit: {
+        title: "Modifier le profil",
+        username: "Nom d'utilisateur",
+        email: "Email",
+        avatar: "Avatar",
+        submit: "Enregistrer",
+        backToProfile: "Annuler"
+      }
     },
     social: {
       title: "Social",
@@ -109,6 +125,14 @@ export const translations = {
         email: "Email",
         submit: "Send link",
         backToLogin: "Back to login"
+      },
+      changePassword: {
+        title: "Change Password",
+        currentPassword: "Current Password",
+        newPassword: "New Password",
+        confirmNewPassword: "Confirm New Password",
+        submit: "Change Password",
+        backToProfile: "Back to Profile"
       }
     },
     menu: {
@@ -132,7 +156,15 @@ export const translations = {
       wonAgainst: "Won against",
       addedFriend: "Added friend",
       hoursAgo: "hours ago",
-      daysAgo: "days ago"
+      daysAgo: "days ago",
+      edit: {
+        title: "Edit Profile",
+        username: "Username",
+        email: "Email",
+        avatar: "Avatar",
+        submit: "Save",
+        backToProfile: "Cancel"
+      }
     },
     social: {
       title: "Social",
@@ -188,6 +220,14 @@ export const translations = {
         email: "Correo electrónico",
         submit: "Enviar enlace",
         backToLogin: "Volver al inicio de sesión"
+      },
+      changePassword: {
+        title: "Cambiar contraseña",
+        currentPassword: "Contraseña actual",
+        newPassword: "Nueva contraseña",
+        confirmNewPassword: "Confirmar nueva contraseña",
+        submit: "Cambiar contraseña",
+        backToProfile: "Volver al perfil"
       }
     },
     menu: {
@@ -211,7 +251,15 @@ export const translations = {
       wonAgainst: "Victoria contra",
       addedFriend: "Añadido amigo",
       hoursAgo: "horas",
-      daysAgo: "días"
+      daysAgo: "días",
+      edit: {
+        title: "Editar perfil",
+        username: "Nombre de usuario",
+        email: "Correo electrónico",
+        avatar: "Avatar",
+        submit: "Guardar",
+        backToProfile: "Cancelar"
+      }
     },
     social: {
       title: "Social",
@@ -262,6 +310,12 @@ type TranslationKeys =
   | 'auth.forgotPassword.email'
   | 'auth.forgotPassword.submit'
   | 'auth.forgotPassword.backToLogin'
+  | 'auth.changePassword.title'
+  | 'auth.changePassword.currentPassword'
+  | 'auth.changePassword.newPassword'
+  | 'auth.changePassword.confirmNewPassword'
+  | 'auth.changePassword.submit'
+  | 'auth.changePassword.backToProfile'
   | 'menu.title'
   | 'menu.profile'
   | 'menu.playLocal'
@@ -279,6 +333,12 @@ type TranslationKeys =
   | 'profile.addedFriend'
   | 'profile.hoursAgo'
   | 'profile.daysAgo'
+  | 'profile.edit.title'
+  | 'profile.edit.username'
+  | 'profile.edit.email'
+  | 'profile.edit.avatar'
+  | 'profile.edit.submit'
+  | 'profile.edit.backToProfile'
   | 'social.title'
   | 'social.searchPlaceholder'
   | 'social.friends.title'

@@ -5,6 +5,7 @@ import jwt from '@fastify/jwt';
 import websocket from '@fastify/websocket';
 import { db } from './database';
 import authRoutes from "./routes/authentication"
+import editRoutes from './routes/reset-pwd';
 import { getSecretFromVault } from './utils/vault';
 
 
@@ -21,8 +22,9 @@ await fastify.register(cors, {
   exposedHeaders: ['x-access-token'],
 });
 
-  // on enregistre les routes definis, qui seront chacune sur /auth/nom_de_la_route
+  // on enregistre les routes definis, qui seront chacune sur /prefix/nom_de_la_route
   await fastify.register(authRoutes, {prefix: "/auth"});
+  await fastify.register(editRoutes, {prefix: "/edit"});
   
   // Register WebSocket
   await fastify.register(websocket);

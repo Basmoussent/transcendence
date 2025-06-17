@@ -152,7 +152,7 @@ async function authRoutes(app: FastifyInstance) {
               return;
             }
 
-            const token = fastify.jwt.sign({ user: 'demo' });
+            const token = fastify.jwt.sign({ user: username });
             resolve(reply.status(200).header('x-access-token', token).send({ 
               message: "Login successful", 
               user: { 
