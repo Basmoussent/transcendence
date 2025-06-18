@@ -1,3 +1,5 @@
+import { getAuthToken, removeAuthToken } from '../../utils/auth';
+
 export async function renderProfil() {
   let userData = {
     username: 'Username',
@@ -10,7 +12,7 @@ export async function renderProfil() {
   };
 
   try {
-    const token = localStorage.getItem('x-access-token');
+    const token = getAuthToken();
     if (!token) {
       alert('❌ Token d\'authentification manquant');
       window.location.href = '/login';
@@ -556,7 +558,7 @@ export async function renderProfil() {
 
     if (logoutButton) {
       logoutButton.addEventListener('click', () => {
-        localStorage.removeItem('x-access-token');
+        removeAuthToken();
         window.location.href = '/login';
       });
     }
@@ -585,7 +587,7 @@ export async function renderProfil() {
 
     if (saveLanguageBtn) {
       saveLanguageBtn.addEventListener('click', async () => {
-        const token = localStorage.getItem('x-access-token');
+        const token = getAuthToken();
         if (!token) return;
 
         const selectedLanguage = (document.querySelector('.language-option.active') as HTMLButtonElement)?.dataset.lang;

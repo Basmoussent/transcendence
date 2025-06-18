@@ -15,14 +15,21 @@ interface UserData {
 
 async function userRoutes(app: FastifyInstance) {
     app.get('/me', async (request: FastifyRequest, reply: FastifyReply) => {
-        const token = request.headers['x-access-token'] as string;
+        // Récupérer le token depuis les headers ou les cookies
+        let token = request.headers['x-access-token'] as string;
+        
+        // TODO: Décommenter quand @fastify/cookie sera installé
+        // if (!token) {
+        //   token = request.cookies['x-access-token'];
+        // }
+        
         if (!token) {
             return reply.status(401).send({ error: 'Token d\'authentification manquant' });
         }
 
         try {
             const decoded = fastify.jwt.verify(token) as { user: string };
-            const username = decoded.user;
+            const email = decoded.user;
 
             const database = db.getDatabase();
             if (!database) {
@@ -32,8 +39,8 @@ async function userRoutes(app: FastifyInstance) {
             // Récupération des données utilisateur
             const user = await new Promise<UserData | null>((resolve, reject) => {
                 database.get(
-                    'SELECT id, username, email, avatar_url, language FROM users WHERE username = ?',
-                    [username],
+                    'SELECT id, username, email, avatar_url, language FROM users WHERE email = ?',
+                    [email],
                     (err: any, row: UserData | undefined) => {
                         if (err) {
                             reject(err);

@@ -1,4 +1,5 @@
 import { t } from '../../utils/translations';
+import { setAuthToken, debugCookies } from '../../utils/auth';
 
 export function renderLogin(): string {
 	return `
@@ -45,14 +46,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
 		if (!response.ok) {
 			alert(`❌ Error: ${result.error || 'Invalid credentials'}`);
+			return;
 		}
-		console.log('headers', response);
+
+		// Le token est maintenant dans un cookie, mais on peut aussi le récupérer du header pour la compatibilité
 		const token = response.headers.get('x-access-token');
-		if (!token) {
-			alert('❌ Token non reçu');
-		return;
+		if (token) {
+			setAuthToken(token);
 		}
-		localStorage.setItem('x-access-token', token);
+		
+		// Debug: vérifier les cookies après login
+		console.log('🔍 Debug après login:');
+		debugCookies();
+		
 		window.location.href = '/main';
 	} catch (err) {
 		console.error('Network or server error', err);

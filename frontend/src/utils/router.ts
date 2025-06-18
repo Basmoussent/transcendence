@@ -11,6 +11,7 @@ import { renderLocal } from '../pages/game/local';
 import { renderBlock } from '../pages/block/main';
 import { renderChangePassword } from '../pages/auth/change-password';
 import { renderEditProfil } from '../pages/social/edit-profil';
+import { getAuthToken, isAuthenticated } from './auth';
 
 export async function router() {
   const path = window.location.pathname;
@@ -18,7 +19,7 @@ export async function router() {
   if (!app) return;
 
   const publicRoutes = ['/', '/login', '/create-account', '/forgot-password'];
-  const token = localStorage.getItem('x-access-token');
+  const token = getAuthToken();
 
   if (!publicRoutes.includes(path) && !token) {
     window.history.pushState({}, '', '/login');

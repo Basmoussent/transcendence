@@ -20,6 +20,7 @@
     "fastify": "^4.0.0",
     "hashi-vault-js": "^0.5.0",
     "sqlite": "^5.1.1",
+    "@fastify/cookie": "11.0.2",
     "sqlite3": "^5.1.7"
   },
   "devDependencies": {

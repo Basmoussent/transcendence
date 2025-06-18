@@ -152,8 +152,39 @@ async function authRoutes(app: FastifyInstance) {
               return;
             }
 
-            const token = fastify.jwt.sign({ user: username });
-            resolve(reply.status(200).header('x-access-token', token).send({ 
+            const token = fastify.jwt.sign({ user: user.email });
+            
+            // Déterminer le domaine du cookie selon l'environnement
+            const origin = request.headers.origin || '';
+            let cookieDomain;
+            
+            if (origin.includes('entropy.local')) {
+              cookieDomain = '.entropy.local'; // Avec le point pour partager entre sous-domaines
+            } else if (origin.includes('localhost')) {
+              // Pour localhost, on ne spécifie pas de domaine pour que le cookie soit valide sur tous les sous-domaines
+              cookieDomain = undefined;
+            }
+            
+            // Envoyer le token dans le header ET dans un cookie
+            const response = reply
+              .status(200)
+              .header('x-access-token', token);
+            
+            // Configurer le cookie selon l'environnement
+            if (cookieDomain) {
+              response.header(
+                'Set-Cookie',
+                `x-access-token=${token}; Path=/; Domain=${cookieDomain}; SameSite=Lax; Max-Age=${7 * 24 * 60 * 60}`
+              );
+            } else {
+              // Pour localhost, pas de domaine spécifié
+              response.header(
+                'Set-Cookie',
+                `x-access-token=${token}; Path=/; SameSite=Lax; Max-Age=${7 * 24 * 60 * 60}`
+              );
+            }
+            
+            resolve(response.send({ 
               message: "Login successful", 
               user: { 
                 id: user.id, 

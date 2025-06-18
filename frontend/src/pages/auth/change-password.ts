@@ -1,4 +1,5 @@
 import { t } from '../../utils/translations';
+import { getAuthToken } from '../../utils/auth';
 
 export function renderChangePassword(): string {
 	return `
@@ -39,7 +40,7 @@ document.addEventListener('DOMContentLoaded', () => {
 			return;
 		}
 		try {
-			const token = localStorage.getItem('x-access-token');
+			const token = getAuthToken();
 			if (!token) {
 				alert('❌ Token d\'authentification manquant');
 				window.location.href = '/login';
