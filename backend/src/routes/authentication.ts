@@ -104,7 +104,7 @@ async function authRoutes(app: FastifyInstance) {
 
     // Récupération de la connexion à la base de données
     const database = db.getDatabase();
-    
+
     // Vérification que la base de données est initialisée
     if (!database) {
       console.error('❌ Database not initialized');
