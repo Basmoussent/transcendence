@@ -25,7 +25,6 @@ html, body {
     height: 100vh;
     top: 0;
     left: 0;
-    /* background: #3E1E68; */
     background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
     overflow: auto;
 }

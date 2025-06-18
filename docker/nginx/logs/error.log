@@ -418,3 +418,27 @@
 2025/06/17 14:36:42 [notice] 1#1: ModSecurity-nginx v1.0.4 (rules loaded inline/local/remote: 0/10/0)
 2025/06/17 14:36:42 [notice] 1#1: libmodsecurity3 version 3.0.14
 2025/06/17 14:36:46 [warn] 4855#4855: *2 an upstream response is buffered to a temporary file /var/cache/nginx/proxy_temp/1/00/0000000001 while reading upstream, client: 172.19.0.1, server: fr.localhost, request: "GET /@vite/client HTTP/1.1", upstream: "http://172.19.0.7:5173/@vite/client", host: "localhost", referrer: "https://localhost/change-password"
+2025/06/18 10:36:31 [notice] 1#1: ModSecurity-nginx v1.0.4 (rules loaded inline/local/remote: 0/10/0)
+2025/06/18 10:36:31 [notice] 1#1: libmodsecurity3 version 3.0.14
+2025/06/18 10:36:36 [warn] 4855#4855: *2 an upstream response is buffered to a temporary file /var/cache/nginx/proxy_temp/1/00/0000000001 while reading upstream, client: 172.19.0.1, server: fr.localhost, request: "GET /@vite/client HTTP/1.1", upstream: "http://172.19.0.7:5173/@vite/client", host: "localhost", referrer: "https://localhost/profil"
+2025/06/18 10:39:20 [notice] 1#1: ModSecurity-nginx v1.0.4 (rules loaded inline/local/remote: 0/10/0)
+2025/06/18 10:39:20 [notice] 1#1: libmodsecurity3 version 3.0.14
+2025/06/18 10:42:45 [notice] 1#1: ModSecurity-nginx v1.0.4 (rules loaded inline/local/remote: 0/10/0)
+2025/06/18 10:42:45 [notice] 1#1: libmodsecurity3 version 3.0.14
+2025/06/18 10:49:21 [notice] 1#1: ModSecurity-nginx v1.0.4 (rules loaded inline/local/remote: 0/10/0)
+2025/06/18 10:49:21 [notice] 1#1: libmodsecurity3 version 3.0.14
+2025/06/18 11:23:39 [notice] 1#1: ModSecurity-nginx v1.0.4 (rules loaded inline/local/remote: 0/10/0)
+2025/06/18 11:23:39 [notice] 1#1: libmodsecurity3 version 3.0.14
+2025/06/18 11:23:43 [warn] 4856#4856: *2 an upstream response is buffered to a temporary file /var/cache/nginx/proxy_temp/1/00/0000000001 while reading upstream, client: 172.19.0.1, server: fr.localhost, request: "GET /@vite/client HTTP/1.1", upstream: "http://172.19.0.7:5173/@vite/client", host: "fr.localhost", referrer: "https://fr.localhost/profil"
+2025/06/18 11:26:12 [notice] 1#1: ModSecurity-nginx v1.0.4 (rules loaded inline/local/remote: 0/10/0)
+2025/06/18 11:26:12 [notice] 1#1: libmodsecurity3 version 3.0.14
+2025/06/18 11:30:00 [notice] 1#1: ModSecurity-nginx v1.0.4 (rules loaded inline/local/remote: 0/10/0)
+2025/06/18 11:30:00 [notice] 1#1: libmodsecurity3 version 3.0.14
+2025/06/18 11:31:09 [notice] 1#1: ModSecurity-nginx v1.0.4 (rules loaded inline/local/remote: 0/10/0)
+2025/06/18 11:31:09 [notice] 1#1: libmodsecurity3 version 3.0.14
+2025/06/18 11:35:33 [notice] 1#1: ModSecurity-nginx v1.0.4 (rules loaded inline/local/remote: 0/10/0)
+2025/06/18 11:35:33 [notice] 1#1: libmodsecurity3 version 3.0.14
+2025/06/18 12:05:55 [notice] 1#1: ModSecurity-nginx v1.0.4 (rules loaded inline/local/remote: 0/10/0)
+2025/06/18 12:05:55 [notice] 1#1: libmodsecurity3 version 3.0.14
+2025/06/18 12:18:23 [notice] 1#1: ModSecurity-nginx v1.0.4 (rules loaded inline/local/remote: 0/10/0)
+2025/06/18 12:18:23 [notice] 1#1: libmodsecurity3 version 3.0.14

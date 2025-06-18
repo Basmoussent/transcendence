@@ -12,7 +12,7 @@ import { renderBlock } from '../pages/block/main';
 import { renderChangePassword } from '../pages/auth/change-password';
 import { renderEditProfil } from '../pages/social/edit-profil';
 
-export function router() {
+export async function router() {
   const path = window.location.pathname;
   const app = document.getElementById('app');
   if (!app) return;
@@ -25,7 +25,7 @@ export function router() {
     app.innerHTML = renderLogin();
     return;
   }
-
+  // TODO: verify token validity
   if (path === '/login' && token) {
     window.history.pushState({}, '', '/main');
     app.innerHTML = renderMain();
@@ -54,7 +54,7 @@ export function router() {
       view = renderSocial();
       break;
     case '/profil':
-      view = renderProfil();
+      view = await renderProfil();
       break;
     case '/multiplayer':
       view = renderMultiplayer();
