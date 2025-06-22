@@ -10,7 +10,7 @@ RUN apk add --no-cache \
 
 WORKDIR /app
 
-RUN npm i @fastify/cookie
+RUN npm i @fastify/cookie@10.0.1
 
 COPY package*.json ./
 

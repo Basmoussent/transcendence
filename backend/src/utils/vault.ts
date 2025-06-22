@@ -26,6 +26,7 @@ export async function getSecretFromVault(
 
       if (!healthResp.ok) {
         console.log(`Waiting for Vault... status: ${healthResp.status}`);
+        console.log('response body:', await healthResp.text());
       } else {
         const data = await healthResp.json();
         console.log('✅ Vault responded with JWT data:', data);

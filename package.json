@@ -1,6 +1,7 @@
 {
   "dependencies": {
     "@fastify/cookie": "^11.0.2",
+    "@fastify/websocket": "^11.1.0",
     "hashi-vault-js": "^0.5.0"
   },
   "devDependencies": {
