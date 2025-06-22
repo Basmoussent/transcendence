@@ -3,7 +3,7 @@ import Fastify from 'fastify';
 import cors from '@fastify/cors';
 import jwt from '@fastify/jwt';
 import websocket from '@fastify/websocket';
-// import cookie from '@fastify/cookie'; // TODO: Installer @fastify/cookie
+import cookie from '@fastify/cookie'; // TODO: Installer @fastify/cookie
 import { db } from './database';
 import authRoutes from "./routes/authentication"
 import editRoutes from './routes/reset-pwd';
@@ -22,11 +22,10 @@ async function setup() {
 await fastify.register(cors, {
   origin: '*',
   exposedHeaders: ['x-access-token'],
-  credentials: true, // Permet l'envoi de cookies
+  credentials: true,
 });
 
-  // Register cookie plugin (TODO: Installer @fastify/cookie)
-  // await fastify.register(cookie);
+  await fastify.register(cookie);
 
   // on enregistre les routes definis, qui seront chacune sur /prefix/nom_de_la_route
   await fastify.register(authRoutes, {prefix: "/auth"});

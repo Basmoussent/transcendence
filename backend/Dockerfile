@@ -10,11 +10,14 @@ RUN apk add --no-cache \
 
 WORKDIR /app
 
+RUN npm i @fastify/cookie
+
 COPY package*.json ./
 
 RUN npm install
 
 RUN npm install -g sqlite3
+
 
 COPY . .
 

@@ -156,14 +156,25 @@ async function authRoutes(app: FastifyInstance) {
             
             // Déterminer le domaine du cookie selon l'environnement
             const origin = request.headers.origin || '';
+            const host = request.headers.host || '';
             let cookieDomain;
             
-            if (origin.includes('entropy.local')) {
+            // Log pour debug
+            console.log('🔍 Debug cookie domain:', { origin, host });
+            
+            if (origin.includes('entropy.local') || host.includes('entropy.local')) {
               cookieDomain = '.entropy.local'; // Avec le point pour partager entre sous-domaines
-            } else if (origin.includes('localhost')) {
-              // Pour localhost, on ne spécifie pas de domaine pour que le cookie soit valide sur tous les sous-domaines
-              cookieDomain = undefined;
+            } else if (origin.includes('localhost') || host.includes('localhost')) {
+              // Pour localhost, on utilise le domaine parent pour partager entre sous-domaines
+              const hostParts = host.split('.');
+              if (hostParts.length > 1) {
+                cookieDomain = `.${hostParts.slice(-1).join('.')}`; // .localhost
+              } else {
+                cookieDomain = undefined; // Pas de domaine pour localhost simple
+              }
             }
+            
+            console.log('🍪 Cookie domain déterminé:', cookieDomain);
             
             // Envoyer le token dans le header ET dans un cookie
             const response = reply
@@ -174,15 +185,17 @@ async function authRoutes(app: FastifyInstance) {
             if (cookieDomain) {
               response.header(
                 'Set-Cookie',
-                `x-access-token=${token}; Path=/; Domain=${cookieDomain}; SameSite=Lax; Max-Age=${7 * 24 * 60 * 60}`
+                `x-access-token=${token}; Path=/; Domain=${cookieDomain}; SameSite=Lax; Max-Age=${7 * 24 * 60 * 60}; HttpOnly`
               );
             } else {
-              // Pour localhost, pas de domaine spécifié
+              // Pour localhost simple, pas de domaine spécifié
               response.header(
                 'Set-Cookie',
-                `x-access-token=${token}; Path=/; SameSite=Lax; Max-Age=${7 * 24 * 60 * 60}`
+                `x-access-token=${token}; Path=/; SameSite=Lax; Max-Age=${7 * 24 * 60 * 60}; HttpOnly`
               );
             }
+            
+            console.log('🍪 Cookie configuré avec succès');
             
             resolve(response.send({ 
               message: "Login successful", 
@@ -200,6 +213,50 @@ async function authRoutes(app: FastifyInstance) {
         }
       );
     });
+  });
+
+  /**
+   * Route de déconnexion (Logout)
+   * POST /auth/logout
+   * 
+   * Cette route permet à un utilisateur de se déconnecter.
+   * Elle supprime le token d'authentification.
+   */
+  app.post('/logout', async (request, reply) => {
+    try {
+      // Déterminer le domaine du cookie selon l'environnement
+      const origin = request.headers.origin || '';
+      const host = request.headers.host || '';
+      let cookieDomain;
+      
+      if (origin.includes('entropy.local') || host.includes('entropy.local')) {
+        cookieDomain = '.entropy.local';
+      } else if (origin.includes('localhost') || host.includes('localhost')) {
+        const hostParts = host.split('.');
+        if (hostParts.length > 1) {
+          cookieDomain = `.${hostParts.slice(-1).join('.')}`;
+        } else {
+          cookieDomain = undefined;
+        }
+      }
+      
+      // Supprimer le cookie
+      let cookieString = 'x-access-token=; Path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; HttpOnly';
+      
+      if (cookieDomain) {
+        cookieString += `; Domain=${cookieDomain}`;
+      }
+      
+      const response = reply.status(200);
+      response.header('Set-Cookie', cookieString);
+      
+      console.log('🍪 Cookie supprimé avec succès');
+      
+      return response.send({ message: 'Logout successful' });
+    } catch (error) {
+      console.error('❌ Error during logout:', error);
+      return reply.status(500).send({ error: 'Internal server error' });
+    }
   });
 }
 

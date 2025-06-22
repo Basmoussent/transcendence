@@ -26,4 +26,28 @@ clean: down
 
 re: clean all
 
-.PHONY: all build up down clean re status 
+# Test du système de cookies
+test-cookies:
+	@echo "🧪 Test du système de cookies..."
+	@./test-cookies.sh
+
+# Test rapide du backend
+test-backend:
+	@echo "🔍 Test rapide du backend..."
+	@curl -s http://localhost:8000/ping || echo "❌ Backend non accessible"
+
+# Debug des cookies (nécessite un navigateur ouvert)
+debug-cookies:
+	@echo "🍪 Pour debugger les cookies, ouvrez la console du navigateur et tapez:"
+	@echo "   debugCookies()"
+	@echo "   testCookieSystem()"
+	@echo "   testCrossSubdomainCookies()"
+
+# Redémarrer les services avec les nouvelles configurations
+restart-cookies:
+	@echo "🔄 Redémarrage des services pour les cookies..."
+	@docker-compose down
+	@docker-compose up -d
+	@echo "✅ Services redémarrés"
+
+.PHONY: all build up down clean re status test-cookies test-backend debug-cookies restart-cookies 
