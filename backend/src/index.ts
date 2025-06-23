@@ -21,7 +21,6 @@ async function setup() {
   // Register CORS
 await fastify.register(cors, {
   origin: ['https://fr.localhost:5173', 'https://en.localhost:5173', "https://es.localhost:5173"],
-  AccessControlAllowOrigin: ['https://fr.localhost:5173', 'https://en.localhost:5173', "https://es.localhost:5173"],
   credentials: true,
   preflightContinue: false,
   exposedHeaders: ['x-access-token']
