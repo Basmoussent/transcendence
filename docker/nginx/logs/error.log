@@ -566,3 +566,33 @@
 2025/06/22 14:38:50 [notice] 1#1: libmodsecurity3 version 3.0.14
 2025/06/22 14:40:45 [notice] 1#1: ModSecurity-nginx v1.0.4 (rules loaded inline/local/remote: 0/10/0)
 2025/06/22 14:40:45 [notice] 1#1: libmodsecurity3 version 3.0.14
+2025/06/23 13:06:55 [notice] 1#1: ModSecurity-nginx v1.0.4 (rules loaded inline/local/remote: 0/10/0)
+2025/06/23 13:06:55 [notice] 1#1: libmodsecurity3 version 3.0.14
+2025/06/23 13:08:01 [warn] 4863#4863: *33 an upstream response is buffered to a temporary file /var/cache/nginx/proxy_temp/1/00/0000000001 while reading upstream, client: 172.18.0.1, server: fr.localhost, request: "GET /@vite/client HTTP/1.1", upstream: "http://172.18.0.7:5173/@vite/client", host: "en.localhost", referrer: "https://en.localhost/"
+2025/06/23 13:13:39 [notice] 1#1: ModSecurity-nginx v1.0.4 (rules loaded inline/local/remote: 0/10/0)
+2025/06/23 13:13:39 [notice] 1#1: libmodsecurity3 version 3.0.14
+2025/06/23 13:16:44 [notice] 1#1: ModSecurity-nginx v1.0.4 (rules loaded inline/local/remote: 0/10/0)
+2025/06/23 13:16:44 [notice] 1#1: libmodsecurity3 version 3.0.14
+2025/06/23 13:17:27 [notice] 1#1: ModSecurity-nginx v1.0.4 (rules loaded inline/local/remote: 0/10/0)
+2025/06/23 13:17:27 [notice] 1#1: libmodsecurity3 version 3.0.14
+2025/06/23 13:18:07 [notice] 1#1: ModSecurity-nginx v1.0.4 (rules loaded inline/local/remote: 0/10/0)
+2025/06/23 13:18:07 [notice] 1#1: libmodsecurity3 version 3.0.14
+2025/06/23 13:18:45 [notice] 1#1: ModSecurity-nginx v1.0.4 (rules loaded inline/local/remote: 0/10/0)
+2025/06/23 13:18:45 [notice] 1#1: libmodsecurity3 version 3.0.14
+2025/06/23 13:22:01 [notice] 1#1: ModSecurity-nginx v1.0.4 (rules loaded inline/local/remote: 0/10/0)
+2025/06/23 13:22:01 [notice] 1#1: libmodsecurity3 version 3.0.14
+2025/06/23 13:24:11 [notice] 1#1: ModSecurity-nginx v1.0.4 (rules loaded inline/local/remote: 0/10/0)
+2025/06/23 13:24:11 [notice] 1#1: libmodsecurity3 version 3.0.14
+2025/06/23 13:26:12 [notice] 1#1: ModSecurity-nginx v1.0.4 (rules loaded inline/local/remote: 0/10/0)
+2025/06/23 13:26:12 [notice] 1#1: libmodsecurity3 version 3.0.14
+2025/06/23 13:27:25 [notice] 1#1: ModSecurity-nginx v1.0.4 (rules loaded inline/local/remote: 0/10/0)
+2025/06/23 13:27:25 [notice] 1#1: libmodsecurity3 version 3.0.14
+2025/06/23 13:27:58 [warn] 4854#4854: *2 an upstream response is buffered to a temporary file /var/cache/nginx/proxy_temp/1/00/0000000001 while reading upstream, client: 172.18.0.1, server: fr.localhost, request: "GET /@vite/client HTTP/1.1", upstream: "http://172.18.0.8:5173/@vite/client", host: "localhost", referrer: "https://localhost/"
+2025/06/23 13:30:36 [notice] 1#1: ModSecurity-nginx v1.0.4 (rules loaded inline/local/remote: 0/10/0)
+2025/06/23 13:30:36 [notice] 1#1: libmodsecurity3 version 3.0.14
+2025/06/23 13:32:10 [notice] 1#1: ModSecurity-nginx v1.0.4 (rules loaded inline/local/remote: 0/10/0)
+2025/06/23 13:32:10 [notice] 1#1: libmodsecurity3 version 3.0.14
+2025/06/23 13:34:23 [notice] 1#1: ModSecurity-nginx v1.0.4 (rules loaded inline/local/remote: 0/10/0)
+2025/06/23 13:34:23 [notice] 1#1: libmodsecurity3 version 3.0.14
+2025/06/23 13:36:44 [notice] 1#1: ModSecurity-nginx v1.0.4 (rules loaded inline/local/remote: 0/10/0)
+2025/06/23 13:36:44 [notice] 1#1: libmodsecurity3 version 3.0.14
