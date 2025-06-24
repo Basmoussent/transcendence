@@ -19,7 +19,7 @@ export async function renderProfil() {
       return '';
     }
 
-    const response = await fetch('http://localhost:8000/me', {
+    const response = await fetch('/api/me', {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -600,7 +600,7 @@ export async function renderProfil() {
         saveLanguageBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sauvegarde...';
 
         try {
-          const response = await fetch('http://localhost:8000/edit/change-language', {
+          const response = await fetch('/api/edit/change-language', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',

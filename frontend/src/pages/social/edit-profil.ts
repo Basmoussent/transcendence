@@ -111,7 +111,7 @@ document.addEventListener('DOMContentLoaded', () => {
 				return;
 			}
 
-			const response = await fetch('http://localhost:8000/edit/profile', {
+			const response = await fetch('/api/edit/profile', {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',

@@ -46,7 +46,7 @@ document.addEventListener('DOMContentLoaded', () => {
 				window.location.href = '/login';
 				return;
 			}
-			const response = await fetch('http://localhost:8000/edit/change-password', {
+			const response = await fetch('/api/edit/change-password', {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',

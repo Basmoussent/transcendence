@@ -39,7 +39,7 @@ document.addEventListener('DOMContentLoaded', () => {
 		console.log('🔐 Tentative de connexion pour:', username);
 		console.log('🌐 URL actuelle:', window.location.href);
 		
-		const response = await fetch('http://localhost:8000/auth/login', {
+		const response = await fetch('/api/auth/login', {
 		method: 'POST',
 		headers: { 'Content-Type': 'application/json' },
 		body: JSON.stringify({ username, password }),
@@ -54,7 +54,7 @@ document.addEventListener('DOMContentLoaded', () => {
 		}
 
 		console.log('✅ Connexion réussie');
-		console.log('🍪 Headers de réponse:', response.headers);
+		console.log('Headers de réponse:', response.headers);
 		
 		// Le token est maintenant dans un cookie, mais on peut aussi le récupérer du header pour la compatibilité
 		const token = response.headers.get('x-access-token');
@@ -62,7 +62,7 @@ document.addEventListener('DOMContentLoaded', () => {
 			console.log('🎫 Token reçu dans le header');
 			setAuthToken(token);
 		} else {
-			console.log('🍪 Token attendu dans les cookies');
+			console.log('Token attendu dans les cookies');
 		}
 		
 		// Debug: vérifier les cookies après login

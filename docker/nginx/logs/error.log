@@ -598,3 +598,16 @@
 2025/06/23 13:36:44 [notice] 1#1: libmodsecurity3 version 3.0.14
 2025/06/23 13:50:27 [notice] 1#1: ModSecurity-nginx v1.0.4 (rules loaded inline/local/remote: 0/10/0)
 2025/06/23 13:50:27 [notice] 1#1: libmodsecurity3 version 3.0.14
+2025/06/24 15:42:35 [notice] 1#1: ModSecurity-nginx v1.0.4 (rules loaded inline/local/remote: 0/10/0)
+2025/06/24 15:42:35 [notice] 1#1: libmodsecurity3 version 3.0.14
+2025/06/24 15:48:47 [emerg] 1#1: open() "/etc/nginx/cors.conf" failed (2: No such file or directory) in /etc/nginx/nginx.conf:85
+2025/06/24 15:49:51 [emerg] 1#1: open() "/etc/nginx/cors.conf" failed (2: No such file or directory) in /etc/nginx/nginx.conf:85
+2025/06/24 15:50:37 [emerg] 1#1: open() "/etc/nginx/cors.conf" failed (2: No such file or directory) in /etc/nginx/nginx.conf:85
+2025/06/24 18:53:20 [emerg] 1#1: open() "/etc/nginx/cors.conf" failed (2: No such file or directory) in /etc/nginx/nginx.conf:85
+2025/06/24 18:57:44 [notice] 1#1: ModSecurity-nginx v1.0.4 (rules loaded inline/local/remote: 0/10/0)
+2025/06/24 18:57:44 [notice] 1#1: libmodsecurity3 version 3.0.14
+2025/06/24 19:36:10 [notice] 1#1: ModSecurity-nginx v1.0.4 (rules loaded inline/local/remote: 0/10/0)
+2025/06/24 19:36:10 [notice] 1#1: libmodsecurity3 version 3.0.14
+2025/06/24 19:37:14 [warn] 125#125: *132 an upstream response is buffered to a temporary file /var/cache/nginx/proxy_temp/1/00/0000000001 while reading upstream, client: 172.18.0.1, server: fr.localhost, request: "GET /@vite/client HTTP/1.1", upstream: "http://172.18.0.7:5173/@vite/client", host: "fr.entropy.local", referrer: "https://fr.entropy.local/main"
+2025/06/24 19:42:03 [warn] 127#127: *229 an upstream response is buffered to a temporary file /var/cache/nginx/proxy_temp/2/00/0000000002 while reading upstream, client: 172.18.0.1, server: fr.localhost, request: "GET /@vite/client HTTP/1.1", upstream: "http://172.18.0.7:5173/@vite/client", host: "fr.entropy.local", referrer: "https://fr.entropy.local/login"
+2025/06/24 19:47:38 [warn] 135#135: *644 an upstream response is buffered to a temporary file /var/cache/nginx/proxy_temp/3/00/0000000003 while reading upstream, client: 172.18.0.1, server: fr.localhost, request: "GET /@vite/client HTTP/1.1", upstream: "http://172.18.0.7:5173/@vite/client", host: "es.entropy.local", referrer: "https://es.entropy.local/main"

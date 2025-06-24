@@ -61,7 +61,6 @@ function getCurrentSubdomain(): string {
 }
 
 export function getAuthToken(): string | null {
-  // Essayer d'abord de récupérer depuis localStorage (pour la compatibilité)
   const localToken = localStorage.getItem('x-access-token');
   if (localToken) {
     return localToken;
@@ -79,7 +78,6 @@ export function getAuthToken(): string | null {
 }
 
 export function setAuthToken(token: string): void {
-  // Stocker dans localStorage pour la compatibilité
   localStorage.setItem('x-access-token', token);
   
   // Stocker aussi dans un cookie pour le partage entre sous-domaines
@@ -99,9 +97,9 @@ export function setAuthToken(token: string): void {
   document.cookie = cookieString;
   
   // Debug: afficher les cookies
-  console.log('🍪 Cookies après setAuthToken:', document.cookie);
-  console.log('🍪 Cookie string généré:', cookieString);
-  console.log('🍪 Domaine utilisé:', domain);
+  console.log('Cookies après setAuthToken:', document.cookie);
+  console.log('Cookie string généré:', cookieString);
+  console.log('Domaine utilisé:', domain);
 }
 
 export function removeAuthToken(): void {
@@ -119,8 +117,8 @@ export function removeAuthToken(): void {
   document.cookie = cookieString;
   
   // Debug: afficher les cookies après suppression
-  console.log('🍪 Cookies après removeAuthToken:', document.cookie);
-  console.log('🍪 Cookie string de suppression:', cookieString);
+  console.log('Cookies après removeAuthToken:', document.cookie);
+  console.log('Cookie string de suppression:', cookieString);
 }
 
 export function isAuthenticated(): boolean {
@@ -150,13 +148,13 @@ export function changeLanguageAndRedirect(lang: string): void {
 
 // Fonction de debug pour vérifier les cookies
 export function debugCookies(): void {
-  console.log('🍪 Tous les cookies:', document.cookie);
-  console.log('🍪 Token depuis getAuthToken:', getAuthToken());
-  console.log('🍪 Token depuis localStorage:', localStorage.getItem('x-access-token'));
-  console.log('🍪 Domaine de cookie:', getCookieDomain());
-  console.log('🍪 Domaine de base:', getBaseDomain());
-  console.log('🍪 Sous-domaine actuel:', getCurrentSubdomain());
-  console.log('🍪 Hostname complet:', window.location.hostname);
+  console.log('Tous les cookies:', document.cookie);
+  console.log('Token depuis getAuthToken:', getAuthToken());
+  console.log('Token depuis localStorage:', localStorage.getItem('x-access-token'));
+  console.log('Domaine de cookie:', getCookieDomain());
+  console.log('Domaine de base:', getBaseDomain());
+  console.log('Sous-domaine actuel:', getCurrentSubdomain());
+  console.log('Hostname complet:', window.location.hostname);
 }
 
 // Fonction de logout
@@ -166,7 +164,7 @@ export async function logout(): Promise<void> {
     
     if (token) {
       // Appeler l'API de logout
-      const response = await fetch('http://localhost:8000/auth/logout', {
+      const response = await fetch('/api/auth/logout', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

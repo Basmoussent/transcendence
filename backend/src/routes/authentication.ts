@@ -174,7 +174,7 @@ async function authRoutes(app: FastifyInstance) {
               }
             }
             
-            console.log('🍪 Cookie domain déterminé:', cookieDomain);
+            console.log('Cookie domain déterminé:', cookieDomain);
             
             // Envoyer le token dans le header ET dans un cookie
             const response = reply
@@ -195,7 +195,7 @@ async function authRoutes(app: FastifyInstance) {
               );
             }
             
-            console.log('🍪 Cookie configuré avec succès');
+            console.log('Cookie configuré avec succès');
             
             resolve(response.send({ 
               message: "Login successful", 
@@ -250,7 +250,7 @@ async function authRoutes(app: FastifyInstance) {
       const response = reply.status(200);
       response.header('Set-Cookie', cookieString);
       
-      console.log('🍪 Cookie supprimé avec succès');
+      console.log('Cookie supprimé avec succès');
       
       return response.send({ message: 'Logout successful' });
     } catch (error) {
