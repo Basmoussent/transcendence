@@ -106,8 +106,12 @@
       <span></span>
       <span></span>
     </div>
+    <script type="module">
+      import { getAuthToken } from './src/utils/auth';
+      window.getAuthToken = getAuthToken;
+    </script>
     <script>
-      function changeLanguage(lang) {
+      window.changeLanguage = async function(lang) {
         const hostname = window.location.hostname;
         const parts = hostname.split('.');
         
@@ -132,9 +136,30 @@
         const newUrl = `${window.location.protocol}//${newHostname}${window.location.pathname}${window.location.search}${window.location.hash}`;
         console.log(`🔄 Changement de langue: ${hostname} -> ${newHostname}`);
         console.log(`🔄 Nouvelle URL: ${newUrl}`);
+
+        try {
+          const authToken = window.getAuthToken();
+          
+          const response = await fetch('/api/edit/change-language', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'x-access-token': authToken
+            },
+            body: JSON.stringify({ language: lang })
+          });
+
+          if (!response.ok) {
+            console.error('Erreur lors du changement de langue:', response.statusText);
+            return;
+          }
+          console.log('Langue changée avec succès');
+        } catch (error) {
+          console.error('Erreur lors du changement de langue:', error);
+        }
         
         window.location.href = newUrl;
-      }
+      };
       
       function ensureSubdomain() {
         const hostname = window.location.hostname;
@@ -172,8 +197,6 @@
             btn.classList.add('active');
           }
         });
-        
-        window.changeLanguageAndRedirect = changeLanguage;
       });
     </script>
   </body>

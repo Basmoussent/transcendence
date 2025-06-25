@@ -25,10 +25,9 @@ async function editRoutes(app: FastifyInstance) {
       // Récupérer le token depuis les headers ou les cookies
       let token = request.headers['x-access-token'] as string;
       
-      // écommenter quand @fastify/cookie sera installé
-      // if (!token) {
-      //   token = request.cookies['x-access-token'];
-      // }
+      if (!token) {
+        token = request.cookies['x-access-token'];
+      }
       
       if (!token) {
         return reply.code(401).send({ error: 'Token manquant' });
@@ -115,13 +114,11 @@ async function editRoutes(app: FastifyInstance) {
       const email = payload.user;
       const { language } = request.body;
 
-      // Validation de la langue
       const validLanguages = ['en', 'fr', 'es'];
       if (!validLanguages.includes(language)) {
         return reply.code(400).send({ error: 'Langue invalide' });
       }
 
-      // Mise à jour de la langue
       await updateLanguage(email, language);
 
       reply.send({ success: true, message: 'Langue modifiée avec succès' });
