@@ -358,6 +358,7 @@ export function getLanguage(): Language {
   const hostname = window.location.hostname;
   const subdomain = hostname.split('.')[0];
   const supportedLanguages = ['en', 'fr', 'es'] as const;
+
   return supportedLanguages.includes(subdomain as Language) ? subdomain as Language : 'en';
 }
 

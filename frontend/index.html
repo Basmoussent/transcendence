@@ -108,40 +108,28 @@
     </div>
     <script>
       function changeLanguage(lang) {
-        // Utiliser la nouvelle fonction d'auth.ts si elle est disponible
-        if (typeof window.changeLanguageAndRedirect === 'function') {
-          window.changeLanguageAndRedirect(lang);
-          return;
-        }
-        
-        // Fallback pour l'ancienne méthode
         const hostname = window.location.hostname;
         const parts = hostname.split('.');
         
-        // Déterminer le domaine de base
         let baseDomain;
         if (hostname.includes('localhost')) {
           if (parts.length > 1) {
-            baseDomain = parts.slice(-1).join('.'); // localhost
+            baseDomain = parts.slice(-1).join('.');
           } else {
-            baseDomain = hostname; // localhost simple
+            baseDomain = hostname;
           }
         } else {
-          baseDomain = parts.slice(-2).join('.'); // entropy.local
+          baseDomain = parts.slice(-2).join('.');
         }
         
-        // Construire le nouveau hostname
         let newHostname;
         if (hostname.includes('localhost') && parts.length === 1) {
-          // Si on est sur localhost simple, ajouter le sous-domaine
           newHostname = `${lang}.${baseDomain}`;
         } else {
-          // Remplacer le premier sous-domaine
           newHostname = `${lang}.${baseDomain}`;
         }
         
         const newUrl = `${window.location.protocol}//${newHostname}${window.location.pathname}${window.location.search}${window.location.hash}`;
-        
         console.log(`🔄 Changement de langue: ${hostname} -> ${newHostname}`);
         console.log(`🔄 Nouvelle URL: ${newUrl}`);
         
@@ -152,25 +140,21 @@
         const hostname = window.location.hostname;
         const parts = hostname.split('.');
         
-        // Vérifier si on a un sous-domaine de langue
         const hasLanguageSubdomain = parts.length > 1 && ['en', 'fr', 'es'].includes(parts[0]);
         
         if (!hasLanguageSubdomain) {
-          // Déterminer le domaine de base
           let baseDomain;
           if (hostname.includes('localhost')) {
             if (parts.length > 1) {
-              baseDomain = parts.slice(-1).join('.'); // localhost
+              baseDomain = parts.slice(-1).join('.');
             } else {
-              baseDomain = hostname; // localhost simple
+              baseDomain = hostname;
             }
           } else {
-            baseDomain = parts.slice(-2).join('.'); // entropy.local
+            baseDomain = parts.slice(-2).join('.');
           }
-          
           const newHost = `en.${baseDomain}`;
           const newUrl = window.location.protocol + '//' + newHost + window.location.pathname + window.location.search + window.location.hash;
-          
           console.log(`🔄 Redirection vers sous-domaine par défaut: ${hostname} -> ${newHost}`);
           window.location.replace(newUrl);
         }
@@ -181,20 +165,15 @@
         const lang = hostname.split('.')[0];
         const buttons = document.querySelectorAll('.language-btn');
         
-        // Vérifier et rediriger si nécessaire
         ensureSubdomain();
         
-        // Marquer le bouton actif
         buttons.forEach(btn => {
           if (btn.classList.contains(`${lang}-flag`)) {
             btn.classList.add('active');
           }
         });
         
-        // Exposer la fonction pour qu'elle soit accessible depuis auth.ts
-        window.changeLanguageAndRedirect = function(lang) {
-          changeLanguage(lang);
-        };
+        window.changeLanguageAndRedirect = changeLanguage;
       });
     </script>
   </body>

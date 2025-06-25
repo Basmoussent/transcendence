@@ -18,6 +18,7 @@
     "@fastify/websocket": "^11.1.0",
     "bcrypt": "^6.0.0",
     "better-sqlite3": "^8.0.0",
+    "dotenv": "^16.5.0",
     "fastify": "^5.4.0",
     "hashi-vault-js": "^0.5.0",
     "sqlite": "^5.1.1",

@@ -66,7 +66,6 @@ export function getAuthToken(): string | null {
     return localToken;
   }
 
-  // Sinon, récupérer depuis les cookies
   const cookies = document.cookie.split(';');
   for (const cookie of cookies) {
     const [name, value] = cookie.trim().split('=');
@@ -80,7 +79,6 @@ export function getAuthToken(): string | null {
 export function setAuthToken(token: string): void {
   localStorage.setItem('x-access-token', token);
   
-  // Stocker aussi dans un cookie pour le partage entre sous-domaines
   const domain = getCookieDomain();
   const isSecure = window.location.protocol === 'https:';
   

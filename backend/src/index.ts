@@ -3,7 +3,7 @@ import Fastify from 'fastify';
 import cors from '@fastify/cors';
 import jwt from '@fastify/jwt';
 import websocket from '@fastify/websocket';
-import cookie from '@fastify/cookie'; // TODO: Installer @fastify/cookie
+import cookie from '@fastify/cookie';
 import { db } from './database';
 import authRoutes from "./routes/authentication"
 import editRoutes from './routes/reset-pwd';

@@ -181,17 +181,15 @@ async function authRoutes(app: FastifyInstance) {
               .status(200)
               .header('x-access-token', token);
             
-            // Configurer le cookie selon l'environnement
             if (cookieDomain) {
               response.header(
                 'Set-Cookie',
-                `x-access-token=${token}; Path=/; Domain=${cookieDomain}; SameSite=Lax; Max-Age=${7 * 24 * 60 * 60}; HttpOnly`
+                `x-access-token=${token}; Path=/; Domain=${cookieDomain}; SameSite=Lax; Max-Age=${7 * 24 * 60 * 60}`
               );
             } else {
-              // Pour localhost simple, pas de domaine spécifié
               response.header(
                 'Set-Cookie',
-                `x-access-token=${token}; Path=/; SameSite=Lax; Max-Age=${7 * 24 * 60 * 60}; HttpOnly`
+                `x-access-token=${token}; Path=/; SameSite=Lax; Max-Age=${7 * 24 * 60 * 60}`
               );
             }
             

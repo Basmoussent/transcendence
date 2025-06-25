@@ -1,4 +1,5 @@
 import { getAuthToken, removeAuthToken } from '../../utils/auth';
+import { t } from '../../utils/translations';
 
 export async function renderProfil() {
   let userData = {
@@ -75,21 +76,21 @@ export async function renderProfil() {
             <i class="fas fa-trophy"></i>
             <div class="stat-info">
               <span class="stat-value">${userData.wins}</span>
-              <span class="stat-label">Wins</span>
+              <span class="stat-label">${t('profile.stats.wins')}</span>
             </div>
           </div>
           <div class="stat-card">
             <i class="fas fa-gamepad"></i>
             <div class="stat-info">
               <span class="stat-value">${userData.games}</span>
-              <span class="stat-label">Games</span>
+              <span class="stat-label">${t('profile.stats.games')}</span>
             </div>
           </div>
           <div class="stat-card">
             <i class="fas fa-star"></i>
             <div class="stat-info">
               <span class="stat-value">${userData.rating}</span>
-              <span class="stat-label">Rating</span>
+              <span class="stat-label">${t('profile.stats.rating')}</span>
             </div>
           </div>
         </div>
@@ -97,47 +98,16 @@ export async function renderProfil() {
         <div class="profile-actions">
           <button class="action-button edit-profile">
             <i class="fas fa-edit"></i>
-            Edit Profile
+            ${t('profile.editProfile')}
           </button>
           <button class="action-button change-password">
             <i class="fas fa-key"></i>
-            Change Password
+            ${t('profile.changePassword')}
           </button>
           <button class="action-button logout">
             <i class="fas fa-sign-out-alt"></i>
-            Logout
+            ${t('profile.logout')}
           </button>
-        </div>
-
-        <div class="profile-preferences">
-          <h2><i class="fas fa-cog"></i> Préférences</h2>
-          <div class="preference-card">
-            <div class="preference-header">
-              <i class="fas fa-language"></i>
-              <div class="preference-info">
-                <span class="preference-title">Langue par défaut</span>
-                <span class="preference-description">Choisissez votre langue préférée pour l'interface</span>
-              </div>
-            </div>
-            <div class="language-selector-profile">
-              <button class="language-option ${userData.preferred_language === 'fr' ? 'active' : ''}" data-lang="fr">
-                <span class="flag fr-flag"></span>
-                <span class="lang-text">Français</span>
-              </button>
-              <button class="language-option ${userData.preferred_language === 'en' ? 'active' : ''}" data-lang="en">
-                <span class="flag en-flag"></span>
-                <span class="lang-text">English</span>
-              </button>
-              <button class="language-option ${userData.preferred_language === 'es' ? 'active' : ''}" data-lang="es">
-                <span class="flag es-flag"></span>
-                <span class="lang-text">Español</span>
-              </button>
-            </div>
-            <button class="save-language-btn">
-              <i class="fas fa-save"></i>
-              Sauvegarder la langue
-            </button>
-          </div>
         </div>
       </div>
     </div>
@@ -359,131 +329,6 @@ export async function renderProfil() {
         box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
       }
 
-      .profile-preferences {
-        margin-top: 30px;
-        padding-top: 20px;
-        border-top: 1px solid rgba(255, 255, 255, 0.1);
-        color: white;
-      }
-
-      .preference-card {
-        background: rgba(255, 255, 255, 0.05);
-        border-radius: 15px;
-        padding: 15px;
-        margin-bottom: 20px;
-      }
-
-      .preference-header {
-        display: flex;
-        align-items: center;
-        gap: 15px;
-        margin-bottom: 15px;
-      }
-
-      .preference-header i {
-        font-size: 1.5em;
-        color: #4a90e2;
-      }
-
-      .preference-info {
-        display: flex;
-        flex-direction: column;
-      }
-
-      .preference-title {
-        font-size: 1.2em;
-        margin-bottom: 5px;
-      }
-
-      .preference-description {
-        color: #ccc;
-        font-size: 0.9em;
-      }
-
-      .language-selector-profile {
-        display: flex;
-        gap: 10px;
-        margin-bottom: 15px;
-      }
-
-      .flag {
-        width: 24px;
-        height: 16px;
-        margin-right: 8px;
-        border-radius: 2px;
-        display: inline-block;
-      }
-
-      .fr-flag {
-        background: linear-gradient(to right, #002395 33%, #fff 33%, #fff 66%, #ed2939 66%);
-      }
-
-      .en-flag {
-        background: linear-gradient(45deg, #012169 25%, transparent 25%), 
-                    linear-gradient(-45deg, #012169 25%, transparent 25%), 
-                    linear-gradient(45deg, transparent 75%, #012169 75%), 
-                    linear-gradient(-45deg, transparent 75%, #012169 75%);
-        background-size: 8px 8px;
-        background-position: 0 0, 0 4px, 4px -4px, -4px 0px;
-        background-color: #c8102e;
-      }
-
-      .es-flag {
-        background: linear-gradient(to bottom, #c60b1e 50%, #ffc400 50%);
-      }
-
-      .lang-text {
-        font-weight: 600;
-        color: white;
-      }
-
-      .language-option {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        padding: 12px;
-        background: rgba(255, 255, 255, 0.05);
-        border: 2px solid transparent;
-        border-radius: 10px;
-        color: white;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        font-size: 0.9em;
-      }
-
-      .language-option:hover {
-        background: rgba(255, 255, 255, 0.1);
-        transform: translateY(-2px);
-      }
-
-      .language-option.active {
-        border-color: #4a90e2;
-        background: rgba(74, 144, 226, 0.2);
-        box-shadow: 0 0 10px rgba(74, 144, 226, 0.3);
-      }
-
-      .save-language-btn {
-        background: linear-gradient(135deg, #9b59b6 0%, #8e44ad 100%);
-        color: white;
-        border: none;
-        padding: 10px 20px;
-        border-radius: 8px;
-        cursor: pointer;
-        font-weight: 600;
-        transition: all 0.3s ease;
-      }
-
-      .save-language-btn:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-      }
-
-      .save-language-btn:disabled {
-        opacity: 0.6;
-        cursor: not-allowed;
-        transform: none;
-      }
-
       @keyframes fadeIn {
         from {
           opacity: 0;
@@ -512,11 +357,6 @@ export async function renderProfil() {
 
         .profile-actions {
           grid-template-columns: 1fr;
-        }
-
-        .language-selector-profile {
-          flex-direction: column;
-          gap: 10px;
         }
 
         .username {
@@ -572,64 +412,6 @@ export async function renderProfil() {
       changePasswordButton.addEventListener('click', () => {
         window.history.pushState({}, '', '/change-password');
         window.dispatchEvent(new PopStateEvent('popstate'));
-      });
-    }
-
-    const saveLanguageBtn = document.querySelector('.save-language-btn') as HTMLButtonElement;
-    const languageOptions = document.querySelectorAll('.language-option');
-
-    languageOptions.forEach(option => {
-      option.addEventListener('click', () => {
-        languageOptions.forEach(opt => opt.classList.remove('active'));
-        option.classList.add('active');
-      });
-    });
-
-    if (saveLanguageBtn) {
-      saveLanguageBtn.addEventListener('click', async () => {
-        const token = getAuthToken();
-        if (!token) return;
-
-        const selectedLanguage = (document.querySelector('.language-option.active') as HTMLButtonElement)?.dataset.lang;
-        if (!selectedLanguage) {
-          alert('❌ Veuillez sélectionner une langue');
-          return;
-        }
-
-        saveLanguageBtn.disabled = true;
-        saveLanguageBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sauvegarde...';
-
-        try {
-          const response = await fetch('/api/edit/change-language', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'x-access-token': token
-            },
-            body: JSON.stringify({
-              language: selectedLanguage
-            })
-          });
-
-          if (response.ok) {
-            saveLanguageBtn.innerHTML = '<i class="fas fa-check"></i> Sauvegardé !';
-            setTimeout(() => {
-              const hostname = window.location.hostname;
-              const parts = hostname.split('.');
-              const newHostname = `${selectedLanguage}.${parts.slice(1).join('.')}`;
-              window.location.href = `${window.location.protocol}//${newHostname}${window.location.pathname}`;
-            }, 1000);
-          } else {
-            throw new Error('Erreur de sauvegarde');
-          }
-        } catch (error) {
-          console.error('Erreur:', error);
-          saveLanguageBtn.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Erreur';
-          setTimeout(() => {
-            saveLanguageBtn.innerHTML = '<i class="fas fa-save"></i> Sauvegarder la langue';
-            saveLanguageBtn.disabled = false;
-          }, 2000);
-        }
       });
     }
   }, 0);

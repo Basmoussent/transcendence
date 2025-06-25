@@ -43,6 +43,7 @@ services:
     volumes:
       - vault_data:/vault/data
       - ./docker/vault/config.hcl:/vault/config/config.hcl:ro
+      - vault_env:/tmp
     environment:
       - VAULT_ADDR=http://0.0.0.0:8200
     env_file:
@@ -78,6 +79,7 @@ services:
     volumes:
       - ./backend:/app:delegated
       - backend_node_modules:/app/node_modules
+      - vault_env:/tmp
     env_file:
       - .env
     environment:
@@ -116,6 +118,8 @@ services:
       - GF_SECURITY_ADMIN_USER=admin
       - GF_SECURITY_ADMIN_PASSWORD=admin
       - GF_USERS_ALLOW_SIGN_UP=false
+      - GF_DASHBOARDS_MIN_REFRESH_INTERVAL=5s
+      - GF_DASHBOARDS_DEFAULT_HOME_DASHBOARD_UID=transcendence
     depends_on:
       - prometheus
     networks:
@@ -146,4 +150,5 @@ volumes:
   frontend_node_modules:
   backend_node_modules:
   vault_data:
+  vault_env:
   modsecurity_logs:

@@ -7,6 +7,11 @@ build:
 	@mkdir -p docker/vault/data/core
 	docker-compose -f $(DOCKER_COMPOSE) --env-file=.env build
 
+reset:
+	@mkdir -p docker/vault/data/core
+	docker-compose -f $(DOCKER_COMPOSE) --env-file=.env build --no-cache
+	docker-compose -f $(DOCKER_COMPOSE) up -d
+
 up:
 	docker-compose -f $(DOCKER_COMPOSE) up -d
 
@@ -23,6 +28,9 @@ down:
 
 clean: down
 	docker system prune -af
+
+env:
+	@docker exec transcendence_vault_1 cat /tmp/vault.env
 
 re: clean all
 
