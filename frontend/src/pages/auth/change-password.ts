@@ -1,4 +1,5 @@
 import { t } from '../../utils/translations';
+import { getAuthToken } from '../../utils/auth';
 
 export function renderChangePassword(): string {
 	return `
@@ -39,13 +40,13 @@ document.addEventListener('DOMContentLoaded', () => {
 			return;
 		}
 		try {
-			const token = localStorage.getItem('x-access-token');
+			const token = getAuthToken();
 			if (!token) {
 				alert('❌ Token d\'authentification manquant');
 				window.location.href = '/login';
 				return;
 			}
-			const response = await fetch('http://localhost:8000/edit/change-password', {
+			const response = await fetch('/api/edit/change-password', {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',

@@ -1,4 +1,5 @@
 import { t } from '../../utils/translations';
+import { getAuthToken } from '../../utils/auth';
 
 export function renderEditProfil(): string {
 	return `
@@ -103,14 +104,14 @@ document.addEventListener('DOMContentLoaded', () => {
 		const selectedAvatar = (document.querySelector('input[name="avatar"]:checked') as HTMLInputElement)?.value || 'avatar.png';
 		
 		try {
-			const token = localStorage.getItem('x-access-token');
+			const token = getAuthToken();
 			if (!token) {
 				alert('❌ Token d\'authentification manquant');
 				window.location.href = '/login';
 				return;
 			}
 
-			const response = await fetch('http://localhost:8000/edit/profile', {
+			const response = await fetch('/api/edit/profile', {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',

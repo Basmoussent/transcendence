@@ -1,5 +1,52 @@
-export function renderProfil() {
-  return `
+import { getAuthToken, removeAuthToken } from '../../utils/auth';
+import { t } from '../../utils/translations';
+
+export async function renderProfil() {
+  let userData = {
+    username: 'Username',
+    email: 'email@example.com',
+    avatar: 'avatar.png',
+    wins: 0,
+    games: 0,
+    rating: 0,
+    preferred_language: 'en'
+  };
+
+  try {
+    const token = getAuthToken();
+    if (!token) {
+      alert('❌ Token d\'authentification manquant');
+      window.location.href = '/login';
+      return '';
+    }
+
+    const response = await fetch('/api/me', {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-access-token': token
+      }
+    });
+    
+    if (response.ok) {
+      const result = await response.json();
+      userData = {
+        username: result.user?.username || 'Username',
+        email: result.user?.email || 'email@example.com',
+        avatar: result.user?.avatar_url || 'avatar.png',
+        wins: result.stats?.wins || 0,
+        games: result.stats?.games || 0,
+        rating: result.stats?.rating || 0,
+        preferred_language: result.user?.language || 'en'
+      };
+    } else {
+      console.error('Erreur lors de la récupération des données utilisateur');
+    }
+  } catch (error) {
+    console.error("Error rendering profile page:", error);
+  }
+
+  const htmlContent = `
     <div class="profile-page">
       <div class="background-circles">
         <div class="circle circle-1"></div>
@@ -10,14 +57,14 @@ export function renderProfil() {
       <div class="profile-container">
         <div class="profile-header">
           <div class="profile-avatar">
-            <img src="../../public/avatar.png" alt="Profile Avatar" class="avatar-image">
+            <img src="../../public/${userData.avatar}" alt="Profile Avatar" class="avatar-image">
             <button class="change-avatar-btn">
               <i class="fas fa-camera"></i>
             </button>
           </div>
           <div class="profile-info">
-            <h1 class="username">Username</h1>
-            <p class="email">email@example.com</p>
+            <h1 class="username">${userData.username}</h1>
+            <p class="email">${userData.email}</p>
             <div class="status online">
               <i class="fas fa-circle"></i> Online
             </div>
@@ -28,22 +75,22 @@ export function renderProfil() {
           <div class="stat-card">
             <i class="fas fa-trophy"></i>
             <div class="stat-info">
-              <span class="stat-value">42</span>
-              <span class="stat-label">Wins</span>
+              <span class="stat-value">${userData.wins}</span>
+              <span class="stat-label">${t('profile.stats.wins')}</span>
             </div>
           </div>
           <div class="stat-card">
             <i class="fas fa-gamepad"></i>
             <div class="stat-info">
-              <span class="stat-value">156</span>
-              <span class="stat-label">Games</span>
+              <span class="stat-value">${userData.games}</span>
+              <span class="stat-label">${t('profile.stats.games')}</span>
             </div>
           </div>
           <div class="stat-card">
             <i class="fas fa-star"></i>
             <div class="stat-info">
-              <span class="stat-value">3.5</span>
-              <span class="stat-label">Rating</span>
+              <span class="stat-value">${userData.rating}</span>
+              <span class="stat-label">${t('profile.stats.rating')}</span>
             </div>
           </div>
         </div>
@@ -51,15 +98,15 @@ export function renderProfil() {
         <div class="profile-actions">
           <button class="action-button edit-profile">
             <i class="fas fa-edit"></i>
-            Edit Profile
+            ${t('profile.editProfile')}
           </button>
           <button class="action-button change-password">
             <i class="fas fa-key"></i>
-            Change Password
+            ${t('profile.changePassword')}
           </button>
           <button class="action-button logout">
             <i class="fas fa-sign-out-alt"></i>
-            Logout
+            ${t('profile.logout')}
           </button>
         </div>
       </div>
@@ -282,45 +329,6 @@ export function renderProfil() {
         box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
       }
 
-      .recent-activity {
-        color: white;
-      }
-
-      .recent-activity h2 {
-        margin-bottom: 20px;
-        font-size: 1.3em;
-      }
-
-      .activity-list {
-        display: flex;
-        flex-direction: column;
-        gap: 15px;
-      }
-
-      .activity-item {
-        display: flex;
-        align-items: center;
-        gap: 15px;
-        padding: 15px;
-        background: rgba(255, 255, 255, 0.05);
-        border-radius: 12px;
-      }
-
-      .activity-item i {
-        font-size: 1.2em;
-        color: #4a90e2;
-      }
-
-      .activity-info {
-        display: flex;
-        flex-direction: column;
-      }
-
-      .activity-time {
-        color: #ccc;
-        font-size: 0.9em;
-      }
-
       @keyframes fadeIn {
         from {
           opacity: 0;
@@ -382,29 +390,31 @@ export function renderProfil() {
       }
     </style>
   `;
+
+  setTimeout(() => {
+    const logoutButton = document.querySelector('.action-button.logout');
+    const editProfileButton = document.querySelector('.action-button.edit-profile');
+    const changePasswordButton = document.querySelector('.action-button.change-password');
+
+    if (logoutButton) {
+      logoutButton.addEventListener('click', () => {
+        removeAuthToken();
+        window.location.href = '/login';
+      });
+    }
+    if (editProfileButton) {
+      editProfileButton.addEventListener('click', () => {
+        window.history.pushState({}, '', '/edit-profil');
+        window.dispatchEvent(new PopStateEvent('popstate'));
+      });
+    }
+    if (changePasswordButton) {
+      changePasswordButton.addEventListener('click', () => {
+        window.history.pushState({}, '', '/change-password');
+        window.dispatchEvent(new PopStateEvent('popstate'));
+      });
+    }
+  }, 0);
+
+  return htmlContent;
 }
-
-document.addEventListener('DOMContentLoaded', () => {
-  const logoutButton = document.querySelector('.action-button.logout');
-  const editProfileButton = document.querySelector('.action-button.edit-profile');
-  const changePasswordButton = document.querySelector('.action-button.change-password');
-
-  if (logoutButton) {
-    logoutButton.addEventListener('click', () => {
-      localStorage.removeItem('x-access-token');
-      window.location.href = '/login';
-    });
-  }
-  if (editProfileButton) {
-    editProfileButton.addEventListener('click', () => {
-      window.history.pushState({}, '', '/edit-profil');
-      window.dispatchEvent(new PopStateEvent('popstate'));
-    });
-  }
-  if (changePasswordButton) {
-    changePasswordButton.addEventListener('click', () => {
-      window.history.pushState({}, '', '/change-password');
-      window.dispatchEvent(new PopStateEvent('popstate'));
-    });
-  }
-});

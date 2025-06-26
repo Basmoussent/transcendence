@@ -65,7 +65,7 @@ export const translations = {
       edit: {
         title: "Modifier le profil",
         username: "Nom d'utilisateur",
-        email: "Email",
+        email: "Pseudo",
         avatar: "Avatar",
         submit: "Enregistrer",
         backToProfile: "Annuler"
@@ -160,7 +160,7 @@ export const translations = {
       edit: {
         title: "Edit Profile",
         username: "Username",
-        email: "Email",
+        email: "Username",
         avatar: "Avatar",
         submit: "Save",
         backToProfile: "Cancel"
@@ -255,7 +255,7 @@ export const translations = {
       edit: {
         title: "Editar perfil",
         username: "Nombre de usuario",
-        email: "Correo electrónico",
+        email: "Usuario",
         avatar: "Avatar",
         submit: "Guardar",
         backToProfile: "Cancelar"
@@ -358,6 +358,7 @@ export function getLanguage(): Language {
   const hostname = window.location.hostname;
   const subdomain = hostname.split('.')[0];
   const supportedLanguages = ['en', 'fr', 'es'] as const;
+
   return supportedLanguages.includes(subdomain as Language) ? subdomain as Language : 'en';
 }
 

@@ -15,36 +15,42 @@ interface EditProfileBody {
   avatar: string;
 }
 
+interface ChangeLanguageBody {
+  language: string;
+}
+
 async function editRoutes(app: FastifyInstance) {
   app.post<{ Body: ChangePasswordBody }>('/change-password', async (request: FastifyRequest<{ Body: ChangePasswordBody }>, reply: FastifyReply) => {
     try {
-      const token = request.headers['x-access-token'] as string;
+      // Récupérer le token depuis les headers ou les cookies
+      let token = request.headers['x-access-token'] as string;
+      
+      if (!token) {
+        token = request.cookies['x-access-token'];
+      }
+      
       if (!token) {
         return reply.code(401).send({ error: 'Token manquant' });
       }
 
       const payload = fastify.jwt.verify(token) as { user: string };
-      const username = payload.user;
+      const email = payload.user;
       const { currentPassword, newPassword, confirmNewPassword } = request.body;
 
-      // Vérification que les nouveaux mots de passe correspondent
       if (newPassword !== confirmNewPassword) {
         return reply.code(400).send({ error: 'Les nouveaux mots de passe ne correspondent pas' });
       }
 
-      // Vérification que le nouveau mot de passe est différent de l'ancien
       if (currentPassword === newPassword) {
         return reply.code(400).send({ error: 'Le nouveau mot de passe doit être différent de l\'ancien' });
       }
 
-      // Vérification du mot de passe actuel
-      const isCurrentPasswordValid = await verifyCurrentPassword(username, currentPassword);
+      const isCurrentPasswordValid = await verifyCurrentPassword(email, currentPassword);
       if (!isCurrentPasswordValid) {
         return reply.code(401).send({ error: 'Mot de passe actuel incorrect' });
       }
 
-      // Mise à jour du mot de passe
-      await updatePassword(username, newPassword);
+      await updatePassword(email, newPassword);
 
       reply.send({ success: true, message: 'Mot de passe modifié avec succès' });
     } catch (err: any) {
@@ -58,28 +64,28 @@ async function editRoutes(app: FastifyInstance) {
 
   app.post<{ Body: EditProfileBody }>('/profile', async (request: FastifyRequest<{ Body: EditProfileBody }>, reply: FastifyReply) => {
     try {
-      const token = request.headers['x-access-token'] as string;
+      // Récupérer le token depuis les headers ou les cookies
+      let token = request.headers['x-access-token'] as string;
+      
+      if (!token) {
+        token = request.cookies['x-access-token'];
+      }
+      
       if (!token) {
         return reply.code(401).send({ error: 'Token manquant' });
       }
 
       const payload = fastify.jwt.verify(token) as { user: string };
-      const username = payload.user;
-      const { email, avatar } = request.body;
+      const email = payload.user;
+      const { email: newEmail, avatar } = request.body;
 
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (!emailRegex.test(email)) {
-        return reply.code(400).send({ error: 'Format d\'email invalide' });
-      }
-
-      // Validation de l'avatar (doit être un des avatars disponibles)
+      // TODO: add a username validator
       const validAvatars = ['avatar.png', 'avatar1.png', 'avatar2.png', 'avatar3.png'];
       if (!validAvatars.includes(avatar)) {
         return reply.code(400).send({ error: 'Avatar invalide' });
       }
 
-      // Mise à jour du profil
-      await updateProfile(username, email, avatar);
+      await updateProfile(email, newEmail, avatar);
 
       reply.send({ success: true, message: 'Profil modifié avec succès' });
     } catch (err: any) {
@@ -91,7 +97,41 @@ async function editRoutes(app: FastifyInstance) {
     }
   });
 
-  const verifyCurrentPassword = async (username: string, currentPassword: string): Promise<boolean> => {
+  app.post<{ Body: ChangeLanguageBody }>('/change-language', async (request: FastifyRequest<{ Body: ChangeLanguageBody }>, reply: FastifyReply) => {
+    try {
+      // Récupérer le token depuis les headers ou les cookies
+      let token = request.headers['x-access-token'] as string;
+      
+      if (!token) {
+        token = request.cookies['x-access-token'];
+      }
+      
+      if (!token) {
+        return reply.code(401).send({ error: 'Token manquant' });
+      }
+
+      const payload = fastify.jwt.verify(token) as { user: string };
+      const email = payload.user;
+      const { language } = request.body;
+
+      const validLanguages = ['en', 'fr', 'es'];
+      if (!validLanguages.includes(language)) {
+        return reply.code(400).send({ error: 'Langue invalide' });
+      }
+
+      await updateLanguage(email, language);
+
+      reply.send({ success: true, message: 'Langue modifiée avec succès' });
+    } catch (err: any) {
+      console.error('❌ Error in change-language:', err);
+      if (err.name === 'JsonWebTokenError') {
+        return reply.code(401).send({ error: 'Token invalide ou expiré' });
+      }
+      reply.code(500).send({ error: 'Erreur serveur interne' });
+    }
+  });
+
+  const verifyCurrentPassword = async (email: string, currentPassword: string): Promise<boolean> => {
     const database = db.getDatabase();
     if (!database) {
       throw new Error('Database connection error');
@@ -99,8 +139,8 @@ async function editRoutes(app: FastifyInstance) {
 
     return new Promise((resolve, reject) => {
       database.get(
-        'SELECT password_hash FROM users WHERE username = ?',
-        [username],
+        'SELECT password_hash FROM users WHERE email = ?',
+        [email],
         async (err: any, user: { password_hash: string } | undefined) => {
           if (err) {
             reject(new Error('Database error'));
@@ -121,7 +161,7 @@ async function editRoutes(app: FastifyInstance) {
     });
   };
 
-  const updatePassword = async (username: string, newPassword: string) => {
+  const updatePassword = async (email: string, newPassword: string) => {
     const database = db.getDatabase();
 
     if (!database) {
@@ -133,8 +173,8 @@ async function editRoutes(app: FastifyInstance) {
 
     return new Promise((resolve, reject) => {
       database.run(
-        'UPDATE users SET password_hash = ? WHERE username = ?',
-        [hashedPassword, username],
+        'UPDATE users SET password_hash = ? WHERE email = ?',
+        [hashedPassword, email],
         function (this: any, err: any) {
           if (err) {
             console.error('❌ Database error:', err);
@@ -151,7 +191,7 @@ async function editRoutes(app: FastifyInstance) {
     });
   };
 
-  const updateProfile = async (username: string, email: string, avatar: string) => {
+  const updateProfile = async (email: string, newEmail: string, avatar: string) => {
     const database = db.getDatabase();
 
     if (!database) {
@@ -161,8 +201,36 @@ async function editRoutes(app: FastifyInstance) {
 
     return new Promise((resolve, reject) => {
       database.run(
-        'UPDATE users SET email = ?, avatar_url = ? WHERE username = ?',
-        [email, avatar, username],
+        'UPDATE users SET username = ?, avatar_url = ? WHERE email = ?',
+        [newEmail, avatar, email],
+        function (this: any, err: any) {
+          if (err) {
+            console.error('❌ Database error:', err);
+            reject(new Error('Database error'));
+          } else {
+            if (this.changes === 0) {
+              reject(new Error('Utilisateur non trouvé'));
+            } else {
+              resolve(this.changes);
+            }
+          }
+        }
+      );
+    });
+  };
+
+  const updateLanguage = async (email: string, language: string) => {
+    const database = db.getDatabase();
+
+    if (!database) {
+      console.error('❌ Database not initialized');
+      throw new Error('Database connection error');
+    }
+
+    return new Promise((resolve, reject) => {
+      database.run(
+        'UPDATE users SET language = ? WHERE email = ?',
+        [language, email],
         function (this: any, err: any) {
           if (err) {
             console.error('❌ Database error:', err);

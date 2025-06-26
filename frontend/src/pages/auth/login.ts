@@ -1,4 +1,5 @@
 import { t } from '../../utils/translations';
+import { setAuthToken, debugCookies } from '../../utils/auth';
 
 export function renderLogin(): string {
 	return `
@@ -35,27 +36,47 @@ document.addEventListener('DOMContentLoaded', () => {
 	const password = (document.getElementById('password') as HTMLInputElement).value;
 
 	try {
-		const response = await fetch('http://localhost:8000/auth/login', {
+		console.log('🔐 Tentative de connexion pour:', username);
+		console.log('🌐 URL actuelle:', window.location.href);
+		
+		const response = await fetch('/api/auth/login', {
 		method: 'POST',
 		headers: { 'Content-Type': 'application/json' },
 		body: JSON.stringify({ username, password }),
+		credentials: 'include' // Important pour recevoir les cookies
 		});
 
 		const result = await response.json();
 
 		if (!response.ok) {
 			alert(`❌ Error: ${result.error || 'Invalid credentials'}`);
+			return;
 		}
-		console.log('headers', response);
+
+		console.log('✅ Connexion réussie');
+		console.log('Headers de réponse:', response.headers);
+		
+		// Le token est maintenant dans un cookie, mais on peut aussi le récupérer du header pour la compatibilité
 		const token = response.headers.get('x-access-token');
-		if (!token) {
-			alert('❌ Token non reçu');
-		return;
+		if (token) {
+			console.log('🎫 Token reçu dans le header');
+			setAuthToken(token);
+		} else {
+			console.log('Token attendu dans les cookies');
 		}
-		localStorage.setItem('x-access-token', token);
-		window.location.href = '/main';
+		
+		// Debug: vérifier les cookies après login
+		console.log('🔍 Debug après login:');
+		debugCookies();
+		
+		// Attendre un peu pour que les cookies soient bien définis
+		setTimeout(() => {
+			console.log('🔄 Redirection vers /main');
+			window.location.href = '/main';
+		}, 100);
+		
 	} catch (err) {
-		console.error('Network or server error', err);
+		console.error('❌ Network or server error', err);
 		alert('❌ Error during login');
 	}
 	});

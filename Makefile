@@ -7,6 +7,11 @@ build:
 	@mkdir -p docker/vault/data/core
 	docker-compose -f $(DOCKER_COMPOSE) --env-file=.env build
 
+reset:
+	@mkdir -p docker/vault/data/core
+	docker-compose -f $(DOCKER_COMPOSE) --env-file=.env build --no-cache
+	docker-compose -f $(DOCKER_COMPOSE) up -d
+
 up:
 	docker-compose -f $(DOCKER_COMPOSE) up -d
 
@@ -16,12 +21,6 @@ status:
 	@echo "\033[1;36mBackend API:\033[0m http://localhost:8000"
 	@echo "\033[1;36mPrometheus:\033[0m http://localhost:9090"
 	@echo "\033[1;36mGrafana:\033[0m http://localhost:3001"
-	@echo "\n\033[1;33mTo access from Windows, use your WSL2 IP:\033[0m"
-	@echo "WSL2 IP: $$(ip addr show eth0 | grep "inet\b" | awk '{print $$2}' | cut -d/ -f1)"
-	@echo "Grafana: http://$$(ip addr show eth0 | grep "inet\b" | awk '{print $$2}' | cut -d/ -f1):3001"
-	@echo "Prometheus: http://$$(ip addr show eth0 | grep "inet\b" | awk '{print $$2}' | cut -d/ -f1):9090"
-	@echo "Frontend: http://$$(ip addr show eth0 | grep "inet\b" | awk '{print $$2}' | cut -d/ -f1):5173"
-	@echo "Backend API: http://$$(ip addr show eth0 | grep "inet\b" | awk '{print $$2}' | cut -d/ -f1):8000"
 	@echo "\n\033[1;32m=== End of Status ===\033[0m\n"
 
 down:
@@ -30,6 +29,13 @@ down:
 clean: down
 	docker system prune -af
 
+env:
+	@docker exec transcendence_vault_1 cat /tmp/vault.env
+
 re: clean all
 
-.PHONY: all build up down clean re status 
+test-backend:
+	@echo "🔍 Test rapide du backend..."
+	@curl -s http://localhost:8000/ping || echo "❌ Backend non accessible"
+
+.PHONY: all build up down clean re status test-cookies test-backend debug-cookies restart-cookies 

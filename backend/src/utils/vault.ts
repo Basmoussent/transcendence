@@ -1,3 +1,6 @@
+import * as dotenv from 'dotenv';
+dotenv.config({ path: '/tmp/vault.env' });
+
 interface VaultResponse {
   data: {
     data: Record<string, any>;
@@ -11,21 +14,17 @@ export async function getSecretFromVault(
   mountPoint = 'secret'
 ): Promise<string> {
   const vaultUrl = process.env.VAULT_ADDR || 'http://vault:8200';
-  const VAULT_TOKEN = process.env.VAULT_TOKEN;
 
   // Attente que Vault soit unsealed
   while (true) {
   try {
-      const healthResp = await fetch(`${vaultUrl}/v1/secret/data/JWT`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-Vault-Token': VAULT_TOKEN
-        }
+      const healthResp = await fetch(`${vaultUrl}/v1/sys/health`, {
+        method: 'GET'
       });
 
       if (!healthResp.ok) {
         console.log(`Waiting for Vault... status: ${healthResp.status}`);
+        console.log('response body:', await healthResp.text());
       } else {
         const data = await healthResp.json();
         console.log('✅ Vault responded with JWT data:', data);

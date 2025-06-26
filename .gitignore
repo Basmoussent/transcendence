@@ -36,3 +36,6 @@ node_modules
 .log
 
 docker/nginx/modsecurity/audit/
+
+# Vault credentials
+backend/vault-credentials/

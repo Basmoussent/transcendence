@@ -31,9 +31,32 @@ export function renderMain() {
             <i class="fas fa-cube"></i>
             Block Game
           </button>
+          
+          <button class="menu-button logout-button" onclick="handleLogout()">
+            <i class="fas fa-sign-out-alt"></i>
+            Logout
+          </button>
         </div>
       </div>
     </div>
+
+    <script>
+      async function handleLogout() {
+        try {
+          console.log('🚪 Tentative de logout...');
+          
+          // Importer la fonction logout depuis auth.ts
+          const { logout } = await import('../../utils/auth.js');
+          await logout();
+          
+          console.log('✅ Logout réussi');
+        } catch (error) {
+          console.error('❌ Erreur lors du logout:', error);
+          // Fallback: redirection directe
+          window.location.href = '/login';
+        }
+      }
+    </script>
 
     <style>
       .main-menu {
@@ -121,6 +144,13 @@ export function renderMain() {
 
       .block-game-button {
         background: linear-gradient(135deg, #f1c40f 0%, #f39c12 100%);
+      }
+
+      .logout-button {
+        background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+        margin-top: 10px;
+        border-top: 1px solid rgba(255, 255, 255, 0.2);
+        padding-top: 20px;
       }
 
       /* Animation d'entrée */
