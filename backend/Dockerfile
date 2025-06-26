@@ -1,6 +1,5 @@
 FROM node:20-alpine
 
-
 RUN apk add --no-cache \
   build-base python3 make cmake git \
   sqlite-dev \

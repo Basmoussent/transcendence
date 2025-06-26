@@ -71,6 +71,8 @@ export function router() {
     case '/edit-profil':
       view = renderEditProfil();
       break;
+    // case '/pong':
+    //   view = 
     default:
       view = render404();
   }
