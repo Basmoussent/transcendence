@@ -30,7 +30,11 @@ test-backend:
 	@echo "🔍 Test rapide du backend..."
 	@curl -s http://localhost:8000/ping || echo "❌ Backend non accessible"
 
-purge:
+env:
+	@echo "🔍 Affichage des variables d'environnement..."
+	@docker exec transcendence_backend_1 cat /app/.env || echo "❌ Impossible d'afficher les variables d'environnement"
+purge: down
+	@docker system prune -af
 	@docker ps -q | xargs -r docker stop
 	@docker ps -aq | xargs -r docker rm
 	@docker volume ls -q | xargs -r docker volume rm
