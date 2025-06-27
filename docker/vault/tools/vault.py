@@ -10,13 +10,15 @@ import signal
 from typing import Optional, Dict, Any
 
 def load_env_file(path):
-    with open(path) as f:
-        for line in f:
-            if line.strip() == '' or line.startswith('#'):
-                continue
-            key, value = line.strip().split('=', 1)
-            os.environ[key] = value
-
+    try:
+        with open(path) as f:
+            for line in f:
+                if line.strip() == '' or line.startswith('#'):
+                    continue
+                key, value = line.strip().split('=', 1)
+                os.environ[key] = value
+    except FileNotFoundError:
+        print(f"Environment file {path} not found, continuing without it.")
 load_env_file('/tmp/vault.env')
 
 class VaultManager:

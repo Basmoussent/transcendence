@@ -5,12 +5,7 @@ all: build up status
 
 build:
 	@mkdir -p docker/vault/data/core
-	docker-compose -f $(DOCKER_COMPOSE) --env-file=.env build
-
-reset:
-	@mkdir -p docker/vault/data/core
-	docker-compose -f $(DOCKER_COMPOSE) --env-file=.env build --no-cache
-	docker-compose -f $(DOCKER_COMPOSE) up -d
+	docker-compose -f $(DOCKER_COMPOSE) build
 
 up:
 	docker-compose -f $(DOCKER_COMPOSE) up -d
@@ -29,13 +24,17 @@ down:
 clean: down
 	docker system prune -af
 
-env:
-	@docker exec transcendence_vault_1 cat /tmp/vault.env
-
 re: clean all
 
 test-backend:
 	@echo "🔍 Test rapide du backend..."
 	@curl -s http://localhost:8000/ping || echo "❌ Backend non accessible"
 
-.PHONY: all build up down clean re status test-cookies test-backend debug-cookies restart-cookies 
+purge:
+	@docker ps -q | xargs -r docker stop
+	@docker ps -aq | xargs -r docker rm
+	@docker volume ls -q | xargs -r docker volume rm
+	@docker image prune -af
+	@echo "✅ Docker purged."
+
+.PHONY: all build up down clean re status

@@ -1,6 +1,3 @@
-import * as dotenv from 'dotenv';
-dotenv.config({ path: '/tmp/vault.env' });
-
 interface VaultResponse {
   data: {
     data: Record<string, any>;
@@ -43,6 +40,7 @@ export async function getSecretFromVault(
     const token = process.env.VAULT_TOKEN;
     
     if (!token) {
+      console.log(process.env);
       throw new Error('VAULT_TOKEN environment variable is required');
     }
     
