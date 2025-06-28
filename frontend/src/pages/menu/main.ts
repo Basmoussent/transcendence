@@ -27,6 +27,11 @@ export function renderMain() {
             ${t('menu.friends')}
           </button>
 
+          <button class="menu-button pong-game-button" onclick="window.location.href='/pong'">
+            <i class="fa-solid fa-trophy"></i>
+            Pong Game
+          </button>
+
           <button class="menu-button block-game-button" onclick="window.location.href='/block'">
             <i class="fas fa-cube"></i>
             Block Game
@@ -144,6 +149,10 @@ export function renderMain() {
 
       .block-game-button {
         background: linear-gradient(135deg, #f1c40f 0%, #f39c12 100%);
+      }
+
+      .pong-game-button {
+        background: linear-gradient(135deg, #ff8000 0%, #f39c12 100%);
       }
 
       .logout-button {

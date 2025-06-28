@@ -277,4 +277,8 @@ export class Pong {
 // a faire
     // modif speedx et speedy en fonction de quelle partie du paddle ca touche
     // ajouter usernames?
+    // power ups
+    // fin de partie apres un certain score
+    // ajouter le bouton pong a l'accueil
+    // ajouter le bouton accueil
     // stocker les scores API
