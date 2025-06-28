@@ -150,7 +150,7 @@ async function authRoutes(app: FastifyInstance) {
               return;
             }
 
-            const token = fastify.jwt.sign({ user: user.email });
+            const token = fastify.jwt.sign({ user: user.email , name: user.username });
             
             const origin = request.headers.origin || '';
             const host = request.headers.host || '';

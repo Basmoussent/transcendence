@@ -1,9 +1,23 @@
 import * as dotenv from 'dotenv';
 import * as path from 'path';
+import * as fs from 'fs';
 
-const envPath = path.resolve('/tmp/vault.env');
+const fileToCheck = '/tmp/vault.env';
 
-dotenv.config({ path: envPath });
+function waitForFileAndExecute(callback: (envPath: string) => void): void {
+    const interval = setInterval(() => {
+        if (fs.existsSync(fileToCheck)) {
+            clearInterval(interval);
+            const envPath = path.resolve(fileToCheck);
+            callback(envPath);
+        }
+    }, 1000);
+}
+
+waitForFileAndExecute((envPath: string) => {
+    dotenv.config({ path: envPath });
+});
+
 
 interface VaultResponse {
   data: {
@@ -44,8 +58,10 @@ export async function getSecretFromVault(
 
   // Continue la récupération du secret
   try {
+    while (!process.env.VAULT_TOKEN) {
+      const token = process.env.VAULT_TOKEN;
+    };
     const token = process.env.VAULT_TOKEN;
-    
     if (!token) {
       console.log(process.env);
       throw new Error('VAULT_TOKEN environment variable is required');

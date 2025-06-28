@@ -140,12 +140,24 @@ class VaultManager:
             print(f"Erreur lors du stockage du secret JWT: {e}")
             return False
     
-    def generate_random_secret(self, length: int = 13) -> str:
+    def generate_random_secret(self, length: int = 24) -> str:
         """Generate a random secret string"""
         import secrets
         import string
-        alphabet = string.ascii_letters + string.digits
-        return ''.join(secrets.choice(alphabet) for _ in range(length))
+        import dotenv
+        try :
+            dotenv.load_dotenv("/tmp/vault.env")
+            JWT = os.getenv('VAULT_JWT_KEY')
+            if JWT:
+                print("Utilisation du secret JWT existant :", JWT)
+                return JWT
+            else:
+                alphabet = string.ascii_letters + string.digits
+                return ''.join(secrets.choice(alphabet) for _ in range(length))
+        except:
+            print("Erreur lors de la génération du secret aléatoire")
+            sys.exit(1)
+        
 
 def signal_handler(signum, frame):
     """Handle shutdown signals"""
@@ -181,7 +193,6 @@ def main():
         print("Vault est déjà initialisé")
         vault_key = os.getenv('VAULT_KEY_1')
         vault_token = os.getenv('VAULT_TOKEN')
-        
         if not vault_manager.unseal_vault(vault_key):
             print("Échec de l'unseal de Vault")
             vault_manager.stop_vault_server()
@@ -210,9 +221,6 @@ def main():
         vault_key = init_result['keys'][0]
         vault_token = init_result['root_token']
         
-        print(f"VAULT_KEY_1 = {vault_key}")
-        print(f"VAULT_TOKEN = {vault_token}")
-        
         if not vault_manager.unseal_vault(vault_key):
             print("Échec de l'unseal de Vault")
             vault_manager.stop_vault_server()
@@ -232,6 +240,7 @@ def main():
         print("Configuration de Vault terminée avec succès")
         env_content = f"""VAULT_KEY_1={vault_key}
 VAULT_TOKEN={vault_token}
+VAULT_JWT_KEY={jwt_secret}
 """
         try:
             with open('/tmp/vault.env', 'w') as f:
