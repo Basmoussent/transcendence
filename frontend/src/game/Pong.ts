@@ -20,7 +20,7 @@ export class Pong {
 	};
 
   private ball: {
-    size: number;
+    radius: number;
     x: number;
     y: number;
     speedx: number;
@@ -56,11 +56,11 @@ export class Pong {
 		};
 
     this.ball = {
-      size: 10,
+      radius: 10,
       x: this.width / 2,
       y: this.height / 2,
-      speedx: 8,
-      speedy: -8
+      speedx: -5,
+      speedy: -5
     };
 
 		this.keys = {};
@@ -91,6 +91,7 @@ export class Pong {
     this.paddle2.x = this.width - this.paddle2.width - 30;
     this.paddle2.y = (this.height - this.paddle1.height) / 2;
 
+    // ajouter adjust ball size?
     this.ball.x = this.width / 2;
     this.ball.y = this.height / 2;
   }
@@ -131,9 +132,83 @@ export class Pong {
       paddle.y = this.height - paddle.height;
   }
 
+  private updateBall(ball: typeof this.ball, paddle1: typeof this.paddle1, paddle2: typeof this.paddle2): void {
+    ball.x += ball.speedx;
+    ball.y += ball.speedy;
+
+    // modif par rapport a ou ca touche le paddle
+    // check paddles collision
+    // if (ball.x - ball.radius <= paddle1.x + paddle1.width && ball.y + ball.radius >= paddle1.y && ball.y - ball.radius <= paddle1.y + paddle1.height)
+    // {
+    //   ball.speedx *= -1;
+    //   ball.x = paddle1.x + paddle1.width + ball.radius;
+    // }
+
+    // if (ball.x + ball.radius >= paddle2.x && ball.y + ball.radius >= paddle2.y && ball.y - ball.radius <= paddle2.y + paddle2.height)
+    // {
+    //   ball.speedx *= -1;
+    //   ball.x = paddle2.x - ball.radius;
+    // }
+
+    // check wall collision - haut et bas
+    if (ball.y - ball.radius <= 0 || ball.y + ball.radius >= this.height)
+      ball.speedy *= -1;
+
+    // check scored point et relancer si oui
+    if (ball.x - ball.radius > this.width || ball.x + ball.radius <= 0)
+    {
+      // add point to player
+      ball.x = this.width / 2;
+      ball.y = this.height / 2;
+      ball.speedx *= -1;
+    }
+  }
+
   private update(): void {
     this.updatePaddle(this.paddle1, 'w', 's');
     this.updatePaddle(this.paddle2, 'arrowup', 'arrowdown');
+    this.updateBall(this.ball, this.paddle1, this.paddle2);
+  }
+
+  private drawBall(ctx: typeof this.ctx, x: number, y: number, size: number): void {
+    ctx.beginPath();
+    ctx.arc(x, y, size, 0, Math.PI * 2);
+    ctx.fillStyle = '#ffffff';
+    ctx.fill();
+    ctx.closePath();
+  }
+
+  private drawPaddles(ctx: typeof this.ctx, paddle1: typeof this.paddle1, paddle2: typeof this.paddle2): void {
+    // paddles
+    ctx.fillStyle = '#4a90e2';
+		ctx.fillRect(
+			paddle1.x,
+			paddle1.y,
+			paddle1.width,
+			paddle1.height
+		);
+    ctx.fillRect(
+			paddle2.x,
+			paddle2.y,
+			paddle2.width,
+			paddle2.height
+		);
+
+    // contours
+    ctx.strokeStyle = '#ffffff';
+		ctx.lineWidth = 2;
+		ctx.strokeRect(
+			paddle1.x,
+			paddle1.y,
+			paddle1.width,
+			paddle1.height
+		);
+    ctx.strokeRect(
+			paddle2.x,
+			paddle2.y,
+			paddle2.width,
+			paddle2.height
+		);
   }
 
   private render(): void {
@@ -144,39 +219,10 @@ export class Pong {
     this.ctx.fillStyle = '#1a1a2e';
 		this.ctx.fillRect(0, 0, this.width, this.height);
 
-    // les paddles
-    this.ctx.fillStyle = '#4a90e2';
-		this.ctx.fillRect(
-			this.paddle1.x,
-			this.paddle1.y,
-			this.paddle1.width,
-			this.paddle1.height
-		);
-    this.ctx.fillRect(
-			this.paddle2.x,
-			this.paddle2.y,
-			this.paddle2.width,
-			this.paddle2.height
-		);
-
-    // contours des 2 paddles
-    this.ctx.strokeStyle = '#ffffff';
-		this.ctx.lineWidth = 2;
-		this.ctx.strokeRect(
-			this.paddle1.x,
-			this.paddle1.y,
-			this.paddle1.width,
-			this.paddle1.height
-		);
-    this.ctx.strokeRect(
-			this.paddle2.x,
-			this.paddle2.y,
-			this.paddle2.width,
-			this.paddle2.height
-		);
+    // les paddles + leur contour
+    this.drawPaddles(this.ctx, this.paddle1, this.paddle2);
 
     // la balle
-    this.ctx.fillStyle = '#ffffff';
-    this.ctx.arc
+    this.drawBall(this.ctx, this.ball.x, this.ball.y, this.ball.radius);
   }
 }
