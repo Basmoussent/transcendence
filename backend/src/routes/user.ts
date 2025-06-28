@@ -4,6 +4,10 @@ import jwt from '@fastify/jwt';
 import bcrypt from 'bcrypt';
 import fastify from '../index';
 import User from './authentication';
+import fs from 'fs'
+import util from 'util'
+import { pipeline } from 'stream'
+ import path from 'path';
 
 interface UserData {
   id: number;
@@ -81,6 +85,32 @@ async function userRoutes(app: FastifyInstance) {
             return reply.status(500).send({ error: 'Erreur serveur interne' });
         }
     });
+
+    app.post('/upload', async function (request: FastifyRequest, reply: FastifyReply) {
+        try {
+            const data = await request.file();
+
+            if (!data) {
+                return reply.status(400).send({ error: 'Aucun fichier reçu' });
+            }
+
+            const uploadPath = path.join(__dirname, '../../uploads', data);
+            const writeStream = fs.createWriteStream(uploadPath);
+
+            await new Promise<void>((resolve, reject) => {
+                data.file.pipe(writeStream)
+                    .on('finish', resolve)
+                    .on('error', reject);
+            });
+
+            const msg = uploadPath + ' uploaded successfully';
+            return { message: msg };
+        } catch (err) {
+            console.error('Erreur pendant l\'upload de fichier :', err);
+            return reply.status(500).send({ error: 'Erreur lors de l\'upload du fichier', details: err.message });
+        }
+    });
+
 }
 
 export default userRoutes;

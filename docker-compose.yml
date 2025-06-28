@@ -46,8 +46,6 @@ services:
       - vault_env:/tmp
     environment:
       - VAULT_ADDR=http://0.0.0.0:8200
-    env_file:
-      - .env
     cap_add:
       - IPC_LOCK
     networks:
@@ -80,8 +78,6 @@ services:
       - ./backend:/app:delegated
       - backend_node_modules:/app/node_modules
       - vault_env:/tmp
-    env_file:
-      - .env
     environment:
       - NODE_ENV=development
       - DATABASE_URL=sqlite:///./database.sqlite

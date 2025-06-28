@@ -1,9 +1,12 @@
 // type: ignore
+import * as dotenv from 'dotenv';
+dotenv.config();
 import Fastify from 'fastify';
 import cors from '@fastify/cors';
 import jwt from '@fastify/jwt';
 import websocket from '@fastify/websocket';
 import cookie from '@fastify/cookie';
+import multipart from '@fastify/multipart'
 import { db } from './database';
 import authRoutes from "./routes/authentication"
 import editRoutes from './routes/reset-pwd';
@@ -19,14 +22,20 @@ async function setup() {
   await db.initialize();
 
   // Register CORS
-await fastify.register(cors, {
-  origin: ['https://fr.localhost:5173', 'https://en.localhost:5173', "https://es.localhost:5173"],
-  credentials: true,
-  preflightContinue: false,
-  exposedHeaders: ['x-access-token']
-});
+  await fastify.register(cors, {
+    origin: ['https://fr.localhost:5173', 'https://en.localhost:5173', "https://es.localhost:5173"],
+    credentials: true,
+    preflightContinue: false,
+    exposedHeaders: ['x-access-token']
+  });
 
   await fastify.register(cookie);
+
+  await fastify.register(multipart, {
+      fieldNameSize: 30,
+      fileSize: 50000000, // 50MB
+      files: 1
+  });
 
   // on enregistre les routes definis, qui seront chacune sur /prefix/nom_de_la_route
   await fastify.register(authRoutes, {prefix: "/auth"});

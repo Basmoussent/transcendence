@@ -143,18 +143,15 @@ async function authRoutes(app: FastifyInstance) {
           }
 
           try {
-            // Comparaison du mot de passe fourni avec le hash stocké
             const passwordMatch = await bcrypt.compare(password, user.password_hash);
 
-            // Si le mot de passe ne correspond pas
             if (!passwordMatch) {
               resolve(reply.status(401).send({ error: 'Invalid username or password' }));
               return;
             }
 
-            const token = fastify.jwt.sign({ user: user.email });
+            const token = fastify.jwt.sign({ user: user.email , name: user.username });
             
-            // Déterminer le domaine du cookie selon l'environnement
             const origin = request.headers.origin || '';
             const host = request.headers.host || '';
             let cookieDomain;
@@ -165,12 +162,11 @@ async function authRoutes(app: FastifyInstance) {
             if (origin.includes('entropy.local') || host.includes('entropy.local')) {
               cookieDomain = '.entropy.local'; // Avec le point pour partager entre sous-domaines
             } else if (origin.includes('localhost') || host.includes('localhost')) {
-              // Pour localhost, on utilise le domaine parent pour partager entre sous-domaines
               const hostParts = host.split('.');
               if (hostParts.length > 1) {
                 cookieDomain = `.${hostParts.slice(-1).join('.')}`; // .localhost
               } else {
-                cookieDomain = undefined; // Pas de domaine pour localhost simple
+                cookieDomain = ".localhost"; // Pas de domaine pour localhost simple
               }
             }
             
