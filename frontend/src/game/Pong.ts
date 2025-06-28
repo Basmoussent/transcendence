@@ -40,16 +40,16 @@ export class Pong {
     this.height = canvas.height;
 
     this.paddle1 = {
-			width: 100,
-			height: 20,
+			width: 20,
+			height: 100,
 			x: 0,
 			y: 0,
       speed: 8
 		};
 
     this.paddle2 = {
-			width: 100,
-			height: 20,
+			width: 20,
+			height: 100,
 			x: 0,
 			y: 0,
       speed: 8
@@ -88,7 +88,7 @@ export class Pong {
     this.paddle1.x = 30;
 		this.paddle1.y = (this.height - this.paddle1.height) / 2;
 
-    this.paddle2.x = this.width - this.paddle2.height - 30;
+    this.paddle2.x = this.width - this.paddle2.width - 30;
     this.paddle2.y = (this.height - this.paddle1.height) / 2;
 
     this.ball.x = this.width / 2;
@@ -127,8 +127,8 @@ export class Pong {
     // ajuster au cas ou il sort des limites
     if (paddle.y < 0)
       paddle.y = 0;
-    else if (paddle.y + paddle.width > this.height)
-      paddle.y = this.height - paddle.width;
+    else if (paddle.y + paddle.height > this.height)
+      paddle.y = this.height - paddle.height;
   }
 
   private update(): void {
@@ -149,14 +149,14 @@ export class Pong {
 		this.ctx.fillRect(
 			this.paddle1.x,
 			this.paddle1.y,
-			this.paddle1.height,
-			this.paddle1.width
+			this.paddle1.width,
+			this.paddle1.height
 		);
     this.ctx.fillRect(
 			this.paddle2.x,
 			this.paddle2.y,
-			this.paddle2.height,
-			this.paddle2.width
+			this.paddle2.width,
+			this.paddle2.height
 		);
 
     // contours des 2 paddles
@@ -165,14 +165,14 @@ export class Pong {
 		this.ctx.strokeRect(
 			this.paddle1.x,
 			this.paddle1.y,
-			this.paddle1.height,
-			this.paddle1.width
+			this.paddle1.width,
+			this.paddle1.height
 		);
     this.ctx.strokeRect(
 			this.paddle2.x,
 			this.paddle2.y,
-			this.paddle2.height,
-			this.paddle2.width
+			this.paddle2.width,
+			this.paddle2.height
 		);
 
     // la balle
