@@ -31,10 +31,10 @@ export function renderPong() {
         align-items: center;
       }
 
-      #blockGameCanvas {
+      #pongGameCanvas {
         width: 100%;
         height: 100%;
-        display: block;
+        display: pong;
         background-color: #1a1a2e;
       }
 
