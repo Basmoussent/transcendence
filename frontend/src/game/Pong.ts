@@ -3,14 +3,31 @@ export class Pong {
   private ctx: CanvasRenderingContext2D;
   private width: number;
   private height: number;
-  private paddle: {
+  private paddle1: {
 		width: number;
 		height: number;
 		x: number;
 		y: number;
-		speed: number;
+    speed: number;
 	};
-	// private keys: { [key: string]: boolean };
+
+  private paddle2: {
+		width: number;
+		height: number;
+		x: number;
+		y: number;
+    speed: number;
+	};
+
+  private ball: {
+    size: number;
+    x: number;
+    y: number;
+    speedx: number;
+    speedy: number;
+  };
+
+	private keys: { [key: string]: boolean };
 
   constructor(canvas: HTMLCanvasElement) {
     this.canvas = canvas;
@@ -19,36 +36,79 @@ export class Pong {
 			throw new Error('Could not get 2D context');
 		}
 		this.ctx = context;
-    
     this.width = canvas.width;
     this.height = canvas.height;
-    
-    this.paddle = {
+
+    this.paddle1 = {
 			width: 100,
 			height: 20,
 			x: 0,
 			y: 0,
-			speed: 8
+      speed: 8
 		};
+
+    this.paddle2 = {
+			width: 100,
+			height: 20,
+			x: 0,
+			y: 0,
+      speed: 8
+		};
+
+    this.ball = {
+      size: 10,
+      x: this.width / 2,
+      y: this.height / 2,
+      speedx: 8,
+      speedy: -8
+    };
+
+		this.keys = {};
   }
 
   public init(): void {
-    // Initialisation du jeu
+		console.log('Initializing paddle game...');
     this.setupCanvas();
+    this.setupEventListeners();
     this.startGameLoop();
+
+    // on resize si la taille de la fenetre change
+    window.addEventListener('resize', () => {
+			this.setupCanvas();
+		});
   }
 
   private setupCanvas(): void {
-    // Configuration du canvas
-    this.canvas.width = 800;
-    this.canvas.height = 600;
+    console.log('Setting up canvas...');
+		this.canvas.width = this.canvas.clientWidth || 800;
+		this.canvas.height = this.canvas.clientHeight || 600;
+		this.width = this.canvas.width;
+		this.height = this.canvas.height;
 
-    this.paddle.x = (this.width - this.paddle.width) / 2;
-		this.paddle.y = this.height - this.paddle.height - 30;
+    this.paddle1.x = 30;
+		this.paddle1.y = (this.height - this.paddle1.height) / 2;
+
+    this.paddle2.x = this.width - this.paddle2.width - 30;
+    this.paddle2.y = (this.height - this.paddle1.height) / 2;
+
+    this.ball.x = this.width / 2;
+    this.ball.y = this.height / 2;
+  }
+
+  // quand on appuie sur une touche this.keys[touche] = true
+	private setupEventListeners(): void {
+    window.addEventListener('keydown', (e) => {
+      this.keys[e.key.toLowerCase()] = true;
+    });
+
+    window.addEventListener('keyup', (e) => {
+      this.keys[e.key.toLowerCase()] = false;
+    });
   }
 
   private startGameLoop(): void {
-    // Boucle principale du jeu
+		console.log('Starting game loop...');
+    // fleche au lieu de function() pour que this fasse ref a Pong
     const gameLoop = () => {
       this.update();
       this.render();
@@ -57,13 +117,66 @@ export class Pong {
     gameLoop();
   }
 
+  private updatePaddle(paddle: typeof this.paddle1, upKey: string, downKey: string): void {
+    // faire bouger le paddle
+    if (this.keys[upKey])
+        paddle.y -= paddle.speed;
+    if (this.keys[downKey])
+        paddle.y += paddle.speed;
+
+    // ajuster au cas ou il sort des limites
+    if (paddle.y < 0)
+      paddle.y = 0;
+    else if (paddle.y + paddle.height > this.height)
+      paddle.y = this.height - paddle.height;
+  }
+
   private update(): void {
-    // Logique de mise à jour du jeu
+    this.updatePaddle(this.paddle1, 'w', 's');
+    this.updatePaddle(this.paddle2, 'arrowup', 'arrowdown');
   }
 
   private render(): void {
-    // Rendu du jeu
+    // on efface tout
     this.ctx.clearRect(0, 0, this.width, this.height);
-    // Dessiner les éléments du jeu ici
+
+    // le fond
+    this.ctx.fillStyle = '#1a1a2e';
+		this.ctx.fillRect(0, 0, this.width, this.height);
+
+    // les paddles
+    this.ctx.fillStyle = '#4a90e2';
+		this.ctx.fillRect(
+			this.paddle1.x,
+			this.paddle1.y,
+			this.paddle1.width,
+			this.paddle1.height
+		);
+    this.ctx.fillRect(
+			this.paddle2.x,
+			this.paddle2.y,
+			this.paddle2.width,
+			this.paddle2.height
+		);
+
+    // contours des 2 paddles
+    this.ctx.strokeStyle = '#ffffff';
+		this.ctx.lineWidth = 2;
+		this.ctx.strokeRect(
+			this.paddle1.x,
+			this.paddle1.y,
+			this.paddle1.width,
+			this.paddle1.height
+		);
+    this.ctx.strokeRect(
+			this.paddle2.x,
+			this.paddle2.y,
+			this.paddle2.width,
+			this.paddle2.height
+		);
+
+    // la balle
+    this.ctx.fillStyle = '#ffffff';
+    this.ctx.arc
   }
 }
