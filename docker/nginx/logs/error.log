@@ -791,3 +791,18 @@
 2025/06/28 14:04:35 [notice] 1#1: ModSecurity-nginx v1.0.4 (rules loaded inline/local/remote: 0/10/0)
 2025/06/28 14:04:35 [notice] 1#1: libmodsecurity3 version 3.0.14
 >>>>>>> origin
+2025/06/28 15:47:51 [notice] 1#1: ModSecurity-nginx v1.0.4 (rules loaded inline/local/remote: 0/10/0)
+2025/06/28 15:47:51 [notice] 1#1: libmodsecurity3 version 3.0.14
+2025/06/28 15:56:14 [error] 4869#4869: *36 connect() failed (111: Connection refused) while connecting to upstream, client: 172.18.0.1, server: fr.localhost, request: "POST /api/auth/register HTTP/1.1", upstream: "http://172.18.0.6:8000/auth/register", host: "localhost:2443", referrer: "https://localhost:2443/create-account"
+2025/06/28 15:58:00 [notice] 1#1: ModSecurity-nginx v1.0.4 (rules loaded inline/local/remote: 0/10/0)
+2025/06/28 15:58:00 [notice] 1#1: libmodsecurity3 version 3.0.14
+2025/06/28 16:04:26 [notice] 1#1: ModSecurity-nginx v1.0.4 (rules loaded inline/local/remote: 0/10/0)
+2025/06/28 16:04:26 [notice] 1#1: libmodsecurity3 version 3.0.14
+2025/06/28 16:06:02 [notice] 1#1: ModSecurity-nginx v1.0.4 (rules loaded inline/local/remote: 0/10/0)
+2025/06/28 16:06:02 [notice] 1#1: libmodsecurity3 version 3.0.14
+2025/06/28 17:39:02 [notice] 1#1: ModSecurity-nginx v1.0.4 (rules loaded inline/local/remote: 0/10/0)
+2025/06/28 17:39:02 [notice] 1#1: libmodsecurity3 version 3.0.14
+2025/06/28 21:10:21 [notice] 1#1: ModSecurity-nginx v1.0.4 (rules loaded inline/local/remote: 0/10/0)
+2025/06/28 21:10:21 [notice] 1#1: libmodsecurity3 version 3.0.14
+2025/06/28 21:11:57 [notice] 1#1: ModSecurity-nginx v1.0.4 (rules loaded inline/local/remote: 0/10/0)
+2025/06/28 21:11:57 [notice] 1#1: libmodsecurity3 version 3.0.14

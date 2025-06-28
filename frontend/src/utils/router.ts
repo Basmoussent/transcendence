@@ -19,7 +19,7 @@ export async function router() {
   const app = document.getElementById('app');
   if (!app) return;
 
-  const publicRoutes = ['/', '/login', '/create-account', '/forgot-password', '/pong'];
+  const publicRoutes = ['/', '/login', '/create-account', '/forgot-password', '/pong', '/block'];
   const token = getAuthToken();
 
   if (!publicRoutes.includes(path) && !token) {
