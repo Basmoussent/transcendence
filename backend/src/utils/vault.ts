@@ -1,3 +1,10 @@
+import * as dotenv from 'dotenv';
+import * as path from 'path';
+
+const envPath = path.resolve('/tmp/vault.env');
+
+dotenv.config({ path: envPath });
+
 interface VaultResponse {
   data: {
     data: Record<string, any>;
