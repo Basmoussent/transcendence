@@ -111,7 +111,13 @@
       window.getAuthToken = getAuthToken;
     </script>
     <script>
+      let isChangingLanguage = false;
+      
       window.changeLanguage = async function(lang) {
+        if (isChangingLanguage) return;
+        
+        isChangingLanguage = true;
+        
         const hostname = window.location.hostname;
         const parts = hostname.split('.');
         
@@ -151,17 +157,65 @@
 
           if (!response.ok) {
             console.error('Erreur lors du changement de langue:', response.statusText);
+            isChangingLanguage = false;
             return;
           }
           console.log('Langue changée avec succès');
+          
+          // Update the URL without full page reload using history API
+          window.history.pushState({}, '', newUrl);
+          
+          // Update the active language button
+          const buttons = document.querySelectorAll('.language-btn');
+          buttons.forEach(btn => btn.classList.remove('active'));
+          const activeBtn = document.querySelector(`.${lang}-flag`);
+          if (activeBtn) activeBtn.classList.add('active');
+          
+          // Trigger a custom event to notify the SPA router
+          window.dispatchEvent(new CustomEvent('languageChanged', { detail: { language: lang } }));
+          
         } catch (error) {
           console.error('Erreur lors du changement de langue:', error);
+          isChangingLanguage = false;
         }
-        
-        window.location.href = newUrl;
       };
       
-      function ensureSubdomain() {
+      async function getPreferedLanguage() {
+        try {
+          const response = await fetch('/api/me', {
+            method: 'GET',
+            headers: {
+              'Content-Type': 'application/json',
+              'x-access-token': window.getAuthToken()
+            }
+          });
+          if (!response) {
+            throw new Error('Erreur lors de la récupération de la langue préférée');
+          }
+          const data = await response.json();
+          console.log('Langue préférée récupérée:', data.user.language);
+          return data.user.language || 'en';
+        } catch (error) {
+          console.error('Erreur lors de la récupération de la langue préférée:', error);
+          return 'en';
+        }
+      }
+
+      async function ensureSubdomain() {
+        if (isChangingLanguage) return; // Prevent execution during language change
+        
+        if (window.getAuthToken().length > 0) {
+          const preferredLanguage = await getPreferedLanguage();
+          const currentLang = window.location.hostname.split('.')[0];
+          
+          if (preferredLanguage !== currentLang) {
+            console.log(`🔄 Redirection vers la langue préférée: ${preferredLanguage}`);
+            changeLanguage(preferredLanguage);
+            return;
+          }
+          return;
+        }
+        
         const hostname = window.location.hostname;
         const parts = hostname.split('.');
         
@@ -181,22 +235,30 @@
           const newHost = `en.${baseDomain}`;
           const newUrl = window.location.protocol + '//' + newHost + window.location.pathname + window.location.search + window.location.hash;
           console.log(`🔄 Redirection vers sous-domaine par défaut: ${hostname} -> ${newHost}`);
-          window.location.replace(newUrl);
+          
+          // Use SPA navigation instead of full page redirect
+          window.history.pushState({}, '', newUrl);
+          window.dispatchEvent(new CustomEvent('languageChanged', { detail: { language: 'en' } }));
         }
       }
 
-      document.addEventListener('DOMContentLoaded', () => {
+      document.addEventListener('DOMContentLoaded', async () => {
         const hostname = window.location.hostname;
         const lang = hostname.split('.')[0];
         const buttons = document.querySelectorAll('.language-btn');
         
-        ensureSubdomain();
+        await ensureSubdomain();
         
         buttons.forEach(btn => {
           if (btn.classList.contains(`${lang}-flag`)) {
             btn.classList.add('active');
           }
         });
+        
+        // Reset the flag after initial setup
+        setTimeout(() => {
+          isChangingLanguage = false;
+        }, 1000);
       });
     </script>
   </body>

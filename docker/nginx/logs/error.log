@@ -771,3 +771,63 @@
 2025/06/28 14:00:45 [notice] 1#1: libmodsecurity3 version 3.0.14
 2025/06/28 14:04:35 [notice] 1#1: ModSecurity-nginx v1.0.4 (rules loaded inline/local/remote: 0/10/0)
 2025/06/28 14:04:35 [notice] 1#1: libmodsecurity3 version 3.0.14
+2025/06/28 15:46:05 [notice] 1#1: ModSecurity-nginx v1.0.4 (rules loaded inline/local/remote: 0/10/0)
+2025/06/28 15:46:05 [notice] 1#1: libmodsecurity3 version 3.0.14
+2025/06/28 15:46:41 [warn] 4864#4864: *37 an upstream response is buffered to a temporary file /var/cache/nginx/proxy_temp/1/00/0000000001 while reading upstream, client: 172.18.0.1, server: fr.localhost, request: "GET /@vite/client HTTP/1.1", upstream: "http://172.18.0.7:5173/@vite/client", host: "en.localhost", referrer: "https://en.localhost/main"
+2025/06/28 16:09:13 [emerg] 1#1: host not found in upstream "frontend" in /etc/nginx/nginx.conf:73
+2025/06/28 16:13:21 [emerg] 1#1: host not found in upstream "frontend" in /etc/nginx/nginx.conf:73
+2025/06/28 16:15:40 [notice] 1#1: ModSecurity-nginx v1.0.4 (rules loaded inline/local/remote: 0/10/0)
+2025/06/28 16:15:40 [notice] 1#1: libmodsecurity3 version 3.0.14
+2025/06/28 16:29:34 [notice] 1#1: ModSecurity-nginx v1.0.4 (rules loaded inline/local/remote: 0/10/0)
+2025/06/28 16:29:34 [notice] 1#1: libmodsecurity3 version 3.0.14
+2025/06/28 16:56:46 [error] 4869#4869: *4567 connect() failed (111: Connection refused) while connecting to upstream, client: 172.18.0.1, server: fr.localhost, request: "POST /api/edit/change-language HTTP/1.1", upstream: "http://172.18.0.6:8000/edit/change-language", host: "en.entropy.local", referrer: "https://en.entropy.local/profil"
+2025/06/28 16:56:54 [error] 4869#4869: *4567 connect() failed (111: Connection refused) while connecting to upstream, client: 172.18.0.1, server: fr.localhost, request: "GET /api/me HTTP/1.1", upstream: "http://172.18.0.6:8000/me", host: "en.entropy.local", referrer: "https://en.entropy.local/profil"
+2025/06/28 16:56:54 [error] 4869#4869: *4567 connect() failed (111: Connection refused) while connecting to upstream, client: 172.18.0.1, server: fr.localhost, request: "GET /api/me HTTP/1.1", upstream: "http://172.18.0.6:8000/me", host: "en.entropy.local", referrer: "https://en.entropy.local/profil"
+2025/06/28 16:56:57 [error] 4869#4869: *4567 connect() failed (111: Connection refused) while connecting to upstream, client: 172.18.0.1, server: fr.localhost, request: "POST /api/edit/change-language HTTP/1.1", upstream: "http://172.18.0.6:8000/edit/change-language", host: "en.entropy.local", referrer: "https://en.entropy.local/profil"
+2025/06/28 16:57:00 [error] 4869#4869: *4567 connect() failed (111: Connection refused) while connecting to upstream, client: 172.18.0.1, server: fr.localhost, request: "POST /api/edit/change-language HTTP/1.1", upstream: "http://172.18.0.6:8000/edit/change-language", host: "en.entropy.local", referrer: "https://en.entropy.local/profil"
+2025/06/28 16:57:41 [notice] 1#1: ModSecurity-nginx v1.0.4 (rules loaded inline/local/remote: 0/10/0)
+2025/06/28 16:57:41 [notice] 1#1: libmodsecurity3 version 3.0.14
+2025/06/28 16:57:51 [error] 4857#4857: *4 connect() failed (111: Connection refused) while connecting to upstream, client: 172.18.0.1, server: fr.localhost, request: "GET /api/me HTTP/1.1", upstream: "http://172.18.0.6:8000/me", host: "es.entropy.local", referrer: "https://es.entropy.local/profil"
+2025/06/28 16:57:51 [error] 4857#4857: *4 connect() failed (111: Connection refused) while connecting to upstream, client: 172.18.0.1, server: fr.localhost, request: "GET /api/me HTTP/1.1", upstream: "http://172.18.0.6:8000/me", host: "es.entropy.local", referrer: "https://es.entropy.local/profil"
+2025/06/28 16:57:51 [error] 4857#4857: *4 connect() failed (111: Connection refused) while connecting to upstream, client: 172.18.0.1, server: fr.localhost, request: "POST /api/edit/change-language HTTP/1.1", upstream: "http://172.18.0.6:8000/edit/change-language", host: "es.entropy.local", referrer: "https://es.entropy.local/profil"
+2025/06/28 16:58:55 [error] 4862#4862: *38 connect() failed (111: Connection refused) while connecting to upstream, client: 172.18.0.1, server: fr.localhost, request: "POST /api/edit/change-language HTTP/1.1", upstream: "http://172.18.0.6:8000/edit/change-language", host: "es.entropy.local"
+2025/06/28 17:00:12 [error] 4866#4866: *44 connect() failed (111: Connection refused) while connecting to upstream, client: 172.18.0.1, server: fr.localhost, request: "GET /api/me HTTP/1.1", upstream: "http://172.18.0.6:8000/me", host: "es.entropy.local", referrer: "https://es.entropy.local/profil"
+2025/06/28 17:00:12 [error] 4864#4864: *40 connect() failed (111: Connection refused) while connecting to upstream, client: 172.18.0.1, server: fr.localhost, request: "GET /api/me HTTP/1.1", upstream: "http://172.18.0.6:8000/me", host: "es.entropy.local", referrer: "https://es.entropy.local/profil"
+2025/06/28 17:00:12 [error] 4866#4866: *44 connect() failed (111: Connection refused) while connecting to upstream, client: 172.18.0.1, server: fr.localhost, request: "POST /api/edit/change-language HTTP/1.1", upstream: "http://172.18.0.6:8000/edit/change-language", host: "es.entropy.local", referrer: "https://es.entropy.local/profil"
+2025/06/28 17:02:13 [error] 4872#4872: *76 connect() failed (111: Connection refused) while connecting to upstream, client: 172.18.0.1, server: fr.localhost, request: "GET /api/me HTTP/1.1", upstream: "http://172.18.0.6:8000/me", host: "en.entropy.local", referrer: "https://en.entropy.local/"
+2025/06/28 17:02:18 [error] 4875#4875: *86 connect() failed (111: Connection refused) while connecting to upstream, client: 172.18.0.1, server: fr.localhost, request: "GET /api/me HTTP/1.1", upstream: "http://172.18.0.6:8000/me", host: "en.entropy.local", referrer: "https://en.entropy.local/profil"
+2025/06/28 17:02:18 [error] 4872#4872: *76 connect() failed (111: Connection refused) while connecting to upstream, client: 172.18.0.1, server: fr.localhost, request: "GET /api/me HTTP/1.1", upstream: "http://172.18.0.6:8000/me", host: "en.entropy.local", referrer: "https://en.entropy.local/profil"
+2025/06/28 17:02:34 [error] 4872#4872: *76 connect() failed (111: Connection refused) while connecting to upstream, client: 172.18.0.1, server: fr.localhost, request: "POST /api/auth/login HTTP/1.1", upstream: "http://172.18.0.6:8000/auth/login", host: "en.entropy.local", referrer: "https://en.entropy.local/login"
+2025/06/28 17:02:42 [error] 4872#4872: *76 connect() failed (111: Connection refused) while connecting to upstream, client: 172.18.0.1, server: fr.localhost, request: "POST /api/auth/login HTTP/1.1", upstream: "http://172.18.0.6:8000/auth/login", host: "en.entropy.local", referrer: "https://en.entropy.local/login"
+2025/06/28 17:02:54 [error] 4872#4872: *76 connect() failed (111: Connection refused) while connecting to upstream, client: 172.18.0.1, server: fr.localhost, request: "POST /api/auth/login HTTP/1.1", upstream: "http://172.18.0.6:8000/auth/login", host: "en.entropy.local", referrer: "https://en.entropy.local/login"
+2025/06/28 17:04:45 [error] 4855#4855: *165 connect() failed (111: Connection refused) while connecting to upstream, client: 172.18.0.1, server: fr.localhost, request: "GET /api/ping HTTP/1.1", upstream: "http://172.18.0.6:8000/ping", host: "en.entropy.local"
+2025/06/28 17:05:34 [notice] 1#1: ModSecurity-nginx v1.0.4 (rules loaded inline/local/remote: 0/10/0)
+2025/06/28 17:05:34 [notice] 1#1: libmodsecurity3 version 3.0.14
+2025/06/28 17:07:01 [error] 4861#4861: *9 connect() failed (111: Connection refused) while connecting to upstream, client: 172.18.0.1, server: fr.localhost, request: "POST /api/auth/login HTTP/1.1", upstream: "http://172.18.0.6:8000/auth/login", host: "en.entropy.local"
+2025/06/28 17:07:28 [error] 4862#4862: *11 connect() failed (111: Connection refused) while connecting to upstream, client: 172.18.0.1, server: fr.localhost, request: "POST /api/auth/login HTTP/1.1", upstream: "http://172.18.0.6:8000/auth/login", host: "en.entropy.local"
+2025/06/28 17:09:02 [notice] 1#1: ModSecurity-nginx v1.0.4 (rules loaded inline/local/remote: 0/10/0)
+2025/06/28 17:09:02 [notice] 1#1: libmodsecurity3 version 3.0.14
+2025/06/28 17:10:12 [notice] 1#1: ModSecurity-nginx v1.0.4 (rules loaded inline/local/remote: 0/10/0)
+2025/06/28 17:10:12 [notice] 1#1: libmodsecurity3 version 3.0.14
+2025/06/28 17:10:29 [warn] 4855#4855: *3 an upstream response is buffered to a temporary file /var/cache/nginx/proxy_temp/1/00/0000000001 while reading upstream, client: 172.18.0.1, server: fr.localhost, request: "GET /@vite/client HTTP/1.1", upstream: "http://172.18.0.8:5173/@vite/client", host: "en.localhost", referrer: "https://en.localhost/login"
+2025/06/28 17:17:33 [notice] 1#1: ModSecurity-nginx v1.0.4 (rules loaded inline/local/remote: 0/10/0)
+2025/06/28 17:17:33 [notice] 1#1: libmodsecurity3 version 3.0.14
+2025/06/28 17:18:27 [warn] 4865#4865: *40 an upstream response is buffered to a temporary file /var/cache/nginx/proxy_temp/1/00/0000000001 while reading upstream, client: 172.18.0.1, server: fr.localhost, request: "GET /@vite/client HTTP/1.1", upstream: "http://172.18.0.8:5173/@vite/client", host: "en.entropy.local", referrer: "https://en.entropy.local/profil"
+2025/06/29 10:29:59 [notice] 1#1: ModSecurity-nginx v1.0.4 (rules loaded inline/local/remote: 0/10/0)
+2025/06/29 10:29:59 [notice] 1#1: libmodsecurity3 version 3.0.14
+2025/06/29 10:42:24 [notice] 1#1: ModSecurity-nginx v1.0.4 (rules loaded inline/local/remote: 0/10/0)
+2025/06/29 10:42:24 [notice] 1#1: libmodsecurity3 version 3.0.14
+2025/06/29 10:43:24 [warn] 4867#4867: *26 an upstream response is buffered to a temporary file /var/cache/nginx/proxy_temp/1/00/0000000001 while reading upstream, client: 172.18.0.1, server: fr.localhost, request: "GET /preview-pong.mp4 HTTP/1.1", upstream: "http://172.18.0.7:5173/preview-pong.mp4", host: "fr.entropy.local", referrer: "https://fr.entropy.local/"
+2025/06/29 10:46:23 [notice] 1#1: ModSecurity-nginx v1.0.4 (rules loaded inline/local/remote: 0/10/0)
+2025/06/29 10:46:23 [notice] 1#1: libmodsecurity3 version 3.0.14
+2025/06/29 10:50:20 [error] 4870#4870: *186 connect() failed (111: Connection refused) while connecting to upstream, client: 172.18.0.1, server: fr.localhost, request: "GET /api/me HTTP/1.1", upstream: "http://172.18.0.6:8000/me", host: "fr.entropy.local", referrer: "https://fr.entropy.local/profil"
+2025/06/29 10:50:20 [error] 4867#4867: *181 connect() failed (111: Connection refused) while connecting to upstream, client: 172.18.0.1, server: fr.localhost, request: "GET /api/me HTTP/1.1", upstream: "http://172.18.0.6:8000/me", host: "fr.entropy.local", referrer: "https://fr.entropy.local/profil"
+2025/06/29 10:50:20 [error] 4867#4867: *181 connect() failed (111: Connection refused) while connecting to upstream, client: 172.18.0.1, server: fr.localhost, request: "GET /api/uploads/avatar.png HTTP/1.1", upstream: "http://172.18.0.6:8000/uploads/avatar.png", host: "fr.entropy.local", referrer: "https://fr.entropy.local/profil"
+2025/06/29 10:50:20 [error] 4870#4870: *186 connect() failed (111: Connection refused) while connecting to upstream, client: 172.18.0.1, server: fr.localhost, request: "POST /api/edit/change-language HTTP/1.1", upstream: "http://172.18.0.6:8000/edit/change-language", host: "fr.entropy.local", referrer: "https://fr.entropy.local/profil"
+2025/06/29 10:52:16 [notice] 1#1: ModSecurity-nginx v1.0.4 (rules loaded inline/local/remote: 0/10/0)
+2025/06/29 10:52:16 [notice] 1#1: libmodsecurity3 version 3.0.14
+2025/06/29 10:56:22 [notice] 1#1: ModSecurity-nginx v1.0.4 (rules loaded inline/local/remote: 0/10/0)
+2025/06/29 10:56:22 [notice] 1#1: libmodsecurity3 version 3.0.14
+2025/06/29 10:57:30 [warn] 4855#4855: *2 a client request body is buffered to a temporary file /var/cache/nginx/client_temp/0000000001, client: 172.18.0.1, server: fr.localhost, request: "POST /api/upload/avatar HTTP/1.1", host: "fr.entropy.local", referrer: "https://fr.entropy.local/edit-profil"
+2025/06/29 11:23:43 [notice] 1#1: ModSecurity-nginx v1.0.4 (rules loaded inline/local/remote: 0/10/0)
+2025/06/29 11:23:43 [notice] 1#1: libmodsecurity3 version 3.0.14

@@ -277,9 +277,12 @@ export function renderHome(): string {
   `;
 }
 
-document.addEventListener('DOMContentLoaded', () => {
+function initializeHomeEvents() {
   const loginBtn = document.getElementById('loginBtn');
   loginBtn?.addEventListener('click', () => {
-    window.location.href = '/login';
+    window.history.pushState({}, '', '/login');
+    window.dispatchEvent(new PopStateEvent('popstate'));
   });
-});
+}
+
+export { initializeHomeEvents };

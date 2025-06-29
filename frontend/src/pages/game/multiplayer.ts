@@ -3,7 +3,7 @@ export function renderMultiplayer() {
     <div class="game-page">
       <div class="game-container">
         <div class="game-header">
-          <button class="home-button" onclick="window.location.href='/main'">
+          <button class="home-button" id="homeBtn">
             <i class="fas fa-home"></i>
             Home
           </button>
@@ -353,4 +353,17 @@ export function renderMultiplayer() {
       }
     </style>
   `;
-} 
+}
+
+function initializeMultiplayerEvents() {
+  const homeBtn = document.getElementById('homeBtn');
+  
+  if (homeBtn) {
+    homeBtn.addEventListener('click', () => {
+      window.history.pushState({}, '', '/main');
+      window.dispatchEvent(new PopStateEvent('popstate'));
+    });
+  }
+}
+
+export { initializeMultiplayerEvents }; 

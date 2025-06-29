@@ -11,7 +11,7 @@ interface ChangePasswordBody {
 }
 
 interface EditProfileBody {
-  email: string;
+  username: string;
   avatar: string;
 }
 
@@ -62,44 +62,86 @@ async function editRoutes(app: FastifyInstance) {
     }
   });
 
-  app.post<{ Body: EditProfileBody }>('/profile', async (request: FastifyRequest<{ Body: EditProfileBody }>, reply: FastifyReply) => {
-    try {
-      // Récupérer le token depuis les headers ou les cookies
-      let token = request.headers['x-access-token'] as string;
-      
-      if (!token) {
-        token = request.cookies['x-access-token'];
-      }
-      
-      if (!token) {
-        return reply.code(401).send({ error: 'Token manquant' });
-      }
+      // Endpoint pour mettre à jour le profil (username et avatar_url)
+      app.post('/profile', async (request: FastifyRequest, reply: FastifyReply) => {
+        try {
+            // Vérifier l'authentification
+            let token = request.headers['x-access-token'] as string;
+            if (!token) {
+                token = request.cookies['x-access-token'];
+            }
+            
+            if (!token) {
+                return reply.status(401).send({ error: 'Token d\'authentification manquant' });
+            }
 
-      const payload = fastify.jwt.verify(token) as { user: string };
-      const email = payload.user;
-      const { email: newEmail, avatar } = request.body;
+            const decoded = fastify.jwt.verify(token) as { user: string };
+            const email = decoded.user;
 
-      // TODO: add a username validator
-      const validAvatars = ['avatar.png', 'avatar1.png', 'avatar2.png', 'avatar3.png'];
-      if (!validAvatars.includes(avatar)) {
-        return reply.code(400).send({ error: 'Avatar invalide' });
-      }
+            const { username, avatar_url } = request.body as { username?: string; avatar_url?: string };
 
-      await updateProfile(email, newEmail, avatar);
+            const database = db.getDatabase();
+            if (!database) {
+                return reply.status(500).send({ error: 'Erreur de connexion à la base de données' });
+            }
 
-      reply.send({ success: true, message: 'Profil modifié avec succès' });
-    } catch (err: any) {
-      console.error('❌ Error in edit-profile:', err);
-      if (err.name === 'JsonWebTokenError') {
-        return reply.code(401).send({ error: 'Token invalide ou expiré' });
-      }
-      reply.code(500).send({ error: 'Erreur serveur interne' });
-    }
-  });
+            if (username && avatar_url) {
+                await new Promise<void>((resolve, reject) => {
+                    database.run(
+                        'UPDATE users SET username = ?, avatar_url = ? WHERE email = ?',
+                        [username, avatar_url, email],
+                        (err: any) => {
+                            if (err) {
+                                reject(err);
+                            } else {
+                                resolve();
+                            }
+                        }
+                    );
+                });
+            } else if (username) {
+                await new Promise<void>((resolve, reject) => {
+                    database.run(
+                        'UPDATE users SET username = ? WHERE email = ?',
+                        [username, email],
+                        (err: any) => {
+                            if (err) {
+                                reject(err);
+                            } else {
+                                resolve();
+                            }
+                        }
+                    );
+                });
+            } else if (avatar_url) {
+                await new Promise<void>((resolve, reject) => {
+                    database.run(
+                        'UPDATE users SET avatar_url = ? WHERE email = ?',
+                        [avatar_url, email],
+                        (err: any) => {
+                            if (err) {
+                                reject(err);
+                            } else {
+                                resolve();
+                            }
+                        }
+                    );
+                });
+            }
+
+            return reply.send({ message: 'Profil mis à jour avec succès' });
+
+        } catch (err: any) {
+            console.error('Erreur lors de la mise à jour du profil :', err);
+            if (err.name === 'JsonWebTokenError') {
+                return reply.status(401).send({ error: 'Token invalide ou expiré' });
+            }
+            return reply.status(500).send({ error: 'Erreur lors de la mise à jour du profil' });
+        }
+    });
 
   app.post<{ Body: ChangeLanguageBody }>('/change-language', async (request: FastifyRequest<{ Body: ChangeLanguageBody }>, reply: FastifyReply) => {
     try {
-      // Récupérer le token depuis les headers ou les cookies
       let token = request.headers['x-access-token'] as string;
       
       if (!token) {

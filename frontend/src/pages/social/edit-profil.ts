@@ -9,42 +9,30 @@ export function renderEditProfil(): string {
 				<h2>${t('profile.edit.title') || 'Modifier le profil'}</h2>
 				<form id="editProfilForm" class="login-form">
 					<div class="form-group">
-						<label for="email">${t('profile.edit.email') || 'Email'}</label>
-						<input type="email" id="email" name="email" placeholder="${t('profile.edit.email') || 'Email'}" required>
+						<label for="username">${t('profile.edit.username') || 'Nom d\'utilisateur'}</label>
+						<input id="username" name="username" placeholder="${t('profile.edit.username') || 'Nom d\'utilisateur'}" required>
 					</div>
 					<div class="form-group">
 						<label for="avatar">${t('profile.edit.avatar') || 'Avatar'}</label>
 						<div class="avatar-selection">
-							<div class="avatar-option">
-								<input type="radio" id="avatar1" name="avatar" value="avatar.png" checked>
-								<label for="avatar1">
-									<img src="../../public/avatar.png" alt="Avatar 1" class="avatar-preview">
+							<div class="avatar-option custom-upload">
+								<input type="radio" id="customAvatar" name="avatar" value="custom">
+								<label for="customAvatar" class="custom-upload-label">
+									<div class="upload-icon">
+										<i class="fas fa-upload"></i>
+									</div>
+									<span class="upload-text">Upload</span>
 								</label>
-							</div>
-							<div class="avatar-option">
-								<input type="radio" id="avatar2" name="avatar" value="avatar1.png">
-								<label for="avatar2">
-									<img src="../../public/avatar1.png" alt="Avatar 2" class="avatar-preview">
-								</label>
-							</div>
-							<div class="avatar-option">
-								<input type="radio" id="avatar3" name="avatar" value="avatar2.png">
-								<label for="avatar3">
-									<img src="../../public/avatar2.png" alt="Avatar 3" class="avatar-preview">
-								</label>
-							</div>
-							<div class="avatar-option">
-								<input type="radio" id="avatar4" name="avatar" value="avatar3.png">
-								<label for="avatar4">
-									<img src="../../public/avatar3.png" alt="Avatar 4" class="avatar-preview">
-								</label>
+								<input type="file" id="customAvatarInput" accept="image/*" style="display: none;">
 							</div>
 						</div>
 					</div>
 					<button type="submit" class="login-btn">${t('profile.edit.submit') || 'Enregistrer'}</button>
 				</form>
 				<div class="login-options">
-					<a href="/social/profil" class="back-to-profile">${t('profile.edit.backToProfile') || 'Annuler'}</a>
+					<button id="backToProfileBtn" class="back-to-profile-btn">
+						${t('profile.edit.backToProfile') || 'Annuler'}
+					</button>
 				</div>
 			</div>
 		</main>
@@ -56,6 +44,7 @@ export function renderEditProfil(): string {
 			gap: 15px;
 			margin-top: 10px;
 			justify-content: center;
+			flex-wrap: wrap;
 		}
 
 		.avatar-option {
@@ -86,28 +75,153 @@ export function renderEditProfil(): string {
 			object-fit: cover;
 		}
 
+		.custom-upload-label {
+			width: 60px;
+			height: 60px;
+			border-radius: 50%;
+			background: linear-gradient(135deg, #4a90e2 0%, #357abd 100%);
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			justify-content: center;
+			color: white;
+			font-size: 0.8em;
+		}
+
+		.upload-icon {
+			font-size: 1.2em;
+			margin-bottom: 2px;
+		}
+
+		.upload-text {
+			font-size: 0.7em;
+		}
+
 		.form-group label {
 			display: block;
 			margin-bottom: 5px;
 			color: #333;
 			font-weight: 500;
 		}
+
+		.back-to-profile-btn {
+			background: linear-gradient(135deg, #6c757d 0%, #5a6268 100%);
+			color: white;
+			border: none;
+			padding: 10px 20px;
+			border-radius: 8px;
+			cursor: pointer;
+			font-size: 14px;
+			font-weight: 500;
+			transition: all 0.3s ease;
+			text-decoration: none;
+			display: inline-block;
+		}
+
+		.back-to-profile-btn:hover {
+			background: linear-gradient(135deg, #5a6268 0%, #495057 100%);
+			transform: translateY(-2px);
+			box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+		}
+
+		.back-to-profile-btn:active {
+			transform: translateY(0);
+		}
 	</style>
 	`;
 }
 
-document.addEventListener('DOMContentLoaded', () => {
+function initializeEditProfileEvents() {
 	const editProfilForm = document.getElementById('editProfilForm');
+	const customAvatarInput = document.getElementById('customAvatarInput') as HTMLInputElement;
+	const customAvatarRadio = document.getElementById('customAvatar') as HTMLInputElement;
+	const backToProfileBtn = document.getElementById('backToProfileBtn');
+
+	if (backToProfileBtn) {
+		backToProfileBtn.addEventListener('click', () => {
+			window.history.pushState({}, '', '/profil');
+			window.dispatchEvent(new PopStateEvent('popstate'));
+		});
+	}
+
+	// Gestion de l'upload d'image personnalisée
+	if (customAvatarInput && customAvatarRadio) {
+		customAvatarInput.addEventListener('change', async (e) => {
+			const file = (e.target as HTMLInputElement).files?.[0];
+			if (!file) return;
+
+			// Vérifier le type de fichier
+			if (!file.type.startsWith('image/')) {
+				alert('❌ Veuillez sélectionner une image valide');
+				return;
+			}
+
+			// Vérifier la taille (5MB max)
+			if (file.size > 5 * 1024 * 1024) {
+				alert('❌ L\'image est trop volumineuse. Taille maximum: 5MB');
+				return;
+			}
+
+			try {
+				const token = getAuthToken();
+				if (!token) {
+					alert('❌ Token d\'authentification manquant');
+					window.history.pushState({}, '', '/login');
+					window.dispatchEvent(new PopStateEvent('popstate'));
+					return;
+				}
+
+				const formData = new FormData();
+				formData.append('file', file);
+
+				const response = await fetch('/api/upload/avatar', {
+					method: 'POST',
+					headers: {
+						'x-access-token': token
+					},
+					body: formData
+				});
+
+				const result = await response.json();
+				
+				if (response.ok) {
+					alert('✅ Avatar uploadé avec succès');
+					// Rediriger vers la page de profil avec le router SPA
+					window.history.pushState({}, '', '/profil');
+					window.dispatchEvent(new PopStateEvent('popstate'));
+				} else {
+					alert(`❌ Erreur: ${result.error || 'Erreur inconnue'}`);
+				}
+			} catch (err) {
+				console.error('Erreur lors de l\'upload:', err);
+				alert('❌ Erreur lors de l\'upload de l\'avatar');
+			}
+		});
+
+		// Quand on clique sur l'option custom, déclencher l'input file
+		customAvatarRadio.addEventListener('change', () => {
+			if (customAvatarRadio.checked) {
+				customAvatarInput.click();
+			}
+		});
+	}
+
 	editProfilForm?.addEventListener('submit', async (e) => {
 		e.preventDefault();
-		const email = (document.getElementById('email') as HTMLInputElement).value;
+		const username = (document.getElementById('username') as HTMLInputElement).value;
 		const selectedAvatar = (document.querySelector('input[name="avatar"]:checked') as HTMLInputElement)?.value || 'avatar.png';
+		
+		// Si c'est un avatar personnalisé, ne pas traiter ici car l'upload est géré séparément
+		if (selectedAvatar === 'custom') {
+			return;
+		}
 		
 		try {
 			const token = getAuthToken();
 			if (!token) {
 				alert('❌ Token d\'authentification manquant');
-				window.location.href = '/login';
+				window.history.pushState({}, '', '/login');
+				window.dispatchEvent(new PopStateEvent('popstate'));
 				return;
 			}
 
@@ -118,8 +232,8 @@ document.addEventListener('DOMContentLoaded', () => {
 					'x-access-token': token
 				},
 				body: JSON.stringify({ 
-					email, 
-					avatar: selectedAvatar 
+					username, 
+					avatar_url: selectedAvatar 
 				})
 			});
 			const result = await response.json();
@@ -127,11 +241,16 @@ document.addEventListener('DOMContentLoaded', () => {
 				alert(`❌ Erreur: ${result.error || 'Erreur inconnue'}`);
 			} else {
 				alert('✅ Profil modifié avec succès');
-				window.location.href = "/profil";
+				// Rediriger vers la page de profil avec le router SPA
+				window.history.pushState({}, '', '/profil');
+				window.dispatchEvent(new PopStateEvent('popstate'));
 			}
 		} catch (err) {
 			console.error('Erreur réseau ou serveur', err);
 			alert('❌ Erreur lors de la modification du profil');
 		}
 	});
-}); 
+}
+
+// Exporter la fonction d'initialisation pour qu'elle puisse être appelée après le rendu
+export { initializeEditProfileEvents }; 

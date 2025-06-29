@@ -1,4 +1,5 @@
 import { getAuthToken, removeAuthToken } from '../../utils/auth';
+import { sanitizeHtml } from '../../utils/sanitizer';
 import { t } from '../../utils/translations';
 
 export async function renderProfil() {
@@ -16,7 +17,8 @@ export async function renderProfil() {
     const token = getAuthToken();
     if (!token) {
       alert('❌ Token d\'authentification manquant');
-      window.location.href = '/login';
+      window.history.pushState({}, '', '/login');
+      window.dispatchEvent(new PopStateEvent('popstate'));
       return '';
     }
 
@@ -31,13 +33,13 @@ export async function renderProfil() {
     if (response.ok) {
       const result = await response.json();
       userData = {
-        username: result.user?.username || 'Username',
-        email: result.user?.email || 'email@example.com',
-        avatar: result.user?.avatar_url || 'avatar.png',
-        wins: result.stats?.wins || 0,
-        games: result.stats?.games || 0,
-        rating: result.stats?.rating || 0,
-        preferred_language: result.user?.language || 'en'
+        username: sanitizeHtml(result.user?.username) || 'Username',
+        email: sanitizeHtml(result.user?.email) || 'email@example.com',
+        avatar: sanitizeHtml(result.user?.avatar_url) || 'avatar.png',
+        wins: (result.stats?.wins) || 0,
+        games: (result.stats?.games) || 0,
+        rating: (result.stats?.rating) || 0,
+        preferred_language: sanitizeHtml(result.user?.language) || 'en'
       };
     } else {
       console.error('Erreur lors de la récupération des données utilisateur');
@@ -45,6 +47,11 @@ export async function renderProfil() {
   } catch (error) {
     console.error("Error rendering profile page:", error);
   }
+
+  // Construire l'URL de l'avatar
+  const avatarUrl = userData.avatar.startsWith('http') || userData.avatar.startsWith('/api/') 
+    ? userData.avatar 
+    : `/api/uploads/${userData.avatar}`;
 
   const htmlContent = `
     <div class="profile-page">
@@ -57,10 +64,11 @@ export async function renderProfil() {
       <div class="profile-container">
         <div class="profile-header">
           <div class="profile-avatar">
-            <img src="../../public/${userData.avatar}" alt="Profile Avatar" class="avatar-image">
-            <button class="change-avatar-btn">
+            <img src="${avatarUrl}" alt="Profile Avatar" class="avatar-image" onerror="this.src='../../public/avatar.png'">
+            <button class="change-avatar-btn" id="changeAvatarBtn">
               <i class="fas fa-camera"></i>
             </button>
+            <input type="file" id="avatarInput" accept="image/*" style="display: none;">
           </div>
           <div class="profile-info">
             <h1 class="username">${userData.username}</h1>
@@ -204,6 +212,7 @@ export async function renderProfil() {
         height: 120px;
         border-radius: 50%;
         border: 4px solid rgba(255, 255, 255, 0.2);
+        object-fit: cover;
       }
 
       .change-avatar-btn {
@@ -395,11 +404,14 @@ export async function renderProfil() {
     const logoutButton = document.querySelector('.action-button.logout');
     const editProfileButton = document.querySelector('.action-button.edit-profile');
     const changePasswordButton = document.querySelector('.action-button.change-password');
+    const changeAvatarBtn = document.getElementById('changeAvatarBtn');
+    const avatarInput = document.getElementById('avatarInput') as HTMLInputElement;
 
     if (logoutButton) {
       logoutButton.addEventListener('click', () => {
         removeAuthToken();
-        window.location.href = '/login';
+        window.history.pushState({}, '', '/login');
+        window.dispatchEvent(new PopStateEvent('popstate'));
       });
     }
     if (editProfileButton) {
@@ -412,6 +424,64 @@ export async function renderProfil() {
       changePasswordButton.addEventListener('click', () => {
         window.history.pushState({}, '', '/change-password');
         window.dispatchEvent(new PopStateEvent('popstate'));
+      });
+    }
+
+    // Gestion de l'upload d'avatar
+    if (changeAvatarBtn && avatarInput) {
+      changeAvatarBtn.addEventListener('click', () => {
+        avatarInput.click();
+      });
+
+      avatarInput.addEventListener('change', async (e) => {
+        const file = (e.target as HTMLInputElement).files?.[0];
+        if (!file) return;
+
+        // Vérifier le type de fichier
+        if (!file.type.startsWith('image/')) {
+          alert('❌ Veuillez sélectionner une image valide');
+          return;
+        }
+
+        // Vérifier la taille (5MB max)
+        if (file.size > 5 * 1024 * 1024) {
+          alert('❌ L\'image est trop volumineuse. Taille maximum: 5MB');
+          return;
+        }
+
+        try {
+          const token = getAuthToken();
+          if (!token) {
+            alert('❌ Token d\'authentification manquant');
+            window.history.pushState({}, '', '/login');
+            window.dispatchEvent(new PopStateEvent('popstate'));
+            return;
+          }
+
+          const formData = new FormData();
+          formData.append('file', file);
+
+          const response = await fetch('/api/upload/avatar', {
+            method: 'POST',
+            headers: {
+              'x-access-token': token
+            },
+            body: formData
+          });
+
+          const result = await response.json();
+          
+          if (response.ok) {
+            alert('✅ Avatar mis à jour avec succès');
+            // Recharger la page pour afficher le nouvel avatar
+            window.location.reload();
+          } else {
+            alert(`❌ Erreur: ${result.error || 'Erreur inconnue'}`);
+          }
+        } catch (err) {
+          console.error('Erreur lors de l\'upload:', err);
+          alert('❌ Erreur lors de l\'upload de l\'avatar');
+        }
       });
     }
   }, 0);

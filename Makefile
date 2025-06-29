@@ -5,6 +5,7 @@ all: build up status
 
 build:
 	@mkdir -p docker/vault/data/core
+	mkdir -p backend/uploads
 	docker-compose -f $(DOCKER_COMPOSE) build
 
 up:

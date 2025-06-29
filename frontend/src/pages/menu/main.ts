@@ -1,4 +1,5 @@
 import { t } from '../../utils/translations';
+import { removeAuthToken } from '../../utils/auth';
 
 export function renderMain() {
   return `
@@ -7,56 +8,38 @@ export function renderMain() {
         <h1 class="menu-title">${t('menu.title')}</h1>
         
         <div class="menu-buttons">
-          <button class="menu-button profile-button" onclick="window.location.href='/profil'">
+          <button class="menu-button profile-button" id="profileBtn">
             <i class="fas fa-user"></i>
             ${t('menu.profile')}
           </button>
           
-          <button class="menu-button local-game-button" onclick="window.location.href='/local-game'">
+          <button class="menu-button local-game-button" id="localGameBtn">
             <i class="fas fa-gamepad"></i>
             ${t('menu.playLocal')}
           </button>
           
-          <button class="menu-button multiplayer-button" onclick="window.location.href='/multiplayer'">
+          <button class="menu-button multiplayer-button" id="multiplayerBtn">
             <i class="fas fa-users"></i>
             ${t('menu.multiplayer')}
           </button>
           
-          <button class="menu-button friends-button" onclick="window.location.href='/friends'">
+          <button class="menu-button friends-button" id="friendsBtn">
             <i class="fas fa-user-friends"></i>
             ${t('menu.friends')}
           </button>
 
-          <button class="menu-button block-game-button" onclick="window.location.href='/block'">
+          <button class="menu-button block-game-button" id="blockGameBtn">
             <i class="fas fa-cube"></i>
             Block Game
           </button>
           
-          <button class="menu-button logout-button" onclick="handleLogout()">
+          <button class="menu-button logout-button" id="logoutBtn">
             <i class="fas fa-sign-out-alt"></i>
             Logout
           </button>
         </div>
       </div>
     </div>
-
-    <script>
-      async function handleLogout() {
-        try {
-          console.log('🚪 Tentative de logout...');
-          
-          // Importer la fonction logout depuis auth.ts
-          const { logout } = await import('../../utils/auth.js');
-          await logout();
-          
-          console.log('✅ Logout réussi');
-        } catch (error) {
-          console.error('❌ Erreur lors du logout:', error);
-          // Fallback: redirection directe
-          window.location.href = '/login';
-        }
-      }
-    </script>
 
     <style>
       .main-menu {
@@ -246,3 +229,67 @@ export function renderMain() {
     </style>
   `;
 }
+
+function initializeMainEvents() {
+  // Gestion des boutons de navigation
+  const profileBtn = document.getElementById('profileBtn');
+  const localGameBtn = document.getElementById('localGameBtn');
+  const multiplayerBtn = document.getElementById('multiplayerBtn');
+  const friendsBtn = document.getElementById('friendsBtn');
+  const blockGameBtn = document.getElementById('blockGameBtn');
+  const logoutBtn = document.getElementById('logoutBtn');
+
+  if (profileBtn) {
+    profileBtn.addEventListener('click', () => {
+      window.history.pushState({}, '', '/profil');
+      window.dispatchEvent(new PopStateEvent('popstate'));
+    });
+  }
+
+  if (localGameBtn) {
+    localGameBtn.addEventListener('click', () => {
+      window.history.pushState({}, '', '/local-game');
+      window.dispatchEvent(new PopStateEvent('popstate'));
+    });
+  }
+
+  if (multiplayerBtn) {
+    multiplayerBtn.addEventListener('click', () => {
+      window.history.pushState({}, '', '/multiplayer');
+      window.dispatchEvent(new PopStateEvent('popstate'));
+    });
+  }
+
+  if (friendsBtn) {
+    friendsBtn.addEventListener('click', () => {
+      window.history.pushState({}, '', '/friends');
+      window.dispatchEvent(new PopStateEvent('popstate'));
+    });
+  }
+
+  if (blockGameBtn) {
+    blockGameBtn.addEventListener('click', () => {
+      window.history.pushState({}, '', '/block');
+      window.dispatchEvent(new PopStateEvent('popstate'));
+    });
+  }
+
+  if (logoutBtn) {
+    logoutBtn.addEventListener('click', async () => {
+      try {
+        console.log('🚪 Tentative de logout...');
+        removeAuthToken();
+        console.log('✅ Logout réussi');
+        window.history.pushState({}, '', '/login');
+        window.dispatchEvent(new PopStateEvent('popstate'));
+      } catch (error) {
+        console.error('❌ Erreur lors du logout:', error);
+        // Fallback: redirection directe
+        window.history.pushState({}, '', '/login');
+        window.dispatchEvent(new PopStateEvent('popstate'));
+      }
+    });
+  }
+}
+
+export { initializeMainEvents };
