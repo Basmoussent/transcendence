@@ -33,7 +33,25 @@ export async function router() {
     }, 0);
     return;
   }
-  // TODO: verify token validity
+  if (!publicRoutes.includes(path) && token) {
+    const response = await fetch('/api/auth/verify', {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-access-token': token || '',
+      },
+    });
+    console.log("api check response:", response);
+    if (response.status === 401) {
+      window.history.pushState({}, '', '/login');
+      app.innerHTML = renderLogin();
+      setTimeout(() => {
+        initializeLoginEvents();
+      }, 0);
+      return;
+    }
+  };
+
   if (path === '/login' && token) {
     window.history.pushState({}, '', '/main');
     app.innerHTML = renderMain();

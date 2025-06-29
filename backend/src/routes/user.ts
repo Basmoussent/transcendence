@@ -2,8 +2,6 @@ import { db } from '../database';
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import jwt from '@fastify/jwt';
 import bcrypt from 'bcrypt';
-import fastify from '../index';
-import User from './authentication';
 import fs from 'fs'
 import util from 'util'
 import { pipeline } from 'stream'
@@ -31,7 +29,7 @@ async function userRoutes(app: FastifyInstance) {
         }
 
         try {
-            const decoded = fastify.jwt.verify(token) as { user: string };
+            const decoded = app.jwt.verify(token) as { user: string };
             const email = decoded.user;
 
             const database = db.getDatabase();
@@ -118,7 +116,7 @@ async function userRoutes(app: FastifyInstance) {
                 return reply.status(401).send({ error: 'Token d\'authentification manquant' });
             }
 
-            const decoded = fastify.jwt.verify(token) as { user: string };
+            const decoded = app.jwt.verify(token) as { user: string };
             const email = decoded.user;
 
             const database = db.getDatabase();

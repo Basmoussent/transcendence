@@ -27,7 +27,7 @@ clean: down
 
 re: clean all
 
-test-backend:
+testb:
 	@echo "🔍 Test rapide du backend..."
 	@curl -s http://localhost:8000/ping || echo "❌ Backend non accessible"
 

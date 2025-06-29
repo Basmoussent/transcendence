@@ -140,8 +140,6 @@
         }
         
         const newUrl = `${window.location.protocol}//${newHostname}${window.location.pathname}${window.location.search}${window.location.hash}`;
-        console.log(`🔄 Changement de langue: ${hostname} -> ${newHostname}`);
-        console.log(`🔄 Nouvelle URL: ${newUrl}`);
 
         try {
           const authToken = window.getAuthToken();
@@ -160,12 +158,10 @@
             isChangingLanguage = false;
             return;
           }
-          console.log('Langue changée avec succès');
           
           // Update the URL without full page reload using history API
           window.history.pushState({}, '', newUrl);
           
-          // Update the active language button
           const buttons = document.querySelectorAll('.language-btn');
           buttons.forEach(btn => btn.classList.remove('active'));
           const activeBtn = document.querySelector(`.${lang}-flag`);

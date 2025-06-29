@@ -2,7 +2,6 @@ import { db } from '../database';
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import jwt from '@fastify/jwt';
 import bcrypt from 'bcrypt';
-import fastify from '../index';
 
 interface ChangePasswordBody {
   currentPassword: string;
@@ -33,7 +32,7 @@ async function editRoutes(app: FastifyInstance) {
         return reply.code(401).send({ error: 'Token manquant' });
       }
 
-      const payload = fastify.jwt.verify(token) as { user: string };
+      const payload = app.jwt.verify(token) as { user: string };
       const email = payload.user;
       const { currentPassword, newPassword, confirmNewPassword } = request.body;
 
@@ -75,7 +74,7 @@ async function editRoutes(app: FastifyInstance) {
                 return reply.status(401).send({ error: 'Token d\'authentification manquant' });
             }
 
-            const decoded = fastify.jwt.verify(token) as { user: string };
+            const decoded = app.jwt.verify(token) as { user: string };
             const email = decoded.user;
 
             const { username, avatar_url } = request.body as { username?: string; avatar_url?: string };
@@ -152,7 +151,7 @@ async function editRoutes(app: FastifyInstance) {
         return reply.code(401).send({ error: 'Token manquant' });
       }
 
-      const payload = fastify.jwt.verify(token) as { user: string };
+      const payload = app.jwt.verify(token) as { user: string };
       const email = payload.user;
       const { language } = request.body;
 

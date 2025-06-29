@@ -55,15 +55,17 @@ export async function getSecretFromVault(
     await new Promise((res) => setTimeout(res, 1000));
   }
 
+  // Recharger les variables d'environnement depuis le fichier vault.env
+  if (fs.existsSync(fileToCheck)) {
+    dotenv.config({ path: fileToCheck });
+  }
 
   // Continue la récupération du secret
   try {
-    while (!process.env.VAULT_TOKEN) {
-      const token = process.env.VAULT_TOKEN;
-    };
     const token = process.env.VAULT_TOKEN;
     if (!token) {
-      console.log(process.env);
+      console.log('❌ VAULT_TOKEN not found in environment variables');
+      console.log('Available env vars:', Object.keys(process.env).filter(key => key.includes('VAULT')));
       throw new Error('VAULT_TOKEN environment variable is required');
     }
     

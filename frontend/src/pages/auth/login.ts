@@ -1,5 +1,5 @@
 import { t } from '../../utils/translations';
-import { setAuthToken, debugCookies } from '../../utils/auth';
+import { setAuthToken } from '../../utils/auth';
 
 export function renderLogin(): string {
 	return `
@@ -81,9 +81,6 @@ function initializeLoginEvents() {
 			console.log('Token attendu dans les cookies');
 		}
 		
-		// Debug: vérifier les cookies après login
-		console.log('🔍 Debug après login:');
-		debugCookies();
 		
 		// Attendre un peu pour que les cookies soient bien définis
 		setTimeout(() => {

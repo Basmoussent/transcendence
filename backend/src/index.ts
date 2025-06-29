@@ -18,10 +18,15 @@ import { getSecretFromVault } from './utils/vault';
 const fastify = Fastify({ logger: { level: 'debug' } });
 
 async function setup() {
+  console.log('🚀 Starting setup...');
+  
   // Initialize database first
+  console.log('📦 Initializing database...');
   await db.initialize();
+  console.log('✅ Database initialized');
 
   // Register CORS
+  console.log('🌐 Registering CORS...');
   await fastify.register(cors, {
     origin: [
       'https://fr.localhost:5173', 
@@ -35,30 +40,45 @@ async function setup() {
     preflightContinue: false,
     exposedHeaders: ['x-access-token']
   });
+  console.log('✅ CORS registered');
 
+  console.log('🍪 Registering cookie plugin...');
   await fastify.register(cookie);
+  console.log('✅ Cookie plugin registered');
 
+  console.log('📁 Registering multipart plugin...');
   await fastify.register(multipart, {
       fieldNameSize: 30,
       fileSize: 50000000, // 50MB
       files: 1
   });
+  console.log('✅ Multipart plugin registered');
 
   // on enregistre les routes definis, qui seront chacune sur /prefix/nom_de_la_route
+  console.log('🛣️ Registering routes...');
   await fastify.register(authRoutes, {prefix: "/auth"});
+  console.log('✅ Auth routes registered');
   await fastify.register(editRoutes, {prefix: "/edit"});
+  console.log('✅ Edit routes registered');
   await fastify.register(userRoutes);
+  console.log('✅ User routes registered');
   
   // Register WebSocket
+  console.log('🔌 Registering WebSocket...');
   await fastify.register(websocket);
+  console.log('✅ WebSocket registered');
 
   // Register JWT
+  console.log('🔑 Getting JWT secret from Vault...');
   const jwtSecret =  await getSecretFromVault("JWT", "JWT_KEY") || "secret";
   console.log("JWT = ",  jwtSecret);
+  console.log('🔑 Registering JWT plugin...');
   await fastify.register(require('@fastify/jwt'), {
   secret: jwtSecret
   })
+  console.log('✅ JWT plugin registered');
   
+  console.log('🏠 Setting up basic routes...');
   fastify.get('/', async () => {
     return { message: 'API is up', database: 'connected' };
   });
@@ -78,7 +98,9 @@ async function setup() {
       return { status: 'error', error: error };
     }
   });
+  console.log('✅ Basic routes set up');
 
+  console.log('🌍 Starting server...');
   await fastify.listen({ port: 8000, host: '0.0.0.0' });
   console.log('🚀 Server running on http://localhost:8000');
 }
