@@ -806,3 +806,14 @@
 2025/06/28 21:10:21 [notice] 1#1: libmodsecurity3 version 3.0.14
 2025/06/28 21:11:57 [notice] 1#1: ModSecurity-nginx v1.0.4 (rules loaded inline/local/remote: 0/10/0)
 2025/06/28 21:11:57 [notice] 1#1: libmodsecurity3 version 3.0.14
+2025/06/29 03:20:10 [notice] 1#1: ModSecurity-nginx v1.0.4 (rules loaded inline/local/remote: 0/10/0)
+2025/06/29 03:20:10 [notice] 1#1: libmodsecurity3 version 3.0.14
+2025/06/29 12:58:54 [notice] 1#1: ModSecurity-nginx v1.0.4 (rules loaded inline/local/remote: 0/10/0)
+2025/06/29 12:58:54 [notice] 1#1: libmodsecurity3 version 3.0.14
+2025/06/29 13:59:09 [notice] 1#1: ModSecurity-nginx v1.0.4 (rules loaded inline/local/remote: 0/10/0)
+2025/06/29 13:59:09 [notice] 1#1: libmodsecurity3 version 3.0.14
+2025/06/29 15:18:03 [error] 4858#4858: *303 connect() failed (111: Connection refused) while connecting to upstream, client: 192.168.65.1, server: fr.localhost, request: "GET / HTTP/1.1", upstream: "http://172.18.0.7:5173/", host: "localhost:2443"
+2025/06/29 15:18:14 [notice] 1#1: ModSecurity-nginx v1.0.4 (rules loaded inline/local/remote: 0/10/0)
+2025/06/29 15:18:14 [notice] 1#1: libmodsecurity3 version 3.0.14
+2025/06/29 18:58:29 [notice] 1#1: ModSecurity-nginx v1.0.4 (rules loaded inline/local/remote: 0/10/0)
+2025/06/29 18:58:29 [notice] 1#1: libmodsecurity3 version 3.0.14

@@ -1,0 +1,15 @@
+faire une classe brick
+	contructor:
+		choisit aleatoirement de quel type elle sera vert bleu rouge
+		
+
+
+bricks:
+	
+	bleu -> oneshot
+
+	vert -> two shot
+
+	rouge -> THREE shot et fragilise les bricks frontalieres
+
+
