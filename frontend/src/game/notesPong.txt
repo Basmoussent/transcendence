@@ -3,6 +3,7 @@ https://stackoverflow.com/questions/4577814/pong-how-does-the-paddle-know-where-
 https://dooglz.github.io/set09121/pong2.html
 
 // a faire
+    // refaire adjustBallDir
     // power ups
     // stocker les scores API
     // police avec l'API
