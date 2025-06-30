@@ -7,5 +7,5 @@ COPY modsecurity.conf /etc/nginx/modsecurity.conf
 COPY cors.conf.template /etc/nginx/cors.conf
 RUN chmod +x /entrypoint.sh
 
-EXPOSE 80 243
+EXPOSE 2200 2443
 ENTRYPOINT ["/entrypoint.sh"]

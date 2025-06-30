@@ -418,6 +418,18 @@
 2025/06/17 14:36:42 [notice] 1#1: ModSecurity-nginx v1.0.4 (rules loaded inline/local/remote: 0/10/0)
 2025/06/17 14:36:42 [notice] 1#1: libmodsecurity3 version 3.0.14
 2025/06/17 14:36:46 [warn] 4855#4855: *2 an upstream response is buffered to a temporary file /var/cache/nginx/proxy_temp/1/00/0000000001 while reading upstream, client: 172.19.0.1, server: fr.localhost, request: "GET /@vite/client HTTP/1.1", upstream: "http://172.19.0.7:5173/@vite/client", host: "localhost", referrer: "https://localhost/change-password"
+<<<<<<< HEAD
+2025/06/18 12:59:08 [notice] 1#1: ModSecurity-nginx v1.0.4 (rules loaded inline/local/remote: 0/10/0)
+2025/06/18 12:59:08 [notice] 1#1: libmodsecurity3 version 3.0.14
+2025/06/18 13:01:25 [notice] 1#1: ModSecurity-nginx v1.0.4 (rules loaded inline/local/remote: 0/10/0)
+2025/06/18 13:01:25 [notice] 1#1: libmodsecurity3 version 3.0.14
+2025/06/23 14:32:59 [notice] 1#1: ModSecurity-nginx v1.0.4 (rules loaded inline/local/remote: 0/10/0)
+2025/06/23 14:32:59 [notice] 1#1: libmodsecurity3 version 3.0.14
+2025/06/24 17:23:15 [notice] 1#1: ModSecurity-nginx v1.0.4 (rules loaded inline/local/remote: 0/10/0)
+2025/06/24 17:23:15 [notice] 1#1: libmodsecurity3 version 3.0.14
+2025/06/26 14:09:40 [notice] 1#1: ModSecurity-nginx v1.0.4 (rules loaded inline/local/remote: 0/10/0)
+2025/06/26 14:09:40 [notice] 1#1: libmodsecurity3 version 3.0.14
+=======
 2025/06/18 10:36:31 [notice] 1#1: ModSecurity-nginx v1.0.4 (rules loaded inline/local/remote: 0/10/0)
 2025/06/18 10:36:31 [notice] 1#1: libmodsecurity3 version 3.0.14
 2025/06/18 10:36:36 [warn] 4855#4855: *2 an upstream response is buffered to a temporary file /var/cache/nginx/proxy_temp/1/00/0000000001 while reading upstream, client: 172.19.0.1, server: fr.localhost, request: "GET /@vite/client HTTP/1.1", upstream: "http://172.19.0.7:5173/@vite/client", host: "localhost", referrer: "https://localhost/profil"
@@ -684,6 +696,13 @@
 2025/06/25 15:13:12 [notice] 1#1: libmodsecurity3 version 3.0.14
 2025/06/25 21:41:18 [notice] 1#1: ModSecurity-nginx v1.0.4 (rules loaded inline/local/remote: 0/10/0)
 2025/06/25 21:41:18 [notice] 1#1: libmodsecurity3 version 3.0.14
+<<<<<<< HEAD
+>>>>>>> origin
+2025/06/26 14:34:37 [notice] 1#1: ModSecurity-nginx v1.0.4 (rules loaded inline/local/remote: 0/10/0)
+2025/06/26 14:34:37 [notice] 1#1: libmodsecurity3 version 3.0.14
+2025/06/28 11:54:03 [notice] 1#1: ModSecurity-nginx v1.0.4 (rules loaded inline/local/remote: 0/10/0)
+2025/06/28 11:54:03 [notice] 1#1: libmodsecurity3 version 3.0.14
+=======
 2025/06/26 11:23:55 [notice] 1#1: ModSecurity-nginx v1.0.4 (rules loaded inline/local/remote: 0/10/0)
 2025/06/26 11:23:55 [notice] 1#1: libmodsecurity3 version 3.0.14
 2025/06/26 11:25:46 [notice] 1#1: ModSecurity-nginx v1.0.4 (rules loaded inline/local/remote: 0/10/0)
@@ -771,6 +790,7 @@
 2025/06/28 14:00:45 [notice] 1#1: libmodsecurity3 version 3.0.14
 2025/06/28 14:04:35 [notice] 1#1: ModSecurity-nginx v1.0.4 (rules loaded inline/local/remote: 0/10/0)
 2025/06/28 14:04:35 [notice] 1#1: libmodsecurity3 version 3.0.14
+<<<<<<< HEAD
 2025/06/28 15:46:05 [notice] 1#1: ModSecurity-nginx v1.0.4 (rules loaded inline/local/remote: 0/10/0)
 2025/06/28 15:46:05 [notice] 1#1: libmodsecurity3 version 3.0.14
 2025/06/28 15:46:41 [warn] 4864#4864: *37 an upstream response is buffered to a temporary file /var/cache/nginx/proxy_temp/1/00/0000000001 while reading upstream, client: 172.18.0.1, server: fr.localhost, request: "GET /@vite/client HTTP/1.1", upstream: "http://172.18.0.7:5173/@vite/client", host: "en.localhost", referrer: "https://en.localhost/main"
@@ -889,3 +909,12 @@
 2025/06/29 19:16:33 [error] 4855#4855: *98 connect() failed (111: Connection refused) while connecting to upstream, client: 172.18.0.1, server: fr.localhost, request: "POST /api/auth/login HTTP/1.1", upstream: "http://172.18.0.6:8000/auth/login", host: "fr.entropy.local", referrer: "https://fr.entropy.local/login"
 2025/06/29 19:19:16 [error] 4855#4855: *101 connect() failed (111: Connection refused) while connecting to upstream, client: 172.18.0.1, server: fr.localhost, request: "POST /api/auth/login HTTP/1.1", upstream: "http://172.18.0.6:8000/auth/login", host: "fr.entropy.local", referrer: "https://fr.entropy.local/login"
 2025/06/29 19:21:02 [error] 4856#4856: *112 connect() failed (111: Connection refused) while connecting to upstream, client: 172.18.0.1, server: fr.localhost, request: "GET /api/auth/verify HTTP/1.1", upstream: "http://172.18.0.6:8000/auth/verify", host: "fr.entropy.local", referrer: "https://fr.entropy.local/login"
+=======
+>>>>>>> origin
+2025/06/28 15:45:24 [notice] 1#1: ModSecurity-nginx v1.0.4 (rules loaded inline/local/remote: 0/10/0)
+2025/06/28 15:45:24 [notice] 1#1: libmodsecurity3 version 3.0.14
+2025/06/28 15:48:38 [notice] 1#1: ModSecurity-nginx v1.0.4 (rules loaded inline/local/remote: 0/10/0)
+2025/06/28 15:48:38 [notice] 1#1: libmodsecurity3 version 3.0.14
+2025/06/30 09:50:04 [notice] 1#1: ModSecurity-nginx v1.0.4 (rules loaded inline/local/remote: 0/10/0)
+2025/06/30 09:50:04 [notice] 1#1: libmodsecurity3 version 3.0.14
+>>>>>>> ines

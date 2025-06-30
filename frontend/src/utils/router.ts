@@ -12,7 +12,11 @@ import { renderBlock } from '../pages/block/main';
 import { renderChangePassword, initializeChangePasswordEvents } from '../pages/auth/change-password';
 import { renderEditProfil, initializeEditProfileEvents } from '../pages/social/edit-profil';
 import { getAuthToken } from './auth';
+<<<<<<< HEAD
 import { clearTranslationCache } from './translations';
+=======
+import { renderPong } from '../pages/pong/main';
+>>>>>>> ines
 
 export async function router() {
   // Clear translation cache to ensure fresh translations
@@ -22,7 +26,7 @@ export async function router() {
   const app = document.getElementById('app');
   if (!app) return;
 
-  const publicRoutes = ['/', '/login', '/create-account', '/forgot-password'];
+  const publicRoutes = ['/', '/login', '/create-account', '/forgot-password', '/pong'];
   const token = getAuthToken();
 
   if (!publicRoutes.includes(path) && !token) {
@@ -99,6 +103,9 @@ export async function router() {
       break;
     case '/edit-profil':
       view = renderEditProfil();
+      break;
+    case '/pong':
+      view = renderPong();
       break;
     default:
       view = render404();
