@@ -1,5 +1,5 @@
 import { t } from '../../utils/translations';
-import { setAuthToken, debugCookies } from '../../utils/auth';
+import { setAuthToken } from '../../utils/auth';
 
 export function renderLogin(): string {
 	return `
@@ -17,17 +17,33 @@ export function renderLogin(): string {
 					<button type="submit" class="login-btn">${t('auth.login.submit')}</button>
 				</form>
 				<div class="login-options">
-					<a href="#" id="forgot-password">${t('auth.login.forgotPassword')}</a>
-					<a href="#" id="create-account">${t('auth.login.createAccount')}</a>
+					<button id="forgot-password" class="link-button">${t('auth.login.forgotPassword')}</button>
+					<button id="create-account" class="link-button">${t('auth.login.createAccount')}</button>
 				</div>
 			</div>
 		</main>
 	</div>
+
+	<style>
+		.link-button {
+			background: none;
+			border: none;
+			color: #4a90e2;
+			cursor: pointer;
+			text-decoration: underline;
+			font-size: 14px;
+			padding: 5px 0;
+			margin: 0 10px;
+		}
+
+		.link-button:hover {
+			color: #357abd;
+		}
+	</style>
 	`;
 }
 
-// Add event listener after the DOM is loaded
-document.addEventListener('DOMContentLoaded', () => {
+function initializeLoginEvents() {
 	const loginForm = document.getElementById('loginForm');
 	loginForm?.addEventListener('submit', async (e) => {
 	e.preventDefault();
@@ -65,14 +81,12 @@ document.addEventListener('DOMContentLoaded', () => {
 			console.log('Token attendu dans les cookies');
 		}
 		
-		// Debug: vérifier les cookies après login
-		console.log('🔍 Debug après login:');
-		debugCookies();
 		
 		// Attendre un peu pour que les cookies soient bien définis
 		setTimeout(() => {
 			console.log('🔄 Redirection vers /main');
-			window.location.href = '/main';
+			window.history.pushState({}, '', '/main');
+			window.dispatchEvent(new PopStateEvent('popstate'));
 		}, 100);
 		
 	} catch (err) {
@@ -84,11 +98,15 @@ document.addEventListener('DOMContentLoaded', () => {
 	
 	const ForgotPassword = document.getElementById('forgot-password');
 	ForgotPassword?.addEventListener('click', () => {
-		window.location.href = '/forgot-password';
+		window.history.pushState({}, '', '/forgot-password');
+		window.dispatchEvent(new PopStateEvent('popstate'));
 	});
 
 	const CreateAccount = document.getElementById('create-account');
 	CreateAccount?.addEventListener('click', () => {
-		window.location.href = '/create-account';
+		window.history.pushState({}, '', '/create-account');
+		window.dispatchEvent(new PopStateEvent('popstate'));
 	});
-});
+}
+
+export { initializeLoginEvents };

@@ -3,7 +3,6 @@ import Fastify from 'fastify';
 import { FastifyInstance } from 'fastify';
 import jwt from '@fastify/jwt';
 import bcrypt from 'bcrypt';
-import fastify from '../index';
 
 
 // Interfaces pour le typage TypeScript
@@ -150,7 +149,7 @@ async function authRoutes(app: FastifyInstance) {
               return;
             }
 
-            const token = fastify.jwt.sign({ user: user.email , name: user.username });
+            const token = app.jwt.sign({ user: user.email , name: user.username });
             
             const origin = request.headers.origin || '';
             const host = request.headers.host || '';
@@ -250,6 +249,25 @@ async function authRoutes(app: FastifyInstance) {
     } catch (error) {
       console.error('❌ Error during logout:', error);
       return reply.status(500).send({ error: 'Internal server error' });
+    }
+  });
+
+  app.get('/verify', async (request, reply) => {
+    let token = request.headers['x-access-token'] as string;
+        
+    if (!token) {
+      token = request.cookies['x-access-token'];
+    }
+    
+    if (!token) {
+        return reply.status(401).send({ error: 'Token d\'authentification manquant' });
+    }
+  
+    try {
+      const decoded = app.jwt.verify(token);
+      return { valid: true, payload: decoded };
+    } catch (err) {
+      return reply.status(401).send({ error: 'Invalid token', detail: err.message });
     }
   });
 }

@@ -93,11 +93,6 @@ export function setAuthToken(token: string): void {
   }
   
   document.cookie = cookieString;
-  
-  // Debug: afficher les cookies
-  console.log('Cookies après setAuthToken:', document.cookie);
-  console.log('Cookie string généré:', cookieString);
-  console.log('Domaine utilisé:', domain);
 }
 
 export function removeAuthToken(): void {
@@ -122,69 +117,3 @@ export function removeAuthToken(): void {
 export function isAuthenticated(): boolean {
   return getAuthToken() !== null;
 }
-
-// Fonction pour changer de langue et rediriger
-export function changeLanguageAndRedirect(lang: string): void {
-  const baseDomain = getBaseDomain();
-  const currentSubdomain = getCurrentSubdomain();
-  
-  // Si on est déjà sur le bon sous-domaine, ne rien faire
-  if (currentSubdomain === lang) {
-    return;
-  }
-  
-  // Construire la nouvelle URL
-  const protocol = window.location.protocol;
-  const newHostname = `${lang}.${baseDomain}`;
-  const newUrl = `${protocol}//${newHostname}${window.location.pathname}${window.location.search}${window.location.hash}`;
-  
-  console.log(`🔄 Changement de langue: ${currentSubdomain} -> ${lang}`);
-  console.log(`🔄 Nouvelle URL: ${newUrl}`);
-  
-  window.location.href = newUrl;
-}
-
-// Fonction de debug pour vérifier les cookies
-export function debugCookies(): void {
-  console.log('Tous les cookies:', document.cookie);
-  console.log('Token depuis getAuthToken:', getAuthToken());
-  console.log('Token depuis localStorage:', localStorage.getItem('x-access-token'));
-  console.log('Domaine de cookie:', getCookieDomain());
-  console.log('Domaine de base:', getBaseDomain());
-  console.log('Sous-domaine actuel:', getCurrentSubdomain());
-  console.log('Hostname complet:', window.location.hostname);
-}
-
-// Fonction de logout
-export async function logout(): Promise<void> {
-  try {
-    const token = getAuthToken();
-    
-    if (token) {
-      // Appeler l'API de logout
-      const response = await fetch('/api/auth/logout', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-access-token': token
-        },
-        credentials: 'include' // Important pour inclure les cookies
-      });
-      
-      if (response.ok) {
-        console.log('✅ Logout réussi côté serveur');
-      } else {
-        console.warn('⚠️ Erreur lors du logout côté serveur:', response.status);
-      }
-    }
-  } catch (error) {
-    console.error('❌ Erreur réseau lors du logout:', error);
-  } finally {
-    // Toujours nettoyer côté client
-    removeAuthToken();
-    console.log('✅ Logout terminé côté client');
-    
-    // Rediriger vers la page de login
-    window.location.href = '/login';
-  }
-} 

@@ -5,6 +5,7 @@ all: build up status
 
 build:
 	@mkdir -p docker/vault/data/core
+	mkdir -p backend/uploads
 	docker-compose -f $(DOCKER_COMPOSE) build
 
 up:
@@ -26,7 +27,7 @@ clean: down
 
 re: clean all
 
-test-backend:
+testb:
 	@echo "🔍 Test rapide du backend..."
 	@curl -s http://localhost:8000/ping || echo "❌ Backend non accessible"
 

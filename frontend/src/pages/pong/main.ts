@@ -1,10 +1,5 @@
 import { Pong } from '../../game/Pong';
 
-// a faire
-    // baisser un peu le y du rectangle
-    // ajouter score
-    // ajouter usernames?
-
 export function renderPong() {
   const html = `
     <div class="pong-game-container">

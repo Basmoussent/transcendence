@@ -362,8 +362,29 @@ export function getLanguage(): Language {
   return supportedLanguages.includes(subdomain as Language) ? subdomain as Language : 'en';
 }
 
+let translationCache: Map<string, string> = new Map();
+let currentLanguage: Language | null = null;
+
+export function clearTranslationCache() {
+  translationCache.clear();
+  currentLanguage = null;
+}
+
 export function t(key: TranslationKeys): string {
   const lang = getLanguage();
+  
+  // Clear cache if language changed
+  if (currentLanguage !== lang) {
+    clearTranslationCache();
+    currentLanguage = lang;
+  }
+  
+  // Check cache first
+  const cacheKey = `${lang}:${key}`;
+  if (translationCache.has(cacheKey)) {
+    return translationCache.get(cacheKey)!;
+  }
+  
   const keys = key.split('.');
   let value: any = translations[lang];
   
@@ -371,9 +392,12 @@ export function t(key: TranslationKeys): string {
     if (value && typeof value === 'object') {
       value = value[k];
     } else {
+      translationCache.set(cacheKey, key);
       return key;
     }
   }
   
-  return typeof value === 'string' ? value : key;
+  const result = typeof value === 'string' ? value : key;
+  translationCache.set(cacheKey, result);
+  return result;
 } 

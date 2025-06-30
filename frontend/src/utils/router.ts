@@ -1,20 +1,24 @@
-import { renderHome } from '../pages/menu/home';
-import { renderLogin } from '../pages/auth/login';
-import { renderCreateAccount } from '../pages/auth/create-account';
-import { renderForgotPassword } from '../pages/auth/forgot-password';
-import { renderMain } from '../pages/menu/main';
+import { renderHome, initializeHomeEvents } from '../pages/menu/home';
+import { renderLogin, initializeLoginEvents } from '../pages/auth/login';
+import { renderCreateAccount, initializeCreateAccountEvents } from '../pages/auth/create-account';
+import { renderForgotPassword, initializeForgotPasswordEvents } from '../pages/auth/forgot-password';
+import { renderMain, initializeMainEvents } from '../pages/menu/main';
 import { render404 } from '../components/404';
 import { renderSocial } from '../pages/social/social';
 import { renderProfil } from '../pages/social/profil';
-import { renderMultiplayer } from '../pages/game/multiplayer';
-import { renderLocal } from '../pages/game/local';
+import { renderMultiplayer, initializeMultiplayerEvents } from '../pages/game/multiplayer';
+import { renderLocal, initializeLocalEvents } from '../pages/game/local';
 import { renderBlock } from '../pages/block/main';
-import { renderChangePassword } from '../pages/auth/change-password';
-import { renderEditProfil } from '../pages/social/edit-profil';
+import { renderChangePassword, initializeChangePasswordEvents } from '../pages/auth/change-password';
+import { renderEditProfil, initializeEditProfileEvents } from '../pages/social/edit-profil';
 import { getAuthToken } from './auth';
+import { clearTranslationCache } from './translations';
 import { renderPong } from '../pages/pong/main';
 
 export async function router() {
+  // Clear translation cache to ensure fresh translations
+  clearTranslationCache();
+  
   const path = window.location.pathname;
   const app = document.getElementById('app');
   if (!app) return;
@@ -25,12 +29,36 @@ export async function router() {
   if (!publicRoutes.includes(path) && !token) {
     window.history.pushState({}, '', '/login');
     app.innerHTML = renderLogin();
+    setTimeout(() => {
+      initializeLoginEvents();
+    }, 0);
     return;
   }
-  // TODO: verify token validity
+  if (!publicRoutes.includes(path) && token) {
+    const response = await fetch('/api/auth/verify', {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-access-token': token || '',
+      },
+    });
+    console.log("api check response:", response);
+    if (response.status === 401) {
+      window.history.pushState({}, '', '/login');
+      app.innerHTML = renderLogin();
+      setTimeout(() => {
+        initializeLoginEvents();
+      }, 0);
+      return;
+    }
+  };
+
   if (path === '/login' && token) {
     window.history.pushState({}, '', '/main');
     app.innerHTML = renderMain();
+    setTimeout(() => {
+      initializeMainEvents();
+    }, 0);
     return;
   }
 
@@ -80,4 +108,37 @@ export async function router() {
       view = render404();
   }
   app.innerHTML = view;
+
+  // Initialiser les événements après le rendu pour les pages qui en ont besoin
+  setTimeout(() => {
+    switch (path) {
+      case '/':
+        initializeHomeEvents();
+        break;
+      case '/login':
+        initializeLoginEvents();
+        break;
+      case '/create-account':
+        initializeCreateAccountEvents();
+        break;
+      case '/forgot-password':
+        initializeForgotPasswordEvents();
+        break;
+      case '/main':
+        initializeMainEvents();
+        break;
+      case '/multiplayer':
+        initializeMultiplayerEvents();
+        break;
+      case '/local-game':
+        initializeLocalEvents();
+        break;
+      case '/change-password':
+        initializeChangePasswordEvents();
+        break;
+      case '/edit-profil':
+        initializeEditProfileEvents();
+        break;
+    }
+  }, 0);
 }
