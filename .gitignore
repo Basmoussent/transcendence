@@ -39,3 +39,5 @@ docker/nginx/modsecurity/audit/
 
 # Vault credentials
 backend/vault-credentials/
+
+backend/uploads
