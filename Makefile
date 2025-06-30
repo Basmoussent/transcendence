@@ -34,6 +34,7 @@ testb:
 env:
 	@echo "🔍 Affichage des variables d'environnement..."
 	@docker exec transcendence_backend_1 cat /tmp/vault.env || echo "❌ Impossible d'afficher les variables d'environnement"
+
 purge: down
 	@docker system prune -af
 	@docker ps -q | xargs -r docker stop
