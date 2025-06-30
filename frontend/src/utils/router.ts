@@ -12,11 +12,8 @@ import { renderBlock } from '../pages/block/main';
 import { renderChangePassword, initializeChangePasswordEvents } from '../pages/auth/change-password';
 import { renderEditProfil, initializeEditProfileEvents } from '../pages/social/edit-profil';
 import { getAuthToken } from './auth';
-<<<<<<< HEAD
 import { clearTranslationCache } from './translations';
-=======
 import { renderPong } from '../pages/pong/main';
->>>>>>> ines
 
 export async function router() {
   // Clear translation cache to ensure fresh translations

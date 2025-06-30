@@ -28,16 +28,12 @@ export function renderMain() {
             ${t('menu.friends')}
           </button>
 
-<<<<<<< HEAD
-          <button class="menu-button block-game-button" id="blockGameBtn">
-=======
-          <button class="menu-button pong-game-button" onclick="window.location.href='/pong'">
+          <button class="menu-button pong-game-button" id="pongBtn">
             <i class="fa-solid fa-trophy"></i>
             Pong Game
           </button>
 
-          <button class="menu-button block-game-button" onclick="window.location.href='/block'">
->>>>>>> ines
+          <button class="menu-button block-game-button" id="blockBtn">
             <i class="fas fa-cube"></i>
             Block Game
           </button>
@@ -249,7 +245,8 @@ function initializeMainEvents() {
   const localGameBtn = document.getElementById('localGameBtn');
   const multiplayerBtn = document.getElementById('multiplayerBtn');
   const friendsBtn = document.getElementById('friendsBtn');
-  const blockGameBtn = document.getElementById('blockGameBtn');
+  const blockGameBtn = document.getElementById('blockBtn');
+  const pongGameBtn = document.getElementById('pongBtn');
   const logoutBtn = document.getElementById('logoutBtn');
 
   if (profileBtn) {
@@ -283,6 +280,13 @@ function initializeMainEvents() {
   if (blockGameBtn) {
     blockGameBtn.addEventListener('click', () => {
       window.history.pushState({}, '', '/block');
+      window.dispatchEvent(new PopStateEvent('popstate'));
+    });
+  }
+
+  if (pongGameBtn) {
+    pongGameBtn.addEventListener('click', () => {
+      window.history.pushState({}, '', '/pong');
       window.dispatchEvent(new PopStateEvent('popstate'));
     });
   }

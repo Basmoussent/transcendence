@@ -282,6 +282,13 @@ export class Pong {
     // ajouter le bouton pong a l'accueil
     // ajouter le bouton accueil
     // stocker les scores API
+    // police avec l'API
 
     // IA
       // recup le timestamp et laisser une seconde sans rien faire
+
+
+    // amis
+      // paires d'amis avec chacun son etat
+        // savoir qui a fait la demande
+        // qui a bloque l'autre
