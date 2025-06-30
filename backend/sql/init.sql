@@ -30,8 +30,8 @@ CREATE TABLE IF NOT EXISTS friends (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   user_1 INTEGER REFERENCES users(id),
   user_2 INTEGER REFERENCES users(id),
-  user1_state VARCHAR(36) users(id),
-  user2_state VARCHAR(36) users(id),
+  user1_state VARCHAR(36),
+  user2_state VARCHAR(36)
 );
 
 CREATE TABLE IF NOT EXISTS messages (

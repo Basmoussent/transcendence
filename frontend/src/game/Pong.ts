@@ -1,9 +1,12 @@
+import { randomInt } from "./pongUtils";
+
 export class Pong {
   private canvas: HTMLCanvasElement;
   private ctx: CanvasRenderingContext2D;
   private width: number;
   private height: number;
   private start: boolean;
+  private end: boolean;
 
   private paddle1: {
 		width: number;
@@ -43,6 +46,7 @@ export class Pong {
     this.width = canvas.width;
     this.height = canvas.height;
     this.start = false;
+    this.end = false;
 
     this.paddle1 = {
 			width: 20,
@@ -66,9 +70,9 @@ export class Pong {
       radius: 10,
       x: this.width / 2,
       y: this.height / 2,
-      speedx: -5,
-      speedy: -5
-    };
+      speedx: 6,
+      speedy: 0
+    }
 
 		this.keys = {};
   }
@@ -120,7 +124,7 @@ export class Pong {
     const gameLoop = () => {
       if (this.keys['enter'])
         this.start = true;
-      if (this.start)
+      if (this.start && !this.end)
         this.update();
       this.render();
       requestAnimationFrame(gameLoop);
@@ -132,6 +136,11 @@ export class Pong {
     ctx.globalAlpha = 0.2;
     ctx.fillStyle = 'white';
     ctx.font = '48px sans-serif'; // changer police
+
+
+    let time: number = Date.now() / 1000;
+    console.log('time = ', time);
+
     ctx.fillText('PRESS ENTER', this.width / 2 - 150, this.height / 2 - 30);
     ctx.fillText('TO START', this.width / 2 - 100, this.height / 2 + 50);
     ctx.globalAlpha = 1;
@@ -148,6 +157,11 @@ export class Pong {
     ctx.lineWidth = 2;
     ctx.stroke();
 
+    if (this.paddle1.score == 5 || this.paddle2.score == 5) {
+      this.end = true;
+      return ;
+    }
+
     // score
     ctx.fillStyle = 'white';
     ctx.font = '48px sans-serif'; // changer police
@@ -155,6 +169,20 @@ export class Pong {
     ctx.fillText(this.paddle2.score.toString(), (this.width / 4) * 3, this.height / 2);
 
     ctx.globalAlpha = 1;
+  }
+
+  private displayResult(): void {
+    this.ctx.globalAlpha = 0.2;
+    this.ctx.fillStyle = 'white';
+    this.ctx.font = '48px sans-serif'; // changer police
+
+    if (this.paddle1.score == 5)
+      this.ctx.fillText("PLAYER1 WINS", this.width / 2 - 150, this.height / 2);
+    else
+      this.ctx.fillText("PLAYER2 WINS", this.width / 2 - 150, this.height / 2);
+
+    this.ctx.globalAlpha = 1;
+    
   }
 
   private updatePaddle(paddle: typeof this.paddle1, upKey: string, downKey: string): void {
@@ -171,18 +199,54 @@ export class Pong {
       paddle.y = this.height - paddle.height;
   }
 
+  private addBallSpeed(): void {
+      this.ball.speedx *= -1;
+      if (this.ball.speedx > 0)
+        this.ball.speedx += 0.25;
+      else
+        this.ball.speedx -= 0.25;
+  }
+
+  private ajdustBallDir(paddle: typeof this.paddle1): void {
+    if (this.ball.y >= paddle.y)
+        this.ball.speedy += 1;
+      else
+        this.ball.speedy -= 1;
+  }
+
+  private endPoint(): void {
+    if (this.ball.x - this.ball.radius > this.width)
+        this.paddle1.score++;
+      else
+        this.paddle2.score++;
+
+      // replace la balle au centre
+      this.ball.x = this.width / 2;
+      this.ball.y = this.height / 2;
+
+      // celui qui gagne recoit la balle en premier
+      this.ball.speedx *= -1;
+
+      // on reset a la vitesse de base
+      if (this.ball.speedx > 0)
+        this.ball.speedx = 6;
+      else
+        this.ball.speedx = -6;
+  }
+
   private updateBall(ball: typeof this.ball, paddle1: typeof this.paddle1, paddle2: typeof this.paddle2): void {
     ball.x += ball.speedx;
     ball.y += ball.speedy;
 
-    // modif par rapport a ou ca touche le paddle
-    // check paddles collision
+    // check paddles collision + la balle prends en vitesse a chaque collision paddle + ajuster dir
     if (ball.x - ball.radius <= paddle1.x + paddle1.width && ball.y + ball.radius >= paddle1.y && ball.y - ball.radius <= paddle1.y + paddle1.height && ball.x > paddle1.x) {
-      ball.speedx *= -1;
+      this.addBallSpeed();
+      this.ajdustBallDir(paddle1);
       ball.x = paddle1.x + paddle1.width + ball.radius;
     }
     if (ball.x + ball.radius >= paddle2.x && ball.y + ball.radius >= paddle2.y && ball.y - ball.radius <= paddle2.y + paddle2.height && ball.x < paddle2.x + paddle2.width) {
-      ball.speedx *= -1;
+      this.addBallSpeed();
+      this.ajdustBallDir(paddle2);
       ball.x = paddle2.x - ball.radius;
     }
 
@@ -192,17 +256,7 @@ export class Pong {
 
     // check scored point et relancer si oui
     if (ball.x - ball.radius > this.width || ball.x + ball.radius <= 0)
-    {
-      // add point to player
-      if (ball.x - ball.radius > this.width)
-        paddle1.score++;
-      else
-        paddle2.score++;
-
-      ball.x = this.width / 2;
-      ball.y = this.height / 2;
-      ball.speedx *= -1;
-    }
+      this.endPoint();
   }
 
   private update(): void {
@@ -263,32 +317,15 @@ export class Pong {
     // les paddles + leur contour
     this.drawPaddles(this.ctx, this.paddle1, this.paddle2);
 
-    // la balle
-    if (this.start) {
-      this.drawBall(this.ctx, this.ball.x, this.ball.y, this.ball.radius);
-      this.displayScore(this.ctx);
+    if (this.start && !this.end) {
+        this.drawBall(this.ctx, this.ball.x, this.ball.y, this.ball.radius);
+        this.displayScore(this.ctx);
     }
-
-    if (!this.start)
-      this.displayStartMsg(this.ctx);
+    else {
+      if (this.end)
+        this.displayResult();
+      else
+        this.displayStartMsg(this.ctx);
+    }
   }
 }
-
-// a faire
-    // modif speedx et speedy en fonction de quelle partie du paddle ca touche
-    // ajouter usernames?
-    // power ups
-    // fin de partie apres un certain score
-    // ajouter le bouton pong a l'accueil
-    // ajouter le bouton accueil
-    // stocker les scores API
-    // police avec l'API
-
-    // IA
-      // recup le timestamp et laisser une seconde sans rien faire
-
-
-    // amis
-      // paires d'amis avec chacun son etat
-        // savoir qui a fait la demande
-        // qui a bloque l'autre
