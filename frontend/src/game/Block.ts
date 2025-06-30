@@ -61,10 +61,20 @@ export class Block {
 			y: this.height / 2,
 			speedx: 12,
 			speedy: 12,
-			flag: true
+			flag: false
 		};
 
 		this.keys = {};
+	}
+
+	private brickId(x: number, y: number): number {
+		var _x = Math.trunc((x * 20)/ this.width);
+		var _y = Math.trunc((y * 20)/ this.height);
+
+		if (_y != 0)
+			--_y;
+
+		return ((20 * _y) + _x);
 	}
 
 	
@@ -146,19 +156,13 @@ export class Block {
 		// collisions bricks verticale
 		if (ball.speedy < 0 && ball.y - ball.radius + ball.speedy <= this.height / 4) {
 
-			var x = Math.trunc((ball.x * 20)/ this.width);
-			var y = Math.trunc((ball.y * 20)/ this.height);
-
-			if (y != 0)
-				--y;
-
-			var id = (20 * y) + x;
+			var id = this.brickId(ball.x, ball.y)
 
 			if (!this.bricks[id])
 				console.error(id, " undefined dans bricks");
 			
 			if (this.bricks[id].getHp()) {
-				console.log("brick (", x, ",", y, ") n", id);
+				// console.log("brick (", x, ",", y, ") n", id);
 				this.bricks[id].getHit();
 				ball.speedy *= -1;
 			}
