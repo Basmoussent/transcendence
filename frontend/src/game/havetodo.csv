@@ -13,3 +13,10 @@ bricks:
 	rouge -> THREE shot et fragilise les bricks frontalieres
 
 
+
+
+
+pblm si on tape sur le cote du paddle
+
+
+ajouter speedx et speedy dans les conditions de collisions avant de bouger la balle

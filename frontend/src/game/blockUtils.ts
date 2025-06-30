@@ -10,12 +10,15 @@ export abstract class brick {
 		this.color = _color;
 	}
 
+	public getHit(): void {
+		this.hp--;
+	}
+
 	public getHp(): number { return (this.hp); }
 	public getType(): string { return (this.type); }
 	public getColor(): string { return (this.color); }
 
 }
-
 
 class blue extends brick {
 	constructor() {
@@ -24,12 +27,12 @@ class blue extends brick {
 
 class green extends brick {
 	constructor() {
-		super(2, "green", "#7CA982"); }
+		super(1, "green", "#7CA982"); }
 }
 
 class red extends brick {
 	constructor() {
-		super(3, "red", "#A3333D"); }
+		super(1, "red", "#A3333D"); }
 }
 
 export function	createRandomBrick(): brick {
