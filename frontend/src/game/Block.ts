@@ -185,6 +185,32 @@ export class Block {
 		// 		// if (Math.trunc((ball.x * 20) / this.width))
 		// 	}
 
+		// collisions horizontale
+	
+		let y = 0;
+	
+		if (ball.speedy > 0)
+			y = ball.y + ball.radius + ball.speedy;
+		else
+			y = ball.y - ball.radius + ball.speedy;
+
+
+
+		if (ball.y - ball.radius + ball.speedy <= this.height / 4) {
+	
+			var id = this.brickId(this.ball.x + this.ball.speedx, ball.y + ball.radius + ball.speedy);
+	
+			// si le prochain x est different de l'actuel
+			if (this.bricks[id].getHp()) {
+				this.bricks[id].getHit();
+				this.ball.speedx *= -1;
+			}
+		
+				// if (Math.trunc((ball.x * 20) / this.width))
+		
+		
+		}
+
 
 		// }
 
