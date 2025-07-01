@@ -41,7 +41,8 @@ export class Pong {
     y: number,
     active: boolean,
     display: boolean,
-    time: number
+    spawnTime: number
+    collisionTime: number | null
   }
 
   private keys: { [key: string]: boolean };
@@ -91,7 +92,8 @@ export class Pong {
       y: randomInt(0, this.height),
       active: false,
       display: false,
-      time: Date.now() / 1000
+      spawnTime: Date.now() / 1000,
+      collisionTime: null
     }
 
     this.keys = {};
@@ -126,7 +128,7 @@ export class Pong {
     this.ball.x = this.width / 2;
     this.ball.y = this.height / 2;
 
-    this.power.width = this.paddle1.width;
+    this.power.width = this.paddle1.width * 1.4;
     this.power.height = this.power.width;
   }
 
@@ -243,16 +245,20 @@ export class Pong {
 
     // celui qui gagne recoit la balle en premier
     this.ball.speedx *= -1;
-    if (this.ball.speedy > 6)
-      this.ball.speedy = 6;
-    else if (this.ball.speedy < -6)
-      this.ball.speedy = -6;
+    if (this.ball.speedy > 5)
+      this.ball.speedy = 5;
+    else if (this.ball.speedy < -5)
+      this.ball.speedy = -5;
 
     // on reset a la vitesse de base
     if (this.ball.speedx > 0)
       this.ball.speedx = 6;
     else
       this.ball.speedx = -6;
+
+    // on annule les powers pour le nouveau point
+    this.paddle1.height = 100;
+    this.paddle2.height = 100;
   }
 
   private adjustBallDir(ball: typeof this.ball, paddle: typeof this.paddle1 | typeof this.paddle2): void {
@@ -370,6 +376,20 @@ export class Pong {
     );
   }
 
+  private circleRectCollision(cx: number, cy: number, r: number, rx: number, ry: number, rw: number, rh: number) {
+  // Trouver le point du rectangle le plus proche du centre du cercle
+  const closestX = Math.max(rx, Math.min(cx, rx + rw));
+  const closestY = Math.max(ry, Math.min(cy, ry + rh));
+
+  // Calculer la distance entre ce point et le centre du cercle
+  const dx = cx - closestX;
+  const dy = cy - closestY;
+
+  // Collision si distance^2 < rayon^2
+  return (dx * dx + dy * dy) <= r * r;
+}
+
+
   private render(): void {
     // on efface tout
     this.ctx.clearRect(0, 0, this.width, this.height);
@@ -382,36 +402,48 @@ export class Pong {
     this.drawPaddles(this.ctx, this.paddle1, this.paddle2);
 
     if (this.start && !this.end) {
+      
       this.drawBall(this.ctx, this.ball.x, this.ball.y, this.ball.radius);
       this.displayScore(this.ctx);
-
-      if ((Date.now() / 1000) - this.power.time >= 3) {
+      
+      const now = Date.now() / 1000;
+      // power up spawn
+      if (!this.power.active && now - this.power.spawnTime >= 3) {
         this.power.active = true;
         this.power.display = true;
-        this.power.time = (Date.now() / 1000);
-
-        // power collision
-        if (this.ball.y - this.ball.radius <= this.power.y && this.ball.x + this.ball.radius >= this.power.x)
-        {
-          this.power.display = false;
-          if (this.ball.speedx > 0)
-            this.paddle1.height += this.paddle1.height / 3;
-          else
-            this.paddle2.height += this.paddle2.height / 3;
-        }
-
-        // this.paddle1.height += this.paddle1.height / 3;
-        // this.paddle2.height += this.paddle2.height / 3;
+        this.power.spawnTime = now;
       }
+
       if (this.power.active) {
         if (this.power.display)
           this.drawPower();
-        if ((Date.now() / 1000) - this.power.time >= 10)
+
+         // power collision
+        if (this.power.display && this.circleRectCollision(this.ball.x, this.ball.y, this.ball.radius, this.power.x, this.power.y, this.power.width, this.power.height))
+        {
+          this.power.display = false;
+          this.power.collisionTime = now;
+          if (this.ball.speedx > 0)
+            this.paddle1.height = 130;
+          else
+            this.paddle2.height = 130;
+        }
+
+        // le pouvoir s'affiche pdt 8s
+        if (this.power.display && now - this.power.spawnTime >= 8)
+          this.power.display = false;
+
+        // on gagne le pouvoir pdt 8s
+        if (this.power.collisionTime !== null && now - this.power.collisionTime >= 8)
         {
           this.power.active = false;
           this.paddle1.height = 100;
           this.paddle2.height = 100;
+          this.power.collisionTime = null;
         }
+
+        if (!this.power.display && this.power.collisionTime === 0)
+          this.power.active = false;
       }
     }
     else {

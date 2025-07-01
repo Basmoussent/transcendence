@@ -110,3 +110,5 @@
 2025/06/30 17:56:53 [error] 346#346: *1124 connect() failed (111: Connection refused) while connecting to upstream, client: 172.18.0.1, server: fr.localhost, request: "POST /api/game/end HTTP/1.1", upstream: "http://172.18.0.6:8000/game/end", host: "localhost:2443", referrer: "https://localhost:2443/pong"
 2025/07/01 11:29:43 [notice] 1#1: ModSecurity-nginx v1.0.4 (rules loaded inline/local/remote: 0/10/0)
 2025/07/01 11:29:43 [notice] 1#1: libmodsecurity3 version 3.0.14
+2025/07/01 15:10:08 [notice] 1#1: ModSecurity-nginx v1.0.4 (rules loaded inline/local/remote: 0/10/0)
+2025/07/01 15:10:08 [notice] 1#1: libmodsecurity3 version 3.0.14
