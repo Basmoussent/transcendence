@@ -45,23 +45,26 @@ export class Block {
 		this.vie = 3;
 
 		for (let it = 0; it < 100; ++it)
-			this.bricks.push(createRandomBrick());
+			this.bricks.push(createRandomBrick(it));
 
 		this.paddle = {
 			width: 100,
 			height: 20,
 			x: 0,
 			y: 0,
-			speed: 12
+			speed: 14
 		};
+
+
+		// this.width et this.height n'ont pas les bonnes mesures a ce moment la
 
 		this.ball = {
 			radius: 10,
 			x: this.width / 2,
 			y: this.height / 2,
-			speedx: 12,
-			speedy: 12,
-			flag: false
+			speedx: 5,
+			speedy: 5,
+			flag: true
 		};
 
 		this.keys = {};
@@ -73,6 +76,9 @@ export class Block {
 
 		if (_y != 0)
 			--_y;
+
+		if (_x >= 20 || _y >= 20)
+			console.error("brick undefined (", _x, ",", _y, ")");
 
 		return ((20 * _y) + _x);
 	}
@@ -128,6 +134,23 @@ export class Block {
 		};
 		gameLoop();
 	}
+
+	private moveToHitPos(ball: typeof this.ball): void {
+
+		for (var i = 0; i < ball.speedx; ++i) {
+
+			var id = this.brickId(ball.x + i, ball.y + i)
+
+			if (!this.bricks[id])
+				continue
+
+			if (this.bricks[id].getHp()) {
+				ball.x += i;
+				ball.y += i;
+				return;
+			}
+		}
+	}
   
 	private update(ball: typeof this.ball): void {
 
@@ -136,6 +159,7 @@ export class Block {
 		if (this.keys['d'])
 			this.paddle.x += this.paddle.speed;
 
+		// mettre pause
 		if (this.keys['p']) {
 			if (this.ball.flag)
 				this.ball.flag = false;
@@ -143,49 +167,32 @@ export class Block {
 				this.ball.flag = true;
 		}
 
+		// limits paddle
 		if (this.paddle.x < 0)
 			this.paddle.x = 0;
 		else if (this.paddle.x + this.paddle.width > this.width)
 			this.paddle.x = this.width - this.paddle.width;
 
-		// collisions paddle
+		// collisions ball -> paddle
 		if (ball.y + ball.radius + ball.speedy >= this.paddle.y && ball.x + ball.radius + ball.speedx >= this.paddle.x &&
 			ball.x + ball.radius + ball.speedx <= this.paddle.x + this.paddle.width)
 				ball.speedy *= -1;
 
-		// collisions bricks verticale
+		// collisions ball -> bricks
 		if (ball.speedy < 0 && ball.y - ball.radius + ball.speedy <= this.height / 4) {
 
 			var id = this.brickId(ball.x, ball.y)
 
 			if (!this.bricks[id])
 				console.error(id, " undefined dans bricks");
+
 			
 			if (this.bricks[id].getHp()) {
-				// console.log("brick (", x, ",", y, ") n", id);
-				this.bricks[id].getHit();
+				this.moveToHitPos(this.ball);
+				this.bricks[id].beenHit();
 				ball.speedy *= -1;
 			}
 		}
-
-		// collisions horizontale
-		// if (ball.y - ball.radius + ball.speedy <= this.height / 4) {
-
-		// 	var x = Math.trunc((ball.x * 20)/ this.width);
-		// 	var y = Math.trunc((ball.y * 20)/ this.height);
-
-		// 	if (y != 0)
-		// 		--y;
-
-		// 	var id = (20 * y) + x;
-
-		// 	if (this.bricks[id].getHp() && ) {
-
-
-		// 		// if (Math.trunc((ball.x * 20) / this.width))
-		// 	}
-
-		// collisions horizontale
 	
 		let y = 0;
 	
@@ -202,7 +209,7 @@ export class Block {
 	
 			// si le prochain x est different de l'actuel
 			if (this.bricks[id].getHp()) {
-				this.bricks[id].getHit();
+				this.bricks[id].beenHit();
 				this.ball.speedx *= -1;
 			}
 		
@@ -227,6 +234,7 @@ export class Block {
 			ball.radius = 10,
 			ball.x = this.width / 2,
 			ball.y = this.height / 2,
+			console.log(this.width / 2, ",", this.height / 2);
 			ball.speedx = 5,
 			ball.speedy = 5
 		}
@@ -260,8 +268,15 @@ export class Block {
 	private drawBall(ball: typeof this.ball): void {
 		this.ctx.beginPath();
 		this.ctx.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2);
-		this.ctx.fillStyle = '#ffffff';
+		this.ctx.fillStyle = '#FF8600';
 		this.ctx.fill();
+
+		// centre de la ball
+		this.ctx.fillStyle = '#DED6D6';
+		this.ctx.fillRect(ball.x - 4, ball.y - 4, 8, 8);
+		//
+
+		this.ctx.fillStyle = '#ffffff';
 		this.ctx.closePath();
 	}
   
@@ -269,11 +284,11 @@ export class Block {
 		this.ctx.clearRect(0, 0, this.width, this.height);
 		
 		// fenetre de jeu
-		this.ctx.fillStyle = '#444C57';
+		this.ctx.fillStyle = '#1a1a2e';
 		this.ctx.fillRect(0, 0, this.width, this.height);
 		
 		// paddle
-		this.ctx.fillStyle = '#508991';
+		this.ctx.fillStyle = '#84AD8A';
 		this.ctx.fillRect(
 			this.paddle.x,
 			this.paddle.y,
