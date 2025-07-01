@@ -1,27 +1,30 @@
+import { randomInt } from "./pongUtils";
+
 export class Pong {
   private canvas: HTMLCanvasElement;
   private ctx: CanvasRenderingContext2D;
   private width: number;
   private height: number;
   private start: boolean;
+  private end: boolean;
 
   private paddle1: {
-		width: number;
-		height: number;
-		x: number;
-		y: number;
+    width: number;
+    height: number;
+    x: number;
+    y: number;
     speed: number;
     score: number;
-	};
+  };
 
   private paddle2: {
-		width: number;
-		height: number;
-		x: number;
-		y: number;
+    width: number;
+    height: number;
+    x: number;
+    y: number;
     speed: number;
     score: number;
-	};
+  };
 
   private ball: {
     radius: number;
@@ -31,69 +34,90 @@ export class Pong {
     speedy: number;
   };
 
-	private keys: { [key: string]: boolean };
+  private power: {
+    width: number,
+    height: number,
+    x: number,
+    y: number,
+    active: boolean,
+    display: boolean,
+    time: number
+  }
+
+  private keys: { [key: string]: boolean };
 
   constructor(canvas: HTMLCanvasElement) {
     this.canvas = canvas;
     const context = canvas.getContext('2d');
-		if (!context) {
-			throw new Error('Could not get 2D context');
-		}
-		this.ctx = context;
+    if (!context) {
+      throw new Error('Could not get 2D context');
+    }
+    this.ctx = context;
     this.width = canvas.width;
     this.height = canvas.height;
     this.start = false;
+    this.end = false;
 
     this.paddle1 = {
-			width: 20,
-			height: 100,
-			x: 0,
-			y: 0,
+      width: 20,
+      height: 100,
+      x: 0,
+      y: 0,
       speed: 8,
       score: 0
-		};
+    };
 
     this.paddle2 = {
-			width: 20,
-			height: 100,
-			x: 0,
-			y: 0,
+      width: 20,
+      height: 100,
+      x: 0,
+      y: 0,
       speed: 8,
       score: 0
-		};
+    };
 
     this.ball = {
       radius: 10,
       x: this.width / 2,
       y: this.height / 2,
-      speedx: -5,
-      speedy: -5
-    };
+      speedx: 6,
+      speedy: 0
+    }
 
-		this.keys = {};
+    this.power = {
+      width: 20,
+      height: 20,
+      x: randomInt((this.width / 5) * 2, (this.width / 5) * 4),
+      y: randomInt(0, this.height),
+      active: false,
+      display: false,
+      time: Date.now() / 1000
+    }
+
+    this.keys = {};
   }
 
   public init(): void {
-		console.log('Initializing paddle game...');
+    console.log('Initializing paddle game...');
     this.setupCanvas();
     this.setupEventListeners();
     this.startGameLoop();
 
     // on resize si la taille de la fenetre change
     window.addEventListener('resize', () => {
-			this.setupCanvas();
-		});
+      this.setupCanvas();
+    });
   }
 
   private setupCanvas(): void {
     console.log('Setting up canvas...');
-		this.canvas.width = this.canvas.clientWidth || 800;
-		this.canvas.height = this.canvas.clientHeight || 600;
-		this.width = this.canvas.width;
-		this.height = this.canvas.height;
+    this.canvas.width = this.canvas.clientWidth || 800;
+    this.canvas.height = this.canvas.clientHeight || 600;
+    this.width = this.canvas.width;
+    this.height = this.canvas.height;
 
     this.paddle1.x = 30;
-		this.paddle1.y = (this.height - this.paddle1.height) / 2;
+    this.paddle1.y = (this.height - this.paddle1.height) / 2;
 
     this.paddle2.x = this.width - this.paddle2.width - 30;
     this.paddle2.y = (this.height - this.paddle1.height) / 2;
@@ -101,10 +125,13 @@ export class Pong {
     // adjust ball size?
     this.ball.x = this.width / 2;
     this.ball.y = this.height / 2;
+
+    this.power.width = this.paddle1.width;
+    this.power.height = this.power.width;
   }
 
   // pendant qu'on appuie sur une touche this.keys[touche] = true
-	private setupEventListeners(): void {
+  private setupEventListeners(): void {
     window.addEventListener('keydown', (e) => {
       this.keys[e.key.toLowerCase()] = true;
     });
@@ -114,13 +141,18 @@ export class Pong {
     });
   }
 
-  private startGameLoop(): void {
-		console.log('Starting game loop...');
+  private async startGameLoop(): Promise<void> {
+    console.log('Starting game loop...');
+
+    // recup les infos des joueurs
+      // nbr de joueurs
+      // s'il y a une ou plusieurs IA dans la partie
+
     // fleche au lieu de function() pour que this fasse ref a Pong
     const gameLoop = () => {
       if (this.keys['enter'])
         this.start = true;
-      if (this.start)
+      if (this.start && !this.end)
         this.update();
       this.render();
       requestAnimationFrame(gameLoop);
@@ -137,7 +169,7 @@ export class Pong {
     ctx.globalAlpha = 1;
   }
 
-  private displayScore(ctx: typeof this.ctx): void {
+  private async displayScore(ctx: typeof this.ctx): Promise<void> {
     ctx.globalAlpha = 0.2;
 
     // ligne du milieu
@@ -148,6 +180,12 @@ export class Pong {
     ctx.lineWidth = 2;
     ctx.stroke();
 
+    if (this.paddle1.score == 5 || this.paddle2.score == 5) {
+      this.end = true;
+      // faire un POST pour update score et etat de la partie
+      return;
+    }
+
     // score
     ctx.fillStyle = 'white';
     ctx.font = '48px sans-serif'; // changer police
@@ -157,12 +195,26 @@ export class Pong {
     ctx.globalAlpha = 1;
   }
 
+  private displayResult(): void {
+    this.ctx.globalAlpha = 0.2;
+    this.ctx.fillStyle = 'white';
+    this.ctx.font = '48px sans-serif'; // changer police
+
+    if (this.paddle1.score == 5)
+      this.ctx.fillText("PLAYER1 WINS", this.width / 2 - 150, this.height / 2);
+    else
+      this.ctx.fillText("PLAYER2 WINS", this.width / 2 - 150, this.height / 2);
+
+    this.ctx.globalAlpha = 1;
+
+  }
+
   private updatePaddle(paddle: typeof this.paddle1, upKey: string, downKey: string): void {
     // faire bouger le paddle
     if (this.keys[upKey])
-        paddle.y -= paddle.speed;
+      paddle.y -= paddle.speed;
     if (this.keys[downKey])
-        paddle.y += paddle.speed;
+      paddle.y += paddle.speed;
 
     // ajuster au cas ou il sort des limites
     if (paddle.y < 0)
@@ -171,20 +223,79 @@ export class Pong {
       paddle.y = this.height - paddle.height;
   }
 
-  private updateBall(ball: typeof this.ball, paddle1: typeof this.paddle1, paddle2: typeof this.paddle2): void {
+  private addBallSpeed(): void {
+    this.ball.speedx *= -1;
+    if (this.ball.speedx > 0 && this.ball.speedx < 12)
+      this.ball.speedx += 0.25;
+    else if (this.ball.speedx < 0 && this.ball.speedx > -12)
+      this.ball.speedx -= 0.25;
+  }
+
+  private endPoint(): void {
+    if (this.ball.x - this.ball.radius > this.width)
+      this.paddle1.score++;
+    else
+      this.paddle2.score++;
+
+    // replace la balle au centre
+    this.ball.x = this.width / 2;
+    this.ball.y = this.height / 2;
+
+    // celui qui gagne recoit la balle en premier
+    this.ball.speedx *= -1;
+    if (this.ball.speedy > 6)
+      this.ball.speedy = 6;
+    else if (this.ball.speedy < -6)
+      this.ball.speedy = -6;
+
+    // on reset a la vitesse de base
+    if (this.ball.speedx > 0)
+      this.ball.speedx = 6;
+    else
+      this.ball.speedx = -6;
+  }
+
+  private adjustBallDir(ball: typeof this.ball, paddle: typeof this.paddle1 | typeof this.paddle2): void {
+    const hitY = ball.y;
+
+    const paddleTop = paddle.y;
+    const paddleBottom = paddle.y + paddle.height;
+    const paddleCenter = paddle.y + paddle.height / 2;
+
+    // bord du paddle (20% en haut et en bas)
+    const edgeZone = paddle.height * 0.2;
+
+    if (hitY <= paddleTop + edgeZone) // touche le bord haut
+      ball.speedy -= 4;
+    else if (hitY >= paddleBottom - edgeZone) // touche le bord bas
+      ball.speedy += 4;
+    else if (hitY <= paddleCenter) // touche cote haut (mais pas bord)
+      ball.speedy -= 2;
+    else if (hitY > paddleCenter) // touche cote bas (mais pas bord)
+      ball.speedy += 2;
+  }
+
+  private paddleCollision(): void {
+    if (this.ball.x - this.ball.radius <= this.paddle1.x + this.paddle1.width && this.ball.y + this.ball.radius >= this.paddle1.y && this.ball.y - this.ball.radius <= this.paddle1.y + this.paddle1.height && this.ball.x > this.paddle1.x) {
+      this.addBallSpeed();
+      this.adjustBallDir(this.ball, this.paddle1);
+      this.ball.x = this.paddle1.x + this.paddle1.width + this.ball.radius;
+      console.log('this.ball.speedx = ', this.ball.speedx);
+    }
+    if (this.ball.x + this.ball.radius >= this.paddle2.x && this.ball.y + this.ball.radius >= this.paddle2.y && this.ball.y - this.ball.radius <= this.paddle2.y + this.paddle2.height && this.ball.x < this.paddle2.x + this.paddle2.width) {
+      this.addBallSpeed();
+      this.adjustBallDir(this.ball, this.paddle2);
+      this.ball.x = this.paddle2.x - this.ball.radius;
+      console.log('this.ball.speedx = ', this.ball.speedx);
+    }
+  }
+
+  private updateBall(ball: typeof this.ball): void {
     ball.x += ball.speedx;
     ball.y += ball.speedy;
 
-    // modif par rapport a ou ca touche le paddle
-    // check paddles collision
-    if (ball.x - ball.radius <= paddle1.x + paddle1.width && ball.y + ball.radius >= paddle1.y && ball.y - ball.radius <= paddle1.y + paddle1.height && ball.x > paddle1.x) {
-      ball.speedx *= -1;
-      ball.x = paddle1.x + paddle1.width + ball.radius;
-    }
-    if (ball.x + ball.radius >= paddle2.x && ball.y + ball.radius >= paddle2.y && ball.y - ball.radius <= paddle2.y + paddle2.height && ball.x < paddle2.x + paddle2.width) {
-      ball.speedx *= -1;
-      ball.x = paddle2.x - ball.radius;
-    }
+    // check paddles collision + la balle prends en vitesse a chaque collision paddle + ajuster dir
+    this.paddleCollision();
 
     // check wall collision - haut et bas
     if (ball.y - ball.radius <= 0 || ball.y + ball.radius >= this.height)
@@ -192,23 +303,13 @@ export class Pong {
 
     // check scored point et relancer si oui
     if (ball.x - ball.radius > this.width || ball.x + ball.radius <= 0)
-    {
-      // add point to player
-      if (ball.x - ball.radius > this.width)
-        paddle1.score++;
-      else
-        paddle2.score++;
-
-      ball.x = this.width / 2;
-      ball.y = this.height / 2;
-      ball.speedx *= -1;
-    }
+      this.endPoint();
   }
 
   private update(): void {
     this.updatePaddle(this.paddle1, 'w', 's');
     this.updatePaddle(this.paddle2, 'arrowup', 'arrowdown');
-    this.updateBall(this.ball, this.paddle1, this.paddle2);
+    this.updateBall(this.ball);
   }
 
   private drawBall(ctx: typeof this.ctx, x: number, y: number, size: number): void {
@@ -219,37 +320,54 @@ export class Pong {
     ctx.closePath();
   }
 
+  private drawPower(): void {
+    this.ctx.fillStyle = '#ff0000';
+    this.ctx.strokeStyle = '#ffffff';
+    this.ctx.fillRect(
+      this.power.x,
+      this.power.y,
+      this.power.width,
+      this.power.height
+    );
+    this.ctx.strokeRect(
+      this.power.x,
+      this.power.y,
+      this.power.width,
+      this.power.height
+    );
+  }
+
   private drawPaddles(ctx: typeof this.ctx, paddle1: typeof this.paddle1, paddle2: typeof this.paddle2): void {
     // paddles
     ctx.fillStyle = '#4a90e2';
-		ctx.fillRect(
-			paddle1.x,
-			paddle1.y,
-			paddle1.width,
-			paddle1.height
-		);
     ctx.fillRect(
-			paddle2.x,
-			paddle2.y,
-			paddle2.width,
-			paddle2.height
-		);
-
+      paddle1.x,
+      paddle1.y,
+      paddle1.width,
+      paddle1.height
+    );
+    ctx.fillRect(
+      paddle2.x,
+      paddle2.y,
+      paddle2.width,
+      paddle2.height
+    );
+    
     // contours
     ctx.strokeStyle = '#ffffff';
-		ctx.lineWidth = 2;
-		ctx.strokeRect(
-			paddle1.x,
-			paddle1.y,
-			paddle1.width,
-			paddle1.height
-		);
+    ctx.lineWidth = 2;
     ctx.strokeRect(
-			paddle2.x,
-			paddle2.y,
-			paddle2.width,
-			paddle2.height
-		);
+      paddle1.x,
+      paddle1.y,
+      paddle1.width,
+      paddle1.height
+    );
+    ctx.strokeRect(
+      paddle2.x,
+      paddle2.y,
+      paddle2.width,
+      paddle2.height
+    );
   }
 
   private render(): void {
@@ -258,37 +376,49 @@ export class Pong {
 
     // le fond
     this.ctx.fillStyle = '#1a1a2e';
-		this.ctx.fillRect(0, 0, this.width, this.height);
+    this.ctx.fillRect(0, 0, this.width, this.height);
 
     // les paddles + leur contour
     this.drawPaddles(this.ctx, this.paddle1, this.paddle2);
 
-    // la balle
-    if (this.start) {
+    if (this.start && !this.end) {
       this.drawBall(this.ctx, this.ball.x, this.ball.y, this.ball.radius);
       this.displayScore(this.ctx);
-    }
 
-    if (!this.start)
-      this.displayStartMsg(this.ctx);
+      if ((Date.now() / 1000) - this.power.time >= 3) {
+        this.power.active = true;
+        this.power.display = true;
+        this.power.time = (Date.now() / 1000);
+
+        // power collision
+        if (this.ball.y - this.ball.radius <= this.power.y && this.ball.x + this.ball.radius >= this.power.x)
+        {
+          this.power.display = false;
+          if (this.ball.speedx > 0)
+            this.paddle1.height += this.paddle1.height / 3;
+          else
+            this.paddle2.height += this.paddle2.height / 3;
+        }
+
+        // this.paddle1.height += this.paddle1.height / 3;
+        // this.paddle2.height += this.paddle2.height / 3;
+      }
+      if (this.power.active) {
+        if (this.power.display)
+          this.drawPower();
+        if ((Date.now() / 1000) - this.power.time >= 10)
+        {
+          this.power.active = false;
+          this.paddle1.height = 100;
+          this.paddle2.height = 100;
+        }
+      }
+    }
+    else {
+      if (this.end)
+        this.displayResult();
+      else
+        this.displayStartMsg(this.ctx);
+    }
   }
 }
-
-// a faire
-    // modif speedx et speedy en fonction de quelle partie du paddle ca touche
-    // ajouter usernames?
-    // power ups
-    // fin de partie apres un certain score
-    // ajouter le bouton pong a l'accueil
-    // ajouter le bouton accueil
-    // stocker les scores API
-    // police avec l'API
-
-    // IA
-      // recup le timestamp et laisser une seconde sans rien faire
-
-
-    // amis
-      // paires d'amis avec chacun son etat
-        // savoir qui a fait la demande
-        // qui a bloque l'autre

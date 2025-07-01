@@ -9,6 +9,7 @@ import cookie from '@fastify/cookie';
 import multipart from '@fastify/multipart'
 import { db } from './database';
 import authRoutes from "./routes/authentication"
+import gameRoutes from './routes/game';
 import editRoutes from './routes/reset-pwd';
 import userRoutes from './routes/user';
 import { getSecretFromVault } from './utils/vault';
@@ -62,6 +63,7 @@ async function setup() {
   console.log('✅ Edit routes registered');
   await fastify.register(userRoutes);
   console.log('✅ User routes registered');
+  await fastify.register(gameRoutes, {prefix: "/game"});
   
   // Register WebSocket
   console.log('🔌 Registering WebSocket...');

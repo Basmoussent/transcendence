@@ -243,7 +243,7 @@
         const lang = hostname.split('.')[0];
         const buttons = document.querySelectorAll('.language-btn');
         
-        // ensureSubdomain();
+        await ensureSubdomain();
         
         buttons.forEach(btn => {
           if (btn.classList.contains(`${lang}-flag`)) {
