@@ -34,6 +34,16 @@ export class Pong {
     speedy: number;
   };
 
+  private power: {
+    width: number,
+    height: number,
+    x: number,
+    y: number,
+    active: boolean,
+    display: boolean,
+    time: number
+  }
+
   private keys: { [key: string]: boolean };
 
   constructor(canvas: HTMLCanvasElement) {
@@ -74,6 +84,16 @@ export class Pong {
       speedy: 0
     }
 
+    this.power = {
+      width: 20,
+      height: 20,
+      x: randomInt((this.width / 5) * 2, (this.width / 5) * 4),
+      y: randomInt(0, this.height),
+      active: false,
+      display: false,
+      time: Date.now() / 1000
+    }
+
     this.keys = {};
   }
 
@@ -105,6 +125,9 @@ export class Pong {
     // adjust ball size?
     this.ball.x = this.width / 2;
     this.ball.y = this.height / 2;
+
+    this.power.width = this.paddle1.width;
+    this.power.height = this.power.width;
   }
 
   // pendant qu'on appuie sur une touche this.keys[touche] = true
@@ -120,17 +143,11 @@ export class Pong {
 
   private async startGameLoop(): Promise<void> {
     console.log('Starting game loop...');
-    const response = await fetch('/api/game/start', {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        player2: 1,
 
-      }),
+    // recup les infos des joueurs
+      // nbr de joueurs
+      // s'il y a une ou plusieurs IA dans la partie
 
-    })
     // fleche au lieu de function() pour que this fasse ref a Pong
     const gameLoop = () => {
       if (this.keys['enter'])
@@ -147,11 +164,6 @@ export class Pong {
     ctx.globalAlpha = 0.2;
     ctx.fillStyle = 'white';
     ctx.font = '48px sans-serif'; // changer police
-
-
-    let time: number = Date.now() / 1000;
-    // console.log('time = ', time);
-
     ctx.fillText('PRESS ENTER', this.width / 2 - 150, this.height / 2 - 30);
     ctx.fillText('TO START', this.width / 2 - 100, this.height / 2 + 50);
     ctx.globalAlpha = 1;
@@ -168,17 +180,9 @@ export class Pong {
     ctx.lineWidth = 2;
     ctx.stroke();
 
-    if (this.paddle1.score == 1 || this.paddle2.score == 1) {
+    if (this.paddle1.score == 5 || this.paddle2.score == 5) {
       this.end = true;
-      const response = await fetch('/api/game/end', {
-        method: "POST",
-        body: JSON.stringify({
-          "winner": 1,
-          "status": "finished",
-          "score": "prout"
-        }),
-
-      })
+      // faire un POST pour update score et etat de la partie
       return;
     }
 
@@ -221,9 +225,9 @@ export class Pong {
 
   private addBallSpeed(): void {
     this.ball.speedx *= -1;
-    if (this.ball.speedx > 0)
+    if (this.ball.speedx > 0 && this.ball.speedx < 12)
       this.ball.speedx += 0.25;
-    else
+    else if (this.ball.speedx < 0 && this.ball.speedx > -12)
       this.ball.speedx -= 0.25;
   }
 
@@ -239,6 +243,10 @@ export class Pong {
 
     // celui qui gagne recoit la balle en premier
     this.ball.speedx *= -1;
+    if (this.ball.speedy > 6)
+      this.ball.speedy = 6;
+    else if (this.ball.speedy < -6)
+      this.ball.speedy = -6;
 
     // on reset a la vitesse de base
     if (this.ball.speedx > 0)
@@ -247,51 +255,47 @@ export class Pong {
       this.ball.speedx = -6;
   }
 
-  private updateBall(ball: typeof this.ball, paddle1: typeof this.paddle1, paddle2: typeof this.paddle2): void {
+  private adjustBallDir(ball: typeof this.ball, paddle: typeof this.paddle1 | typeof this.paddle2): void {
+    const hitY = ball.y;
+
+    const paddleTop = paddle.y;
+    const paddleBottom = paddle.y + paddle.height;
+    const paddleCenter = paddle.y + paddle.height / 2;
+
+    // bord du paddle (20% en haut et en bas)
+    const edgeZone = paddle.height * 0.2;
+
+    if (hitY <= paddleTop + edgeZone) // touche le bord haut
+      ball.speedy -= 4;
+    else if (hitY >= paddleBottom - edgeZone) // touche le bord bas
+      ball.speedy += 4;
+    else if (hitY <= paddleCenter) // touche cote haut (mais pas bord)
+      ball.speedy -= 2;
+    else if (hitY > paddleCenter) // touche cote bas (mais pas bord)
+      ball.speedy += 2;
+  }
+
+  private paddleCollision(): void {
+    if (this.ball.x - this.ball.radius <= this.paddle1.x + this.paddle1.width && this.ball.y + this.ball.radius >= this.paddle1.y && this.ball.y - this.ball.radius <= this.paddle1.y + this.paddle1.height && this.ball.x > this.paddle1.x) {
+      this.addBallSpeed();
+      this.adjustBallDir(this.ball, this.paddle1);
+      this.ball.x = this.paddle1.x + this.paddle1.width + this.ball.radius;
+      console.log('this.ball.speedx = ', this.ball.speedx);
+    }
+    if (this.ball.x + this.ball.radius >= this.paddle2.x && this.ball.y + this.ball.radius >= this.paddle2.y && this.ball.y - this.ball.radius <= this.paddle2.y + this.paddle2.height && this.ball.x < this.paddle2.x + this.paddle2.width) {
+      this.addBallSpeed();
+      this.adjustBallDir(this.ball, this.paddle2);
+      this.ball.x = this.paddle2.x - this.ball.radius;
+      console.log('this.ball.speedx = ', this.ball.speedx);
+    }
+  }
+
+  private updateBall(ball: typeof this.ball): void {
     ball.x += ball.speedx;
     ball.y += ball.speedy;
 
     // check paddles collision + la balle prends en vitesse a chaque collision paddle + ajuster dir
-    if (ball.x - ball.radius <= paddle1.x + paddle1.width && ball.y + ball.radius >= paddle1.y && ball.y - ball.radius <= paddle1.y + paddle1.height && ball.x > paddle1.x) {
-      this.addBallSpeed();
-
-      // adjustBallDir
-      if (this.ball.y >= this.paddle2.y) // ca marche si this.paddle2.y est le milieu haut du paddle
-      {
-        if (this.ball.y >= this.paddle2.y + this.paddle2.height - 5)
-          this.ball.speedy -= 3;
-        else
-          this.ball.speedy -= 1;
-      }
-      else {
-        if (this.ball.y < this.paddle2.y + 5)
-          this.ball.speedy += 3;
-        else
-          this.ball.speedy += 1;
-      }
-
-      ball.x = paddle1.x + paddle1.width + ball.radius;
-    }
-    if (ball.x + ball.radius >= paddle2.x && ball.y + ball.radius >= paddle2.y && ball.y - ball.radius <= paddle2.y + paddle2.height && ball.x < paddle2.x + paddle2.width) {
-      this.addBallSpeed();
-
-      // adjustBallDir
-      if (this.ball.y >= this.paddle2.y) // ca marche si this.paddle2.y est le milieu haut du paddle
-      {
-        if (this.ball.y >= this.paddle2.y + this.paddle2.height - 5)
-          this.ball.speedy += 3;
-        else
-          this.ball.speedy += 1;
-      }
-      else {
-        if (this.ball.y < this.paddle2.y + 5)
-          this.ball.speedy -= 3;
-        else
-          this.ball.speedy -= 1;
-      }
-
-      ball.x = paddle2.x - ball.radius;
-    }
+    this.paddleCollision();
 
     // check wall collision - haut et bas
     if (ball.y - ball.radius <= 0 || ball.y + ball.radius >= this.height)
@@ -305,7 +309,7 @@ export class Pong {
   private update(): void {
     this.updatePaddle(this.paddle1, 'w', 's');
     this.updatePaddle(this.paddle2, 'arrowup', 'arrowdown');
-    this.updateBall(this.ball, this.paddle1, this.paddle2);
+    this.updateBall(this.ball);
   }
 
   private drawBall(ctx: typeof this.ctx, x: number, y: number, size: number): void {
@@ -314,6 +318,23 @@ export class Pong {
     ctx.fillStyle = '#ffffff';
     ctx.fill();
     ctx.closePath();
+  }
+
+  private drawPower(): void {
+    this.ctx.fillStyle = '#ff0000';
+    this.ctx.strokeStyle = '#ffffff';
+    this.ctx.fillRect(
+      this.power.x,
+      this.power.y,
+      this.power.width,
+      this.power.height
+    );
+    this.ctx.strokeRect(
+      this.power.x,
+      this.power.y,
+      this.power.width,
+      this.power.height
+    );
   }
 
   private drawPaddles(ctx: typeof this.ctx, paddle1: typeof this.paddle1, paddle2: typeof this.paddle2): void {
@@ -331,7 +352,7 @@ export class Pong {
       paddle2.width,
       paddle2.height
     );
-
+    
     // contours
     ctx.strokeStyle = '#ffffff';
     ctx.lineWidth = 2;
@@ -363,6 +384,35 @@ export class Pong {
     if (this.start && !this.end) {
       this.drawBall(this.ctx, this.ball.x, this.ball.y, this.ball.radius);
       this.displayScore(this.ctx);
+
+      if ((Date.now() / 1000) - this.power.time >= 3) {
+        this.power.active = true;
+        this.power.display = true;
+        this.power.time = (Date.now() / 1000);
+
+        // power collision
+        if (this.ball.y - this.ball.radius <= this.power.y && this.ball.x + this.ball.radius >= this.power.x)
+        {
+          this.power.display = false;
+          if (this.ball.speedx > 0)
+            this.paddle1.height += this.paddle1.height / 3;
+          else
+            this.paddle2.height += this.paddle2.height / 3;
+        }
+
+        // this.paddle1.height += this.paddle1.height / 3;
+        // this.paddle2.height += this.paddle2.height / 3;
+      }
+      if (this.power.active) {
+        if (this.power.display)
+          this.drawPower();
+        if ((Date.now() / 1000) - this.power.time >= 10)
+        {
+          this.power.active = false;
+          this.paddle1.height = 100;
+          this.paddle2.height = 100;
+        }
+      }
     }
     else {
       if (this.end)

@@ -3,13 +3,15 @@ https://stackoverflow.com/questions/4577814/pong-how-does-the-paddle-know-where-
 https://dooglz.github.io/set09121/pong2.html
 
 // a faire
-    // refaire adjustBallDir
+    // reprendre backend/src/routes/game.ts
     // power ups
     // stocker les scores API
     // police avec l'API
         // ajuster texte au milieu pcq la c'est bancal
 
     // IA
+                // let time: number = Date.now() / 1000;
+                // console.log('time = ', time);
         // j'ai besoin de savoir qu'un de mes joueurs est une IA 
     // recup le timestamp et laisser une seconde sans rien faire
         // if lastTS + 1s < currentTS -> return
