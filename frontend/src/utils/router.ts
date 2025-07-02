@@ -6,6 +6,7 @@ import { renderMain, initializeMainEvents } from '../pages/menu/main';
 import { render404 } from '../components/404';
 import { renderSocial } from '../pages/social/social';
 import { renderProfil } from '../pages/social/profil';
+import { renderHistory } from '../pages/social/history';
 import { renderMultiplayer, initializeMultiplayerEvents } from '../pages/game/multiplayer';
 import { renderLocal, initializeLocalEvents } from '../pages/game/local';
 import { renderBlock } from '../pages/block/main';
@@ -85,6 +86,9 @@ export async function router() {
       break;
     case '/profil':
       view = await renderProfil();
+      break;
+    case '/game-history':
+      view = await renderHistory();
       break;
     case '/multiplayer':
       view = renderMultiplayer();

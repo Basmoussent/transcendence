@@ -64,6 +64,8 @@ async function setup() {
   await fastify.register(userRoutes);
   console.log('✅ User routes registered');
   await fastify.register(gameRoutes, {prefix: "/game"});
+  await fastify.register(require('./routes/history'), {prefix: "/profil"});
+  // await fastify.register(require('./routes/history'), {prefix: "/api"});
   
   // Register WebSocket
   console.log('🔌 Registering WebSocket...');

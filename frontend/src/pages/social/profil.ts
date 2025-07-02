@@ -116,6 +116,10 @@ export async function renderProfil() {
             <i class="fas fa-sign-out-alt"></i>
             ${t('profile.logout')}
           </button>
+          <button class="action-button game-history">
+            <i class="fas fa-list"></i>
+            ${t('profile.gameHistory')} // rajouter la traduction dans tous les define
+          </button>
         </div>
       </div>
     </div>
@@ -406,6 +410,7 @@ export async function renderProfil() {
     const changePasswordButton = document.querySelector('.action-button.change-password');
     const changeAvatarBtn = document.getElementById('changeAvatarBtn');
     const avatarInput = document.getElementById('avatarInput') as HTMLInputElement;
+    const gameHistoryButton = document.querySelector('.action-button.game-history');
 
     if (logoutButton) {
       logoutButton.addEventListener('click', () => {
@@ -423,6 +428,12 @@ export async function renderProfil() {
     if (changePasswordButton) {
       changePasswordButton.addEventListener('click', () => {
         window.history.pushState({}, '', '/change-password');
+        window.dispatchEvent(new PopStateEvent('popstate'));
+      });
+    }
+    if (gameHistoryButton) { // changer la page tout en gardant le SPA
+      gameHistoryButton.addEventListener('click', () => {
+        window.history.pushState({}, '', '/game-history');
         window.dispatchEvent(new PopStateEvent('popstate'));
       });
     }
