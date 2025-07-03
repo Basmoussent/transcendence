@@ -3,11 +3,13 @@ https://stackoverflow.com/questions/4577814/pong-how-does-the-paddle-know-where-
 https://dooglz.github.io/set09121/pong2.html
 
 // a faire
-    // y'a un probleme
-        // logique balle
-        // logique de temps power up
+    // continuer a reflechir en multijoueur
+        // faire collisions paddle/paddle
     // reprendre backend/src/routes/game.ts
-    // power ups
+    // power ups - aleatoir entre : (peut etre annonce en fond)
+        // paddle + grand/+ petit pour l'adversaire
+        // balle en trop
+        // freeze du paddle de l'adversaire pendant genre 1sec
     // stocker les scores API
     // police avec l'API
         // ajuster texte au milieu pcq la c'est bancal
@@ -30,6 +32,10 @@ https://dooglz.github.io/set09121/pong2.html
 
         // calculer a l'avance mouvements de balle et aller a l'endroit de la collision
 
+    // une page d'accueil du jeu ou le joueur peut choisir:
+        // activer les powers ups dans la partie
+        // choisir d'ajouter des ia ou non
+        // nombre de joueurs
 
     // amis
       // paires d'amis avec chacun son etat
