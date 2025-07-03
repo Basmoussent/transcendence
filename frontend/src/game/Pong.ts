@@ -1,4 +1,5 @@
 import { randomInt } from "./pongUtils";
+import { Paddle } from "./pongUtils";
 
 export class Pong {
   private canvas: HTMLCanvasElement;
@@ -8,23 +9,7 @@ export class Pong {
   private start: boolean;
   private end: boolean;
 
-  private paddle1: {
-    width: number;
-    height: number;
-    x: number;
-    y: number;
-    speed: number;
-    score: number;
-  };
-
-  private paddle2: {
-    width: number;
-    height: number;
-    x: number;
-    y: number;
-    speed: number;
-    score: number;
-  };
+  private paddles: [Paddle, Paddle, (Paddle | null)?, (Paddle | null)?];
 
   private ball: {
     radius: number;
@@ -53,29 +38,20 @@ export class Pong {
     if (!context) {
       throw new Error('Could not get 2D context');
     }
+
     this.ctx = context;
     this.width = canvas.width;
     this.height = canvas.height;
     this.start = false;
     this.end = false;
 
-    this.paddle1 = {
-      width: 20,
-      height: 100,
-      x: 0,
-      y: 0,
-      speed: 8,
-      score: 0
-    };
-
-    this.paddle2 = {
-      width: 20,
-      height: 100,
-      x: 0,
-      y: 0,
-      speed: 8,
-      score: 0
-    };
+    // !!! modifier ca avec un this.paddles.push quand je pourrais get les infos de la partie
+    this.paddles = [
+      new Paddle(20, 100, 0, 0, 8),
+      new Paddle(20, 100, 0, 0, 8),
+      null,
+      null
+    ];
 
     this.ball = {
       radius: 10,
@@ -111,6 +87,32 @@ export class Pong {
     });
   }
 
+  private setUpPaddles(): void {
+    this.paddles[0].x = 30;
+    this.paddles[0].y = (this.height - this.paddles[0].height) / 2;
+    this.paddles[0].scorex = (this.width / 2) / 2;
+    this.paddles[0].scorey = this.height / 2;
+
+    this.paddles[1].x = this.width - this.paddles[1].width - 30;
+    this.paddles[1].y = (this.height - this.paddles[1].height) / 2;
+    this.paddles[1].scorex = (this.width / 4) * 3;
+    this.paddles[1].scorey = this.height / 2;
+
+    if (this.paddles[2]) {
+      this.paddles[2].x = this.width / 2 - this.paddles[2].width / 2;
+      this.paddles[2].y = this.height - this.paddles[2].height - 30;
+      this.paddles[2].scorex = this.width / 2;
+      this.paddles[2].scorey = this.height - 100;
+    }
+
+    if (this.paddles[3]) {
+      this.paddles[3].x = this.width / 2 - this.paddles[3].width / 2;
+      this.paddles[3].y = 30;
+      this.paddles[3].scorex = this.width / 2;
+      this.paddles[3].scorey = this.height - this.height + 100;
+    }
+  }
+
   private setupCanvas(): void {
     console.log('Setting up canvas...');
     this.canvas.width = this.canvas.clientWidth || 800;
@@ -118,18 +120,14 @@ export class Pong {
     this.width = this.canvas.width;
     this.height = this.canvas.height;
 
-    this.paddle1.x = 30;
-    this.paddle1.y = (this.height - this.paddle1.height) / 2;
-
-    this.paddle2.x = this.width - this.paddle2.width - 30;
-    this.paddle2.y = (this.height - this.paddle1.height) / 2;
+    this.setUpPaddles();
 
     // adjust ball size?
     this.ball.x = this.width / 2;
     this.ball.y = this.height / 2;
 
-    this.power.width = this.paddle1.width * 1.4;
-    this.power.height = this.power.width;
+    // this.power.width = this.paddles[0].width * 1.4;
+    // this.power.height = this.power.width;
   }
 
   // pendant qu'on appuie sur une touche this.keys[touche] = true
@@ -162,39 +160,47 @@ export class Pong {
     gameLoop();
   }
 
-  private displayStartMsg(ctx: typeof this.ctx): void {
-    ctx.globalAlpha = 0.2;
-    ctx.fillStyle = 'white';
-    ctx.font = '48px sans-serif'; // changer police
-    ctx.fillText('PRESS ENTER', this.width / 2 - 150, this.height / 2 - 30);
-    ctx.fillText('TO START', this.width / 2 - 100, this.height / 2 + 50);
-    ctx.globalAlpha = 1;
+  private displayStartMsg(): void {
+    this.ctx.globalAlpha = 0.2;
+    this.ctx.fillStyle = 'white';
+    this.ctx.font = '48px sans-serif'; // changer police
+    this.ctx.fillText('PRESS ENTER', this.width / 2 - 150, this.height / 2 - 30);
+    this.ctx.fillText('TO START', this.width / 2 - 100, this.height / 2 + 50);
+    this.ctx.globalAlpha = 1;
   }
 
-  private async displayScore(ctx: typeof this.ctx): Promise<void> {
-    ctx.globalAlpha = 0.2;
+  private drawLine(): void {
+    this.ctx.beginPath();
+    this.ctx.moveTo(this.width / 2, 30);
+    this.ctx.lineTo(this.width / 2, this.height - 30);
+    this.ctx.strokeStyle = 'white';
+    this.ctx.lineWidth = 2;
+    this.ctx.stroke();
+  }
 
-    // ligne du milieu
-    ctx.beginPath();
-    ctx.moveTo(this.width / 2, 30);
-    ctx.lineTo(this.width / 2, this.height - 30);
-    ctx.strokeStyle = 'white';
-    ctx.lineWidth = 2;
-    ctx.stroke();
+  private displayScore(): void{
+    this.ctx.globalAlpha = 0.2;
 
-    if (this.paddle1.score == 5 || this.paddle2.score == 5) {
-      this.end = true;
-      // faire un POST pour update score et etat de la partie
-      return;
+    // ligne du milieu que si y'a 2 joueurs
+    if (this.paddles[2] === null)
+      this.drawLine();
+
+    // faut faire un POST pour update score et etat de la partie
+    for (let i = 0; i < 4; i++) {
+      const paddle = this.paddles[i];
+      if (paddle && paddle.winsGame() === true) {
+        this.end = true;
+        return ;
+      }
     }
 
-    // score
-    ctx.fillStyle = 'white';
-    ctx.font = '48px sans-serif'; // changer police
-    ctx.fillText(this.paddle1.score.toString(), (this.width / 2) / 2, this.height / 2);
-    ctx.fillText(this.paddle2.score.toString(), (this.width / 4) * 3, this.height / 2);
+    // les scores
+    for (let i = 0; i < 4; i++) {
+      if (this.paddles[i] !== null)
+        this.paddles[i]?.displayScore(this.ctx);
+    }
 
-    ctx.globalAlpha = 1;
+    this.ctx.globalAlpha = 1;
   }
 
   private displayResult(): void {
@@ -202,27 +208,40 @@ export class Pong {
     this.ctx.fillStyle = 'white';
     this.ctx.font = '48px sans-serif'; // changer police
 
-    if (this.paddle1.score == 5)
-      this.ctx.fillText("PLAYER1 WINS", this.width / 2 - 150, this.height / 2);
-    else
-      this.ctx.fillText("PLAYER2 WINS", this.width / 2 - 150, this.height / 2);
+    for (let i = 0; i < 4; i++) {
+      const paddle = this.paddles[i];
+      if (paddle && paddle.winsGame() === true) {
+        this.ctx.fillText(paddle.name, this.width / 2 - 150, this.height / 2);
+        break ;
+      }
+    }
+    this.ctx.fillText("WINS", this.width / 2 - 150, this.height / 2);
 
     this.ctx.globalAlpha = 1;
-
   }
 
-  private updatePaddle(paddle: typeof this.paddle1, upKey: string, downKey: string): void {
-    // faire bouger le paddle
-    if (this.keys[upKey])
-      paddle.y -= paddle.speed;
-    if (this.keys[downKey])
-      paddle.y += paddle.speed;
+  private updatePaddleUpDown(paddle: typeof this.paddles[0] | null, upKey: string, downKey: string): void {
+    if (paddle === null)
+      return ;
 
-    // ajuster au cas ou il sort des limites
-    if (paddle.y < 0)
-      paddle.y = 0;
-    else if (paddle.y + paddle.height > this.height)
-      paddle.y = this.height - paddle.height;
+    // faire bouger le paddle
+    else if (this.keys[downKey])
+      paddle.moveRight(this.width);
+    else if (this.keys[upKey])
+      paddle.moveLeft();
+
+    // !!! paddle collision
+      // peut collide avec this.paddles[0] et this.paddles[1]
+  }
+
+  private updatePaddleRightLeft(paddle: typeof this.paddles[0], upKey: string, downKey: string): void {
+    if (this.keys[upKey])
+      paddle.moveUp();
+    if (this.keys[downKey])
+      paddle.moveDown(this.height);
+
+    // !!! paddle collision
+      // peut collide avec this.paddles[3] et this.paddles[4]
   }
 
   private addBallSpeed(): void {
@@ -233,11 +252,11 @@ export class Pong {
       this.ball.speedx -= 0.25;
   }
 
-  private endPoint(): void {
+  private startPoint(): void {
     if (this.ball.x - this.ball.radius > this.width)
-      this.paddle1.score++;
+      this.paddles[0].score++;
     else
-      this.paddle2.score++;
+      this.paddles[1].score++;
 
     // replace la balle au centre
     this.ball.x = this.width / 2;
@@ -257,11 +276,11 @@ export class Pong {
       this.ball.speedx = -6;
 
     // on annule les powers pour le nouveau point
-    this.paddle1.height = 100;
-    this.paddle2.height = 100;
+    this.paddles[0].height = 100;
+    this.paddles[1].height = 100;
   }
 
-  private adjustBallDir(ball: typeof this.ball, paddle: typeof this.paddle1 | typeof this.paddle2): void {
+  private adjustBallDir(ball: typeof this.ball, paddle: typeof this.paddles[0] | typeof this.paddles[1]): void {
     const hitY = ball.y;
 
     const paddleTop = paddle.y;
@@ -282,16 +301,16 @@ export class Pong {
   }
 
   private paddleCollision(): void {
-    if (this.ball.x - this.ball.radius <= this.paddle1.x + this.paddle1.width && this.ball.y + this.ball.radius >= this.paddle1.y && this.ball.y - this.ball.radius <= this.paddle1.y + this.paddle1.height && this.ball.x > this.paddle1.x) {
+    if (this.ball.x - this.ball.radius <= this.paddles[0].x + this.paddles[0].width && this.ball.y + this.ball.radius >= this.paddles[0].y && this.ball.y - this.ball.radius <= this.paddles[0].y + this.paddles[0].height && this.ball.x > this.paddles[0].x) {
       this.addBallSpeed();
-      this.adjustBallDir(this.ball, this.paddle1);
-      this.ball.x = this.paddle1.x + this.paddle1.width + this.ball.radius;
+      // this.adjustBallDir(this.ball, this.paddles[0]);
+      this.ball.x = this.paddles[0].x + this.paddles[0].width + this.ball.radius;
       console.log('this.ball.speedx = ', this.ball.speedx);
     }
-    if (this.ball.x + this.ball.radius >= this.paddle2.x && this.ball.y + this.ball.radius >= this.paddle2.y && this.ball.y - this.ball.radius <= this.paddle2.y + this.paddle2.height && this.ball.x < this.paddle2.x + this.paddle2.width) {
+    if (this.ball.x + this.ball.radius >= this.paddles[1].x && this.ball.y + this.ball.radius >= this.paddles[1].y && this.ball.y - this.ball.radius <= this.paddles[1].y + this.paddles[1].height && this.ball.x < this.paddles[1].x + this.paddles[1].width) {
       this.addBallSpeed();
-      this.adjustBallDir(this.ball, this.paddle2);
-      this.ball.x = this.paddle2.x - this.ball.radius;
+      // this.adjustBallDir(this.ball, this.paddles[1]);
+      this.ball.x = this.paddles[1].x - this.ball.radius;
       console.log('this.ball.speedx = ', this.ball.speedx);
     }
   }
@@ -309,12 +328,18 @@ export class Pong {
 
     // check scored point et relancer si oui
     if (ball.x - ball.radius > this.width || ball.x + ball.radius <= 0)
-      this.endPoint();
+      this.startPoint();
   }
 
   private update(): void {
-    this.updatePaddle(this.paddle1, 'w', 's');
-    this.updatePaddle(this.paddle2, 'arrowup', 'arrowdown');
+    this.updatePaddleRightLeft(this.paddles[0], 'w', 's');
+    this.updatePaddleRightLeft(this.paddles[1], 'arrowup', 'arrowdown');
+
+    if (this.paddles[2])
+      this.updatePaddleUpDown(this.paddles[2], 'k', 'l');
+    if (this.paddles[3])
+      this.updatePaddleUpDown(this.paddles[3], '5', '6');
+
     this.updateBall(this.ball);
   }
 
@@ -343,52 +368,18 @@ export class Pong {
     );
   }
 
-  private drawPaddles(ctx: typeof this.ctx, paddle1: typeof this.paddle1, paddle2: typeof this.paddle2): void {
-    // paddles
-    ctx.fillStyle = '#4a90e2';
-    ctx.fillRect(
-      paddle1.x,
-      paddle1.y,
-      paddle1.width,
-      paddle1.height
-    );
-    ctx.fillRect(
-      paddle2.x,
-      paddle2.y,
-      paddle2.width,
-      paddle2.height
-    );
-    
-    // contours
-    ctx.strokeStyle = '#ffffff';
-    ctx.lineWidth = 2;
-    ctx.strokeRect(
-      paddle1.x,
-      paddle1.y,
-      paddle1.width,
-      paddle1.height
-    );
-    ctx.strokeRect(
-      paddle2.x,
-      paddle2.y,
-      paddle2.width,
-      paddle2.height
-    );
+  private powerCollision(ballx: number, bally: number, ballradius: number, powerx: number, powery: number, powerwidth: number, powerheight: number) {
+    // Trouver le point du rectangle le plus proche du centre du cercle
+    const closestX = Math.max(powerx, Math.min(ballx, powerx + powerwidth));
+    const closestY = Math.max(powery, Math.min(bally, powery + powerheight));
+
+    // Calculer la distance entre ce point et le centre du cercle
+    const dx = ballx - closestX;
+    const dy = bally - closestY;
+
+    // Collision si distance^2 < rayon^2
+    return (dx * dx + dy * dy) <= ballradius * ballradius;
   }
-
-  private circleRectCollision(cx: number, cy: number, r: number, rx: number, ry: number, rw: number, rh: number) {
-  // Trouver le point du rectangle le plus proche du centre du cercle
-  const closestX = Math.max(rx, Math.min(cx, rx + rw));
-  const closestY = Math.max(ry, Math.min(cy, ry + rh));
-
-  // Calculer la distance entre ce point et le centre du cercle
-  const dx = cx - closestX;
-  const dy = cy - closestY;
-
-  // Collision si distance^2 < rayon^2
-  return (dx * dx + dy * dy) <= r * r;
-}
-
 
   private render(): void {
     // on efface tout
@@ -399,58 +390,19 @@ export class Pong {
     this.ctx.fillRect(0, 0, this.width, this.height);
 
     // les paddles + leur contour
-    this.drawPaddles(this.ctx, this.paddle1, this.paddle2);
+    for (let i = 0; i < this.paddles.length; i++)
+      this.paddles[i]?.drawPaddle(this.ctx);
 
     if (this.start && !this.end) {
       
       this.drawBall(this.ctx, this.ball.x, this.ball.y, this.ball.radius);
-      this.displayScore(this.ctx);
-      
-      const now = Date.now() / 1000;
-      // power up spawn
-      if (!this.power.active && now - this.power.spawnTime >= 3) {
-        this.power.active = true;
-        this.power.display = true;
-        this.power.spawnTime = now;
-      }
-
-      if (this.power.active) {
-        if (this.power.display)
-          this.drawPower();
-
-         // power collision
-        if (this.power.display && this.circleRectCollision(this.ball.x, this.ball.y, this.ball.radius, this.power.x, this.power.y, this.power.width, this.power.height))
-        {
-          this.power.display = false;
-          this.power.collisionTime = now;
-          if (this.ball.speedx > 0)
-            this.paddle1.height = 130;
-          else
-            this.paddle2.height = 130;
-        }
-
-        // le pouvoir s'affiche pdt 8s
-        if (this.power.display && now - this.power.spawnTime >= 8)
-          this.power.display = false;
-
-        // on gagne le pouvoir pdt 8s
-        if (this.power.collisionTime !== null && now - this.power.collisionTime >= 8)
-        {
-          this.power.active = false;
-          this.paddle1.height = 100;
-          this.paddle2.height = 100;
-          this.power.collisionTime = null;
-        }
-
-        if (!this.power.display && this.power.collisionTime === 0)
-          this.power.active = false;
-      }
+      this.displayScore(); 
     }
     else {
       if (this.end)
         this.displayResult();
       else
-        this.displayStartMsg(this.ctx);
+        this.displayStartMsg();
     }
   }
 }

@@ -3,11 +3,19 @@ https://stackoverflow.com/questions/4577814/pong-how-does-the-paddle-know-where-
 https://dooglz.github.io/set09121/pong2.html
 
 // a faire
+    // y'a un probleme
+        // logique balle
+        // logique de temps power up
     // reprendre backend/src/routes/game.ts
     // power ups
     // stocker les scores API
     // police avec l'API
         // ajuster texte au milieu pcq la c'est bancal
+
+    // pour les pouvoirs:
+        // garder une seule struct de base avec toutes les infos
+        // seule diff sera au moment de la collision avec le power
+            // on en active un random
 
     // IA
                 // let time: number = Date.now() / 1000;
