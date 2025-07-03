@@ -45,7 +45,6 @@ export class Block {
 		this.bHeight = 0;
 		this.bWidth = 0;
 
-		
 
 		this.paddle = {
 			width: 100,
@@ -54,7 +53,6 @@ export class Block {
 			y: 0,
 			speed: 14
 		};
-
 
 		// this.width et this.height n'ont pas les bonnes mesures a ce moment la
 
@@ -68,6 +66,8 @@ export class Block {
 		};
 
 		this.keys = {};
+		this.bricks = [];
+
 	}
 
 	private brickId(x: number, y: number): number {
@@ -162,10 +162,28 @@ export class Block {
 		ctx.fillText('TO START', this.width / 2 - 100, this.height / 2 + 50);
 		ctx.globalAlpha = 1;
 	}
+
+	// private async logGame(): Promise<void> {
+	// 	try {
+	// 		const response = await fetch('http://localhost:2443/logGame', {
+	// 			method: 'POST',
+	// 			headers: {
+	// 				'Content-Type': 'application/json',
+	// 				'x-access-token': localStorage.getItem('token') || '', 
+	// 			},
+	// 			body: JSON.stringify({
+
+	// 			})
+	// 		})
+	// 	}
+	// }
   
 	private update(ball: typeof this.ball): void {
 
 		if (this.keys['enter'] && !this.status) {
+			if (this.bricks) {
+				this.logGame();
+			}
 			this.bricks = [];
 			for (let it = 0; it < 100; ++it)
 				this.bricks.push(createRandomBrick(it));

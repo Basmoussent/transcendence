@@ -9,6 +9,7 @@ import { renderProfil } from '../pages/social/profil';
 import { renderMultiplayer, initializeMultiplayerEvents } from '../pages/game/multiplayer';
 import { renderLocal, initializeLocalEvents } from '../pages/game/local';
 import { renderBlock } from '../pages/block/main';
+import { renderTest } from '../pages/test/main';
 import { renderChangePassword, initializeChangePasswordEvents } from '../pages/auth/change-password';
 import { renderEditProfil, initializeEditProfileEvents } from '../pages/social/edit-profil';
 import { getAuthToken } from './auth';
@@ -94,6 +95,9 @@ export async function router() {
       break;
     case '/block':
       view = renderBlock();
+      break;
+    case '/test':
+      view = renderTest();
       break;
     case '/change-password':
       view = renderChangePassword();

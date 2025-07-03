@@ -13,6 +13,7 @@ import gameRoutes from './routes/game';
 import editRoutes from './routes/reset-pwd';
 import userRoutes from './routes/user';
 import { getSecretFromVault } from './utils/vault';
+import barRoutes from './routes/testrouter';
 
 
 
@@ -64,6 +65,8 @@ async function setup() {
   await fastify.register(userRoutes);
   console.log('✅ User routes registered');
   await fastify.register(gameRoutes, {prefix: "/game"});
+  console.log('✅ BarTables routes registered');
+  await fastify.register(barRoutes, {prefix: "/bar"});
   
   // Register WebSocket
   console.log('🔌 Registering WebSocket...');
