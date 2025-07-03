@@ -45,8 +45,7 @@ export class Block {
 		this.bHeight = 0;
 		this.bWidth = 0;
 
-		for (let it = 0; it < 100; ++it)
-			this.bricks.push(createRandomBrick(it));
+		
 
 		this.paddle = {
 			width: 100,
@@ -97,37 +96,6 @@ export class Block {
 			this.setupCanvas();
 		});
 	}
-
-	private reset(): void {
-		this.status = false;
-
-		this.bricks = [];
-		for (let it = 0; it < 100; ++it)
-			this.bricks.push(createRandomBrick(it));
-
-		this.paddle.x = (this.width - this.paddle.width) / 2;
-		this.paddle.y = this.height - this.paddle.height - 12;
-
-		this.ball = {
-			radius: 10,
-			x: this.width / 2,
-			y: this.height / 2,
-			speedx: 5,
-			speedy: 5,
-			flag: true
-		};
-
-		this.paddle = {
-			width: 100,
-			height: 20,
-			x: 0,
-			y: 0,
-			speed: 14
-		};
-
-		this.keys = {};
-	}
-
 
 	private setupEventListeners(): void {
 		window.addEventListener('keydown', (e) => {
@@ -197,8 +165,12 @@ export class Block {
   
 	private update(ball: typeof this.ball): void {
 
-		if (this.keys['enter'] && !this.status)
+		if (this.keys['enter'] && !this.status) {
+			this.bricks = [];
+			for (let it = 0; it < 100; ++it)
+				this.bricks.push(createRandomBrick(it));
 			this.status = true;
+		}
 
 		if (!this.status)
 			return ;
@@ -253,13 +225,9 @@ export class Block {
 				this.ball.speedx *= -1;
 			}
 		
-				// if (Math.trunc((ball.x * 20) / this.width))
-		
-		
 		}
 
 
-		// }
 
 		// collisions gauche droite
 		if (ball.x + ball.speedx <= 0 || ball.x + ball.speedx >= this.width)
@@ -276,6 +244,7 @@ export class Block {
 			console.log(this.width / 2, ",", this.height / 2);
 			ball.speedx = 5,
 			ball.speedy = 5
+			
 			this.status = false; // plus en partie
 			// api.post(game(temp de la game, gagnee ou perdue, nombre de coups de paddle pour les stats))
 		}
