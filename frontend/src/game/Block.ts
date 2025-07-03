@@ -7,7 +7,7 @@ export class Block {
 	private height: number;
 	private bHeight: number;
 	private bWidth: number;
-	private vie: number;
+	private status: boolean;
 
 	private paddle: {
 		width: number;
@@ -34,6 +34,8 @@ export class Block {
 		this.canvas = canvas;
 		const context = canvas.getContext('2d');
 
+		this.status = false;
+
 		if (!context)
 			throw new Error('Could not get 2D context');
 
@@ -42,7 +44,6 @@ export class Block {
 		this.height = canvas.height;
 		this.bHeight = 0;
 		this.bWidth = 0;
-		this.vie = 3;
 
 		for (let it = 0; it < 100; ++it)
 			this.bricks.push(createRandomBrick(it));
@@ -96,6 +97,37 @@ export class Block {
 			this.setupCanvas();
 		});
 	}
+
+	private reset(): void {
+		this.status = false;
+
+		this.bricks = [];
+		for (let it = 0; it < 100; ++it)
+			this.bricks.push(createRandomBrick(it));
+
+		this.paddle.x = (this.width - this.paddle.width) / 2;
+		this.paddle.y = this.height - this.paddle.height - 12;
+
+		this.ball = {
+			radius: 10,
+			x: this.width / 2,
+			y: this.height / 2,
+			speedx: 5,
+			speedy: 5,
+			flag: true
+		};
+
+		this.paddle = {
+			width: 100,
+			height: 20,
+			x: 0,
+			y: 0,
+			speed: 14
+		};
+
+		this.keys = {};
+	}
+
 
 	private setupEventListeners(): void {
 		window.addEventListener('keydown', (e) => {
@@ -151,8 +183,25 @@ export class Block {
 			}
 		}
 	}
+
+	private displayStartMsg(ctx: typeof this.ctx): void {
+		if (this.status)
+			return;
+		ctx.globalAlpha = 0.2;
+		ctx.fillStyle = 'white';
+		ctx.font = '48px sans-serif'; // changer police
+		ctx.fillText('PRESS ENTER', this.width / 2 - 150, this.height / 2 - 30);
+		ctx.fillText('TO START', this.width / 2 - 100, this.height / 2 + 50);
+		ctx.globalAlpha = 1;
+	}
   
 	private update(ball: typeof this.ball): void {
+
+		if (this.keys['enter'] && !this.status)
+			this.status = true;
+
+		if (!this.status)
+			return ;
 
 		if (this.keys['a']) 
 			this.paddle.x -= this.paddle.speed;
@@ -193,15 +242,6 @@ export class Block {
 				ball.speedy *= -1;
 			}
 		}
-	
-		let y = 0;
-	
-		if (ball.speedy > 0)
-			y = ball.y + ball.radius + ball.speedy;
-		else
-			y = ball.y - ball.radius + ball.speedy;
-
-
 
 		if (ball.y - ball.radius + ball.speedy <= this.height / 4) {
 	
@@ -230,13 +270,14 @@ export class Block {
 			ball.speedy *= -1;
 
 		if (ball.y + ball.speedy >= this.height) {
-			--this.vie;
 			ball.radius = 10,
 			ball.x = this.width / 2,
 			ball.y = this.height / 2,
 			console.log(this.width / 2, ",", this.height / 2);
 			ball.speedx = 5,
 			ball.speedy = 5
+			this.status = false; // plus en partie
+			// api.post(game(temp de la game, gagnee ou perdue, nombre de coups de paddle pour les stats))
 		}
 		
 		if (ball.flag) {
@@ -307,6 +348,7 @@ export class Block {
 		);
 		this.renderBricks();
 		this.drawBall(this.ball);
+		this.displayStartMsg(this.ctx);
 
 	}
 

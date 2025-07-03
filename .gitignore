@@ -33,13 +33,12 @@ node_modules/*
 node_modules/hashi-vault-js/tests/AppRole.test.js
 node_modules
 
-.log
-
 docker/nginx/modsecurity/audit/
+docker/nginx/logs/*.log
 
 # Vault credentials
 backend/vault-credentials/
 backend/uploads/*
 
 # BDD
-backend/data/*
+backend/data/
