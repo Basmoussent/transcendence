@@ -114,7 +114,7 @@ export class Paddle {
                 this.moveLeft();
             else
                 this.x = PADDLE_OFFSET + paddles[0].width;
-        }
+            }
   }
 
   updatePaddleRightLeft(keys: { [key: string]: boolean }, upKey: string, downKey: string, paddles: [Paddle, Paddle, (Paddle | null)?, (Paddle | null)?], canvasHeight: number): void {
@@ -130,12 +130,11 @@ export class Paddle {
 
         if (horizontalOverlap && verticalCollision)
           canMove = false;
-
-        if (canMove)
-          this.moveUp();
-        else
-          this.y = PADDLE_OFFSET + player3.height; // eviter collision avec player3
       }
+      if (canMove)
+        this.moveUp();
+      else if (player3)
+        this.y = PADDLE_OFFSET + player3.height; // eviter collision avec player3
     }
 
     if (keys[downKey]) {
@@ -147,12 +146,11 @@ export class Paddle {
 
         if (horizontalOverlap && verticalCollision)
           canMove = false;
-
-        if (canMove)
-          this.moveDown(canvasHeight);
-        else
-          this.y = canvasHeight - PADDLE_OFFSET - player4.height - this.height; // eviter collision avec player4
       }
+      if (canMove)
+        this.moveDown(canvasHeight);
+      else if (player4)
+        this.y = canvasHeight - PADDLE_OFFSET - player4.height - this.height; // eviter collision avec player4
     }
   }
 }

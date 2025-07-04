@@ -41,7 +41,7 @@ export class Pong {
     this.paddles = [
       new Paddle(20, 100, 0, 0, 8),
       new Paddle(20, 100, 0, 0, 8),
-      new Paddle(100, 20, 0, 0, 8),
+      null,
       null
     ];
 
@@ -82,18 +82,20 @@ export class Pong {
     this.paddles[1].scorex = (this.width / 4) * 3;
     this.paddles[1].scorey = this.height / 2;
 
-    if (this.paddles[2]) {
-      this.paddles[2].x = this.width / 2 - this.paddles[2].width / 2;
-      this.paddles[2].y = PADDLE_OFFSET;
-      this.paddles[2].scorex = this.width / 2;
-      this.paddles[2].scorey = this.height - this.height + 100;
+    const player3 = this.paddles[2];
+    if (player3) {
+      player3.x = this.width / 2 - player3.width / 2;
+      player3.y = PADDLE_OFFSET;
+      player3.scorex = this.width / 2;
+      player3.scorey = this.height - this.height + 100;
     }
 
-    if (this.paddles[3]) {
-      this.paddles[3].x = this.width / 2 - this.paddles[3].width / 2;
-      this.paddles[3].y = this.height - this.paddles[3].height - PADDLE_OFFSET;
-      this.paddles[3].scorex = this.width / 2;
-      this.paddles[3].scorey = this.height - 100;
+    const player4 = this.paddles[3];
+    if (player4) {
+      player4.x = this.width / 2 - player4.width / 2;
+      player4.y = this.height - player4.height - PADDLE_OFFSET;
+      player4.scorex = this.width / 2;
+      player4.scorey = this.height - 100;
     }
   }
 
@@ -172,7 +174,7 @@ export class Pong {
     // faut faire un POST pour update score et etat de la partie
     for (let i = 0; i < 4; i++) {
       const paddle = this.paddles[i];
-      if (paddle && paddle.winsGame() === true) {
+      if (paddle && paddle?.winsGame() === true) {
         this.end = true;
         return;
       }
@@ -180,8 +182,9 @@ export class Pong {
 
     // les scores
     for (let i = 0; i < 4; i++) {
-      if (this.paddles[i])
-        this.paddles[i]?.displayScore(this.ctx);
+      const paddle = this.paddles[i];
+      if (paddle)
+        paddle?.displayScore(this.ctx);
     }
 
     this.ctx.globalAlpha = 1;
@@ -195,7 +198,7 @@ export class Pong {
 
     for (let i = 0; i < 4; i++) {
       const paddle = this.paddles[i];
-      if (paddle && paddle.winsGame() === true) {
+      if (paddle && paddle?.winsGame() === true) {
         this.ctx.fillText(paddle.name, this.width / 2 - 70, this.height / 2);
         break;
       }
@@ -261,7 +264,7 @@ export class Pong {
       ball.speedy += 1;
   }
 
-  private adjustBallDirMultiplayer(ball: typeof this.ball, paddle: typeof this.paddles[2] | typeof this.paddles[2] | null): void {
+  private adjustBallDirMultiplayer(ball: typeof this.ball, paddle: typeof this.paddles[2] | typeof this.paddles[3] | null): void {
     if (!paddle)
       return ;
 
@@ -376,10 +379,13 @@ export class Pong {
     this.paddles[0].updatePaddleRightLeft(this.keys, 'w', 's', this.paddles, this.height);
     this.paddles[1].updatePaddleRightLeft(this.keys, 'arrowup', 'arrowdown', this.paddles, this.height);
 
-    if (this.paddles[2])
-      this.paddles[2].updatePaddleUpDown(this.keys, 'k', 'l', this.paddles, this.width);
-    if (this.paddles[3])
-      this.paddles[3].updatePaddleUpDown(this.keys, '5', '6', this.paddles, this.width);
+    const player3 = this.paddles[2];
+    if (player3)
+      player3?.updatePaddleUpDown(this.keys, 'k', 'l', this.paddles, this.width);
+
+    const player4 = this.paddles[3];
+    if (player4)
+      player4?.updatePaddleUpDown(this.keys, '5', '6', this.paddles, this.width);
 
     this.updateBall(this.ball);
   }
