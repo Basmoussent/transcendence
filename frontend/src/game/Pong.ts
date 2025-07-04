@@ -12,7 +12,6 @@ export class Pong {
   private lastPlayerColl: number; // pour savoir qui va gagner le point
 
   private paddles: [Paddle, Paddle, (Paddle | null)?, (Paddle | null)?];
-  // private power: Power;
 
   private ball: {
     radius: number;
@@ -72,6 +71,7 @@ export class Pong {
 
   // positions et tailles de base en fonction de la taille du canvas
   private setupPaddles(): void {
+    console.log('Setting up paddles...');
     this.paddles[0].x = PADDLE_OFFSET;
     this.paddles[0].y = (this.height - this.paddles[0].height) / 2;
     this.paddles[0].scorex = (this.width / 2) / 2;
@@ -142,6 +142,7 @@ export class Pong {
   }
 
   private displayStartMsg(): void {
+    console.log('Display start msg...');
     this.ctx.globalAlpha = 0.2;
     this.ctx.fillStyle = 'white';
     this.ctx.font = '48px sans-serif'; // changer police
@@ -151,6 +152,7 @@ export class Pong {
   }
 
   private drawLine(): void {
+    console.log('Drawing line...');
     this.ctx.beginPath();
     this.ctx.moveTo(this.width / 2, 30);
     this.ctx.lineTo(this.width / 2, this.height - 30);
@@ -160,6 +162,7 @@ export class Pong {
   }
 
   private displayScore(): void {
+    console.log('Display score...');
     this.ctx.globalAlpha = 0.2;
 
     // ligne du milieu que si y'a 2 joueurs
@@ -185,6 +188,7 @@ export class Pong {
   }
 
   private displayResult(): void {
+    console.log('Display result...');
     this.ctx.globalAlpha = 0.2;
     this.ctx.fillStyle = 'white';
     this.ctx.font = '48px sans-serif'; // changer police
@@ -192,16 +196,17 @@ export class Pong {
     for (let i = 0; i < 4; i++) {
       const paddle = this.paddles[i];
       if (paddle && paddle.winsGame() === true) {
-        this.ctx.fillText(paddle.name, this.width / 2 - 150, this.height / 2);
+        this.ctx.fillText(paddle.name, this.width / 2 - 70, this.height / 2);
         break;
       }
     }
-    this.ctx.fillText("WINS", this.width / 2 - 150, this.height / 2 - 150);
+    this.ctx.fillText("WINS", this.width / 2 - 70, this.height / 2 + 50);
 
     this.ctx.globalAlpha = 1;
   }
 
   private addBallSpeed(): void {
+    console.log('adding BallSpeed...');
     if (this.ball.speedx > 0 && this.ball.speedx < 12)
       this.ball.speedx += 0.25;
     else if (this.ball.speedx < 0 && this.ball.speedx > -12)
@@ -209,6 +214,7 @@ export class Pong {
   }
 
   private startPoint(): void {
+    console.log('starting point...');
     const paddle = this.paddles[this.lastPlayerColl];
     if (paddle)
       paddle.score++;
@@ -231,11 +237,12 @@ export class Pong {
       this.ball.speedx = -6;
 
     // on annule les powers pour le nouveau point
-    this.paddles[0].height = 100;
-    this.paddles[1].height = 100;
+    // this.paddles[0].height = 100;
+    // this.paddles[1].height = 100;
   }
 
   private adjustBallDir(ball: typeof this.ball, paddle: typeof this.paddles[0] | typeof this.paddles[1]): void {
+    console.log('adjusting normal ball dir...');
     const hitY = ball.y;
 
     const paddleTop = paddle.y;
@@ -254,7 +261,11 @@ export class Pong {
       ball.speedy += 1;
   }
 
-  private adjustBallDirMultiplayer(ball: typeof this.ball, paddle: typeof this.paddles[0]): void {
+  private adjustBallDirMultiplayer(ball: typeof this.ball, paddle: typeof this.paddles[2] | typeof this.paddles[2] | null): void {
+    if (!paddle)
+      return ;
+
+    console.log('adjusting multiplayer ball dir...');
     const hitX = ball.x;
 
     const paddleLeft = paddle.x;
@@ -274,6 +285,7 @@ export class Pong {
   }
 
   private ballPaddleCollision(): void {
+    console.log('ball paddle normal collision...');
     if (this.ball.x - this.ball.radius <= this.paddles[0].x + this.paddles[0].width && this.ball.y + this.ball.radius >= this.paddles[0].y && this.ball.y - this.ball.radius <= this.paddles[0].y + this.paddles[0].height && this.ball.x > this.paddles[0].x) {
       this.addBallSpeed();
       this.ball.speedx *= -1;
@@ -293,6 +305,7 @@ export class Pong {
   }
 
   private ballMultiplayerCollision(): void {
+    console.log('ball paddle multiplayer collision...');
     const player3 = this.paddles[2]; // haut
 
     if (player3 &&
@@ -333,27 +346,33 @@ export class Pong {
   }
 
   private updateBall(ball: typeof this.ball): void {
+    console.log('updating ball position...');
+    const player3 = this.paddles[2];
+    const player4 = this.paddles[3];
+
     ball.x += ball.speedx;
     ball.y += ball.speedy;
 
     // check paddles collision + la balle prends en vitesse a chaque collision paddle + ajuster dir
     this.ballPaddleCollision();
-    this.ballMultiplayerCollision();
+    if (player3)
+      this.ballMultiplayerCollision();
 
     // check scored point et relancer si oui
-    if (ball.x - ball.radius > this.width || ball.x + ball.radius <= 0 || (ball.y - ball.radius <= 0 && this.paddles[2]) || (ball.y + ball.radius >= this.height && this.paddles[3]))
+    if (ball.x - ball.radius > this.width || ball.x + ball.radius <= 0 || (player3 && ball.y - ball.radius <= 0) || (player4 && ball.y + ball.radius >= this.height))
       this.startPoint();
 
     // check wall collision haut
-    if (ball.y - ball.radius <= 0 && this.paddles[2] === null)
+    if (!player3 && ball.y - ball.radius <= 0)
       ball.speedy *= -1;
 
     // check wall collision bas
-    if (ball.y + ball.radius >= this.height && this.paddles[3] === null)
+    if (!player4 && ball.y + ball.radius >= this.height)
       ball.speedy *= -1;
   }
 
   private update(): void {
+    console.log('jvais update');
     this.paddles[0].updatePaddleRightLeft(this.keys, 'w', 's', this.paddles, this.height);
     this.paddles[1].updatePaddleRightLeft(this.keys, 'arrowup', 'arrowdown', this.paddles, this.height);
 
@@ -366,6 +385,7 @@ export class Pong {
   }
 
   private drawBall(ctx: typeof this.ctx, x: number, y: number, size: number): void {
+    console.log('drawing ball...');
     ctx.beginPath();
     ctx.arc(x, y, size, 0, Math.PI * 2);
     ctx.fillStyle = '#ffffff';
@@ -374,6 +394,8 @@ export class Pong {
   }
 
   private render(): void {
+    console.log('rendering...');
+  
     // on efface tout
     this.ctx.clearRect(0, 0, this.width, this.height);
 
@@ -382,11 +404,13 @@ export class Pong {
     this.ctx.fillRect(0, 0, this.width, this.height);
 
     // les paddles + leur contour
-    for (let i = 0; i < this.paddles.length; i++)
-      this.paddles[i]?.drawPaddle(this.ctx);
+    for (let i = 0; i < 4; i++) {
+      const paddle = this.paddles[i];
+      if (paddle)
+        this.paddles[i]?.drawPaddle(this.ctx);
+    }
 
     if (this.start && !this.end) {
-
       this.drawBall(this.ctx, this.ball.x, this.ball.y, this.ball.radius);
       this.displayScore();
     }

@@ -17,7 +17,7 @@ export class Paddle {
     scorey: number;
 
     constructor(width: number, height: number, x: number, y: number, speed: number) {
-        this.name = "player";
+        this.name = "Player";
         this.ia = false;
         this.width = width;
         this.height = height;
@@ -87,6 +87,7 @@ export class Paddle {
         const player2 = paddles[1]; // droite
 
         if (keys[downKey]) {
+            console.log('keydown detectee');console.log('keydown detectee');console.log('keydown detectee');console.log('keydown detectee');
             let canMove = true;
             const verticalOverlap = this.y < player2.y + player2.height && this.y + this.height > player2.y;
             const horizontalCollision = this.x + this.width >= player2.x - PADDLE_OFFSET;
@@ -101,6 +102,7 @@ export class Paddle {
         }
 
         if (keys[upKey]) {
+            console.log('keyup detectee');console.log('keyup detectee');console.log('keyup detectee');console.log('keyup detectee');console.log('keyup detectee');console.log('keyup detectee');
             let canMove = true;
             const verticalOverlap = this.y < player1.y + player1.height && this.y + this.height > player1.y;
             const horizontalCollision = this.x <= player1.x + player1.width + PADDLE_OFFSET;
@@ -120,6 +122,7 @@ export class Paddle {
     const player4 = paddles[3]; // bas
 
     if (keys[upKey]) {
+        console.log('keyup detectee');console.log('keyup detectee');console.log('keyup detectee');console.log('keyup detectee');console.log('keyup detectee');console.log('keyup detectee');
       let canMove = true;
       if (player3) {
         const horizontalOverlap = this.x < player3.x + player3.width && this.x + this.width > player3.x;
@@ -136,6 +139,7 @@ export class Paddle {
     }
 
     if (keys[downKey]) {
+        console.log('keydown detectee');console.log('keydown detectee');console.log('keydown detectee');console.log('keydown detectee');
       let canMove = true;
       if (player4) {
         const horizontalOverlap = this.x < player4.x + player4.width && this.x + this.width > player4.x;
