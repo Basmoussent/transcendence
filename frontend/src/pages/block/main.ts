@@ -1,4 +1,4 @@
-import { Block } from '../../game/Block';
+import { Block } from '../../game/block/Block';
 
 export function renderBlock() {
   // Créer le HTML

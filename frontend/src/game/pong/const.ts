@@ -1,0 +1,1 @@
+export const PADDLE_OFFSET = 30;

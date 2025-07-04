@@ -1,6 +1,7 @@
-import { Paddle } from "./pongUtils";
-
-const PADDLE_OFFSET = 30;
+import { Ball } from "./ball";
+import { Paddle } from "./paddle";
+import { Power } from "./power";
+import { PADDLE_OFFSET } from "./const";
 
 export class Pong {
   private canvas: HTMLCanvasElement;
@@ -13,13 +14,7 @@ export class Pong {
 
   private paddles: [Paddle, Paddle, (Paddle | null)?, (Paddle | null)?];
 
-  private ball: {
-    radius: number;
-    x: number;
-    y: number;
-    speedx: number;
-    speedy: number;
-  };
+  private ball: Ball;
 
   private keys: { [key: string]: boolean };
 
@@ -45,13 +40,7 @@ export class Pong {
       null
     ];
 
-    this.ball = {
-      radius: 10,
-      x: this.width / 2,
-      y: this.height / 2,
-      speedx: 6,
-      speedy: 0
-    }
+    this.ball = new Ball(this.height, this.width);
 
     // this.power = new Power(this.width, this.height);
     this.keys = {};
@@ -208,14 +197,6 @@ export class Pong {
     this.ctx.globalAlpha = 1;
   }
 
-  private addBallSpeed(): void {
-    console.log('adding BallSpeed...');
-    if (this.ball.speedx > 0 && this.ball.speedx < 12)
-      this.ball.speedx += 0.25;
-    else if (this.ball.speedx < 0 && this.ball.speedx > -12)
-      this.ball.speedx -= 0.25;
-  }
-
   private startPoint(): void {
     console.log('starting point...');
     const paddle = this.paddles[this.lastPlayerColl];
@@ -225,43 +206,9 @@ export class Pong {
     // le point est rejoue si personne ne touche la balle
     this.lastPlayerColl = -1;
 
-    // replace la balle au centre
-    this.ball.x = this.width / 2;
-    this.ball.y = this.height / 2;
+    this.ball.resetBallInfo(this.width, this.height);
 
-    // celui qui gagne recoit la balle en premier
-    this.ball.speedx *= -1;
-    this.ball.speedy = 1;
-
-    // on reset a la vitesse de base
-    if (this.ball.speedx > 0)
-      this.ball.speedx = 6;
-    else
-      this.ball.speedx = -6;
-
-    // on annule les powers pour le nouveau point
-    // this.paddles[0].height = 100;
-    // this.paddles[1].height = 100;
-  }
-
-  private adjustBallDir(ball: typeof this.ball, paddle: typeof this.paddles[0] | typeof this.paddles[1]): void {
-    console.log('adjusting normal ball dir...');
-    const hitY = ball.y;
-
-    const paddleTop = paddle.y;
-    const paddleBottom = paddle.y + paddle.height;
-    const paddleCenter = paddle.y + paddle.height / 2;
-
-    const edgeZone = paddle.height * 0.2;
-
-    if (hitY <= paddleTop + edgeZone) // touche le bord haut
-      ball.speedy -= 3;
-    else if (hitY >= paddleBottom - edgeZone) // touche le bord bas
-      ball.speedy += 3;
-    else if (hitY <= paddleCenter) // touche cote haut (mais pas bord)
-      ball.speedy -= 1;
-    else if (hitY > paddleCenter) // touche cote bas (mais pas bord)
-      ball.speedy += 1;
+    // !!! on annule les powers pour le nouveau point
   }
 
   private adjustBallDirMultiplayer(ball: typeof this.ball, paddle: typeof this.paddles[2] | typeof this.paddles[3] | null): void {
@@ -290,17 +237,17 @@ export class Pong {
   private ballPaddleCollision(): void {
     console.log('ball paddle normal collision...');
     if (this.ball.x - this.ball.radius <= this.paddles[0].x + this.paddles[0].width && this.ball.y + this.ball.radius >= this.paddles[0].y && this.ball.y - this.ball.radius <= this.paddles[0].y + this.paddles[0].height && this.ball.x > this.paddles[0].x) {
-      this.addBallSpeed();
+      this.ball.addBallSpeed();
       this.ball.speedx *= -1;
-      this.adjustBallDir(this.ball, this.paddles[0]);
+      this.ball.adjustBallDir(this.paddles[0]);
       this.ball.x = this.paddles[0].x + this.paddles[0].width + this.ball.radius;
 
       this.lastPlayerColl = 0;
     }
     if (this.ball.x + this.ball.radius >= this.paddles[1].x && this.ball.y + this.ball.radius >= this.paddles[1].y && this.ball.y - this.ball.radius <= this.paddles[1].y + this.paddles[1].height && this.ball.x < this.paddles[1].x + this.paddles[1].width) {
-      this.addBallSpeed();
+      this.ball.addBallSpeed();
       this.ball.speedx *= -1;
-      this.adjustBallDir(this.ball, this.paddles[1]);
+      this.ball.adjustBallDir(this.paddles[1]);
       this.ball.x = this.paddles[1].x - this.ball.radius;
 
       this.lastPlayerColl = 1;
@@ -316,7 +263,7 @@ export class Pong {
       this.ball.x + this.ball.radius >= player3.x &&
       this.ball.x - this.ball.radius <= player3.x + player3.width &&
       this.ball.y > player3.y) {
-        this.addBallSpeed();
+        this.ball.addBallSpeed();
         this.ball.speedy *= -1;
         this.adjustBallDirMultiplayer(this.ball, player3);
         
@@ -335,7 +282,7 @@ export class Pong {
       this.ball.x + this.ball.radius >= player4.x &&
       this.ball.x - this.ball.radius <= player4.x + player4.width &&
       this.ball.y < player4.y + player4.height) {
-        this.addBallSpeed();
+        this.ball.addBallSpeed();
         this.ball.speedy *= -1;
         this.adjustBallDirMultiplayer(this.ball, player4);
 
@@ -390,15 +337,6 @@ export class Pong {
     this.updateBall(this.ball);
   }
 
-  private drawBall(ctx: typeof this.ctx, x: number, y: number, size: number): void {
-    console.log('drawing ball...');
-    ctx.beginPath();
-    ctx.arc(x, y, size, 0, Math.PI * 2);
-    ctx.fillStyle = '#ffffff';
-    ctx.fill();
-    ctx.closePath();
-  }
-
   private render(): void {
     console.log('rendering...');
   
@@ -417,7 +355,7 @@ export class Pong {
     }
 
     if (this.start && !this.end) {
-      this.drawBall(this.ctx, this.ball.x, this.ball.y, this.ball.radius);
+      this.ball.drawBall(this.ctx, this.ball.x, this.ball.y, this.ball.radius);
       this.displayScore();
     }
     else {
