@@ -43,3 +43,6 @@ WHERE ville = 'paris'
 
 
 post une game avec les valeurs null a null des le debut pour pouvoir insert apres et post des le debut psqu'on doit tout renseigner
+
+
+coder un middleware

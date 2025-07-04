@@ -1,7 +1,7 @@
-import { brick, Ball, Paddle, createRandomBrick, fetchUsername } from "./blockUtils.ts"
+import { brick, createRandomBrick, fetchUsername } from "./blockUtils.ts"
 import { getAuthToken } from '../utils/auth';
 
-export class Block {
+export class Block1v1 {
 	private canvas: HTMLCanvasElement;
 	private ctx: CanvasRenderingContext2D;
 	private width: number;
@@ -11,13 +11,42 @@ export class Block {
 	private status: boolean;
 	private username: string;
 
-	private ball: Ball;
-	private paddle: Paddle;
+	private paddle1: {
+		width: number;
+		height: number;
+		x: number;
+		y: number;
+		speed: number;
+	};
+
+	private ball1: {
+		radius: number;
+		x: number;
+		y: number;
+		speedx: number;
+		speedy: number;
+		flag: boolean
+	};
+
+	private ball2: {
+		radius: number;
+		x: number;
+		y: number;
+		speedx: number;
+		speedy: number;
+		flag: boolean
+	};
+
 	private bricks: brick[] = [];
 
 	private keys: { [key: string]: boolean };
   
 	constructor(canvas: HTMLCanvasElement) {
+
+		const token = getAuthToken();
+
+		if (!token) {
+			alert('❌ Token d\'authentification manquant'); }
 
 		console.log(" token recu");
 
@@ -36,8 +65,34 @@ export class Block {
 		this.bWidth = 0;
 		this.username = "ko";
 
-		this.paddle = new Paddle(0, 0, 100, 20, 14);
-		this.ball = new Ball(this.width / 2, this.height / 2, 10); // this.width et this.height are false
+
+		this.paddle1 = {
+			width: 100,
+			height: 20,
+			x: 0,
+			y: 0,
+			speed: 14
+		};
+
+		// this.width et this.height n'ont pas les bonnes mesures a ce moment la
+
+		this.ball1 = {
+			radius: 10,
+			x: this.width / 2,
+			y: this.height / 2, // update: mettre a hauteur de la derniere ligne de bricks
+			speedx: 5,
+			speedy: 5,
+			flag: true
+		};
+
+		this.ball2 = {
+			radius: 10,
+			x: this.width / 2,
+			y: this.height / 2, // update: mettre a hauteur de la premiere ligne de bricks
+			speedx: 5,
+			speedy: 5,
+			flag: true
+		};
 
 		this.keys = {};
 		this.bricks = [];
@@ -52,8 +107,10 @@ export class Block {
 		if (_y != 0)
 			--_y;
 
-		if (_x >= 20 || _y >= 20)
-			console.error("brick undefined (", _x, ",", _y, ")");
+		if (_x >= 20 || _y >= 20 || ((20 * _y) + _x)) {
+			console.error("brick undefined (", _x, ",", _y, ")\t", (20 * _y) + _x);
+			throw new Error ("access brick");
+		}
 
 		return ((20 * _y) + _x);
 	}
@@ -98,29 +155,28 @@ export class Block {
 		this.width = this.canvas.width;
 		this.height = this.canvas.height;
 		
-		this.paddle.x = (this.width - this.paddle.width) / 2;
-		this.paddle.y = this.height - this.paddle.height - 12; // 20 de base
-
+		this.paddle1.x = (this.width - this.paddle1.width) / 2;
+		this.paddle1.y = this.height - this.paddle1.height - 12; // 20 de base
 
 
 		this.bWidth = this.width / 20;
 		this.bHeight = this.height / 20;
 		
 		console.log('Canvas size:', this.width, this.height);
-		console.log('Paddle position:', this.paddle.x, this.paddle.y);
+		console.log('Paddle position:', this.paddle1.x, this.paddle1.y);
 	}
   
 	private startGameLoop(): void {
 		console.log('Starting game loop...');
 		const gameLoop = () => {
-			this.update(this.ball);
+			this.update(this.ball1);
 			this.render();
 			requestAnimationFrame(gameLoop);
 		};
 		gameLoop();
 	}
 
-	private moveToHitPos(ball: typeof this.ball): void {
+	private moveToHitPos(ball: typeof this.ball1): void {
 
 		for (var i = 0; i < ball.speedx; ++i) {
 
@@ -148,11 +204,14 @@ export class Block {
 		ctx.globalAlpha = 1;
 	}
 
-	private update(ball: typeof this.ball): void {
+	private update(ball: typeof this.ball1): void {
 
 		if (this.keys['enter'] && !this.status) {
+			if (this.bricks) {
+				// this.logGame();
+			}
 			this.bricks = [];
-			for (let it = 0; it < 100; ++it)
+			for (let it = 0; it < 80; ++it)
 				this.bricks.push(createRandomBrick(it));
 			this.status = true;
 		}
@@ -160,43 +219,89 @@ export class Block {
 		if (!this.status)
 			return ;
 
+		if (this.keys['a']) 
+			this.paddle1.x -= this.paddle1.speed;
+		if (this.keys['d'])
+			this.paddle1.x += this.paddle1.speed;
+
+		// mettre pause
 		if (this.keys['p']) {
-			if (this.ball.flag)
-				this.ball.flag = false;
+			if (this.ball1.flag)
+				this.ball1.flag = false;
 			else 
-				this.ball.flag = true;
+				this.ball1.flag = true;
 		}
 
-		if (this.keys['a']) 
-			this.paddle.move("left", this.width)
-		if (this.keys['d'])
-			this.paddle.move("right", this.width)
+		// limits paddle
+		if (this.paddle1.x < 0)
+			this.paddle1.x = 0;
+		else if (this.paddle1.x + this.paddle1.width > this.width)
+			this.paddle1.x = this.width - this.paddle1.width;
 
-		this.ball.collisionPadd(this.paddle);
-		this.ball.collisionWindow(this.width);
+		// collisions ball -> paddle
+		if (ball.y + ball.radius + ball.speedy >= this.paddle1.y && ball.x + ball.radius + ball.speedx >= this.paddle1.x &&
+			ball.x + ball.radius + ball.speedx <= this.paddle1.x + this.paddle1.width)
+				ball.speedy *= -1;
 
 		// collisions ball -> bricks
 		if (ball.speedy < 0 && ball.y - ball.radius + ball.speedy <= this.height / 4) {
 
-			var id = this.brickId(ball.x, ball.y)
-
-			if (this.bricks[id].getHp()) {
-				this.moveToHitPos(this.ball);
-				this.bricks[id].beenHit();
-				ball.speedy *= -1;
-				// if (!this.brick[id].getHp())
-					// on vient de casser une brick
-					// si c'etait la derniere le joueur a gagne
+			try {
+				var id = this.brickId(ball.x, ball.y)
+				
+				if (!this.bricks[id])
+					console.error(id, " undefined dans bricks");
+	
+				
+				if (this.bricks[id].getHp()) {
+					this.moveToHitPos(this.ball1);
+					this.bricks[id].beenHit();
+					ball.speedy *= -1;
+				}
 			}
+			catch (err) {
+				console.log(err); }
+
 		}
 
-		if (this.ball.lost(this.width, this.height)) {
-			this.status = false;
+		if (ball.y - ball.radius + ball.speedy <= this.height / 4) {
+	
+			var id = this.brickId(this.ball1.x + this.ball1.speedx, ball.y + ball.radius + ball.speedy);
+	
+			// si le prochain x est different de l'actuel
+			if (this.bricks[id].getHp()) {
+				this.bricks[id].beenHit();
+				this.ball1.speedx *= -1;
+			}
+		
+		}
+
+
+
+		// collisions gauche droite
+		if (ball.x + ball.speedx <= 0 || ball.x + ball.speedx >= this.width)
+			ball.speedx *= -1;
+
+		// collisions haut
+		if (ball.y + ball.speedy <= 0)
+			ball.speedy *= -1;
+
+		if (ball.y + ball.speedy >= this.height) {
+			ball.radius = 10,
+			ball.x = this.width / 2,
+			ball.y = this.height / 2,
+			console.log(this.width / 2, ",", this.height / 2);
+			ball.speedx = 5,
+			ball.speedy = 5
+			
+			this.status = false; // plus en partie
 			// api.post(game(temp de la game, gagnee ou perdue, nombre de coups de paddle pour les stats))
 		}
 		
-		if (ball.flag)
-			ball.move();
+		if (ball.flag) {
+			ball.x += ball.speedx;
+			ball.y += ball.speedy;
+		}
 
 	}
 
@@ -207,6 +312,7 @@ export class Block {
 		for (const brick of this.bricks) {
 
 			++it
+
 			if (!brick.getHp())
 				continue;
 
@@ -218,7 +324,7 @@ export class Block {
 		}		
 	}
 
-	private drawBall(ball: typeof this.ball): void {
+	private drawBall(ball: typeof this.ball1): void {
 		this.ctx.beginPath();
 		this.ctx.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2);
 		this.ctx.fillStyle = '#FF8600';
@@ -243,23 +349,23 @@ export class Block {
 		// paddle
 		this.ctx.fillStyle = '#84AD8A';
 		this.ctx.fillRect(
-			this.paddle.x,
-			this.paddle.y,
-			this.paddle.width,
-			this.paddle.height
+			this.paddle1.x,
+			this.paddle1.y,
+			this.paddle1.width,
+			this.paddle1.height
 		);
 		
 		// bord paddle
 		this.ctx.strokeStyle = '#ffffff';
 		this.ctx.lineWidth = 2;
 		this.ctx.strokeRect(
-			this.paddle.x,
-			this.paddle.y,
-			this.paddle.width,
-			this.paddle.height
+			this.paddle1.x,
+			this.paddle1.y,
+			this.paddle1.width,
+			this.paddle1.height
 		);
 		this.renderBricks();
-		this.drawBall(this.ball);
+		this.drawBall(this.ball1);
 		this.displayStartMsg(this.ctx);
 
 	}

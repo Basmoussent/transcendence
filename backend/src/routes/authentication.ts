@@ -1,7 +1,6 @@
 import { db } from '../database';
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import Fastify from 'fastify';
-import { FastifyInstance } from 'fastify';
 import jwt from '@fastify/jwt';
 import bcrypt from 'bcrypt';
 

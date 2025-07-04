@@ -16,8 +16,8 @@ CREATE TABLE IF NOT EXISTS games (
   player3 TEXT,
   player4 TEXT,
   winner TEXT,
-  time_start TEXT NOT NULL,
-  end_start TEXT
+  start_time TEXT NOT NULL,
+  end_time TEXT
 );
 
 CREATE TABLE IF NOT EXISTS chats (
