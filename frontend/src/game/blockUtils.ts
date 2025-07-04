@@ -12,7 +12,7 @@ export class Paddle {
 	constructor(_x:number, _y:number, _speed:number) {
 		this.x = _x
 		this.y = _y
-		this.width = 10000
+		this.width = 100
 		this.height = 20
 		this.speed = _speed
 	}
@@ -31,6 +31,7 @@ export class Paddle {
 				this.x += this.speed;
 		}
 	}
+	
 }
 
 export class Ball {
@@ -40,15 +41,13 @@ export class Ball {
 	public radius: number;
 	public speedx: number;
 	public speedy: number;
-	public flag: boolean
 	
-	constructor(_x:number, _y:number, _radius:number) {
+	constructor(_x:number, _y:number,) {
 		this.x = _x
 		this.y = _y
-		this.radius = _radius
-		this.speedx = 10
-		this.speedy = 10
-		this.flag = true
+		this.radius = 10
+		this.speedx = 0
+		this.speedy = 0
 	}
 
 	public move() {
@@ -56,12 +55,12 @@ export class Ball {
 		this.y += this.speedy;
 	}
 
-	public reset(_x:number, _y:number, _radius:number) {
+	public reset(_x:number, _y:number,) {
 		this.x = _x
 		this.y = _y
-		this.radius = _radius
-		this.speedx = 80
-		this.speedy = 80
+		this.radius = 10
+		this.speedx = 0
+		this.speedy = 5
 	}
 
 	public collisionPadd(paddle: Paddle) {
@@ -96,11 +95,9 @@ export class Ball {
 		}
 	}
 
-	public collisionWindow(width:number) {
+	public collisionWindow(width:number, flag:boolean) {
 
-		// collisions gauche droite
-		if (this.x + this.speedx <= 0 || this.x + this.speedx >= width) {
-
+		if (this.x + this.speedx <= 0 || this.x + this.speedx >= width)  {
 			var it = 0;
 
 			for (; it != this.speedx;) {
@@ -113,16 +110,19 @@ export class Ball {
 		}
 
 		// collisions haut
-		if (this.y + this.speedy <= 0) {
-			var it = 0;
-
-			for (; it != this.speedy;) {
-				this.speedy < 0 ? --it: ++it;
-				if (this.x + it <= 0)
-					break;
+		if (flag) {
+			if (this.y + this.speedy <= 0) {
+				var it = 0;
+	
+				for (; it != this.speedy;) {
+					this.speedy < 0 ? --it: ++it;
+					if (this.x + it <= 0)
+						break;
+				}
+				this.moveTo(this.x + it, this.y + it);
+				this.speedy *= -1;
+	
 			}
-			this.moveTo(this.x + it, this.y + it);
-			this.speedy *= -1;
 
 		}
 	}

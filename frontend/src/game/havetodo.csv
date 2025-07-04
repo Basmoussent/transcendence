@@ -57,3 +57,6 @@ ball touche droite/gauche
 faire raycasting pour savoir ou est-ce qu'elle va touche, si on est dans l'area 
 des brick check si bricksid donne quelque chose de valable et si la brick est tjrs en vie
 alors faire la collision avec elle
+
+
+pouvoir qui fait que ta balle traverse et tues toutes les bricks

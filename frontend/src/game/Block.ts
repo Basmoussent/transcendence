@@ -1,5 +1,4 @@
 import { brick, Ball, Paddle, createRandomBrick, fetchUsername } from "./blockUtils.ts"
-import { getAuthToken } from '../utils/auth';
 
 export class Block {
 	private canvas: HTMLCanvasElement;
@@ -37,7 +36,7 @@ export class Block {
 		this.username = "ko";
 
 		this.paddle = new Paddle(0, 0, 14);
-		this.ball = new Ball(this.width / 2, this.height / 2, 10); // this.width et this.height are false
+		this.ball = new Ball(this.width / 2, this.height / 4); // this.width et this.height are false
 
 		this.keys = {};
 		this.bricks = [];
@@ -131,33 +130,26 @@ export class Block {
 		ctx.globalAlpha = 1;
 	}
 
-	private update(ball: typeof this.ball): void {
+	private update(ball: Ball): void {
 
 		if (this.keys['enter'] && !this.status) {
 			// this.bricks = [];
 			// for (let it = 0; it < 100; ++it)
 			// 	this.bricks.push(createRandomBrick(it));
-			this.ball.reset(this.width / 2, this.height / 2, 10)
+			ball.reset(this.width / 2, this.height / 4)
 			this.status = true;
 		}
 
 		if (!this.status)
 			return ;
 
-		if (this.keys['p']) {
-			if (this.ball.flag)
-				this.ball.flag = false;
-			else 
-				this.ball.flag = true;
-		}
-
 		if (this.keys['a']) 
 			this.paddle.move("left", this.width)
 		if (this.keys['d'])
 			this.paddle.move("right", this.width)
 
-		this.ball.collisionPadd(this.paddle);
-		this.ball.collisionWindow(this.width);
+		ball.collisionPadd(this.paddle);
+		ball.collisionWindow(this.width, true);
 
 		// collisions ball -> bricks
 		// if (ball.y - ball.radius + ball.speedy <= this.height / 4) {
@@ -194,18 +186,16 @@ export class Block {
 		// 	}
 		// }
 
-		console.log("ball speedy ", this.ball.speedy);
+		console.log("ball speedy ", ball.speedy);
 
-		if (this.ball.lost(this.height)) {
+		if (ball.lost(this.height)) {
 			console.log("le y du paddle: ", this.paddle.y);
 			this.status = false;
 			// api.post(game(temp de la game, gagnee ou perdue, nombre de coups de paddle pour les stats))
 		}
 		
-		if (ball.flag) {
-			ball.move();
-		}
-			console.log("le y du paddle: ", this.paddle.y);
+		ball.move();
+		console.log("le y du paddle: ", this.paddle.y);
 
 
 	}
@@ -270,8 +260,6 @@ export class Block {
 			this.paddle.width,
 			this.paddle.height
 		);
-		
-		// bord paddle
 		this.ctx.strokeStyle = '#ffffff';
 		this.ctx.lineWidth = 2;
 		this.ctx.strokeRect(
@@ -280,7 +268,9 @@ export class Block {
 			this.paddle.width,
 			this.paddle.height
 		);
-		// this.renderBricks();
+
+		
+		this.renderBricks();
 		this.drawBall(this.ball);
 		this.displayStartMsg(this.ctx);
 
