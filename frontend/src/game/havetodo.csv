@@ -46,3 +46,14 @@ post une game avec les valeurs null a null des le debut pour pouvoir insert apre
 
 
 coder un middleware
+
+
+
+
+
+
+ball touche droite/gauche
+
+faire raycasting pour savoir ou est-ce qu'elle va touche, si on est dans l'area 
+des brick check si bricksid donne quelque chose de valable et si la brick est tjrs en vie
+alors faire la collision avec elle

@@ -9,11 +9,11 @@ export class Paddle {
 	public height: number;
 	public speed: number;
 
-	constructor(_x:number, _y:number, _width:number, _height:number, _speed:number) {
+	constructor(_x:number, _y:number, _speed:number) {
 		this.x = _x
 		this.y = _y
-		this.width = _width
-		this.height = _height
+		this.width = 10000
+		this.height = 20
 		this.speed = _speed
 	}
 
@@ -46,8 +46,8 @@ export class Ball {
 		this.x = _x
 		this.y = _y
 		this.radius = _radius
-		this.speedx = 8
-		this.speedy = 8
+		this.speedx = 10
+		this.speedy = 10
 		this.flag = true
 	}
 
@@ -60,43 +60,89 @@ export class Ball {
 		this.x = _x
 		this.y = _y
 		this.radius = _radius
-		this.speedx = 8
-		this.speedy = 8
+		this.speedx = 80
+		this.speedy = 80
 	}
 
 	public collisionPadd(paddle: Paddle) {
 
-		if (this.y + this.radius + this.speedy >= paddle.y && this.x + this.radius + this.speedx >= paddle.x &&
-			this.x + this.radius + this.speedx <= paddle.x + paddle.width)
-				this.speedy *= -1;
+		// si la prochaine pos est plus basse que le y du paddle
+		if (this.y + this.radius + this.speedy >= paddle.y) {
+
+			var	it = 0;
+
+			// boucle tant qu'on est pas sur le y du paddle
+			for (; this.y + it != this.y + this.radius + this.speedy; ++it)
+				if (this.y + it >= paddle.y)
+					break;
+
+			console.log("on va check pour ", this.y + it);
+
+			// regarder si le x a ce moment est sur l'intervalle paddle.x, paddle.x + paddle.width
+			if (this.speedx < 0 && this.x - it < paddle.x)
+				return; // si la balle va vers la gauche et au moment ou les y sont les memes le x de la balle est inferieur au coin gauche du paddle
+			else if (this.x + it > paddle.x + paddle.width)
+				return;
+
+			console.log("dans le mauvais");
+
+			if (this.speedx > 0)
+				this.moveTo(this.x + it, paddle.y - 1);
+			else
+				this.moveTo(this.x - it, paddle.y - 1);
+			console.log(this.speedy)
+			this.speedy *= -1;
+			console.log("to ", this.speedy)
+		}
 	}
 
 	public collisionWindow(width:number) {
-		if (this.x + this.speedx <= 0 || this.x + this.speedx >= width)
+
+		// collisions gauche droite
+		if (this.x + this.speedx <= 0 || this.x + this.speedx >= width) {
+
+			var it = 0;
+
+			for (; it != this.speedx;) {
+				this.speedx < 0 ? --it: ++it;
+				if (this.x + it <= 0)
+					break;
+			}
+			this.moveTo(this.x + it, this.y + it);
 			this.speedx *= -1;
-		else if (this.y + this.speedy <= 0)
+		}
+
+		// collisions haut
+		if (this.y + this.speedy <= 0) {
+			var it = 0;
+
+			for (; it != this.speedy;) {
+				this.speedy < 0 ? --it: ++it;
+				if (this.x + it <= 0)
+					break;
+			}
+			this.moveTo(this.x + it, this.y + it);
 			this.speedy *= -1;
-		else
-			return;
 
-		this.moveToHitPos();
-
-
+		}
 	}
 
-	private moveToHitPos() {
-
-	}
-
-	public lost(width:number, height:number) {
+	public lost(height:number) {
 		if (this.y < height)
 			return (false);
-		this.radius = 10;
-		this.x = width / 2;
-		this.y = height / 2;
-		this.speedx = 5;
-		this.speedy = 5;
+		// this.radius = 10;
+		// this.x = width / 2;
+		// this.y = height / 2;
+		// this.speedx = 5;
+		// this.speedy = 5;
+
+		console.log("lost ", this.y);
 		return (true);
+	}
+
+	public moveTo(_x:number, _y:number) {
+		this.x = _x;
+		this.y = _y;
 	}
 }
 
