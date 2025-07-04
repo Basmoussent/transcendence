@@ -1,13 +1,13 @@
 import { brick, Ball, Paddle, createRandomBrick, fetchUsername } from "./blockUtils.ts"
-import { getAuthToken } from '../utils/auth';
 
 export class Block {
 	private canvas: HTMLCanvasElement;
 	private ctx: CanvasRenderingContext2D;
 	private width: number;
 	private height: number;
-	private bHeight: number;
-	private bWidth: number;
+	private howMuchBricks: number;
+	private brickHeight: number;
+	private y_bricks_area: number;
 	private status: boolean;
 	private username: string;
 
@@ -18,8 +18,6 @@ export class Block {
 	private keys: { [key: string]: boolean };
   
 	constructor(canvas: HTMLCanvasElement) {
-
-		console.log(" token recu");
 
 		this.canvas = canvas;
 		const context = canvas.getContext('2d');
@@ -32,31 +30,24 @@ export class Block {
 		this.ctx = context;
 		this.width = canvas.width;
 		this.height = canvas.height;
-		this.bHeight = 0;
-		this.bWidth = 0;
+		this.howMuchBricks = 100;
+		this.brickHeight = 0;
+		this.y_bricks_area = 0;
 		this.username = "ko";
+		this.loadUsername();
+
+		this.keys = {};
+		this.bricks = [];
 
 		this.paddle = new Paddle(0, 0, 100, 20, 14);
 		this.ball = new Ball(this.width / 2, this.height / 2, 10); // this.width et this.height are false
 
-		this.keys = {};
-		this.bricks = [];
-		this.loadUsername();
-
 	}
 
-	private brickId(x: number, y: number): number {
-		var _x = Math.trunc((x * 20)/ this.width);
-		var _y = Math.trunc((y * 20)/ this.height);
+	// private brickId(x: number, y: number): number {
 
-		if (_y != 0)
-			--_y;
-
-		if (_x >= 20 || _y >= 20)
-			console.error("brick undefined (", _x, ",", _y, ")");
-
-		return ((20 * _y) + _x);
-	}
+	// 	return (0);
+	// }
 
 	private async loadUsername() {
 		try {
@@ -101,10 +92,7 @@ export class Block {
 		this.paddle.x = (this.width - this.paddle.width) / 2;
 		this.paddle.y = this.height - this.paddle.height - 12; // 20 de base
 
-
-
-		this.bWidth = this.width / 20;
-		this.bHeight = this.height / 20;
+		// this.brickHeight = 
 		
 		console.log('Canvas size:', this.width, this.height);
 		console.log('Paddle position:', this.paddle.x, this.paddle.y);
@@ -120,22 +108,7 @@ export class Block {
 		gameLoop();
 	}
 
-	private moveToHitPos(ball: typeof this.ball): void {
-
-		for (var i = 0; i < ball.speedx; ++i) {
-
-			var id = this.brickId(ball.x + i, ball.y + i)
-
-			if (!this.bricks[id])
-				continue
-
-			if (this.bricks[id].getHp()) {
-				ball.x += i;
-				ball.y += i;
-				return;
-			}
-		}
-	}
+	
 
 	private displayStartMsg(ctx: typeof this.ctx): void {
 		if (this.status)
@@ -152,13 +125,15 @@ export class Block {
 
 		if (this.keys['enter'] && !this.status) {
 			this.bricks = [];
-			for (let it = 0; it < 100; ++it)
+			for (let it = 0; it < this.howMuchBricks; ++it)
 				this.bricks.push(createRandomBrick(it));
 			this.status = true;
 		}
 
-		if (!this.status)
+		if (!this.status) {
+			this.ball.reset(this.width / 2, this.height / 2, 10)
 			return ;
+		}
 
 		if (this.keys['p']) {
 			if (this.ball.flag)
@@ -176,19 +151,18 @@ export class Block {
 		this.ball.collisionWindow(this.width);
 
 		// collisions ball -> bricks
-		if (ball.speedy < 0 && ball.y - ball.radius + ball.speedy <= this.height / 4) {
+		// if (ball.speedy < 0 && ball.y - ball.radius + ball.speedy <= this.height / 4) {
 
-			var id = this.brickId(ball.x, ball.y)
+		// 	var id = this.brickId(ball.x, ball.y)
 
-			if (this.bricks[id].getHp()) {
-				this.moveToHitPos(this.ball);
-				this.bricks[id].beenHit();
-				ball.speedy *= -1;
-				// if (!this.brick[id].getHp())
-					// on vient de casser une brick
-					// si c'etait la derniere le joueur a gagne
-			}
-		}
+		// 	if (this.bricks[id].getHp()) {
+		// 		this.bricks[id].beenHit();
+		// 		ball.speedy *= -1;
+		// 		// if (!this.brick[id].getHp())
+		// 			// on vient de casser une brick
+		// 			// si c'etait la derniere le joueur a gagne
+		// 	}
+		// }
 
 		if (this.ball.lost(this.width, this.height)) {
 			this.status = false;
@@ -202,20 +176,7 @@ export class Block {
 
 
 	private renderBricks() {
-		let	it = -1;
-
-		for (const brick of this.bricks) {
-
-			++it
-			if (!brick.getHp())
-				continue;
-
-			let x = this.width / 20 * (it % 20);
-			let y = this.height / 20 * Math.trunc(it / 20);
-
-			this.ctx.fillStyle = brick.getColor();
-			this.ctx.fillRect(x, y, this.bWidth, this.bHeight);
-		}		
+			
 	}
 
 	private drawBall(ball: typeof this.ball): void {

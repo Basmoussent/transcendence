@@ -46,8 +46,8 @@ export class Ball {
 		this.x = _x
 		this.y = _y
 		this.radius = _radius
-		this.speedx = 5
-		this.speedy = 5
+		this.speedx = 8
+		this.speedy = 8
 		this.flag = true
 	}
 
@@ -60,8 +60,8 @@ export class Ball {
 		this.x = _x
 		this.y = _y
 		this.radius = _radius
-		this.speedx = 5
-		this.speedy = 5
+		this.speedx = 8
+		this.speedy = 8
 	}
 
 	public collisionPadd(paddle: Paddle) {
@@ -74,10 +74,18 @@ export class Ball {
 	public collisionWindow(width:number) {
 		if (this.x + this.speedx <= 0 || this.x + this.speedx >= width)
 			this.speedx *= -1;
-
-		// collisions haut
-		if (this.y + this.speedy <= 0)
+		else if (this.y + this.speedy <= 0)
 			this.speedy *= -1;
+		else
+			return;
+
+		this.moveToHitPos();
+
+
+	}
+
+	private moveToHitPos() {
+
 	}
 
 	public lost(width:number, height:number) {
