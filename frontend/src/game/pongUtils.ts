@@ -2,6 +2,8 @@ export function randomInt(min: number, max: number): number {
     return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
+const PADDLE_OFFSET = 30;
+
 export class Paddle {
     name: string;
     ia: boolean;
@@ -79,6 +81,76 @@ export class Paddle {
         this.height
         );
     }
+
+    updatePaddleUpDown(keys: { [key: string]: boolean }, upKey: string, downKey: string, paddles: [Paddle, Paddle, (Paddle | null)?, (Paddle | null)?], canvasWidth: number): void {
+        const player1 = paddles[0]; // gauche
+        const player2 = paddles[1]; // droite
+
+        if (keys[downKey]) {
+            let canMove = true;
+            const verticalOverlap = this.y < player2.y + player2.height && this.y + this.height > player2.y;
+            const horizontalCollision = this.x + this.width >= player2.x - PADDLE_OFFSET;
+
+            if (verticalOverlap && horizontalCollision)
+                canMove = false;
+
+            if (canMove)
+                this.moveRight(canvasWidth);
+            else
+                this.x = canvasWidth - PADDLE_OFFSET - this.width - paddles[1].width;
+        }
+
+        if (keys[upKey]) {
+            let canMove = true;
+            const verticalOverlap = this.y < player1.y + player1.height && this.y + this.height > player1.y;
+            const horizontalCollision = this.x <= player1.x + player1.width + PADDLE_OFFSET;
+
+            if (verticalOverlap && horizontalCollision)
+                canMove = false;
+
+            if (canMove)
+                this.moveLeft();
+            else
+                this.x = PADDLE_OFFSET + paddles[0].width;
+        }
+  }
+
+  updatePaddleRightLeft(keys: { [key: string]: boolean }, upKey: string, downKey: string, paddles: [Paddle, Paddle, (Paddle | null)?, (Paddle | null)?], canvasHeight: number): void {
+    const player3 = paddles[2]; // haut
+    const player4 = paddles[3]; // bas
+
+    if (keys[upKey]) {
+      let canMove = true;
+      if (player3) {
+        const horizontalOverlap = this.x < player3.x + player3.width && this.x + this.width > player3.x;
+        const verticalCollision = this.y <= player3.y + player3.height + PADDLE_OFFSET;
+
+        if (horizontalOverlap && verticalCollision)
+          canMove = false;
+
+        if (canMove)
+          this.moveUp();
+        else
+          this.y = PADDLE_OFFSET + player3.height; // eviter collision avec player3
+      }
+    }
+
+    if (keys[downKey]) {
+      let canMove = true;
+      if (player4) {
+        const horizontalOverlap = this.x < player4.x + player4.width && this.x + this.width > player4.x;
+        const verticalCollision = this.y + this.height >= player4.y - PADDLE_OFFSET;
+
+        if (horizontalOverlap && verticalCollision)
+          canMove = false;
+
+        if (canMove)
+          this.moveDown(canvasHeight);
+        else
+          this.y = canvasHeight - PADDLE_OFFSET - player4.height - this.height; // eviter collision avec player4
+      }
+    }
+  }
 }
 
 export class Power {
