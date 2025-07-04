@@ -1,5 +1,7 @@
 import { Paddle } from "./pongUtils";
 
+const PADDLE_OFFSET = 30;
+
 export class Pong {
   private canvas: HTMLCanvasElement;
   private ctx: CanvasRenderingContext2D;
@@ -7,7 +9,7 @@ export class Pong {
   private height: number;
   private start: boolean;
   private end: boolean;
-  private lastPlayerColl: number;
+  private lastPlayerColl: number; // pour savoir qui va gagner le point
 
   private paddles: [Paddle, Paddle, (Paddle | null)?, (Paddle | null)?];
   // private power: Power;
@@ -41,7 +43,7 @@ export class Pong {
       new Paddle(20, 100, 0, 0, 8),
       new Paddle(20, 100, 0, 0, 8),
       new Paddle(100, 20, 0, 0, 8),
-      null
+      new Paddle(100, 20, 0, 0, 8)
     ];
 
     this.ball = {
@@ -69,26 +71,26 @@ export class Pong {
   }
 
   private setupPaddles(): void {
-    this.paddles[0].x = 30;
+    this.paddles[0].x = PADDLE_OFFSET;
     this.paddles[0].y = (this.height - this.paddles[0].height) / 2;
     this.paddles[0].scorex = (this.width / 2) / 2;
     this.paddles[0].scorey = this.height / 2;
 
-    this.paddles[1].x = this.width - this.paddles[1].width - 30;
+    this.paddles[1].x = this.width - this.paddles[1].width - PADDLE_OFFSET;
     this.paddles[1].y = (this.height - this.paddles[1].height) / 2;
     this.paddles[1].scorex = (this.width / 4) * 3;
     this.paddles[1].scorey = this.height / 2;
 
     if (this.paddles[2]) {
       this.paddles[2].x = this.width / 2 - this.paddles[2].width / 2;
-      this.paddles[2].y = 30;
+      this.paddles[2].y = PADDLE_OFFSET;
       this.paddles[2].scorex = this.width / 2;
       this.paddles[2].scorey = this.height - this.height + 100;
     }
 
     if (this.paddles[3]) {
       this.paddles[3].x = this.width / 2 - this.paddles[3].width / 2;
-      this.paddles[3].y = this.height - this.paddles[3].height - 30;
+      this.paddles[3].y = this.height - this.paddles[3].height - PADDLE_OFFSET;
       this.paddles[3].scorex = this.width / 2;
       this.paddles[3].scorey = this.height - 100;
     }
@@ -202,24 +204,73 @@ export class Pong {
     if (paddle === null)
       return;
 
-    // faire bouger le paddle
-    else if (this.keys[downKey])
-      paddle.moveRight(this.width);
-    else if (this.keys[upKey])
-      paddle.moveLeft();
+    const player1 = this.paddles[0]; // gauche
+    const player2 = this.paddles[1]; // droite
 
-    // !!! paddle collision
-    // peut collide avec this.paddles[0] et this.paddles[1]
+    if (this.keys[downKey]) {
+      let canMove = true;
+      const verticalOverlap = paddle.y < player2.y + player2.height && paddle.y + paddle.height > player2.y;
+      const horizontalCollision = paddle.x + paddle.width >= player2.x - PADDLE_OFFSET;
+
+      if (verticalOverlap && horizontalCollision)
+        canMove = false;
+
+      if (canMove)
+        paddle.moveRight(this.width);
+      else
+        paddle.x = this.width - PADDLE_OFFSET - paddle.width - this.paddles[1].width;
+    }
+
+    if (this.keys[upKey]) {
+      let canMove = true;
+      const verticalOverlap = paddle.y < player1.y + player1.height && paddle.y + paddle.height > player1.y;
+      const horizontalCollision = paddle.x <= player1.x + player1.width + PADDLE_OFFSET;
+
+      if (verticalOverlap && horizontalCollision)
+        canMove = false;
+
+      if (canMove)
+        paddle.moveLeft();
+      else
+        paddle.x = PADDLE_OFFSET + this.paddles[0].width;
+    }
   }
 
   private updatePaddleRightLeft(paddle: typeof this.paddles[0], upKey: string, downKey: string): void {
-    if (this.keys[upKey])
-      paddle.moveUp();
-    if (this.keys[downKey])
-      paddle.moveDown(this.height);
+    const player3 = this.paddles[2]; // haut
+    const player4 = this.paddles[3]; // bas
 
-    // !!! paddle collision
-    // peut collide avec this.paddles[3] et this.paddles[4]
+    if (this.keys[upKey]) {
+      let canMove = true;
+      if (player3) {
+        const horizontalOverlap = paddle.x < player3.x + player3.width && paddle.x + paddle.width > player3.x;
+        const verticalCollision = paddle.y <= player3.y + player3.height + PADDLE_OFFSET;
+
+        if (horizontalOverlap && verticalCollision)
+          canMove = false;
+
+        if (canMove)
+          paddle.moveUp();
+        else
+          paddle.y = PADDLE_OFFSET + player3.height; // eviter collision avec player3
+      }
+    }
+
+    if (this.keys[downKey]) {
+      let canMove = true;
+      if (player4) {
+        const horizontalOverlap = paddle.x < player4.x + player4.width && paddle.x + paddle.width > player4.x;
+        const verticalCollision = paddle.y + paddle.height >= player4.y - PADDLE_OFFSET;
+
+        if (horizontalOverlap && verticalCollision)
+          canMove = false;
+
+        if (canMove)
+          paddle.moveDown(this.height);
+        else
+          paddle.y = this.height - PADDLE_OFFSET - player4.height - paddle.height; // eviter collision avec player4
+      }
+    }
   }
 
   private addBallSpeed(): void {
@@ -314,49 +365,44 @@ export class Pong {
   }
 
   private ballMultiplayerCollision(): void {
-    const player3 = this.paddles[2];
-    // Paddle en haut (index 2)
+    const player3 = this.paddles[2]; // haut
+
     if (player3 &&
       this.ball.y - this.ball.radius <= player3.y + player3.height &&
       this.ball.x + this.ball.radius >= player3.x &&
       this.ball.x - this.ball.radius <= player3.x + player3.width &&
-      this.ball.y > player3.y
-    ) {
-      this.addBallSpeed();
-      this.ball.speedy *= -1;
-      this.adjustBallDirMultiplayer(this.ball, player3);
-      
-      // Repositionner la balle juste en dessous du paddle (avec une marge)
-      this.ball.y = player3.y + player3.height + this.ball.radius + 0.1;
-      
-      // Inverser la vitesse verticale (rebond)
-      this.ball.speedy = Math.abs(this.ball.speedy);
+      this.ball.y > player3.y) {
+        this.addBallSpeed();
+        this.ball.speedy *= -1;
+        this.adjustBallDirMultiplayer(this.ball, player3);
+        
+        // repositionner balle pour eviter comportement bizarre
+        this.ball.y = player3.y + player3.height + this.ball.radius + 0.1;
+        
+        this.ball.speedy = Math.abs(this.ball.speedy);
 
-      this.lastPlayerColl = 2;
+        this.lastPlayerColl = 2;
     }
 
-    const player4 = this.paddles[3];
-    // Paddle en bas (index 3)
+    const player4 = this.paddles[3]; // bas
+
     if (player4 &&
       this.ball.y + this.ball.radius >= player4.y &&
       this.ball.x + this.ball.radius >= player4.x &&
       this.ball.x - this.ball.radius <= player4.x + player4.width &&
-      this.ball.y < player4.y + player4.height
-    ) {
-      this.addBallSpeed();
-      this.ball.speedy *= -1;
-      this.adjustBallDirMultiplayer(this.ball, player4);
+      this.ball.y < player4.y + player4.height) {
+        this.addBallSpeed();
+        this.ball.speedy *= -1;
+        this.adjustBallDirMultiplayer(this.ball, player4);
 
-      // Repositionner la balle juste au-dessus du paddle (avec une marge)
-      this.ball.y = player4.y - this.ball.radius - 0.1;
+        // repositionner balle pour eviter comportement bizarre
+        this.ball.y = player4.y - this.ball.radius - 0.1;
 
-      // Inverser la vitesse verticale (rebond)
-      this.ball.speedy = -Math.abs(this.ball.speedy);
+        this.ball.speedy = -Math.abs(this.ball.speedy);
 
-      this.lastPlayerColl = 3;
+        this.lastPlayerColl = 3;
     }
   }
-
 
   private updateBall(ball: typeof this.ball): void {
     ball.x += ball.speedx;

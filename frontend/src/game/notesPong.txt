@@ -3,10 +3,8 @@ https://stackoverflow.com/questions/4577814/pong-how-does-the-paddle-know-where-
 https://dooglz.github.io/set09121/pong2.html
 
 // a faire
-    // continuer a reflechir en multijoueur
-        // faire collisions paddle/paddle
     // reprendre backend/src/routes/game.ts
-    // power ups - aleatoir entre : (peut etre annonce en fond)
+    // power ups - aleatoire entre : (peut etre annonce en fond)
         // paddle + grand/+ petit pour l'adversaire
         // balle en trop
         // freeze du paddle de l'adversaire pendant genre 1sec
