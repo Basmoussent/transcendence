@@ -1,4 +1,5 @@
 import { db } from '../database';
+import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import Fastify from 'fastify';
 import { FastifyInstance } from 'fastify';
 import jwt from '@fastify/jwt';
@@ -39,7 +40,7 @@ async function authRoutes(app: FastifyInstance) {
    * 2. Que les mots de passe correspondent
    * 3. Que l'utilisateur n'existe pas déjà (username ou email unique)
    */
-  app.post<{ Body: RegisterBody }>('/register', async (request, reply) => {
+  app.post<{ Body: RegisterBody }>('/register', async (request: FastifyRequest, reply: FastifyReply) => {
     // Extraction des données du corps de la requête
     const { username, email, password, confirmPassword } = request.body;
     
@@ -92,7 +93,7 @@ async function authRoutes(app: FastifyInstance) {
    * 2. Que l'utilisateur existe
    * 3. Que le mot de passe est correct
    */
-  app.post<{ Body: LoginBody }>('/login', async (request, reply) => {
+  app.post<{ Body: LoginBody }>('/login', async (request: FastifyRequest, reply: FastifyReply) => {
     // Extraction des données du corps de la requête
     const { username, password } = request.body;
 
@@ -215,7 +216,7 @@ async function authRoutes(app: FastifyInstance) {
    * Cette route permet à un utilisateur de se déconnecter.
    * Elle supprime le token d'authentification.
    */
-  app.post('/logout', async (request, reply) => {
+  app.post('/logout', async (request: FastifyRequest, reply: FastifyReply) => {
     try {
       // Déterminer le domaine du cookie selon l'environnement
       const origin = request.headers.origin || '';
@@ -252,7 +253,7 @@ async function authRoutes(app: FastifyInstance) {
     }
   });
 
-  app.get('/verify', async (request, reply) => {
+  app.get('/verify', async (request: FastifyRequest, reply: FastifyReply) => {
     let token = request.headers['x-access-token'] as string;
         
     if (!token) {
@@ -270,6 +271,7 @@ async function authRoutes(app: FastifyInstance) {
       return reply.status(401).send({ error: 'Invalid token', detail: err.message });
     }
   });
+
 }
 
 export default authRoutes;

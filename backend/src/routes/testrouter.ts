@@ -90,12 +90,7 @@ async function barRoutes(app: FastifyInstance) {
 					'INSERT INTO drinks (drink_name, cost) VALUES (?, ?)',
 					[drink_name, intprix],
 					(err: any) => {
-						if (err) {
-							console.log(err)
-							reject(err);
-						} else {
-							resolve();
-						}
+						err ? reject(err) : resolve();
 					}
 				);
 			});

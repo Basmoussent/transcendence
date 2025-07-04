@@ -7,244 +7,93 @@ import util from 'util'
 import { pipeline } from 'stream'
 import path from 'path';
 
-interface Game {
-    id: number;
-    player1: string;
-    score1: string;
-    player2: string;
-    score2: string;
-    winner: string | null;
-    status: "started" | "finished" | "ff'ed"
-}
-
-interface UserData {
-    id: number;
-    username: string;
-    email: string;
-    avatar_url?: string;
-    language: string;
+interface GameTables {
+	id: number,
+	game_name: string,
+	player1: string,
+	player2: string,
+	player3: string,
+	player4: string,
+	winner: string,
+	time_start: string,
+	end_start: string
 }
 
 async function gameRoutes(app: FastifyInstance) {
-    //    app.post('/start', async function (request: FastifyRequest, reply: FastifyReply) {
 
-    //     console.log("route game/start appexxxlee");
-    //     try {
-    //         let token = request.headers['x-access-token'] as string;
-    //         if (!token) {
-    //             token = request.cookies['x-access-token'];
-    //         }
+	app.get('/', async function (request: FastifyRequest, reply: FastifyReply) {
 
-    //         if (!token) {
-    //             return reply.status(401).send({ error: 'Token d\'authentification manquant' });
-    //         }
+		console.log("get sur /games renvoie toutes les games enregistrees");
 
-    //         const decoded = app.jwt.verify(token) as { user: string };
-    //         const email = decoded.user;
+		try {
+			const database = db.getDatabase();
 
-    //         const database = db.getDatabase();
-    //         if (!database) {
-    //             return reply.status(500).send({ error: 'Erreur de connexion à la base de données' });
-    //         }
+			const gameTables = await new Promise<GameTables[] | null>((resolve, reject) => {
 
-    //         const user = await new Promise<UserData | null>((resolve, reject) => {
-    //             database.get(
-    //                 'SELECT id, username, email, avatar_url, language FROM users WHERE email = ?',
-    //                 [email],
-    //                 (err: any, row: UserData | undefined) => {
-    //                     if (err) {
-    //                         reject(err);
-    //                     } else {
-    //                         resolve(row || null);
-    //                     }
-    //                 }
-    //             );
-    //         });
+				database.get(
+					'SELECT * FROM games',
+					(err: any, row: GameTables[] | undefined) => {
+						err ? reject(err) : resolve(row || null); }
+				);
+			});
+			console.log("gameTables", gameTables);
 
-    //         if (!user) {
-    //             return reply.status(404).send({ error: 'Utilisateur non trouvé' });
-    //         }
+			return reply.send({
+				message: 'gameTables recu avec succès',
+				gameTables: gameTables,
+			});
+		}
 
-    //         const allGamesOfUser = await new Promise<UserData | null>((resolve, reject) => {
-    //             database.get(
-    //                 'SELECT * FROM games WHERE player1 = ?', [user.id],
-    //                 (err: any, row: UserData | undefined) => {
-    //                     if (err) {
-    //                         reject(err);
-    //                     } else {
-    //                         resolve(row || null);
-    //                     }
-    //                 }
-    //             );
-    //         });
-    //         console.log("allGamesOfUser", allGamesOfUser)
-    //         return reply.send({ 
-    //             message: 'Avatar uploadé avec succès',
-    //             allGamesOfUser:allGamesOfUser,
-    //         });
+		catch (err: any) {
+			console.error('Erreur retrieve game tables :', err);
+			if (err.name === 'JsonWebTokenError')
+				return reply.status(401).send({ error: 'Token invalide ou expiré' });
+			return reply.status(500).send({ error: 'Erreur lors de cxxxl\'upload de l\'avatar', details: err.message });
+		}
 
-    //     } catch (err: any) {
-    //         console.error('Erreur pendant l\'upload d\'avatar :', err);
-    //         if (err.name === 'JsonWebTokenError') {
-    //             return reply.status(401).send({ error: 'Token invalide ou expiré' });
-    //         }
-    //         return reply.status(500).send({ error: 'Erreur lors de cxxxl\'upload de l\'avatar', details: err.message });
-    //     }
-    // });
-    app.post('/start', async function (request: FastifyRequest, reply: FastifyReply) {
+	})
 
-        console.log("route game/start appexxxlee");
-        try {
-            let token = request.headers['x-access-token'] as string;
-            if (!token) {
-                token = request.cookies['x-access-token'];
-            }
+	app.post('/', async function (request: FastifyRequest, reply: FastifyReply) {
 
-            if (!token) {
-                return reply.status(401).send({ error: 'Token d\'authentification manquant' });
-            }
+		console.log("enregistrer une game");
 
-            const decoded = app.jwt.verify(token) as { user: string };
-            const email = decoded.user;
+		try {
+			const database = db.getDatabase();
 
-            const database = db.getDatabase();
-            if (!database) {
-                return reply.status(500).send({ error: 'Erreur de connexion à la base de données' });
-            }
+			const { id, game_name, player1, player2, player3, player4, winner, time_start, end_start } = request.body;
 
-            const user = await new Promise<UserData | null>((resolve, reject) => {
-                database.get(
-                    'SELECT id, username, email, avatar_url, language FROM users WHERE email = ?',
-                    [email],
-                    (err: any, row: UserData | undefined) => {
-                        if (err) {
-                            reject(err);
-                        } else {
-                            resolve(row || null);
-                        }
-                    }
-                );
-            });
-
-            if (!user) {
-                return reply.status(404).send({ error: 'Utilisateur non trouvé' });
-            }
-
-            const { player2 } = request.body;
-            console.log("player2", player2);
+			if (!game_name)
+				throw new Error("You need to precise which game we're talking about");
+			if (!player1)
+				throw new Error("to create a game it gotta a player at least");
+			if (!time_start)
+				throw new Error("Precise at what time it started");
 
 
-            const allusersindb = await new Promise<UserData | null>((resolve, reject) => {
-                database.get(
-                    'SELECT * FROM users',
-                    (err: any, row: UserData | undefined) => {
-                        if (err) {
-                            reject(err);
-                        } else {
-                            resolve(row || null);
-                        }
-                    }
-                );
-            });
-            console.log("allusersindb", allusersindb)
-            await new Promise<void>((resolve, reject) => {
-                database.run(
-                    'INSERT INTO games (status, player1, player2) VALUES (?, ?, ?)',
-                    ['ongoing', user.username, player2],
-                    (err: any) => {
-                        if (err) {
-                            reject(err);
-                        } else {
-                            resolve();
-                        }
-                    }
-                );
-            });
+			const gameTables = await new Promise<void>((resolve, reject) => {
+				database.run(
+					'INSERT INTO games (game_name, player1, player2, player3, player4, winner, time_start, end_start) VALUES (?, ?)',
+					[game_name, player1, player2, player3, player4, winner, time_start, end_start],
+					(err: any) => {
+						err ? reject(err) : resolve(); }
+				);
+			});
 
+			return reply.send({
+				message: 'post une game avec succès',
+			});
+		}
 
-            return reply.send({
-                message: 'Avatar uploadé avec succès',
-            });
+		catch (err: any) {
+			console.error('Erreur retrieve game tables :', err);
+			if (err.name === 'JsonWebTokenError')
+				return reply.status(401).send({ error: 'Token invalide ou expiré' });
+			return reply.status(500).send({ error: 'Erreur lors de cxxxl\'upload de l\'avatar', details: err.message });
+		}
 
-        } catch (err: any) {
-            console.error('Erreur pendant l\'upload d\'avatar :', err);
-            if (err.name === 'JsonWebTokenError') {
-                return reply.status(401).send({ error: 'Token invalide ou expiré' });
-            }
-            return reply.status(500).send({ error: 'Erreur lors de cxxxl\'upload de l\'avatar', details: err.message });
-        }
-    });
-
-    app.post('/end', async function (request: FastifyRequest, reply: FastifyReply) {
-
-        console.log("route game/start appexxxlee");
-        try {
-            let token = request.headers['x-access-token'] as string;
-            if (!token) {
-                token = request.cookies['x-access-token'];
-            }
-
-            if (!token) {
-                return reply.status(401).send({ error: 'Token d\'authentification manquant' });
-            }
-
-            const decoded = app.jwt.verify(token) as { user: string };
-            const email = decoded.user;
-
-            const database = db.getDatabase();
-            if (!database) {
-                return reply.status(500).send({ error: 'Erreur de connexion à la base de données' });
-            }
-
-            const user = await new Promise<UserData | null>((resolve, reject) => {
-                database.get(
-                    'SELECT id, username, email, avatar_url, language FROM users WHERE email = ?',
-                    [email],
-                    (err: any, row: UserData | undefined) => {
-                        if (err) {
-                            reject(err);
-                        } else {
-                            resolve(row || null);
-                        }
-                    }
-                );
-            });
-
-            if (!user) {
-                return reply.status(404).send({ error: 'Utilisateur non trouvé' });
-            }
-
-            const { winner, score } = request.body;
-            console.log("whole body", request.body);
-
-            await new Promise<void>((resolve, reject) => {
-                database.run(
-                    'UPDATE games SET status = ?, score = ?, winner = ? WHERE id = ?',
-                    ["sadasdsdsadsdjashjashdkjash", score, winner, 1],
-                    (err: any) => {
-                        if (err) {
-                            reject(err);
-                        } else {
-                            resolve();
-                        }
-                    }
-                );
-            });
-
-
-            return reply.send({
-                message: 'Avatar uploadé avec succès',
-            });
-
-        } catch (err: any) {
-            console.error('Erreur pendant l\'uxxxxxxxxpload d\'avatar :', err);
-            if (err.name === 'JsonWebTokenError') {
-                return reply.status(401).send({ error: 'Token invalide ou expiré' });
-            }
-            return reply.status(500).send({ error: 'Erreur lors de cxxxl\'upload de l\'avatar', details: err.message });
-        }
-    });
-
+	})
 }
+
+
 
 export default gameRoutes;

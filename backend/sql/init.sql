@@ -10,13 +10,14 @@ CREATE TABLE IF NOT EXISTS users (
 
 CREATE TABLE IF NOT EXISTS games (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
-  status VARCHAR NOT NULL,
-  player1 INTEGER NOT NULL REFERENCES users(id),
-  player2 INTEGER NOT NULL REFERENCES users(id),
-  winner INTEGER,
-  score VARCHAR,
-  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-  ended_at DATETIME
+  game_name TEXT NOT NULL,
+  player1 TEXT NOT NULL,
+  player2 TEXT,
+  player3 TEXT,
+  player4 TEXT,
+  winner TEXT,
+  time_start TEXT NOT NULL,
+  end_start TEXT
 );
 
 CREATE TABLE IF NOT EXISTS chats (
@@ -43,16 +44,22 @@ CREATE TABLE IF NOT EXISTS messages (
 );
 
 
-CREATE TABLE IF NOT EXISTS barTables (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
-  user_tab ARRAY,
-  drinks_tab ARRAY REFERENCES drinks(drink_name),
-  total_cost INTEGER
-);
 
 
-CREATE TABLE IF NOT EXISTS drinks (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
-  drink_name  VARCHAR(36) UNIQUE NOT NULL ,
-  cost INTEGER NOT NULL
-);
+
+
+
+
+-- CREATE TABLE IF NOT EXISTS barTables (
+--   id INTEGER PRIMARY KEY AUTOINCREMENT,
+--   user_tab ARRAY,
+--   drinks_tab ARRAY REFERENCES drinks(drink_name),
+--   total_cost INTEGER
+-- );
+
+
+-- CREATE TABLE IF NOT EXISTS drinks (
+--   id INTEGER PRIMARY KEY AUTOINCREMENT,
+--   drink_name  VARCHAR(36) UNIQUE NOT NULL ,
+--   cost INTEGER NOT NULL
+-- );

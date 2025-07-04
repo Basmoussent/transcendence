@@ -182,7 +182,7 @@ export class Block {
 
 		if (this.keys['enter'] && !this.status) {
 			if (this.bricks) {
-				this.logGame();
+				// this.logGame();
 			}
 			this.bricks = [];
 			for (let it = 0; it < 100; ++it)

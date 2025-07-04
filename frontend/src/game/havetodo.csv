@@ -32,3 +32,14 @@ pourquoi ca affiche mal la balle ->
 
 faire une sorte de raycasting quand on detecte que la prochaine position est dasn une brick up
 
+
+
+Pour obtenir seulement la liste des clients qui habitent à Paris, il faut effectuer la requête suivante :
+SELECT *
+FROM client
+WHERE ville = 'paris'
+
+
+
+
+post une game avec les valeurs null a null des le debut pour pouvoir insert apres et post des le debut psqu'on doit tout renseigner

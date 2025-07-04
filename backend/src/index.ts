@@ -64,9 +64,9 @@ async function setup() {
   console.log('✅ Edit routes registered');
   await fastify.register(userRoutes);
   console.log('✅ User routes registered');
-  await fastify.register(gameRoutes, {prefix: "/game"});
-  console.log('✅ BarTables routes registered');
-  await fastify.register(barRoutes, {prefix: "/bar"});
+  await fastify.register(gameRoutes, {prefix: "/games"});
+  // console.log('✅ BarTables routes registered');
+  // await fastify.register(barRoutes, {prefix: "/bar"});
   
   // Register WebSocket
   console.log('🔌 Registering WebSocket...');
