@@ -1,5 +1,5 @@
-import { getAuthToken } from '../utils/auth';
-import { sanitizeHtml } from '../utils/sanitizer';
+import { getAuthToken } from '../../utils/auth';
+import { sanitizeHtml } from '../../utils/sanitizer';
 
 export class Paddle {
 
@@ -175,12 +175,18 @@ export abstract class brick {
 	protected id: number;
 	protected type: string;
 	protected color: string;
+	protected x: number;
+	protected y: number;
 
-	constructor(_hp:number,_id:number, _type:string, _color:string) {
+
+	constructor(_hp:number,_id:number, _type:string, _color:string, _x:number, _y:number) {
 		this.hp = _hp;
 		this.id = _id;
 		this.type = _type;
 		this.color = _color;
+		this.x = _x;
+		this.y = _y;
+
 	}
 
 	public beenHit(): void {
@@ -191,34 +197,36 @@ export abstract class brick {
 	public getId(): number { return (this.id); }
 	public getType(): string { return (this.type); }
 	public getColor(): string { return (this.color); }
+	public getX(): number { return (this.x); }
+	public getY(): number { return (this.y); }
 	
 
 }
 
 class blue extends brick {
-	constructor(_id:number) {
-		super(1, _id, "blue", "#4780B1"); }
+	constructor(_id:number, _x:number, _y:number) {
+		super(1, _id, "blue", "#4780B1", _x, _y); }
 }
 
 class green extends brick {
-	constructor(_id:number) {
-		super(1, _id, "green", "#61AB39"); }
+	constructor(_id:number, _x:number, _y:number) {
+		super(1, _id, "green", "#61AB39", _x, _y); }
 }
 
 class red extends brick {
-	constructor(_id:number) {
-		super(1, _id, "red", "#FF101F"); }
+	constructor(_id:number, _x:number, _y:number) {
+		super(1, _id, "red", "#FF101F", _x, _y); }
 }
 
-export function	createRandomBrick(it:number): brick {
+export function	createRandomBrick(it:number, _x:number, _y:number): brick {
 
 	const rand = Math.floor(Math.random() * 3);
 
 	if (rand === 0)
-		return (new red(it));
+		return (new red(it, _x, _y));
 	if (rand === 1)
-		return (new green(it));
-	return (new blue(it));
+		return (new green(it, _x, _y));
+	return (new blue(it, _x, _y));
 }
 
 let userData = {

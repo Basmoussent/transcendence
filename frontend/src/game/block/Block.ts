@@ -7,8 +7,9 @@ export class Block {
 	private height: number;
 	private status: boolean;
 	private username: string;
-	private brickWidth: number;
+
 	private brickHeight: number;
+	private brickWidth: number;
 
 	private ball: Ball;
 	private paddle: Paddle;
@@ -32,18 +33,22 @@ export class Block {
 		this.width = canvas.width;
 		this.height = canvas.height;
 		this.username = "ko";
-		this.brickWidth = this.width / 20;
-		this.brickHeight = this.height / 20;
+		this.loadUsername();
 
 		this.paddle = new Paddle(0, 0, 14);
-		this.ball = new Ball(0, 0); // this.width et this.height are false
+		this.ball = new Ball(this.width / 2, this.height / 2); // this.width et this.height are false
 
 		this.keys = {};
 		this.bricks = [];
+		
 		for (let it = 0; it < 100; ++it)
-			this.bricks.push(createRandomBrick(it));
-		this.loadUsername();
+			this.bricks.push(createRandomBrick(it, it % 20, Math.floor(it / 20)));
 
+		this.brickWidth = this.width / 20;
+		this.brickHeight = Math.floor(this.height / 20);
+
+		// for (let it = 0; it < 100; ++it)
+		// 	console.log(this.bricks[it].getX(), ".", this.bricks[it].getY());
 	}
 
 	private async loadUsername() {
@@ -87,7 +92,14 @@ export class Block {
 		this.height = this.canvas.height;
 		
 		this.paddle.x = (this.width - this.paddle.width) / 2;
-		this.paddle.y = this.height - this.paddle.height - 12; // 20 de base
+		this.paddle.y = this.height - this.paddle.height - 12;
+
+		this.brickWidth = this.width / 20;
+		this.brickHeight = Math.floor(this.height / 20);
+
+		this.ball.x = this.width / 2;
+		this.ball.y = (this.height / 4) + 50;
+
 
 		console.log('Canvas size:', this.width, this.height);
 		console.log('Paddle position:', this.paddle.x, this.paddle.y);
@@ -120,12 +132,15 @@ export class Block {
 			// this.bricks = [];
 			// for (let it = 0; it < 100; ++it)
 			// 	this.bricks.push(createRandomBrick(it));
-			ball.reset(this.width / 2, (this.height / 4) + 5, 3, 6)
+			ball.reset(this.width / 2, (this.height / 4) + 50, 3, 6)
 			this.status = true;
 		}
 
 		if (!this.status)
 			return ;
+
+		this.brickWidth = this.width / 20;
+		this.brickHeight = Math.floor(this.height / 20);
 
 		if (this.keys['a']) 
 			this.paddle.move("left", this.width)
@@ -133,23 +148,29 @@ export class Block {
 			this.paddle.move("right", this.width)
 
 		ball.collisionPadd1(this.paddle);
-		
+
 		if (ball.y <= this.height / 4 && ball.y > 0) {
 
-			let row = Math.floor(ball.y / (this.height / 5 ) * 5);
-			let index = Math.floor(ball.x / (this.width) * 20);
+			for (const brick of this.bricks) {
 
-			if (row > 4)
-				row = 4;
+				if (brick.getHp()) {
+					const brickLeft = brick.getX() * this.brickWidth;
+					const brickRight = brickLeft + this.brickWidth;
+					const brickTop = brick.getY() * this.brickHeight;
+					const brickBottom = brickTop + this.brickHeight;
+					
+					if (ball.x - ball.radius / 2 >= brickLeft && ball.x + ball.radius / 2 <= brickRight &&
+						ball.y - ball.radius / 2 >= brickTop && ball.y + ball.radius / 2 <= brickBottom) {
+						
+						brick.beenHit();
+						ball.speedy *= -1;
 
-			console.log("row - index, ", row, " ", index);
-
-			if (this.bricks[(row * 20) + index].getHp()) {
-
-				this.bricks[(row * 20) + index].beenHit();
-				ball.speedy *= -1;
+						break;
+					}
+				}
 			}
 		}
+
 		console.log("ball => ", ball.x, ",", ball.y);
 
 		ball.collisionWindow(this.width);
@@ -164,14 +185,13 @@ export class Block {
 
 	private renderBricks() {
 
-		for (var row = 0; row < 5; ++row) {
-			for (var index = 0; index < 20; ++index) {
-				if (!this.bricks[(row * 20) + index].getHp())
-					continue ;
-				this.bricks[(row * 20) + index].getColor();
-				this.ctx.fillStyle = this.bricks[(row * 20) + index].getColor();
-				this.ctx.fillRect(Math.round(this.width / 20 * index), Math.round(this.height / 20 * row), Math.round(this.width / 20), Math.round(this.height / 20));
-			}
+		for (const brick of this.bricks) {
+
+			if (!brick.getHp())
+				continue ;
+
+			this.ctx.fillStyle = brick.getColor();
+			this.ctx.fillRect(brick.getX() * this.brickWidth, brick.getY() * this.brickHeight, this.brickWidth, this.brickHeight);
 		}
 	}
 

@@ -10,6 +10,9 @@ export class Block1v1 {
 	private status: boolean;
 	private username: string;
 
+	private brickHeight: number;
+	private brickWidth: number;
+
 	private ball1: Ball;
 	private ball2: Ball;
 	private paddle1: Paddle;
@@ -43,7 +46,7 @@ export class Block1v1 {
 		this.keys = {};
 		this.bricks = [];
 		for (let it = 0; it < 100; ++it)
-			this.bricks.push(createRandomBrick(it));
+			this.bricks.push(createRandomBrick(it, it % 20, Math.floor(it / 20)));
 		// this.loadUsername();
 
 	}
@@ -85,6 +88,13 @@ export class Block1v1 {
 		this.paddle2.x = (this.width - this.paddle2.width) / 2;
 		this.paddle2.y = this.paddle2.height - 12 + 1;
 
+
+		this.ball1.x = this.width / 2;
+		this.ball1.y = (this.height / 5) * 3;
+
+		this.ball2.x = this.width / 2;
+		this.ball2.y = (this.height / 5) * 2;
+
 		console.log('Canvas size:', this.width, this.height);
 		console.log('Paddle1 position:', this.paddle1.x, this.paddle1.y);
 		console.log('Paddle2 position:', this.paddle2.x, this.paddle2.y);
@@ -114,6 +124,9 @@ export class Block1v1 {
 		if (!this.status)
 			return ;
 
+		this.brickWidth = this.width / 20;
+		this.brickHeight = Math.floor(this.height / 20);
+
 		if (this.keys['a']) 
 			this.paddle1.move("left", this.width)
 		if (this.keys['d'])
@@ -130,37 +143,52 @@ export class Block1v1 {
 		ball2.collisionPadd1(this.paddle1);
 		ball2.collisionPadd2(this.paddle2);
 
+
 		if (ball1.y >= (this.height / 5) * 2 && ball1.y <= (this.height / 5) * 3) {
 
-			let row = Math.floor((ball1.y - (this.height / 5) * 2) / (this.height / 5 ) * 5);
-			let index = Math.floor(ball1.x / (this.width) * 20);
+			console.log("on passe");
 
-			if (row > 4)
-				row = 4;
+			for (const brick of this.bricks) {
 
-			console.log("row - index, ", row, " ", index);
-
-			if (this.bricks[(row * 20) + index].getHp()) {
-
-				this.bricks[(row * 20) + index].beenHit();
-				ball1.speedy *= -1;
+				if (brick.getHp()) {
+					const brickLeft = brick.getX() * this.brickWidth;
+					const brickRight = brickLeft + this.brickWidth;
+					const brickTop = brick.getY() * this.brickHeight + ((this.brickHeight / 5) * 2);
+					const brickBottom = brickTop + this.brickHeight + ((this.brickHeight / 5) * 2);
+					
+					if (ball1.x - ball1.radius / 2 >= brickLeft && ball1.x + ball1.radius / 2 <= brickRight &&
+						ball1.y - ball1.radius / 2 >= brickTop && ball1.y + ball1.radius / 2 <= brickBottom) {
+						
+						brick.beenHit();
+						ball1.speedy *= -1;
+						
+						break;
+					}
+				}
 			}
 		}
 
 		if (ball2.y >= (this.height / 5) * 2 && ball2.y <= (this.height / 5) * 3) {
 
-			let row = Math.floor((ball2.y - (this.height / 5) * 2) / (this.height / 5 ) * 5);
-			let index = Math.floor(ball2.x / (this.width) * 20);
+			console.log("on passe");
 
-			if (row > 4)
-				row = 4;
+			for (const brick of this.bricks) {
 
-			console.log("row - index, ", row, " ", index);
-
-			if (this.bricks[(row * 20) + index].getHp()) {
-
-				this.bricks[(row * 20) + index].beenHit();
-				ball2.speedy *= -1;
+				if (brick.getHp()) {
+					const brickLeft = brick.getX() * this.brickWidth;
+					const brickRight = brickLeft + this.brickWidth;
+					const brickTop = brick.getY() * this.brickHeight + ((this.brickHeight / 5) * 2);
+					const brickBottom = brickTop + this.brickHeight + ((this.brickHeight / 5) * 2);
+					
+					if (ball2.x - ball2.radius / 2 >= brickLeft && ball2.x + ball2.radius / 2 <= brickRight &&
+						ball2.y - ball2.radius / 2 >= brickTop && ball2.y + ball2.radius / 2 <= brickBottom) {
+						
+						brick.beenHit();
+						ball2.speedy *= -1;
+						
+						break;
+					}
+				}
 			}
 		}
 
@@ -171,7 +199,7 @@ export class Block1v1 {
 		}
 
 		ball1.move();
-		ball2.move();
+		// ball2.move();
 
 		// console.log(`Ball 1 - x: ${ball1.x}, y: ${ball1.y}`);
 		// console.log(`Ball 2 - x: ${ball2.x}, y: ${ball2.y}`);
@@ -206,14 +234,13 @@ export class Block1v1 {
 
 	private renderBricks() {
 
-		for (var row = 0; row < 5; ++row) {
-			for (var index = 0; index < 20; ++index) {
-				if (!this.bricks[(row * 20) + index].getHp())
-					continue ;
-				this.bricks[(row * 20) + index].getColor();
-				this.ctx.fillStyle = this.bricks[(row * 20) + index].getColor();
-				this.ctx.fillRect(Math.round(this.width / 20 * index), Math.round((this.height / 20 * row) + (this.height / 5) * 2), Math.round(this.width / 20), Math.round(this.height / 20));
-			}
+		for (const brick of this.bricks) {
+
+			if (!brick.getHp())
+				continue ;
+
+			this.ctx.fillStyle = brick.getColor();
+			this.ctx.fillRect(brick.getX() * this.brickWidth, brick.getY() * this.brickHeight + (this.height / 5 * 2), this.brickWidth, this.brickHeight);
 		}
 	}
 
