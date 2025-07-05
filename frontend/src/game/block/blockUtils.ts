@@ -63,13 +63,6 @@ export class Ball {
 		this.speedy = _speedy
 	}
 
-	public lost(height:number): boolean {
-
-		if (this.y + this.radius >= height)
-			return true;
-		return false;
-	}
-
 	public moveTo(_x:number, _y:number) {
 		this.x = _x;
 		this.y = _y;
@@ -277,4 +270,34 @@ export async function fetchUsername() {
 	}
 	catch (error) {
 		console.error("Error rendering profile page:", error); }
+}
+
+
+export async function logGame() {
+	
+	try {
+		const token = getAuthToken();
+		if (!token) {
+			alert('❌ Token d\'authentification manquant');
+			window.history.pushState({}, '', '/login');
+			window.dispatchEvent(new PopStateEvent('popstate'));
+			return '';
+		}
+
+		const response = await fetch('/api/me', {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+				'x-access-token': token }
+		});
+	
+		if (response.ok) {
+			const result = await response.json();
+			
+		}
+		else 
+			console.error("Erreur lors de log une game");
+	}
+	catch (error) {
+		console.error("Error saving a game: ", error); }
 }

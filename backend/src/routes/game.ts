@@ -60,20 +60,17 @@ async function gameRoutes(app: FastifyInstance) {
 		try {
 			const database = db.getDatabase();
 
-			const { game_name, player1, start_time } = request.body;
+			const { game_name, player1} = request.body;
 
 			if (!game_name)
 				throw new Error("You need to precise which game we're talking about");
 			if (!player1)
 				throw new Error("to create a game it gotta a player at least");
-			if (!start_time)
-				throw new Error("Precise at what time it started");
-
 
 			const gameTables = await new Promise<void>((resolve, reject) => {
 				database.run(
-					'INSERT INTO games (game_name, player1, start_time) VALUES (?, ?, ?)',
-					[game_name, player1, start_time],
+					'INSERT INTO games (game_name, player1) VALUES (?, ?)',
+					[game_name, player1],
 					(err: any) => {
 						err ? reject(err) : resolve(); }
 				);

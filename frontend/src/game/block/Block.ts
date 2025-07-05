@@ -7,6 +7,8 @@ export class Block {
 	private height: number;
 	private status: boolean;
 	private username: string;
+	private win: boolean;
+	private lost: boolean;
 
 	private brickHeight: number;
 	private brickWidth: number;
@@ -32,6 +34,8 @@ export class Block {
 		this.ctx = context;
 		this.width = canvas.width;
 		this.height = canvas.height;
+		this.win = false;
+		this.lost = false;
 		this.username = "ko";
 		this.loadUsername();
 
@@ -126,6 +130,22 @@ export class Block {
 		ctx.globalAlpha = 1;
 	}
 
+	private updateWin() {
+
+		for (const brick of this.bricks)
+			if (brick.getHp())
+				return;
+
+		this.win = true;		
+	}
+
+	public updateLost() {
+
+		if (this.ball.y - this.ball.radius >= this.height)
+			this.status = false;
+
+	}
+
 	private update(ball: Ball): void {
 
 		if (this.keys['enter'] && !this.status) {
@@ -161,9 +181,9 @@ export class Block {
 					
 					if (ball.x - ball.radius / 2 >= brickLeft && ball.x + ball.radius / 2 <= brickRight &&
 						ball.y - ball.radius / 2 >= brickTop && ball.y + ball.radius / 2 <= brickBottom) {
-						
 
 						brick.beenHit();
+						this.updateWin();
 						ball.moveTo(ball.x, (brick.getY() * this.brickHeight) + this.brickHeight + ball.radius);
 						ball.speedy *= -1;
 
@@ -173,15 +193,14 @@ export class Block {
 			}
 		}
 
-		// console.log("ball => ", ball.x, ",", ball.y);
-
 		ball.collisionWindow(this.width, true);
 
-		if (ball.lost(this.height)) {
+		if (this.win || this.lost) {
 			this.status = false;
+			
 			// api.post(game(temp de la game, gagnee ou perdue, nombre de coups de paddle pour les stats))
 		}
-		
+
 		ball.move();
 	}
 

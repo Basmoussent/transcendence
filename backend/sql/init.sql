@@ -16,7 +16,7 @@ CREATE TABLE IF NOT EXISTS games (
   player3 TEXT,
   player4 TEXT,
   winner TEXT,
-  start_time TEXT NOT NULL,
+  start_time TEXT,
   end_time TEXT
 );
 
