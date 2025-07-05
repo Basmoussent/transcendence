@@ -8,6 +8,7 @@ https://dooglz.github.io/set09121/pong2.html
 // probleme vient de startPoint ??
 
 // a faire
+    // ajouter l'offset aux ia
     // reprendre backend/src/routes/game.ts
     // power ups - aleatoire entre : (peut etre annonce en fond)
         // paddle + grand/+ petit pour l'adversaire
@@ -23,6 +24,9 @@ https://dooglz.github.io/set09121/pong2.html
             // on en active un random
 
     // IA
+        // calculer ou le paddle va aller plutot que de check sa pos par rapport a la balle
+            // pcq sinon interdit
+        // si grosse diff entre middle et hard je degage easy
         // si la balle est pas en train de venir vers lui se replacer au milieu
             // sauf si c'est un paddle up down
                 // let time: number = Date.now() / 1000;

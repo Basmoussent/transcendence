@@ -17,7 +17,6 @@ export class Ball {
   }
 
   drawBall(ctx: CanvasRenderingContext2D, x: number, y: number, size: number): void {
-    console.log('drawing ball...');
     ctx.beginPath();
     ctx.arc(x, y, size, 0, Math.PI * 2);
     ctx.fillStyle = '#ffffff';
@@ -26,7 +25,6 @@ export class Ball {
   }
 
   addBallSpeed(): void {
-    console.log('adding BallSpeed...');
     if (this.speedX > 0 && this.speedX < 12)
       this.speedX += 0.25;
     else if (this.speedX < 0 && this.speedX > -12)
@@ -34,7 +32,6 @@ export class Ball {
   }
 
   adjustBallDir(paddle: Paddle | PaddleAI): void {
-    console.log('adjusting normal ball dir...');
     const hitY = this.y;
 
     const paddleTop = paddle.y;

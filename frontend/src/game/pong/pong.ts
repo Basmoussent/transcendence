@@ -37,8 +37,8 @@ export class Pong {
 		this.paddles = [
 			new Paddle(20, 100, 0, 0, 8),
 			new PaddleAI(20, 100, 0, 0, 8, 0),
-			null,
-			null
+			new PaddleAI(100, 20, 0, 0, 8, 0),
+			new PaddleAI(100, 20, 0, 0, 8, 0),
 		];
 
 		this.ball = new Ball(this.height, this.width);
@@ -322,11 +322,15 @@ export class Pong {
 			this.paddles[1].updatePaddleRightLeft(this.keys, 'arrowup', 'arrowdown', this.paddles, this.height);
 
 		const player3 = this.paddles[2];
-		if (player3)
+		if (player3 && player3 instanceof PaddleAI)
+			player3?.middleUpDown(this.ball, this.paddles, this.width, this.height);
+		else if (player3)
 			player3?.updatePaddleUpDown(this.keys, 'k', 'l', this.paddles, this.width);
 
 		const player4 = this.paddles[3];
-		if (player4)
+		if (player4 && player4 instanceof PaddleAI)
+			player4?.middleUpDown(this.ball, this.paddles, this.width, this.height);
+		else if (player4)
 			player4?.updatePaddleUpDown(this.keys, '5', '6', this.paddles, this.width);
 
 		this.updateBall(this.ball);
