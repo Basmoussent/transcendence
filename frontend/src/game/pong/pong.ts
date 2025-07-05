@@ -34,8 +34,8 @@ export class Pong {
 
     // !!! modifier ca avec les infos de la partie
     this.paddles = [
-      new Paddle(20, 100, 0, 0, 8),
-      new Paddle(20, 100, 0, 0, 8),
+      new Paddle(20, 100, 0, 0, 8, false),
+      new Paddle(20, 100, 0, 0, 8, true),
       null,
       null
     ];
@@ -133,7 +133,6 @@ export class Pong {
   }
 
   private displayStartMsg(): void {
-    console.log('Display start msg...');
     this.ctx.globalAlpha = 0.2;
     this.ctx.fillStyle = 'white';
     this.ctx.font = '48px sans-serif'; // changer police
@@ -143,7 +142,6 @@ export class Pong {
   }
 
   private drawLine(): void {
-    console.log('Drawing line...');
     this.ctx.beginPath();
     this.ctx.moveTo(this.width / 2, 30);
     this.ctx.lineTo(this.width / 2, this.height - 30);
@@ -153,7 +151,6 @@ export class Pong {
   }
 
   private displayScore(): void {
-    console.log('Display score...');
     this.ctx.globalAlpha = 0.2;
 
     // ligne du milieu que si y'a 2 joueurs
@@ -180,7 +177,6 @@ export class Pong {
   }
 
   private displayResult(): void {
-    console.log('Display result...');
     this.ctx.globalAlpha = 0.2;
     this.ctx.fillStyle = 'white';
     this.ctx.font = '48px sans-serif'; // changer police
@@ -198,7 +194,6 @@ export class Pong {
   }
 
   private startPoint(): void {
-    console.log('starting point...');
     const paddle = this.paddles[this.lastPlayerColl];
     if (paddle)
       paddle.score++;
@@ -215,7 +210,6 @@ export class Pong {
     if (!paddle)
       return ;
 
-    console.log('adjusting multiplayer ball dir...');
     const hitX = ball.x;
 
     const paddleLeft = paddle.x;
@@ -235,7 +229,6 @@ export class Pong {
   }
 
   private ballPaddleCollision(): void {
-    console.log('ball paddle normal collision...');
     if (this.ball.x - this.ball.radius <= this.paddles[0].x + this.paddles[0].width && this.ball.y + this.ball.radius >= this.paddles[0].y && this.ball.y - this.ball.radius <= this.paddles[0].y + this.paddles[0].height && this.ball.x > this.paddles[0].x) {
       this.ball.addBallSpeed();
       this.ball.speedx *= -1;
@@ -255,7 +248,6 @@ export class Pong {
   }
 
   private ballMultiplayerCollision(): void {
-    console.log('ball paddle multiplayer collision...');
     const player3 = this.paddles[2]; // haut
 
     if (player3 &&
@@ -296,7 +288,6 @@ export class Pong {
   }
 
   private updateBall(ball: typeof this.ball): void {
-    console.log('updating ball position...');
     const player3 = this.paddles[2];
     const player4 = this.paddles[3];
 
@@ -322,9 +313,12 @@ export class Pong {
   }
 
   private update(): void {
-    console.log('jvais update');
     this.paddles[0].updatePaddleRightLeft(this.keys, 'w', 's', this.paddles, this.height);
-    this.paddles[1].updatePaddleRightLeft(this.keys, 'arrowup', 'arrowdown', this.paddles, this.height);
+
+    if (this.paddles[1].ai)
+      this.paddles[1].updateAIRightLeft(this.ball, this.paddles, this.height);
+    else
+      this.paddles[1].updatePaddleRightLeft(this.keys, 'arrowup', 'arrowdown', this.paddles, this.height);
 
     const player3 = this.paddles[2];
     if (player3)
@@ -338,7 +332,6 @@ export class Pong {
   }
 
   private render(): void {
-    console.log('rendering...');
   
     // on efface tout
     this.ctx.clearRect(0, 0, this.width, this.height);

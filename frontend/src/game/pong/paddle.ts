@@ -2,7 +2,6 @@ import { PADDLE_OFFSET } from "./const";
 
 export class Paddle {
     name: string;
-    ia: boolean;
     width: number;
     height: number;
     x: number;
@@ -14,7 +13,6 @@ export class Paddle {
 
     constructor(width: number, height: number, x: number, y: number, speed: number) {
         this.name = "Player";
-        this.ia = false;
         this.width = width;
         this.height = height;
         this.x = x;
@@ -83,7 +81,6 @@ export class Paddle {
         const player2 = paddles[1]; // droite
 
         if (keys[downKey]) {
-            console.log('keydown detectee');console.log('keydown detectee');console.log('keydown detectee');console.log('keydown detectee');
             let canMove = true;
             const verticalOverlap = this.y < player2.y + player2.height && this.y + this.height > player2.y;
             const horizontalCollision = this.x + this.width >= player2.x - PADDLE_OFFSET;
@@ -98,7 +95,6 @@ export class Paddle {
         }
 
         if (keys[upKey]) {
-            console.log('keyup detectee');console.log('keyup detectee');console.log('keyup detectee');console.log('keyup detectee');console.log('keyup detectee');console.log('keyup detectee');
             let canMove = true;
             const verticalOverlap = this.y < player1.y + player1.height && this.y + this.height > player1.y;
             const horizontalCollision = this.x <= player1.x + player1.width + PADDLE_OFFSET;
@@ -110,43 +106,48 @@ export class Paddle {
                 this.moveLeft();
             else
                 this.x = PADDLE_OFFSET + paddles[0].width;
-            }
-  }
-
-  updatePaddleRightLeft(keys: { [key: string]: boolean }, upKey: string, downKey: string, paddles: [Paddle, Paddle, (Paddle | null)?, (Paddle | null)?], canvasHeight: number): void {
-    const player3 = paddles[2]; // haut
-    const player4 = paddles[3]; // bas
-
-    if (keys[upKey]) {
-        console.log('keyup detectee');console.log('keyup detectee');console.log('keyup detectee');console.log('keyup detectee');console.log('keyup detectee');console.log('keyup detectee');
-      let canMove = true;
-      if (player3) {
-        const horizontalOverlap = this.x < player3.x + player3.width && this.x + this.width > player3.x;
-        const verticalCollision = this.y <= player3.y + player3.height + PADDLE_OFFSET;
-
-        if (horizontalOverlap && verticalCollision)
-          canMove = false;
-      }
-      if (canMove)
-        this.moveUp();
-      else if (player3)
-        this.y = PADDLE_OFFSET + player3.height; // eviter collision avec player3
+        }
     }
 
-    if (keys[downKey]) {
-        console.log('keydown detectee');console.log('keydown detectee');console.log('keydown detectee');console.log('keydown detectee');
-      let canMove = true;
-      if (player4) {
-        const horizontalOverlap = this.x < player4.x + player4.width && this.x + this.width > player4.x;
-        const verticalCollision = this.y + this.height >= player4.y - PADDLE_OFFSET;
+    private   checkAndMoveUp(player3: Paddle | null | undefined): void {
+        let canMove = true;
 
-        if (horizontalOverlap && verticalCollision)
-          canMove = false;
-      }
-      if (canMove)
-        this.moveDown(canvasHeight);
-      else if (player4)
-        this.y = canvasHeight - PADDLE_OFFSET - player4.height - this.height; // eviter collision avec player4
+        if (player3) {
+            const horizontalOverlap = this.x < player3.x + player3.width && this.x + this.width > player3.x;
+            const verticalCollision = this.y <= player3.y + player3.height + PADDLE_OFFSET;
+
+            if (horizontalOverlap && verticalCollision)
+                canMove = false;
+        }
+
+        if (canMove)
+            this.moveUp();
+        else if (player3)
+            this.y = PADDLE_OFFSET + player3.height; // eviter collision avec player3
     }
-  }
+
+    private   checkAndMoveDown(player4: Paddle | null | undefined, canvasHeight: number): void {
+        let canMove = true;
+
+        if (player4) {
+            const horizontalOverlap = this.x < player4.x + player4.width && this.x + this.width > player4.x;
+            const verticalCollision = this.y + this.height >= player4.y - PADDLE_OFFSET;
+
+            if (horizontalOverlap && verticalCollision)
+                canMove = false;
+        }
+
+        if (canMove)
+            this.moveDown(canvasHeight);
+        else if (player4)
+            this.y = canvasHeight - PADDLE_OFFSET - player4.height - this.height; // eviter collision avec player4
+    }
+
+    updatePaddleRightLeft(keys: { [key: string]: boolean }, upKey: string, downKey: string, paddles: [Paddle, Paddle, (Paddle | null)?, (Paddle | null)?], canvasHeight: number): void {
+        if (keys[upKey])
+            this.checkAndMoveUp(paddles[2]);
+
+        if (keys[downKey])
+            this.checkAndMoveDown(paddles[3], canvasHeight);
+    }
 }

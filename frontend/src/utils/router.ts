@@ -14,6 +14,7 @@ import { renderEditProfil, initializeEditProfileEvents } from '../pages/social/e
 import { getAuthToken } from './auth';
 import { clearTranslationCache } from './translations';
 import { renderPong } from '../pages/pong/main';
+import { renderChooseGame } from '../pages/game/choose-game';
 
 export async function router() {
   // Clear translation cache to ensure fresh translations
@@ -94,6 +95,8 @@ export async function router() {
       break;
     case '/block':
       view = renderBlock();
+    case '/game':
+      view = renderChooseGame();
       break;
     case '/change-password':
       view = renderChangePassword();

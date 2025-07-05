@@ -28,14 +28,14 @@ export function renderMain() {
             ${t('menu.friends')}
           </button>
 
-          <button class="menu-button pong-game-button" id="pongBtn">
-            <i class="fa-solid fa-trophy"></i>
-            Pong Game
-          </button>
-
           <button class="menu-button block-game-button" id="blockBtn">
             <i class="fas fa-cube"></i>
             Block Game
+          </button>
+
+          <button class="menu-button pong-game-button" id="pongBtn">
+            <i class="fas fa-cube"></i>
+            Pong Game
           </button>
           
           <button class="menu-button logout-button" id="logoutBtn">
@@ -134,7 +134,7 @@ export function renderMain() {
         background: linear-gradient(135deg, #f1c40f 0%, #f39c12 100%);
       }
 
-      .pong-game-button {
+      .game-button {
         background: linear-gradient(135deg, #ff8000 0%, #f39c12 100%);
       }
 
@@ -247,6 +247,7 @@ function initializeMainEvents() {
   const friendsBtn = document.getElementById('friendsBtn');
   const blockGameBtn = document.getElementById('blockBtn');
   const pongGameBtn = document.getElementById('pongBtn');
+  // const gameBtn = document.getElementById('gameBtn');
   const logoutBtn = document.getElementById('logoutBtn');
 
   if (profileBtn) {
@@ -290,6 +291,13 @@ function initializeMainEvents() {
       window.dispatchEvent(new PopStateEvent('popstate'));
     });
   }
+
+  // if (gameBtn) {
+  //   gameBtn.addEventListener('click', () => {
+  //     window.history.pushState({}, '', '/game');
+  //     window.dispatchEvent(new PopStateEvent('popstate'));
+  //   });
+  // }
 
   if (logoutBtn) {
     logoutBtn.addEventListener('click', async () => {

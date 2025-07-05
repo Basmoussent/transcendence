@@ -27,6 +27,8 @@ https://dooglz.github.io/set09121/pong2.html
             // on en active un random
 
     // IA
+        // si la balle est pas en train de venir vers lui se replacer au milieu
+            // sauf si c'est un paddle up down
                 // let time: number = Date.now() / 1000;
                 // console.log('time = ', time);
         // j'ai besoin de savoir qu'un de mes joueurs est une IA 
