@@ -5,8 +5,6 @@ export class Block {
 	private ctx: CanvasRenderingContext2D;
 	private width: number;
 	private height: number;
-	private bHeight: number;
-	private bWidth: number;
 	private status: boolean;
 	private username: string;
 
@@ -31,12 +29,10 @@ export class Block {
 		this.ctx = context;
 		this.width = canvas.width;
 		this.height = canvas.height;
-		this.bHeight = 0;
-		this.bWidth = 0;
 		this.username = "ko";
 
 		this.paddle = new Paddle(0, 0, 14);
-		this.ball = new Ball(this.width / 2, this.height / 4); // this.width et this.height are false
+		this.ball = new Ball(0, 0); // this.width et this.height are false
 
 		this.keys = {};
 		this.bricks = [];
@@ -44,19 +40,6 @@ export class Block {
 			this.bricks.push(createRandomBrick(it));
 		this.loadUsername();
 
-	}
-
-	private brickId(x: number, y: number): number {
-		var _x = Math.round((x * 20)/ this.width);
-		var _y = Math.round((y * 20)/ this.height);
-
-		if (_y != 0)
-			--_y;
-
-		if (_x >= 20 || _y >= 5)
-			console.error("brick undefined (", _x, ",", _y, ")");
-
-		return ((20 * _y) + _x);
 	}
 
 	private async loadUsername() {
@@ -102,9 +85,6 @@ export class Block {
 		this.paddle.x = (this.width - this.paddle.width) / 2;
 		this.paddle.y = this.height - this.paddle.height - 12; // 20 de base
 
-		this.bWidth = this.width / 20;
-		this.bHeight = this.height / 20;
-		
 		console.log('Canvas size:', this.width, this.height);
 		console.log('Paddle position:', this.paddle.x, this.paddle.y);
 	}
@@ -136,7 +116,7 @@ export class Block {
 			// this.bricks = [];
 			// for (let it = 0; it < 100; ++it)
 			// 	this.bricks.push(createRandomBrick(it));
-			ball.reset(this.width / 2, this.height / 4)
+			ball.reset(this.width / 2, (this.height / 4) + 5)
 			this.status = true;
 		}
 
@@ -149,85 +129,17 @@ export class Block {
 			this.paddle.move("right", this.width)
 
 		ball.collisionPadd(this.paddle);
-		ball.collisionWindow(this.width, true);
-
-		// collisions ball -> bricks
-		// if (ball.y - ball.radius + ball.speedy <= this.height / 4) {
-
-		// 	var it = 0;
-
-		// 	for (; it != ball.speedy;) {
-		// 		ball.speedy < 0 ? --it: ++it;
-		// 		if (ball.y - ball.radius + it <= this.height / 4)
-		// 			break;
-		// 	}
-		// 	ball.moveTo(ball.x + it, ball.y + it);
-
-		// 	for (; it != ball.speedy;) {
-		// 		ball.speedy < 0 ? --it: ++it;
-		// 		if (this.bricks[this.brickId(ball.x, ball.y)].getHp()) {
-		// 			this.bricks[this.brickId(ball.x, ball.y)].beenHit();
-
-		// 			var _x = Math.round((ball.x * 20)/ this.width);
-		// 			var _y = Math.round((ball.y * 20)/ this.height);
-
-		// 			if (_y != 0)
-		// 				--_y;
-
-		// 			console.log("beenHit (", _x, ",", _y, ")");
-
-		// 			ball.moveTo(ball.x + it, ball.y + it);
-		// 			ball.speedy *= -1;
-		// 			// if (!this.brick[id].getHp())
-		// 				// on vient de casser une brick
-		// 				// si c'etait la derniere le joueur a gagne
-		// 			break;
-		// 		}
-		// 	}
-		// }
-
-		console.log("ball speedy ", ball.speedy);
+		ball.collisionWindow(this.width);
 
 		if (ball.lost(this.height)) {
-			console.log("le y du paddle: ", this.paddle.y);
 			this.status = false;
 			// api.post(game(temp de la game, gagnee ou perdue, nombre de coups de paddle pour les stats))
 		}
 		
 		ball.move();
-		console.log("le y du paddle: ", this.paddle.y);
-
-
 	}
 
 	private renderBricks() {
-		let	it = -1;
-
-		for (const brick of this.bricks) {
-
-			++it
-			if (!brick.getHp())
-				continue;
-
-			let x = this.width / 20 * (it % 20);
-			let y = this.height / 20 * Math.floor(it / 20);
-
-			this.ctx.fillStyle = brick.getColor();
-			this.ctx.fillRect(x, y, this.bWidth, this.bHeight);
-		}		
-	}
-
-	private powerCollision(ballx: number, bally: number, ballradius: number) {
-		// Trouver le point du rectangle le plus proche du centre du cercle
-		const closestX = Math.max(this.x, Math.min(ballx, this.x + this.width));
-		const closestY = Math.max(this.y, Math.min(bally, this.y + this.height));
-
-		// Calculer la distance entre ce point et le centre du cercle
-		const dx = ballx - closestX;
-		const dy = bally - closestY;
-
-		// Collision si distance^2 < rayon^2
-		return (dx * dx + dy * dy) <= ballradius * ballradius;
 	}
 
 	private drawBall(ball: typeof this.ball): void {
