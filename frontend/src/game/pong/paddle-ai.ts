@@ -22,7 +22,7 @@ export class PaddleAI {
     mode: number; // easy = 0 / middle = 1 / hard = 2
 
     constructor(width: number, height: number, x: number, y: number, speed: number, mode: number) {
-        this.name = "Player";
+        this.name = "AI Player";
         this.width = width;
         this.height = height;
         this.x = x;
@@ -255,6 +255,7 @@ export class PaddleAI {
         	this.lastRefresh = Date.now() / 1000;
 		}
     }
+	
 	// utilise les coordonnees de la balle et sa vitesse pour calculer targetY (chaque seconde)
 	middleRightLeft(ball: Ball, paddles: [Paddle, Paddle | PaddleAI, (Paddle | PaddleAI | null)?, (Paddle | PaddleAI | null)?], canvasHeight: number): void {
 		if (this.up && this.y > this.targetY) // changer par un calcul prediction ou sera le paddle

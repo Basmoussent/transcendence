@@ -1,7 +1,0 @@
-2025/07/04 13:10:24 [notice] 1#1: ModSecurity-nginx v1.0.4 (rules loaded inline/local/remote: 0/10/0)
-2025/07/04 13:10:24 [notice] 1#1: libmodsecurity3 version 3.0.14
-2025/07/04 13:10:28 [warn] 344#344: *2 an upstream response is buffered to a temporary file /var/cache/nginx/proxy_temp/1/00/0000000001 while reading upstream, client: 172.18.0.1, server: fr.localhost, request: "GET /@vite/client HTTP/1.1", upstream: "http://172.18.0.8:5173/@vite/client", host: "localhost:2443", referrer: "https://localhost:2443/pong"
-2025/07/05 12:25:49 [notice] 1#1: ModSecurity-nginx v1.0.4 (rules loaded inline/local/remote: 0/10/0)
-2025/07/05 12:25:49 [notice] 1#1: libmodsecurity3 version 3.0.14
-2025/07/05 13:53:06 [notice] 1#1: ModSecurity-nginx v1.0.4 (rules loaded inline/local/remote: 0/10/0)
-2025/07/05 13:53:06 [notice] 1#1: libmodsecurity3 version 3.0.14

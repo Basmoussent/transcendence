@@ -1,7 +1,7 @@
 import { Ball } from "./ball";
 import { Paddle } from "./paddle";
 import { PaddleAI } from "./paddle-ai";
-import { Power } from "./power";
+import { Power, randomInt } from "./power";
 import { PADDLE_OFFSET } from "./const";
 
 export class Pong {
@@ -301,7 +301,7 @@ export class Pong {
 			this.ballMultiplayerCollision();
 
 		// check scored point et relancer si oui
-		if (ball.x - ball.radius > this.width || ball.x + ball.radius <= 0 || (player3 && ball.y - ball.radius <= 0) || (player4 && ball.y + ball.radius >= this.height))
+		if (ball.x - ball.radius > this.width || ball.x + ball.radius <= 0 || (player3 && ball.y + ball.radius < 0) || (player4 && ball.y - ball.radius > this.height))
 			this.startPoint();
 
 		// check wall collision haut

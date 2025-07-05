@@ -3,17 +3,13 @@ https://stackoverflow.com/questions/4577814/pong-how-does-the-paddle-know-where-
 https://dooglz.github.io/set09121/pong2.html
 
 // pour que ca fonctionne bien
-    // le jeu ne doit jamais etre lance avec paddles[0] ou paddles[1] null
+    // le jeu ne doit jamais etre lance avec paddles[0] ou paddles[1] null/undefined
 
-// probleme vient de startPoint ??
 
 // a faire
+    // faire en sorte que les joueurs haut bas aussi recoivent la balle au debut du point
     // ajouter l'offset aux ia
     // reprendre backend/src/routes/game.ts
-    // power ups - aleatoire entre : (peut etre annonce en fond)
-        // paddle + grand/+ petit pour l'adversaire
-        // balle en trop
-        // commandes de l'adversaire sont inversees pendant 4/5 sec
     // stocker les scores API
     // police avec l'API
         // ajuster texte au milieu pcq la c'est bancal
@@ -22,10 +18,14 @@ https://dooglz.github.io/set09121/pong2.html
         // garder une seule struct de base avec toutes les infos
         // seule diff sera au moment de la collision avec le power
             // on en active un random
+        // power ups - aleatoire entre : (peut etre annonce en fond)
+                // paddle + grand/+ petit pour l'adversaire
+                // balle en trop
+                // commandes de l'adversaire sont inversees pendant 4/5 sec
 
     // IA
         // calculer ou le paddle va aller plutot que de check sa pos par rapport a la balle
-            // pcq sinon interdit
+            // pcq sinon interdit??
         // si grosse diff entre middle et hard je degage easy
         // si la balle est pas en train de venir vers lui se replacer au milieu
             // sauf si c'est un paddle up down
