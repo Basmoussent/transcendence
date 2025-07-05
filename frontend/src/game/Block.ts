@@ -120,7 +120,7 @@ export class Block {
 			// this.bricks = [];
 			// for (let it = 0; it < 100; ++it)
 			// 	this.bricks.push(createRandomBrick(it));
-			ball.reset(this.width / 2, (this.height / 4) + 5)
+			ball.reset(this.width / 2, (this.height / 4) + 5, 3, 6)
 			this.status = true;
 		}
 
@@ -132,7 +132,7 @@ export class Block {
 		if (this.keys['d'])
 			this.paddle.move("right", this.width)
 
-		ball.collisionPadd(this.paddle);
+		ball.collisionPadd1(this.paddle);
 		
 		if (ball.y <= this.height / 4 && ball.y > 0) {
 

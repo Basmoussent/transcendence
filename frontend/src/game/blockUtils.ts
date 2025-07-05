@@ -55,14 +55,13 @@ export class Ball {
 		this.y += this.speedy;
 	}
 
-	public reset(_x:number, _y:number,) {
+	public reset(_x:number, _y:number, _speedx:number, _speedy:number) {
 		this.x = _x
 		this.y = _y
 		this.radius = 10
-		this.speedx = 1
-		this.speedy = 7
+		this.speedx = _speedx
+		this.speedy = _speedy
 	}
-
 
 	public lost(height:number): boolean {
 
@@ -76,7 +75,7 @@ export class Ball {
 		this.y = _y;
 	}
 
-	public collisionPadd(paddle: Paddle) {
+	public collisionPadd1(paddle: Paddle) {
 
 		if (!(this.y + this.radius >= paddle.y && 
 			this.y - this.radius <= paddle.y + paddle.height))
@@ -113,6 +112,43 @@ export class Ball {
 			if (this.speedy > 0)
 				this.y = paddle.y - this.radius - 1;
 		}		
+	}
+
+	public collisionPadd2(paddle: Paddle) {
+
+		if (!(this.y - this.radius <= paddle.y + paddle.height && 
+			this.y + this.radius >= paddle.y))
+			return;
+			
+		if (this.x + this.radius >= paddle.x && 
+			this.x - this.radius <= paddle.x + paddle.width) {
+			
+			const relativeIntersectX = (this.x - paddle.x) / paddle.width;
+
+			// Calculer l'angle de rebond basé sur la position d'impact
+			const bounceAngle = (relativeIntersectX - 0.5) * Math.PI / 3; // Max 60°
+
+			const speed = Math.sqrt(this.speedx * this.speedx + this.speedy * this.speedy);
+
+			const leftEdge = paddle.x + paddle.width * 0.1;
+			const rightEdge = paddle.x + paddle.width * 0.9;
+
+			if (this.x < leftEdge) {
+				this.speedx = -Math.abs(speed * Math.sin(bounceAngle));
+				this.speedy = Math.abs(speed * Math.cos(bounceAngle));
+			}
+			else if (this.x > rightEdge) {
+				this.speedx = Math.abs(speed * Math.sin(bounceAngle));
+				this.speedy = Math.abs(speed * Math.cos(bounceAngle));
+			}
+			else {
+				this.speedx = speed * Math.sin(bounceAngle);
+				this.speedy = Math.abs(speed * Math.cos(bounceAngle));
+			}
+
+			if (this.speedy < 0)
+				this.y = paddle.y + paddle.height + this.radius + 1;
+		}	
 	}
 
 	public collisionWindow(width: number) {
