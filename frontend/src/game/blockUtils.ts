@@ -59,8 +59,8 @@ export class Ball {
 		this.x = _x
 		this.y = _y
 		this.radius = 10
-		this.speedx = 0
-		this.speedy = 8
+		this.speedx = 1
+		this.speedy = 7
 	}
 
 
@@ -132,9 +132,6 @@ export class Ball {
 	}
 
 }
-	
-
-
 
 export abstract class brick {
 
@@ -164,12 +161,12 @@ export abstract class brick {
 
 class blue extends brick {
 	constructor(_id:number) {
-		super(1, _id, "blue", "#00ABE7"); }
+		super(1, _id, "blue", "#4780B1"); }
 }
 
 class green extends brick {
 	constructor(_id:number) {
-		super(1, _id, "green", "#81D17D"); }
+		super(1, _id, "green", "#61AB39"); }
 }
 
 class red extends brick {

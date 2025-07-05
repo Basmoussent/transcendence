@@ -7,6 +7,8 @@ export class Block {
 	private height: number;
 	private status: boolean;
 	private username: string;
+	private brickWidth: number;
+	private brickHeight: number;
 
 	private ball: Ball;
 	private paddle: Paddle;
@@ -30,6 +32,8 @@ export class Block {
 		this.width = canvas.width;
 		this.height = canvas.height;
 		this.username = "ko";
+		this.brickWidth = this.width / 20;
+		this.brickHeight = this.height / 20;
 
 		this.paddle = new Paddle(0, 0, 14);
 		this.ball = new Ball(0, 0); // this.width et this.height are false
@@ -129,6 +133,25 @@ export class Block {
 			this.paddle.move("right", this.width)
 
 		ball.collisionPadd(this.paddle);
+		
+		if (ball.y <= this.height / 4 && ball.y > 0) {
+
+			let row = Math.floor(ball.y / (this.height / 5 ) * 5);
+			let index = Math.floor(ball.x / (this.width) * 20);
+
+			if (row > 4)
+				row = 4;
+
+			console.log("row - index, ", row, " ", index);
+
+			if (this.bricks[(row * 20) + index].getHp()) {
+
+				this.bricks[(row * 20) + index].beenHit();
+				ball.speedy *= -1;
+			}
+		}
+		console.log("ball => ", ball.x, ",", ball.y);
+
 		ball.collisionWindow(this.width);
 
 		if (ball.lost(this.height)) {
@@ -140,6 +163,16 @@ export class Block {
 	}
 
 	private renderBricks() {
+
+		for (var row = 0; row < 5; ++row) {
+			for (var index = 0; index < 20; ++index) {
+				if (!this.bricks[(row * 20) + index].getHp())
+					continue ;
+				this.bricks[(row * 20) + index].getColor();
+				this.ctx.fillStyle = this.bricks[(row * 20) + index].getColor();
+				this.ctx.fillRect(Math.round(this.width / 20 * index), Math.round(this.height / 20 * row), Math.round(this.width / 20), Math.round(this.height / 20));
+			}
+		}
 	}
 
 	private drawBall(ball: typeof this.ball): void {
