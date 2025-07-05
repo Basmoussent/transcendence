@@ -1,0 +1,54 @@
+https://stackoverflow.com/questions/4577814/pong-how-does-the-paddle-know-where-the-ball-will-hit
+
+https://dooglz.github.io/set09121/pong2.html
+
+
+
+// pour que ca fonctionne bien
+    // le jeu ne doit jamais etre lance avec paddles[0] ou paddles[1] null
+    // jamais paddles[4] pas null et paddles[3] null
+
+
+// probleme vient de startPoint ??
+
+// a faire
+    // reprendre backend/src/routes/game.ts
+    // power ups - aleatoire entre : (peut etre annonce en fond)
+        // paddle + grand/+ petit pour l'adversaire
+        // balle en trop
+        // freeze du paddle de l'adversaire pendant genre 1sec
+    // stocker les scores API
+    // police avec l'API
+        // ajuster texte au milieu pcq la c'est bancal
+
+    // pour les pouvoirs:
+        // garder une seule struct de base avec toutes les infos
+        // seule diff sera au moment de la collision avec le power
+            // on en active un random
+
+    // IA
+                // let time: number = Date.now() / 1000;
+                // console.log('time = ', time);
+        // j'ai besoin de savoir qu'un de mes joueurs est une IA 
+    // recup le timestamp et laisser une seconde sans rien faire
+        // if lastTS + 1s < currentTS -> return
+        // et a la fin de la fct lastTS = currentTS
+    // tester
+        // si la balle est au dessus du paddle monter
+        // si la balle est en dessous du paddle descendre
+
+        // calculer a l'avance mouvements de balle et aller a l'endroit de la collision
+
+    // une page d'accueil du jeu ou le joueur peut choisir:
+        // activer les powers ups dans la partie
+        // choisir d'ajouter des ia ou non
+        // nombre de joueurs
+
+    // amis
+      // paires d'amis avec chacun son etat
+        // savoir qui a fait la demande
+        // qui a bloque l'autre
+
+
+    // la page principale du site renvoie vers la liste de boutons pas vers login
+    // la page edit profile pourrait etre + lisible

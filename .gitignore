@@ -41,4 +41,6 @@ backend/vault-credentials/
 backend/uploads/*
 
 # BDD
-backend/data/
+backend/data/*
+
+docker/nginx/logs/*

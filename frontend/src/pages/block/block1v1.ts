@@ -1,4 +1,4 @@
-import { Block1v1 } from '../../game/Block1v1';
+import { Block1v1 } from '../../game/block/Block1v1';
 
 export function renderBlock1v1() {
   // Créer le HTML
