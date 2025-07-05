@@ -1,4 +1,5 @@
 import { Paddle } from "./paddle";
+import { PaddleAI } from "./paddle-ai";
 
 export class Ball {
   radius: number;
@@ -32,7 +33,7 @@ export class Ball {
       this.speedx -= 0.25;
   }
 
-  adjustBallDir(paddle: Paddle): void {
+  adjustBallDir(paddle: Paddle | PaddleAI): void {
     console.log('adjusting normal ball dir...');
     const hitY = this.y;
 

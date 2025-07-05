@@ -1,4 +1,5 @@
 import { PADDLE_OFFSET } from "./const";
+import { PaddleAI } from "./paddle-ai";
 
 export class Paddle {
     name: string;
@@ -76,40 +77,44 @@ export class Paddle {
         );
     }
 
-    updatePaddleUpDown(keys: { [key: string]: boolean }, upKey: string, downKey: string, paddles: [Paddle, Paddle, (Paddle | null)?, (Paddle | null)?], canvasWidth: number): void {
-        const player1 = paddles[0]; // gauche
-        const player2 = paddles[1]; // droite
+    private checkAndMoveRight(player2: Paddle | PaddleAI, canvasWidth: number): void {
+      let canMove = true;
+      const verticalOverlap = this.y < player2.y + player2.height && this.y + this.height > player2.y;
+      const horizontalCollision = this.x + this.width >= player2.x - PADDLE_OFFSET;
 
-        if (keys[downKey]) {
-            let canMove = true;
-            const verticalOverlap = this.y < player2.y + player2.height && this.y + this.height > player2.y;
-            const horizontalCollision = this.x + this.width >= player2.x - PADDLE_OFFSET;
+      if (verticalOverlap && horizontalCollision)
+          canMove = false;
 
-            if (verticalOverlap && horizontalCollision)
-                canMove = false;
-
-            if (canMove)
-                this.moveRight(canvasWidth);
-            else
-                this.x = canvasWidth - PADDLE_OFFSET - this.width - paddles[1].width;
-        }
-
-        if (keys[upKey]) {
-            let canMove = true;
-            const verticalOverlap = this.y < player1.y + player1.height && this.y + this.height > player1.y;
-            const horizontalCollision = this.x <= player1.x + player1.width + PADDLE_OFFSET;
-
-            if (verticalOverlap && horizontalCollision)
-                canMove = false;
-
-            if (canMove)
-                this.moveLeft();
-            else
-                this.x = PADDLE_OFFSET + paddles[0].width;
-        }
+      if (canMove)
+          this.moveRight(canvasWidth);
+      else
+          this.x = canvasWidth - PADDLE_OFFSET - this.width - player2.width;
     }
 
-    private   checkAndMoveUp(player3: Paddle | null | undefined): void {
+    private checkAndMoveLeft(player1: Paddle): void {
+      let canMove = true;
+      const verticalOverlap = this.y < player1.y + player1.height && this.y + this.height > player1.y;
+      const horizontalCollision = this.x <= player1.x + player1.width + PADDLE_OFFSET;
+
+      if (verticalOverlap && horizontalCollision)
+          canMove = false;
+
+      if (canMove)
+          this.moveLeft();
+      else
+          this.x = PADDLE_OFFSET + player1.width;
+    }
+    
+    updatePaddleUpDown(keys: { [key: string]: boolean }, upKey: string, downKey: string, paddles: [Paddle, Paddle | PaddleAI, (Paddle | PaddleAI | null)?, (Paddle | PaddleAI | null)?], canvasWidth: number): void {
+
+        if (keys[downKey])
+            this.checkAndMoveRight(paddles[1], canvasWidth);
+
+        if (keys[upKey])
+            this.checkAndMoveLeft(paddles[0]);
+    }
+
+    private   checkAndMoveUp(player3: Paddle | PaddleAI | null | undefined): void {
         let canMove = true;
 
         if (player3) {
@@ -126,7 +131,7 @@ export class Paddle {
             this.y = PADDLE_OFFSET + player3.height; // eviter collision avec player3
     }
 
-    private   checkAndMoveDown(player4: Paddle | null | undefined, canvasHeight: number): void {
+    private   checkAndMoveDown(player4: Paddle | PaddleAI | null | undefined, canvasHeight: number): void {
         let canMove = true;
 
         if (player4) {
@@ -143,7 +148,7 @@ export class Paddle {
             this.y = canvasHeight - PADDLE_OFFSET - player4.height - this.height; // eviter collision avec player4
     }
 
-    updatePaddleRightLeft(keys: { [key: string]: boolean }, upKey: string, downKey: string, paddles: [Paddle, Paddle, (Paddle | null)?, (Paddle | null)?], canvasHeight: number): void {
+    updatePaddleRightLeft(keys: { [key: string]: boolean }, upKey: string, downKey: string, paddles: [Paddle, Paddle | PaddleAI, (Paddle | PaddleAI | null)?, (Paddle | PaddleAI | null)?], canvasHeight: number): void {
         if (keys[upKey])
             this.checkAndMoveUp(paddles[2]);
 

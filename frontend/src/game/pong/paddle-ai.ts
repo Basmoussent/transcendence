@@ -14,14 +14,13 @@ export class PaddleAI {
     scorey: number;
 
     // ai
-    ai: boolean;
     lastRefresh: number | null;
     up: boolean;
     down: boolean;
     targety: number;
-    mode: number; // easy = 0/middle = 1/hard = 2
+    mode: number; // easy = 0 / middle = 1 / hard = 2
 
-    constructor(width: number, height: number, x: number, y: number, speed: number, ai: boolean) {
+    constructor(width: number, height: number, x: number, y: number, speed: number, mode: number) {
         this.name = "Player";
         this.width = width;
         this.height = height;
@@ -33,11 +32,11 @@ export class PaddleAI {
         this.scorey = 0;
 
         // ia
-        this.ai = ai;
         this.lastRefresh = null;
         this.up = false;
         this.down = false;
         this.targety = 0;
+        this.mode = mode;
     }
 
     moveUp(): void {
@@ -93,132 +92,103 @@ export class PaddleAI {
         );
     }
 
-    updatePaddleUpDown(keys: { [key: string]: boolean }, upKey: string, downKey: string, paddles: [Paddle, Paddle | PaddleAI, (Paddle | null)?, (Paddle | null)?], canvasWidth: number): void {
-        const player1 = paddles[0]; // gauche
-        const player2 = paddles[1]; // droite
+    private checkAndMoveRight(player2: Paddle | PaddleAI, canvasWidth: number): void {
+      let canMove = true;
+      const verticalOverlap = this.y < player2.y + player2.height && this.y + this.height > player2.y;
+      const horizontalCollision = this.x + this.width >= player2.x - PADDLE_OFFSET;
 
-        if (keys[downKey]) {
-            let canMove = true;
-            const verticalOverlap = this.y < player2.y + player2.height && this.y + this.height > player2.y;
-            const horizontalCollision = this.x + this.width >= player2.x - PADDLE_OFFSET;
-
-            if (verticalOverlap && horizontalCollision)
-                canMove = false;
-
-            if (canMove)
-                this.moveRight(canvasWidth);
-            else
-                this.x = canvasWidth - PADDLE_OFFSET - this.width - paddles[1].width;
-        }
-
-        if (keys[upKey]) {
-            let canMove = true;
-            const verticalOverlap = this.y < player1.y + player1.height && this.y + this.height > player1.y;
-            const horizontalCollision = this.x <= player1.x + player1.width + PADDLE_OFFSET;
-
-            if (verticalOverlap && horizontalCollision)
-                canMove = false;
-
-            if (canMove)
-                this.moveLeft();
-            else
-                this.x = PADDLE_OFFSET + paddles[0].width;
-            }
-  }
-
-  private   checkAndMoveUp(player3: Paddle | null | undefined): void {
-
-    let canMove = true;
-    if (player3) {
-    const horizontalOverlap = this.x < player3.x + player3.width && this.x + this.width > player3.x;
-    const verticalCollision = this.y <= player3.y + player3.height + PADDLE_OFFSET;
-
-    if (horizontalOverlap && verticalCollision)
-        canMove = false;
-    }
-    if (canMove)
-    this.moveUp();
-    else if (player3)
-    this.y = PADDLE_OFFSET + player3.height; // eviter collision avec player3
-  }
-
-  private   checkAndMoveDown(player4: Paddle | null | undefined, canvasHeight: number): void {
-
-    let canMove = true;
-      if (player4) {
-        const horizontalOverlap = this.x < player4.x + player4.width && this.x + this.width > player4.x;
-        const verticalCollision = this.y + this.height >= player4.y - PADDLE_OFFSET;
-
-        if (horizontalOverlap && verticalCollision)
+      if (verticalOverlap && horizontalCollision)
           canMove = false;
-      }
+
       if (canMove)
-        this.moveDown(canvasHeight);
-      else if (player4)
-        this.y = canvasHeight - PADDLE_OFFSET - player4.height - this.height; // eviter collision avec player4
-  }
-
-  updateAIRightLeft(ball: Ball, paddles: [Paddle, Paddle, (Paddle | null)?, (Paddle | null)?], canvasHeight: number): void {
-    if (this.up && this.y > this.targety)
-        this.checkAndMoveUp(paddles[2]);
-    else if (this.down && this.y < this.targety)
-        this.checkAndMoveDown(paddles[3], canvasHeight);
-    
-    // the AI can only refresh its view of the game once per second
-    if (this.lastRefresh === null || Date.now() / 1000 - this.lastRefresh >= 0.99) {
-        if (Math.abs(ball.y) < Math.abs(this.y)) {
-            this.down = false;
-            this.up = true;
-            this.targety = ball.y;
-            console.log("je dois monter");
-        }
-        else if (Math.abs(ball.y) > Math.abs(this.y)) {
-            this.up = false;
-            this.down = true;
-            this.targety = ball.y;
-            console.log("je dois descendre");
-        }
-        else if (ball.y == this.y) {
-            this.up = false;
-            this.down = false;
-        }
-        // else if la dir de la balle est pas vers nous alors on met les deux a false
-        this.lastRefresh = Date.now() / 1000;
+          this.moveRight(canvasWidth);
+      else
+          this.x = canvasWidth - PADDLE_OFFSET - this.width - player2.width;
     }
-  }
 
-  updatePaddleRightLeft(keys: { [key: string]: boolean }, upKey: string, downKey: string, paddles: [Paddle, Paddle, (Paddle | null)?, (Paddle | null)?], canvasHeight: number): void {
-    const player3 = paddles[2]; // haut
-    const player4 = paddles[3]; // bas
+    private checkAndMoveLeft(player1: Paddle): void {
+      let canMove = true;
+      const verticalOverlap = this.y < player1.y + player1.height && this.y + this.height > player1.y;
+      const horizontalCollision = this.x <= player1.x + player1.width + PADDLE_OFFSET;
 
-    if (keys[upKey]) {
+      if (verticalOverlap && horizontalCollision)
+          canMove = false;
+
+      if (canMove)
+          this.moveLeft();
+      else
+          this.x = PADDLE_OFFSET + player1.width;
+    }
+
+    updatePaddleUpDown(keys: { [key: string]: boolean }, upKey: string, downKey: string, paddles: [Paddle, Paddle | PaddleAI, (Paddle | PaddleAI | null)?, (Paddle | PaddleAI | null)?], canvasWidth: number): void {
+
+        if (keys[downKey])
+          this.checkAndMoveRight(paddles[1], canvasWidth);
+
+        if (keys[upKey])
+          this.checkAndMoveLeft(paddles[0]);
+    }
+
+    private   checkAndMoveUp(player3: Paddle | PaddleAI | null | undefined): void {
+
       let canMove = true;
       if (player3) {
-        const horizontalOverlap = this.x < player3.x + player3.width && this.x + this.width > player3.x;
-        const verticalCollision = this.y <= player3.y + player3.height + PADDLE_OFFSET;
+      const horizontalOverlap = this.x < player3.x + player3.width && this.x + this.width > player3.x;
+      const verticalCollision = this.y <= player3.y + player3.height + PADDLE_OFFSET;
 
-        if (horizontalOverlap && verticalCollision)
+      if (horizontalOverlap && verticalCollision)
           canMove = false;
       }
       if (canMove)
-        this.moveUp();
+      this.moveUp();
       else if (player3)
-        this.y = PADDLE_OFFSET + player3.height; // eviter collision avec player3
+      this.y = PADDLE_OFFSET + player3.height; // eviter collision avec player3
     }
 
-    if (keys[downKey]) {
+    private   checkAndMoveDown(player4: Paddle | PaddleAI | null | undefined, canvasHeight: number): void {
+
       let canMove = true;
-      if (player4) {
-        const horizontalOverlap = this.x < player4.x + player4.width && this.x + this.width > player4.x;
-        const verticalCollision = this.y + this.height >= player4.y - PADDLE_OFFSET;
+        if (player4) {
+          const horizontalOverlap = this.x < player4.x + player4.width && this.x + this.width > player4.x;
+          const verticalCollision = this.y + this.height >= player4.y - PADDLE_OFFSET;
 
-        if (horizontalOverlap && verticalCollision)
-          canMove = false;
-      }
-      if (canMove)
-        this.moveDown(canvasHeight);
-      else if (player4)
-        this.y = canvasHeight - PADDLE_OFFSET - player4.height - this.height; // eviter collision avec player4
+          if (horizontalOverlap && verticalCollision)
+            canMove = false;
+        }
+        if (canMove)
+          this.moveDown(canvasHeight);
+        else if (player4)
+          this.y = canvasHeight - PADDLE_OFFSET - player4.height - this.height; // eviter collision avec player4
     }
-  }
+
+    private canRefresh(): boolean {
+      return this.lastRefresh === null || Date.now() / 1000 - this.lastRefresh >= 0.99;
+    }
+
+    easyRightLeft(ball: Ball, paddles: [Paddle, Paddle | PaddleAI, (Paddle | PaddleAI | null)?, (Paddle | PaddleAI | null)?], canvasHeight: number): void {
+      if (this.up && this.y > this.targety)
+          this.checkAndMoveUp(paddles[2]);
+      else if (this.down && this.y < this.targety)
+          this.checkAndMoveDown(paddles[3], canvasHeight);
+      
+      // the AI can only refresh its view of the game once per second
+      if (this.canRefresh()) {
+          if (ball.y < this.y) {
+              this.down = false;
+              this.up = true;
+              this.targety = ball.y;
+          }
+          else if (ball.y > this.y) {
+              this.up = false;
+              this.down = true;
+              this.targety = ball.y;
+          }
+          else if (ball.y == this.y) {
+              this.up = false;
+              this.down = false;
+          }
+          // else if la dir de la balle est pas vers nous alors on met les deux a false
+          this.lastRefresh = Date.now() / 1000;
+      }
+    }
 }
