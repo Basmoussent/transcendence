@@ -151,9 +151,9 @@ export class Ball {
 		}	
 	}
 
-	public collisionWindow(width: number) {
+	public collisionWindow(width: number, flag:boolean) {
 
-		if (this.y - this.radius <= 0) {
+		if (flag && this.y - this.radius <= 0) {
 			this.speedy = Math.abs(this.speedy);
 			this.y = this.radius;
 		}
@@ -210,12 +210,12 @@ class blue extends brick {
 
 class green extends brick {
 	constructor(_id:number, _x:number, _y:number) {
-		super(1, _id, "green", "#61AB39", _x, _y); }
+		super(2, _id, "green", "#61AB39", _x, _y); }
 }
 
 class red extends brick {
 	constructor(_id:number, _x:number, _y:number) {
-		super(1, _id, "red", "#FF101F", _x, _y); }
+		super(3, _id, "red", "#FF101F", _x, _y); }
 }
 
 export function	createRandomBrick(it:number, _x:number, _y:number): brick {

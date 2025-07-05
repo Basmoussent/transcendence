@@ -37,11 +37,14 @@ export class Block1v1 {
 		this.winner = "nobody";
 		this.username = "ko";
 
+		this.brickWidth = 0;
+		this.brickHeight = 0;
+
 		this.paddle1 = new Paddle(0, 0, 14);
-		this.ball1 = new Ball(this.width / 2, (this.height / 5) * 3); // spawn a la ligne basse des bricks
+		this.ball1 = new Ball(this.width / 2, (this.height / 5) * 3);
 
 		this.paddle2 = new Paddle(0, 0, 14);
-		this.ball2 = new Ball(this.width / 2, (this.height / 5) * 2); // spawn a la ligne haute des bricks
+		this.ball2 = new Ball(this.width / 2, (this.height / 5) * 2);
 
 		this.keys = {};
 		this.bricks = [];
@@ -88,12 +91,11 @@ export class Block1v1 {
 		this.paddle2.x = (this.width - this.paddle2.width) / 2;
 		this.paddle2.y = this.paddle2.height - 12 + 1;
 
+		this.brickWidth = this.width / 20;
+		this.brickHeight = Math.floor(this.height / 20);
 
-		this.ball1.x = this.width / 2;
-		this.ball1.y = (this.height / 5) * 3;
-
-		this.ball2.x = this.width / 2;
-		this.ball2.y = (this.height / 5) * 2;
+		this.ball1.reset(this.width / 2, ((this.height / 5) * 3) + 50, -2, 3)
+		this.ball2.reset(this.width / 2, ((this.height / 5) * 2) - this.brickHeight - 50, 2, -3)
 
 		console.log('Canvas size:', this.width, this.height);
 		console.log('Paddle1 position:', this.paddle1.x, this.paddle1.y);
@@ -110,14 +112,54 @@ export class Block1v1 {
 		gameLoop();
 	}
 
+	private checkBrickCollision(ball: Ball): void {
+
+		const brickZoneTop = (this.height / 5 * 2) - this.brickHeight;
+		const brickZoneBottom = (this.height / 5 * 3);
+		
+		if (ball.y + ball.radius >= brickZoneTop && ball.y - ball.radius <= brickZoneBottom) {
+			
+			for (const brick of this.bricks) {
+
+				if (!brick.getHp())
+					continue;
+				
+				const brickLeft = brick.getX() * this.brickWidth;
+				const brickRight = brickLeft + this.brickWidth;
+				const brickTop = brick.getY() * this.brickHeight + (this.height / 5 * 2) - this.brickHeight;
+				const brickBottom = brickTop + this.brickHeight;
+				
+				if (ball.x >= brickLeft && ball.x <= brickRight && 
+					ball.y >= brickTop && ball.y <= brickBottom) {
+
+					brick.beenHit();
+					this.handleBrickBounce(ball, brickLeft, brickRight, brickTop, brickBottom);
+					break;
+				}
+			}
+		}
+	}
+
+	private handleBrickBounce(ball: Ball, brickLeft: number, brickRight: number, brickTop: number, brickBottom: number): void {
+
+		const distanceLeft = Math.abs(ball.x - brickLeft);
+		const distanceRight = Math.abs(ball.x - brickRight);
+		const distanceTop = Math.abs(ball.y - brickTop);
+		const distanceBottom = Math.abs(ball.y - brickBottom);
+		
+		const minDistance = Math.min(distanceLeft, distanceRight, distanceTop, distanceBottom);
+		
+		(minDistance === distanceLeft || minDistance === distanceRight) ? ball.speedx *= -1 : ball.speedy *= -1;
+	}
+
 	private update(ball1: Ball, ball2: Ball): void {
 
 		if (this.keys['enter'] && !this.status) {
 			// this.bricks = [];
 			// for (let it = 0; it < 100; ++it)
 			// 	this.bricks.push(createRandomBrick(it));
-			ball1.reset(this.width / 2, (this.height / 5) * 3, -2, 3)
-			ball2.reset(this.width / 2, (this.height / 5) * 2, 2, -3)
+			ball1.reset(this.width / 2, ((this.height / 5) * 3) + 50, -2, 3)
+			ball2.reset(this.width / 2, ((this.height / 5) * 2) - this.brickHeight - 50, 2, -3)
 			this.status = true;
 		}
 
@@ -143,55 +185,11 @@ export class Block1v1 {
 		ball2.collisionPadd1(this.paddle1);
 		ball2.collisionPadd2(this.paddle2);
 
+		this.checkBrickCollision(ball1);
+		this.checkBrickCollision(ball2);
 
-		if (ball1.y >= (this.height / 5) * 2 && ball1.y <= (this.height / 5) * 3) {
-
-			console.log("on passe");
-
-			for (const brick of this.bricks) {
-
-				if (brick.getHp()) {
-					const brickLeft = brick.getX() * this.brickWidth;
-					const brickRight = brickLeft + this.brickWidth;
-					const brickTop = brick.getY() * this.brickHeight + ((this.brickHeight / 5) * 2);
-					const brickBottom = brickTop + this.brickHeight + ((this.brickHeight / 5) * 2);
-					
-					if (ball1.x - ball1.radius / 2 >= brickLeft && ball1.x + ball1.radius / 2 <= brickRight &&
-						ball1.y - ball1.radius / 2 >= brickTop && ball1.y + ball1.radius / 2 <= brickBottom) {
-						
-						brick.beenHit();
-						ball1.speedy *= -1;
-						
-						break;
-					}
-				}
-			}
-		}
-
-		if (ball2.y >= (this.height / 5) * 2 && ball2.y <= (this.height / 5) * 3) {
-
-			console.log("on passe");
-
-			for (const brick of this.bricks) {
-
-				if (brick.getHp()) {
-					const brickLeft = brick.getX() * this.brickWidth;
-					const brickRight = brickLeft + this.brickWidth;
-					const brickTop = brick.getY() * this.brickHeight + ((this.brickHeight / 5) * 2);
-					const brickBottom = brickTop + this.brickHeight + ((this.brickHeight / 5) * 2);
-					
-					if (ball2.x - ball2.radius / 2 >= brickLeft && ball2.x + ball2.radius / 2 <= brickRight &&
-						ball2.y - ball2.radius / 2 >= brickTop && ball2.y + ball2.radius / 2 <= brickBottom) {
-						
-						brick.beenHit();
-						ball2.speedy *= -1;
-						
-						break;
-					}
-				}
-			}
-		}
-
+		ball1.collisionWindow(this.width, false);
+		ball2.collisionWindow(this.width, false);
 
 		if (this.lost1v1(this.height, ball1, ball2)) {
 			this.status = false;
@@ -199,7 +197,7 @@ export class Block1v1 {
 		}
 
 		ball1.move();
-		// ball2.move();
+		ball2.move();
 
 		// console.log(`Ball 1 - x: ${ball1.x}, y: ${ball1.y}`);
 		// console.log(`Ball 2 - x: ${ball2.x}, y: ${ball2.y}`);
@@ -240,7 +238,7 @@ export class Block1v1 {
 				continue ;
 
 			this.ctx.fillStyle = brick.getColor();
-			this.ctx.fillRect(brick.getX() * this.brickWidth, brick.getY() * this.brickHeight + (this.height / 5 * 2), this.brickWidth, this.brickHeight);
+			this.ctx.fillRect(brick.getX() * this.brickWidth, brick.getY() * this.brickHeight + ((this.height / 5 * 2) - this.brickHeight), this.brickWidth, this.brickHeight);
 		}
 	}
 

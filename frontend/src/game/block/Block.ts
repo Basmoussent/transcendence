@@ -149,7 +149,7 @@ export class Block {
 
 		ball.collisionPadd1(this.paddle);
 
-		if (ball.y <= this.height / 4 && ball.y > 0) {
+		if (ball.y + ball.speedy <= this.height / 4 && ball.y > 0) {
 
 			for (const brick of this.bricks) {
 
@@ -162,7 +162,9 @@ export class Block {
 					if (ball.x - ball.radius / 2 >= brickLeft && ball.x + ball.radius / 2 <= brickRight &&
 						ball.y - ball.radius / 2 >= brickTop && ball.y + ball.radius / 2 <= brickBottom) {
 						
+
 						brick.beenHit();
+						ball.moveTo(ball.x, (brick.getY() * this.brickHeight) + this.brickHeight + ball.radius);
 						ball.speedy *= -1;
 
 						break;
@@ -171,9 +173,9 @@ export class Block {
 			}
 		}
 
-		console.log("ball => ", ball.x, ",", ball.y);
+		// console.log("ball => ", ball.x, ",", ball.y);
 
-		ball.collisionWindow(this.width);
+		ball.collisionWindow(this.width, true);
 
 		if (ball.lost(this.height)) {
 			this.status = false;
