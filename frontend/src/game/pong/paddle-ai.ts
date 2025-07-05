@@ -17,7 +17,7 @@ export class PaddleAI {
     lastRefresh: number | null;
     up: boolean;
     down: boolean;
-    targety: number;
+    targetY: number;
     mode: number; // easy = 0 / middle = 1 / hard = 2
 
     constructor(width: number, height: number, x: number, y: number, speed: number, mode: number) {
@@ -35,7 +35,7 @@ export class PaddleAI {
         this.lastRefresh = null;
         this.up = false;
         this.down = false;
-        this.targety = 0;
+        this.targetY = 0;
         this.mode = mode;
     }
 
@@ -162,13 +162,14 @@ export class PaddleAI {
     }
 
     private canRefresh(): boolean {
-      return this.lastRefresh === null || Date.now() / 1000 - this.lastRefresh >= 0.99;
+      return this.lastRefresh === null || Date.now() / 1000 - this.lastRefresh >= 1;
     }
 
+	// ne predit rien, essaye juste de suivre la balle
     easyRightLeft(ball: Ball, paddles: [Paddle, Paddle | PaddleAI, (Paddle | PaddleAI | null)?, (Paddle | PaddleAI | null)?], canvasHeight: number): void {
-      if (this.up && this.y > this.targety)
+      if (this.up && this.y > this.targetY)
           this.checkAndMoveUp(paddles[2]);
-      else if (this.down && this.y < this.targety)
+      else if (this.down && this.y < this.targetY)
           this.checkAndMoveDown(paddles[3], canvasHeight);
       
       // the AI can only refresh its view of the game once per second
@@ -176,19 +177,65 @@ export class PaddleAI {
           if (ball.y < this.y) {
               this.down = false;
               this.up = true;
-              this.targety = ball.y;
+              this.targetY = ball.y;
           }
           else if (ball.y > this.y) {
               this.up = false;
               this.down = true;
-              this.targety = ball.y;
+              this.targetY = ball.y;
           }
           else if (ball.y == this.y) {
               this.up = false;
               this.down = false;
+			  this.targetY = this.height / 2;
           }
-          // else if la dir de la balle est pas vers nous alors on met les deux a false
           this.lastRefresh = Date.now() / 1000;
       }
     }
+
+	// utilise les coordonnees de la balle et sa vitesse pour calculer targetY (chaque seconde)
+	middleRightLeft(ball: Ball, paddles: [Paddle, Paddle | PaddleAI, (Paddle | PaddleAI | null)?, (Paddle | PaddleAI | null)?], canvasHeight: number): void {
+		if (this.up && this.y > this.targetY)
+			this.checkAndMoveUp(paddles[2]);
+		else if (this.down && this.y < this.targetY)
+			this.checkAndMoveDown(paddles[3], canvasHeight);
+		
+		// the AI can only refresh its view of the game once per second
+		if (this.canRefresh()) {
+			const timeToImpact = (this.x - ball.x) / ball.speedX;
+			this.targetY = ball.y + ball.speedY * timeToImpact;
+
+			// si la balle est pas en train de venir vers nous on se replace au milieu
+			if (ball.speedX < 0) {
+				this.targetY = (canvasHeight - this.height) / 2;
+				this.up = false;
+				this.down = false;
+			}
+			if (this.y > this.targetY) {
+				this.up = true;
+				this.down = false;
+			}
+			else if (this.y < this.targetY) {
+				this.up = false;
+				this.down = true;
+			}
+			this.lastRefresh = Date.now() / 1000;
+		}
+    }
+
+	// au moment de la collision paddle, calcule tous les prochains mouvements/rebonds de la balle jusqu'au point d'impact
+	// l'ia a acces au resultat du calcul 1 fois par sec, faudra peut etre reduire sa speed pour compenser ou autre
+	hardRightLeft(ball: Ball, paddles: [Paddle, Paddle | PaddleAI, (Paddle | PaddleAI | null)?, (Paddle | PaddleAI | null)?], canvasHeight: number): void {
+		if (this.up && this.y > this.targetY)
+			this.checkAndMoveUp(paddles[2]);
+		else if (this.down && this.y < this.targetY)
+			this.checkAndMoveDown(paddles[3], canvasHeight);
+		
+		// the AI can only refresh its view of the game once per second
+		if (this.canRefresh()) {
+			// calculer targetY et se diriger vers lui 
+			// else if la dir de la balle est pas vers nous alors on met les deux a false
+			this.lastRefresh = Date.now() / 1000;
+		}
+	}
 }

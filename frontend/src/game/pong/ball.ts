@@ -5,15 +5,15 @@ export class Ball {
   radius: number;
   x: number;
   y: number;
-  speedx: number;
-  speedy: number;
+  speedX: number;
+  speedY: number;
 
   constructor(canvasHeight: number, canvasWidth: number) {
     this.radius = 10;
     this.x = canvasWidth / 2;
     this.y = canvasHeight / 2;
-    this.speedx = 6;
-    this.speedy = 0;
+    this.speedX = 6;
+    this.speedY = 0;
   }
 
   drawBall(ctx: CanvasRenderingContext2D, x: number, y: number, size: number): void {
@@ -27,10 +27,10 @@ export class Ball {
 
   addBallSpeed(): void {
     console.log('adding BallSpeed...');
-    if (this.speedx > 0 && this.speedx < 12)
-      this.speedx += 0.25;
-    else if (this.speedx < 0 && this.speedx > -12)
-      this.speedx -= 0.25;
+    if (this.speedX > 0 && this.speedX < 12)
+      this.speedX += 0.25;
+    else if (this.speedX < 0 && this.speedX > -12)
+      this.speedX -= 0.25;
   }
 
   adjustBallDir(paddle: Paddle | PaddleAI): void {
@@ -44,13 +44,13 @@ export class Ball {
     const edgeZone = paddle.height * 0.2;
 
     if (hitY <= paddleTop + edgeZone) // touche le bord haut
-      this.speedy -= 3;
+      this.speedY -= 3;
     else if (hitY >= paddleBottom - edgeZone) // touche le bord bas
-      this.speedy += 3;
+      this.speedY += 3;
     else if (hitY <= paddleCenter) // touche cote haut (mais pas bord)
-      this.speedy -= 1;
+      this.speedY -= 1;
     else if (hitY > paddleCenter) // touche cote bas (mais pas bord)
-      this.speedy += 1;
+      this.speedY += 1;
   }
 
   resetBallInfo(canvasWidth: number, canvasHeight: number): void {
@@ -59,14 +59,14 @@ export class Ball {
     this.y = canvasHeight / 2;
 
     // celui qui gagne recoit la balle en premier
-    this.speedx *= -1;
-    this.speedy = 1;
+    this.speedX *= -1;
+    this.speedY = 1;
 
     // on reset a la vitesse de base
-    if (this.speedx > 0)
-      this.speedx = 6;
+    if (this.speedX > 0)
+      this.speedX = 6;
     else
-      this.speedx = -6;
+      this.speedX = -6;
   }
 
 }

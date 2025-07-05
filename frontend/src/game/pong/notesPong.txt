@@ -2,12 +2,8 @@ https://stackoverflow.com/questions/4577814/pong-how-does-the-paddle-know-where-
 
 https://dooglz.github.io/set09121/pong2.html
 
-
-
 // pour que ca fonctionne bien
     // le jeu ne doit jamais etre lance avec paddles[0] ou paddles[1] null
-    // jamais paddles[4] pas null et paddles[3] null
-
 
 // probleme vient de startPoint ??
 
@@ -16,7 +12,7 @@ https://dooglz.github.io/set09121/pong2.html
     // power ups - aleatoire entre : (peut etre annonce en fond)
         // paddle + grand/+ petit pour l'adversaire
         // balle en trop
-        // freeze du paddle de l'adversaire pendant genre 1sec
+        // commandes de l'adversaire sont inversees pendant 4/5 sec
     // stocker les scores API
     // police avec l'API
         // ajuster texte au milieu pcq la c'est bancal
