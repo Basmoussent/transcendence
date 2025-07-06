@@ -61,8 +61,8 @@ async function authRoutes(app: FastifyInstance) {
     try {
       // Préparation et exécution de la requête SQL d'insertion
       const stmt = datab.prepare(
-        `INSERT INTO users (username, email, password_hash, wins)
-         VALUES (?, ?, ?, 0)`
+        `INSERT INTO users (username, email, password_hash)
+         VALUES (?, ?, ?)`
       );
 
       stmt.run(username, email, password_hash);
