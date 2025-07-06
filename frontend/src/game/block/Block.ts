@@ -130,13 +130,20 @@ export class Block {
 		ctx.globalAlpha = 1;
 	}
 
-	private async createGame() {
+	private updateWin() {
 
+		for (const brick of this.bricks)
+			if (brick.getHp())
+				return;
 
-		
-		this.status = true;
-		
+		this.win = true;
 	}
+
+	private updateLose() {
+		if (this.ball.y - this.ball.radius >= this.height)
+			this.lost = true;
+	}
+
 
 	private async update(ball: Ball) {
 
@@ -145,8 +152,7 @@ export class Block {
 			ball.reset(this.width / 2, (this.height / 4) + 50, 3, 6)
 
 			this.gameId = await logStartingGame(this.username);
-			if (this.gameId == -1)
-				return ;
+			// proteger si on arrive pas
 			this.bricks = [];
 			for (let it = 0; it < 100; ++it)
 				this.bricks.push(createRandomBrick(it, it % 20, Math.floor(it / 20)));
@@ -192,12 +198,14 @@ export class Block {
 
 		ball.collisionWindow(this.width, true);
 
-		this.updateLost();
+		this.updateLose();
 		if (this.win || this.lost) {
-			this.status = false;
-			logEndGame(this.gameId, this.username, this.winner);
+
 			
-			// api.post(game(temp de la game, gagnee ou perdue, nombre de coups de paddle pour les stats))
+			this.status = false;
+			logEndGame(this.gameId, this.username);
+			this.win = false;
+			this.lost = false;
 		}
 
 		ball.move();

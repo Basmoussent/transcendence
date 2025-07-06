@@ -64,8 +64,9 @@ async function authRoutes(app: FastifyInstance) {
         `INSERT INTO users (username, email, password_hash, wins)
          VALUES (?, ?, ?, 0)`
       );
-      
+
       stmt.run(username, email, password_hash);
+      // INSERT INTO statistics (l'id du user qui vient d'être créé)
       
       // Retourne un succès si l'insertion a réussi
       return reply.status(201).send({ message: 'User registered successfully' });
@@ -80,6 +81,7 @@ async function authRoutes(app: FastifyInstance) {
         return reply.status(500).send({ error: 'Internal server error' });
       }
     }
+    
   });
   
   /**

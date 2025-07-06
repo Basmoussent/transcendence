@@ -4,7 +4,6 @@ CREATE TABLE IF NOT EXISTS users (
   email VARCHAR UNIQUE NOT NULL,
   password_hash TEXT NOT NULL,
   avatar_url TEXT,
-  stats statistics,
   language VARCHAR DEFAULT 'fr',
   created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
@@ -46,8 +45,9 @@ CREATE TABLE IF NOT EXISTS messages (
 );
 
 CREATE TABLE IF NOT EXISTS statistics (
-  win INTEGER,
-  pong_games INTEGER,
-  block_games INTEGER,
+  user_id INTEGER REFERENCES chats(id) ON DELETE CASCADE,
+  win INTEGER DEFAULT 0,
+  pong_games INTEGER DEFAULT 0,
+  block_games INTEGER DEFAULT 0,
   rating INTEGER
 )

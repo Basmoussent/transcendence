@@ -106,7 +106,6 @@ async function gameRoutes(app: FastifyInstance) {
 
 	// 		const games = await new Promise<void>((resolve, reject) => {
 	// 			database.run(
-	// 				// 'UPDATE games SET game_name = ?, player2 = ?, player3 = ?, player4 = ?, winner = ?, end_time = ? WHERE id = ?) VALUES (?, ?, ?, ?, ?, ?, ?)',
 	// 				`UPDATE games 
 	// 				SET game_name = ?, player2 = ?, player3 = ?, player4 = ?, winner = ?, end_time = ?
 	// 				WHERE id = ?`,

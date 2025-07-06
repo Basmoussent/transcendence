@@ -48,7 +48,7 @@ async function userRoutes(app: FastifyInstance) {
             // Récupération des données utilisateur
             const user = await new Promise<UserData | null>((resolve, reject) => {
                 database.get(
-                    'SELECT id, username, email, avatar_url, language, stats FROM users WHERE email = ?',
+                    'SELECT id, username, email, avatar_url, language FROM users WHERE email = ?',
                     [email],
                     (err: any, row: UserData | undefined) => {
                         if (err) {

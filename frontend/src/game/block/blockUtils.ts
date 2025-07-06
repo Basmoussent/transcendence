@@ -334,6 +334,8 @@ export async function logEndGame(gameId: number, winner:string) {
 				end_time: Date.now().toString()
 			})
 		});
+
+		
 	
 		if (response.ok) {
 			const result = await response.json();
@@ -345,3 +347,5 @@ export async function logEndGame(gameId: number, winner:string) {
 	catch (error) {
 		console.error("Error saving a game: ", error); }
 }
+
+// export async function updateStats(gameId:number)
