@@ -150,6 +150,7 @@ export class Block {
 		if (this.keys['enter'] && !this.status) {
 			
 			ball.reset(this.width / 2, (this.height / 4) + 50, 3, 6)
+			this.status = true;
 
 			this.gameId = await logStartingGame(this.username);
 			// proteger si on arrive pas
@@ -197,11 +198,9 @@ export class Block {
 		}
 
 		ball.collisionWindow(this.width, true);
-
 		this.updateLose();
-		if (this.win || this.lost) {
 
-			
+		if (this.win || this.lost) {
 			this.status = false;
 			logEndGame(this.gameId, this.username);
 			this.win = false;
