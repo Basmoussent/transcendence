@@ -7,12 +7,20 @@ import util from 'util'
 import { pipeline } from 'stream'
 import path from 'path';
 
+interface stats {
+    win: number,
+    pong_games: number,
+    block_games: number,
+    rating: number
+}
+
 interface UserData {
   id: number;
   username: string;
   email: string;
   avatar_url?: string;
   language: string;
+  stats: stats;
 }
 
 async function userRoutes(app: FastifyInstance) {
@@ -40,7 +48,7 @@ async function userRoutes(app: FastifyInstance) {
             // Récupération des données utilisateur
             const user = await new Promise<UserData | null>((resolve, reject) => {
                 database.get(
-                    'SELECT id, username, email, avatar_url, language FROM users WHERE email = ?',
+                    'SELECT id, username, email, avatar_url, language, stats FROM users WHERE email = ?',
                     [email],
                     (err: any, row: UserData | undefined) => {
                         if (err) {
@@ -59,9 +67,10 @@ async function userRoutes(app: FastifyInstance) {
             // Récupération des statistiques (pour l'instant des valeurs par défaut)
             // TODO: Implémenter la vraie logique des statistiques
             const stats = {
-                wins: 0,
-                games: 0,
-                rating: 0
+                win: user.stats.win,
+                pong_games: user.stats.pong_games,
+                block_games: user.stats.block_games,
+                rating: user.stats.rating
             };
 
             return reply.send({

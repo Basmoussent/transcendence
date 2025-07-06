@@ -1,12 +1,16 @@
-import { brick, Ball, Paddle, createRandomBrick, fetchUsername } from "./blockUtils.ts"
+import { brick, Ball, Paddle, createRandomBrick, fetchUsername, logStartingGame, logEndGame } from "./blockUtils.ts"
 
 export class Block {
 	private canvas: HTMLCanvasElement;
 	private ctx: CanvasRenderingContext2D;
+
+	private gameId: number
+
 	private width: number;
 	private height: number;
 	private status: boolean;
 	private username: string;
+	private winner: string;
 	private win: boolean;
 	private lost: boolean;
 
@@ -34,25 +38,29 @@ export class Block {
 		this.ctx = context;
 		this.width = canvas.width;
 		this.height = canvas.height;
+
+		this.winner = 'nil';
+		this.gameId = -1;
 		this.win = false;
 		this.lost = false;
 		this.username = "ko";
 		this.loadUsername();
 
 		this.paddle = new Paddle(0, 0, 14);
-		this.ball = new Ball(this.width / 2, this.height / 2); // this.width et this.height are false
+		this.ball = new Ball(0, 0); // this.width et this.height are false
 
 		this.keys = {};
 		this.bricks = [];
 		
-		for (let it = 0; it < 100; ++it)
-			this.bricks.push(createRandomBrick(it, it % 20, Math.floor(it / 20)));
-
-		this.brickWidth = this.width / 20;
-		this.brickHeight = Math.floor(this.height / 20);
+		this.brickWidth = 0;
+		this.brickHeight = 0;
 
 		// for (let it = 0; it < 100; ++it)
 		// 	console.log(this.bricks[it].getX(), ".", this.bricks[it].getY());
+
+		this.setupCanvas();
+		this.setupEventListeners();
+		this.startGameLoop();
 	}
 
 	private async loadUsername() {
@@ -65,20 +73,12 @@ export class Block {
 			console.error("Erreur fetchUsername :", err); }
 	}
   
-	public init(): void {
 
-		console.log('Initializing paddle game...');
+	private setupEventListeners(): void {
 
-		this.setupCanvas();
-		this.setupEventListeners();
-		this.startGameLoop();
-			
 		window.addEventListener('resize', () => {
 			this.setupCanvas();
 		});
-	}
-
-	private setupEventListeners(): void {
 		window.addEventListener('keydown', (e) => {
 			this.keys[e.key.toLowerCase()] = true;
 		});
@@ -130,30 +130,26 @@ export class Block {
 		ctx.globalAlpha = 1;
 	}
 
-	private updateWin() {
+	private async createGame() {
 
-		for (const brick of this.bricks)
-			if (brick.getHp())
-				return;
 
-		this.win = true;		
+		
+		this.status = true;
+		
 	}
 
-	public updateLost() {
-
-		if (this.ball.y - this.ball.radius >= this.height)
-			this.status = false;
-
-	}
-
-	private update(ball: Ball): void {
+	private async update(ball: Ball) {
 
 		if (this.keys['enter'] && !this.status) {
-			// this.bricks = [];
-			// for (let it = 0; it < 100; ++it)
-			// 	this.bricks.push(createRandomBrick(it));
+			
 			ball.reset(this.width / 2, (this.height / 4) + 50, 3, 6)
-			this.status = true;
+
+			this.gameId = await logStartingGame(this.username);
+			if (this.gameId == -1)
+				return ;
+			this.bricks = [];
+			for (let it = 0; it < 100; ++it)
+				this.bricks.push(createRandomBrick(it, it % 20, Math.floor(it / 20)));
 		}
 
 		if (!this.status)
@@ -169,6 +165,7 @@ export class Block {
 
 		ball.collisionPadd1(this.paddle);
 
+		// collision ball bricks
 		if (ball.y + ball.speedy <= this.height / 4 && ball.y > 0) {
 
 			for (const brick of this.bricks) {
@@ -195,8 +192,10 @@ export class Block {
 
 		ball.collisionWindow(this.width, true);
 
+		this.updateLost();
 		if (this.win || this.lost) {
 			this.status = false;
+			logEndGame(this.gameId, this.username, this.winner);
 			
 			// api.post(game(temp de la game, gagnee ou perdue, nombre de coups de paddle pour les stats))
 		}

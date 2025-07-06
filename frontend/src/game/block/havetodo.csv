@@ -36,3 +36,13 @@ ball touche droite/gauche
 
 
 pouvoir qui fait que ta balle traverse et tues toutes les bricks
+
+creer une nouvelle game:  -> this.gameId = await logStartingGame(this.username);
+
+	eteins ca cree plusieurs game vue que la fonction est async
+	moyen pour recuperer l'id de la game
+	on peut surement avoir l'id de la game avant de lancer la partie avec le matchmaking
+	mais la c'est solo donc faut trouver alternative
+
+
+quand une game est terminee, aller update les wins du user qui a gagne

@@ -4,6 +4,7 @@ CREATE TABLE IF NOT EXISTS users (
   email VARCHAR UNIQUE NOT NULL,
   password_hash TEXT NOT NULL,
   avatar_url TEXT,
+  stats statistics,
   language VARCHAR DEFAULT 'fr',
   created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
@@ -11,6 +12,7 @@ CREATE TABLE IF NOT EXISTS users (
 CREATE TABLE IF NOT EXISTS games (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   game_name TEXT NOT NULL,
+  chef TEXT NOT NULL,
   player1 TEXT NOT NULL,
   player2 TEXT,
   player3 TEXT,
@@ -43,23 +45,9 @@ CREATE TABLE IF NOT EXISTS messages (
   sent_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
-
-
-
-
-
-
-
--- CREATE TABLE IF NOT EXISTS barTables (
---   id INTEGER PRIMARY KEY AUTOINCREMENT,
---   user_tab ARRAY,
---   drinks_tab ARRAY REFERENCES drinks(drink_name),
---   total_cost INTEGER
--- );
-
-
--- CREATE TABLE IF NOT EXISTS drinks (
---   id INTEGER PRIMARY KEY AUTOINCREMENT,
---   drink_name  VARCHAR(36) UNIQUE NOT NULL ,
---   cost INTEGER NOT NULL
--- );
+CREATE TABLE IF NOT EXISTS statistics (
+  win INTEGER,
+  pong_games INTEGER,
+  block_games INTEGER,
+  rating INTEGER
+)

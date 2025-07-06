@@ -1,3 +1,4 @@
+import { Block } from './Block';
 import { getAuthToken } from '../../utils/auth';
 import { sanitizeHtml } from '../../utils/sanitizer';
 
@@ -159,7 +160,6 @@ export class Ball {
 			this.x = width - this.radius;
 		}
 	}
-
 }
 
 export abstract class brick {
@@ -272,8 +272,46 @@ export async function fetchUsername() {
 		console.error("Error rendering profile page:", error); }
 }
 
+export async function logStartingGame(username:string): Promise<number> {
+	
+	try {
+		const token = getAuthToken();
+		if (!token) {
+			alert('❌ Token d\'authentification manquant');
+			window.history.pushState({}, '', '/login');
+			window.dispatchEvent(new PopStateEvent('popstate'));
+			return -1;
+		}
 
-export async function logGame() {
+		const response = await fetch('http://localhost:8000/games', {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+				'x-access-token': token,
+			},
+			body: JSON.stringify({
+				game_name: 'block',
+				chef: "maestro",
+				player1: username,
+				player2: "ines",
+				start_time: Date.now().toString(),
+			})
+		});
+	
+		if (response.ok) {
+			const result = await response.json();
+			console.log("game bien log", result);
+			return (result.gameId);
+		}
+		else 
+			console.error("Erreur lors de log une game");
+	}
+	catch (error) {
+		console.error("Error saving a game: ", error); }
+	return -1;
+}
+
+export async function logEndGame(gameId: number, winner:string) {
 	
 	try {
 		const token = getAuthToken();
@@ -284,16 +322,22 @@ export async function logGame() {
 			return '';
 		}
 
-		const response = await fetch('/api/me', {
-			method: 'POST',
+		const response = await fetch('http://localhost:8000/games', {
+			method: 'PUT',
 			headers: {
 				'Content-Type': 'application/json',
-				'x-access-token': token }
+				'x-access-token': token,
+			},
+			body: JSON.stringify({
+				gameId: gameId,
+				winner: winner,
+				end_time: Date.now().toString()
+			})
 		});
 	
 		if (response.ok) {
 			const result = await response.json();
-			
+			console.log("endgame bien log", result);
 		}
 		else 
 			console.error("Erreur lors de log une game");

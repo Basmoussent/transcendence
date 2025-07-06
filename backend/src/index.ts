@@ -31,6 +31,7 @@ async function setup() {
   console.log('🌐 Registering CORS...');
   await fastify.register(cors, {
     origin: [
+      'https://localhost:2443', 
       'https://fr.localhost:5173', 
       'https://en.localhost:5173', 
       'https://es.localhost:5173',
@@ -40,7 +41,10 @@ async function setup() {
     ],
     credentials: true,
     preflightContinue: false,
-    exposedHeaders: ['x-access-token']
+    exposedHeaders: ['x-access-token'],
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'x-access-token']
+    // louche qu'on puisse pas faire de get depuis le port 2443 sans methods et allowedHeaders
   });
   console.log('✅ CORS registered');
 
@@ -66,7 +70,6 @@ async function setup() {
   console.log('✅ User routes registered');
   await fastify.register(gameRoutes, {prefix: "/games"});
   // console.log('✅ BarTables routes registered');
-  // await fastify.register(barRoutes, {prefix: "/bar"});
   
   // Register WebSocket
   console.log('🔌 Registering WebSocket...');

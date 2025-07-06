@@ -1,5 +1,6 @@
 import { db } from '../database';
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
+import sqlite3 from 'sqlite3';
 import jwt from '@fastify/jwt';
 import bcrypt from 'bcrypt';
 import fs from 'fs'
@@ -23,14 +24,14 @@ async function gameRoutes(app: FastifyInstance) {
 
 	app.get('/', async function (request: FastifyRequest, reply: FastifyReply) {
 
-		console.log("get sur /games renvoie toutes les games enregistrees");
+		console.log("récupérer toute les games");
 
 		try {
 			const database = db.getDatabase();
 
 			const gameTables = await new Promise<GameTables[] | null>((resolve, reject) => {
 
-				database.get(
+				database.all(
 					'SELECT * FROM games',
 					(err: any, row: GameTables[] | undefined) => {
 						err ? reject(err) : resolve(row || null); }
@@ -53,82 +54,128 @@ async function gameRoutes(app: FastifyInstance) {
 
 	})
 
-	app.post('/start-game', async function (request: FastifyRequest, reply: FastifyReply) {
+	app.post('/', async function (request: FastifyRequest, reply: FastifyReply) {
 
 		console.log("enregistrer une game");
 
 		try {
 			const database = db.getDatabase();
 
-			const { game_name, player1} = request.body;
+			const { game_name, chef, player1, player2, start_time } = request.body;
 
-			if (!game_name)
-				throw new Error("You need to precise which game we're talking about");
-			if (!player1)
-				throw new Error("to create a game it gotta a player at least");
+			if (!game_name || !chef || !player1 || !player2 || !start_time)
+				throw new Error("Mandatory info needed to prelog game");
 
-			const gameTables = await new Promise<void>((resolve, reject) => {
+			const gameId = await new Promise<void>((resolve, reject) => {
 				database.run(
-					'INSERT INTO games (game_name, player1) VALUES (?, ?)',
-					[game_name, player1],
+					'INSERT INTO games (game_name, chef, player1, player2, start_time) VALUES (?, ?, ?, ?, ?)',
+					[game_name, chef, player1, player2, start_time],
 					(err: any) => {
-						err ? reject(err) : resolve(); }
+						err ? reject(err) : resolve(); },
+					database.get('SELECT last_insert_rowid() as id', (err: any, row: any) => {
+						err ? reject(err) : resolve(row.id); })
 				);
 			});
 
 			return reply.send({
-				message: 'post une game avec succès',
+				message: 'crée une game avec succès',
+				gameId: gameId,
 			});
 		}
 
 		catch (err: any) {
-			console.error('Erreur retrieve game tables :', err);
+			console.error('enregistrer une game :', err);
 			if (err.name === 'JsonWebTokenError')
 				return reply.status(401).send({ error: 'Token invalide ou expiré' });
-			return reply.status(500).send({ error: 'Erreur lors de cxxxl\'upload de l\'avatar', details: err.message });
+			return reply.status(500).send({ error: 'enregistrer une game', details: err.message });
 		}
 
 	})
 
-	app.post('end-game', async function (request: FastifyRequest, reply: FastifyReply) {
+	// app.put('/', async function (request: FastifyRequest, reply: FastifyReply) {
 
-		console.log("mettre a jour la game");
+	// 	console.log("enregistrer une game");
 
+	// 	try {
+	// 		const database = db.getDatabase();
+
+	// 		const { game_name, player2, player3, player4, winner, end_time, gameId } = request.body;
+
+	// 		if (!gameId)
+	// 			throw new Error("zignew faut l'id de la game")
+
+	// 		const games = await new Promise<void>((resolve, reject) => {
+	// 			database.run(
+	// 				// 'UPDATE games SET game_name = ?, player2 = ?, player3 = ?, player4 = ?, winner = ?, end_time = ? WHERE id = ?) VALUES (?, ?, ?, ?, ?, ?, ?)',
+	// 				`UPDATE games 
+	// 				SET game_name = ?, player2 = ?, player3 = ?, player4 = ?, winner = ?, end_time = ?
+	// 				WHERE id = ?`,
+	// 				[game_name, player2, player3, player4, winner, end_time, gameId],
+	// 				(err: any) => {
+	// 					err ? reject(err) : resolve(); },
+	// 			);
+	// 		});
+
+
+	// 		return reply.send({
+	// 			message: 'update une game avec succès',
+	// 			games: games,
+	// 		});
+	// 	}
+
+	// 	catch (err: any) {
+	// 		console.error('Erreur retrieve game tables :', err);
+	// 		if (err.name === 'JsonWebTokenError')
+	// 			return reply.status(401).send({ error: 'Token invalide ou expiré' });
+	// 		return reply.status(500).send({ error: 'dans le mauvais pour update la game mgl', details: err.message });
+	// 	}
+
+	// })
+
+	app.put('/', async function (request: FastifyRequest, reply: FastifyReply) {
 		try {
 			const database = db.getDatabase();
 
-			const { game_name, player1, start_time } = request.body;
+			const { gameId, ...fields } = request.body;
 
-			if (!game_name)
-				throw new Error("You need to precise which game we're talking about");
-			if (!player1)
-				throw new Error("to create a game it gotta a player at least");
-			if (!start_time)
-				throw new Error("Precise at what time it started");
+			if (!gameId) throw new Error("gameId est obligatoire pour la mise à jour");
 
+			// Garde uniquement les champs définis (non null, non undefined)
+			const keys = Object.keys(fields).filter(key => fields[key] !== undefined && fields[key] !== null);
 
-			const gameTables = await new Promise<void>((resolve, reject) => {
-				database.run(
-					'INSERT INTO games (game_name, player1, start_time) VALUES (?, ?, ?)',
-					[game_name, player1, start_time],
-					(err: any) => {
-						err ? reject(err) : resolve(); }
-				);
+			if (keys.length === 0) {
+				// Rien à mettre à jour
+				return reply.send({ message: "Aucun champ à mettre à jour." });
+			}
+
+			// Construis la partie SET de la requête dynamique : "col1 = ?, col2 = ?, ..."
+			const setClause = keys.map(key => `${key} = ?`).join(', ');
+
+			// Prépare les valeurs correspondantes dans le même ordre
+			const values = keys.map(key => fields[key]);
+
+			// Ajoute gameId à la fin pour la clause WHERE
+			values.push(gameId);
+
+			const sql = `UPDATE games SET ${setClause} WHERE id = ?`;
+
+			await new Promise<void>((resolve, reject) => {
+				database.run(sql, values, (err: any) => {
+					err ? reject(err) : resolve();
+				});
 			});
 
 			return reply.send({
-				message: 'post une game avec succès',
+				message: 'Update réussie',
 			});
-		}
-
-		catch (err: any) {
-			console.error('Erreur retrieve game tables :', err);
+		} catch (err: any) {
+			console.error('Erreur update game :', err);
 			if (err.name === 'JsonWebTokenError')
 				return reply.status(401).send({ error: 'Token invalide ou expiré' });
-			return reply.status(500).send({ error: 'Erreur lors de cxxxl\'upload de l\'avatar', details: err.message });
+			return reply.status(500).send({ error: 'Erreur update game', details: err.message });
 		}
+	});
 
-	})
 }
 
 
