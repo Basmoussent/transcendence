@@ -14,6 +14,8 @@ export class makingGame {
 	private _2playerBtn: HTMLElement;
 	private _3playerBtn: HTMLElement;
 	private _4playerBtn: HTMLElement;
+	private launchBtn: HTMLElement;
+	private resetBtn: HTMLElement;
 
 	constructor() {
 		this.homeBtn = this.getElement('homeBtn');
@@ -23,6 +25,8 @@ export class makingGame {
 		this._2playerBtn = this.getElement('2playerBtn');
 		this._3playerBtn = this.getElement('3playerBtn');
 		this._4playerBtn = this.getElement('4playerBtn');
+		this.launchBtn = this.getElement('launchBtn');
+		this.resetBtn = this.getElement('resetBtn');
 
 		this.pong = false;
 		this.brick = false;
@@ -147,6 +151,36 @@ export class makingGame {
 				this._2player = false;
 				this._3player = false;
 			}
+
+		});
+
+		this.launchBtn.addEventListener('click', () => {
+
+			if (this.pong)
+				window.history.pushState({}, '', '/pong');
+			else
+				window.history.pushState({}, '', '/block');
+			window.dispatchEvent(new PopStateEvent('popstate'));
+		});
+
+		this.resetBtn.addEventListener('click', () => {
+
+			this.pong = false;
+			
+			this.brick = false;
+			this._1player = false;
+			this._2player = false;
+			this._3player = false;
+			this._4player = false;
+
+			this.pongBtn.classList.remove("chosen-button");
+			this.brickBtn.classList.remove("chosen-button");
+			this._1playerBtn.classList.remove("chosen-button");
+			this._2playerBtn.classList.remove("chosen-button");
+			this._3playerBtn.classList.remove("chosen-button");
+			this._4playerBtn.classList.remove("chosen-button");
+			this._3playerBtn.classList.remove("player-button-grise");
+			this._4playerBtn.classList.remove("player-button-grise");
 
 		});
 
