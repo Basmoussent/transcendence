@@ -198,17 +198,17 @@ export abstract class brick {
 
 class blue extends brick {
 	constructor(_id:number, _x:number, _y:number) {
-		super(1, _id, "blue", "#4780B1", _x, _y); }
+		super(1, _id, "blue", "#95ADB6", _x, _y); }
 }
 
 class green extends brick {
 	constructor(_id:number, _x:number, _y:number) {
-		super(2, _id, "green", "#61AB39", _x, _y); }
+		super(2, _id, "green", "#8DA1B9", _x, _y); }
 }
 
 class red extends brick {
 	constructor(_id:number, _x:number, _y:number) {
-		super(3, _id, "red", "#FF101F", _x, _y); }
+		super(3, _id, "red", "#CBB3BF", _x, _y); }
 }
 
 export function	createRandomBrick(it:number, _x:number, _y:number): brick {

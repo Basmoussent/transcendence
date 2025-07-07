@@ -7,7 +7,7 @@ import { render404 } from '../components/404';
 import { renderSocial } from '../pages/social/social';
 import { renderProfil } from '../pages/social/profil';
 import { renderMultiplayer, initializeMultiplayerEvents } from '../pages/game/multiplayer';
-import { renderLocal, initializeLocalEvents } from '../pages/game/local';
+import { renderLocal, makingGame } from '../pages/local/local';
 import { renderBlock } from '../pages/block/main';
 import { renderBlock1v1 } from '../pages/block/block1v1';
 import { renderTest } from '../pages/test/main';
@@ -138,9 +138,9 @@ export async function router() {
       case '/multiplayer':
         initializeMultiplayerEvents();
         break;
-      case '/local-game':
-        initializeLocalEvents();
-        break;
+      // case '/local-game':
+      //   makingGame();
+      //   break;
       case '/change-password':
         initializeChangePasswordEvents();
         break;

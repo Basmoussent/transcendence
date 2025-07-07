@@ -218,7 +218,7 @@ export class Block {
 				continue ;
 
 			this.ctx.fillStyle = brick.getColor();
-			this.ctx.fillRect(brick.getX() * this.brickWidth, brick.getY() * this.brickHeight, this.brickWidth, this.brickHeight);
+			this.ctx.fillRect(brick.getX() * this.brickWidth, brick.getY() * this.brickHeight, this.brickWidth + 1, this.brickHeight + 1);
 		}
 	}
 
