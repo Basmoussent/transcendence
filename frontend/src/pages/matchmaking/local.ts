@@ -36,8 +36,6 @@ const getTemplate = (name: string) => {
 			<h1 class="">Join a game</h1>
 
 			<div class="bg-red-500/40 w-[95%] h-[83%] grid grid-cols-2 gap-4 justify-start items-start pt-[2%] px-6 overflow-y-scroll" id=available-games>
-				<div class="bg-green-400 h-32">Test</div>
-				<div class="bg-green-400 h-32">Test</div>
 			</div>
 
 		</div>

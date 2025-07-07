@@ -25,3 +25,11 @@ creer une nouvelle game:  -> this.gameId = await logStartGame(this.username);
 
 
 quand une game est terminee, aller update les wins du user qui a gagne
+
+j'ai cree ma game
+
+je suis dans le chargement
+si ya assez de player on lance
+sinon on att
+
+appuyer sur un boutton pour rejoindre la game

@@ -35,15 +35,18 @@ export async function loadAvailableGames(): Promise<string | -1> {
 		if (response.ok) {
 			const result = await response.json();
 			const available: Available[] = result.games.map((game:any) => ({
-				game_name: game.game_name,
-				chef: game.chef,
-				player1: game.player1,
-				player2: game?.player2,
-				player3: game?.player3,
-				player4: game?.player4,
-				users_needed: (game.users_needed),
+				gameId: sanitizeHtml(game.id),
+				game_name: sanitizeHtml(game.game_name),
+				chef: sanitizeHtml(game.chef),
+				player1: sanitizeHtml(game.player1),
+				player2: sanitizeHtml(game?.player2),
+				player3: sanitizeHtml(game?.player3),
+				player4: sanitizeHtml(game?.player4),
+				users_needed:(sanitizeHtml(game.users_needed)),
 				divConverion(): string {
-					return `<div class="bg-green-400 h-32">${(this.chef)}</div>`;
+					return `<div class="bg-black h-32">${(this.chef)}
+						<button class="p-2 button launch-button" id="join${this.gameId}Btn">Join</button>
+						</div>`;
 				}
 			}));
 			console.log("available games: ", );
@@ -61,8 +64,12 @@ export async function gamesToDiv(games:Available[]): Promise<string> {
 
 	let tmp:string = '';
 
-	for (const game of games)
+	for (const game of games) {
+
+		this
+
 		tmp += game.divConverion();
+	}
 
 	console.log("available games div: ", tmp);
 	return tmp;
@@ -317,6 +324,15 @@ export class matchmaking {
 			console.log("_1playerBtn classes:", this._1playerBtn.classList);
 
 		});
+
+		// this.joinBtn.addEventListener('click', () => {
+
+		// boucler sur les join %d buttons de toutes les available games generees
+		// => requete PUT vers api/games
+		//	mettre le gameId dans le body
+		//	rajouter mon username en tant que player --> comment savoir quel player !!
+
+		
 
 
 	}
