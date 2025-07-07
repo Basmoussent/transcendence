@@ -137,6 +137,7 @@ export class Block {
 				return;
 
 		this.win = true;
+		this.winner = this.username;
 	}
 
 	private updateLose() {

@@ -7,7 +7,7 @@ import { render404 } from '../components/404';
 import { renderSocial } from '../pages/social/social';
 import { renderProfil } from '../pages/social/profil';
 import { renderMultiplayer, initializeMultiplayerEvents } from '../pages/game/multiplayer';
-import { renderLocal, makingGame } from '../pages/local/local';
+import { renderMatchmaking } from '../pages/matchmaking/local';
 import { renderBlock } from '../pages/block/main';
 import { renderBlock1v1 } from '../pages/block/block1v1';
 import { renderTest } from '../pages/test/main';
@@ -91,8 +91,8 @@ export async function router() {
     case '/multiplayer':
       view = renderMultiplayer();
       break;
-    case '/local-game':
-      view = renderLocal();
+    case '/matchmaking':
+      view = renderMatchmaking();
       break;
     case '/block':
       view = renderBlock();
@@ -138,9 +138,6 @@ export async function router() {
       case '/multiplayer':
         initializeMultiplayerEvents();
         break;
-      // case '/local-game':
-      //   makingGame();
-      //   break;
       case '/change-password':
         initializeChangePasswordEvents();
         break;

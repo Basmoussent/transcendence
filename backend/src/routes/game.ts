@@ -46,10 +46,10 @@ async function gameRoutes(app: FastifyInstance) {
 		}
 
 		catch (err: any) {
-			console.error('Erreur retrieve game tables :', err);
+			console.error('erreur GET /games :', err);
 			if (err.name === 'JsonWebTokenError')
 				return reply.status(401).send({ error: 'Token invalide ou expiré' });
-			return reply.status(500).send({ error: 'Erreur lors de cxxxl\'upload de l\'avatar', details: err.message });
+			return reply.status(500).send({ error: 'erreur GET /games', details: err.message });
 		}
 
 	})
@@ -61,15 +61,16 @@ async function gameRoutes(app: FastifyInstance) {
 		try {
 			const database = db.getDatabase();
 
-			const { game_name, chef, player1, player2, start_time } = request.body;
+			const { game_name, chef, player1, users_needed } = request.body;
 
-			if (!game_name || !chef || !player1 || !player2 || !start_time)
+
+			if (!game_name || !chef || !player1 || !users_needed)
 				throw new Error("Mandatory info needed to prelog game");
 
 			const gameId = await new Promise<void>((resolve, reject) => {
 				database.run(
-					'INSERT INTO games (game_name, chef, player1, player2, start_time) VALUES (?, ?, ?, ?, ?)',
-					[game_name, chef, player1, player2, start_time],
+					'INSERT INTO games (game_name, chef, player1, users_needed) VALUES (?, ?, ?, ?)',
+					[game_name, chef, player1, users_needed],
 					(err: any) => {
 						err ? reject(err) : resolve(); },
 					database.get('SELECT last_insert_rowid() as id', (err: any, row: any) => {
@@ -84,10 +85,10 @@ async function gameRoutes(app: FastifyInstance) {
 		}
 
 		catch (err: any) {
-			console.error('enregistrer une game :', err);
+			console.error('erreur PUT /games :', err);
 			if (err.name === 'JsonWebTokenError')
 				return reply.status(401).send({ error: 'Token invalide ou expiré' });
-			return reply.status(500).send({ error: 'enregistrer une game', details: err.message });
+			return reply.status(500).send({ error: 'erreur PUT /games', details: err.message });
 		}
 
 	})
@@ -168,12 +169,44 @@ async function gameRoutes(app: FastifyInstance) {
 				message: 'Update réussie',
 			});
 		} catch (err: any) {
-			console.error('Erreur update game :', err);
+			console.error('erreur PUT /games', err);
 			if (err.name === 'JsonWebTokenError')
 				return reply.status(401).send({ error: 'Token invalide ou expiré' });
-			return reply.status(500).send({ error: 'Erreur update game', details: err.message });
+			return reply.status(500).send({ error: 'erreur PUT /games', details: err.message });
 		}
 	});
+
+	app.get('/available', async function (request: FastifyRequest, reply: FastifyReply) {
+
+		console.log("récupérer qui attendent de pouvoir se lancer");
+
+		try {
+			const database = db.getDatabase();
+
+			const gameTables = await new Promise<GameTables[] | null>((resolve, reject) => {
+
+				database.all(
+					'SELECT * FROM games where start_time IS NULL',
+					(err: any, row: GameTables[] | undefined) => {
+						err ? reject(err) : resolve(row || null); }
+				);
+			});
+			console.log("gameTables", gameTables);
+
+			return reply.send({
+				message: 'gameTables recu avec succès',
+				gameTables: gameTables,
+			});
+		}
+
+		catch (err: any) {
+			console.error('pblm GET /games//available :', err);
+			if (err.name === 'JsonWebTokenError')
+				return reply.status(401).send({ error: 'Token invalide ou expiré' });
+			return reply.status(500).send({ error: 'pblm GET /games/available', details: err.message });
+		}
+
+	})
 
 }
 

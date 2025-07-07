@@ -1,4 +1,4 @@
-export class makingGame {
+export class matchmaking {
 
 	private pong: boolean;
 	private brick: boolean;
@@ -9,7 +9,7 @@ export class makingGame {
 
 	private homeBtn: HTMLElement;
 	private pongBtn: HTMLElement;
-	private brickBtn: HTMLElement;
+	private blockBtn: HTMLElement;
 	private _1playerBtn: HTMLElement;
 	private _2playerBtn: HTMLElement;
 	private _3playerBtn: HTMLElement;
@@ -20,7 +20,7 @@ export class makingGame {
 	constructor() {
 		this.homeBtn = this.getElement('homeBtn');
 		this.pongBtn = this.getElement('pongBtn');
-		this.brickBtn = this.getElement('brickBtn');
+		this.blockBtn = this.getElement('blockBtn');
 		this._1playerBtn = this.getElement('1playerBtn');
 		this._2playerBtn = this.getElement('2playerBtn');
 		this._3playerBtn = this.getElement('3playerBtn');
@@ -71,31 +71,36 @@ export class makingGame {
 				return ;
 
 			this.pong = true;
-			this.pongBtn.classList.add("chosen-button");
+			this._1player = false;
+			this._1playerBtn.classList.add("player-button-grise");
 			this._3playerBtn.classList.remove("player-button-grise");
 			this._4playerBtn.classList.remove("player-button-grise");
-			
+			this.pongBtn.classList.add("chosen-button");
+
 			if (this.brick) {
 				this.brick = false;
-				this.brickBtn.classList.remove("chosen-button");
+				this.blockBtn.classList.remove("chosen-button");
 			}
+
 		});
 
-		this.brickBtn.addEventListener('click', () => {
+		this.blockBtn.addEventListener('click', () => {
 			if (this.brick)
 				return ;
 
 			this.brick = true;
-			this.brickBtn.classList.add("chosen-button");
-			this._3playerBtn.classList.add("player-button-grise");
-			this._4playerBtn.classList.add("player-button-grise");
 			this._3player = false;
 			this._4player = false;
+			this._1playerBtn.classList.remove("player-button-grise");
+			this._3playerBtn.classList.add("player-button-grise");
+			this._4playerBtn.classList.add("player-button-grise");
+			this.blockBtn.classList.add("chosen-button");
 
 			if (this.pong) {
 				this.pong = false;
 				this.pongBtn.classList.remove("chosen-button");
 			}
+
 		});
 
 		this._1playerBtn.addEventListener('click', () => {
@@ -107,6 +112,7 @@ export class makingGame {
 				this._3player = false;
 				this._4player = false;
 			}
+			// this._1playerBtn.classList.add("chosen-button");
 		});
 
 		this._2playerBtn.addEventListener('click', () => {
@@ -118,6 +124,7 @@ export class makingGame {
 				this._3player = false;
 				this._4player = false;
 			}
+			// this._2playerBtn.classList.add("chosen-button");
 		});
 
 		this._3playerBtn.addEventListener('click', () => {
@@ -134,6 +141,7 @@ export class makingGame {
 				this._2player = false;
 				this._4player = false;
 			}
+			// this._3playerBtn.classList.add("chosen-button");
 
 		});
 
@@ -151,6 +159,7 @@ export class makingGame {
 				this._2player = false;
 				this._3player = false;
 			}
+			// this._4playerBtn.classList.add("chosen-button");
 
 		});
 
@@ -174,7 +183,7 @@ export class makingGame {
 			this._4player = false;
 
 			this.pongBtn.classList.remove("chosen-button");
-			this.brickBtn.classList.remove("chosen-button");
+			this.blockBtn.classList.remove("chosen-button");
 			this._1playerBtn.classList.remove("chosen-button");
 			this._2playerBtn.classList.remove("chosen-button");
 			this._3playerBtn.classList.remove("chosen-button");
@@ -186,4 +195,17 @@ export class makingGame {
 
 
 	}
+}
+
+
+export class GameList {
+	private container: HTMLElement;
+	private games: Game[] = [];
+	private refreshInterval: number | null = null;
+
+	constructor() {
+
+	}
+
+
 }

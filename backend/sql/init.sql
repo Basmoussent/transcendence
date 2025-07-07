@@ -17,6 +17,7 @@ CREATE TABLE IF NOT EXISTS games (
   player3 TEXT,
   player4 TEXT,
   winner TEXT,
+  users_needed INTEGER,
   start_time TEXT,
   end_time TEXT
 );
