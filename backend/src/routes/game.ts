@@ -183,7 +183,7 @@ async function gameRoutes(app: FastifyInstance) {
 		try {
 			const database = db.getDatabase();
 
-			const gameTables = await new Promise<GameTables[] | null>((resolve, reject) => {
+			const games = await new Promise<GameTables[] | null>((resolve, reject) => {
 
 				database.all(
 					'SELECT * FROM games where start_time IS NULL',
@@ -191,11 +191,11 @@ async function gameRoutes(app: FastifyInstance) {
 						err ? reject(err) : resolve(row || null); }
 				);
 			});
-			console.log("gameTables", gameTables);
+			console.log("games", games);
 
 			return reply.send({
-				message: 'gameTables recu avec succès',
-				gameTables: gameTables,
+				message: 'games recu avec succès',
+				games: games,
 			});
 		}
 

@@ -1,7 +1,6 @@
-import { matchmaking,  } from "./matchmaking";
+import { loadAvailableGames, matchmaking,  } from "./matchmaking";
 import { getAuthToken } from '../../utils/auth';
 import { sanitizeHtml } from '../../utils/sanitizer';
-
 
 const getTemplate = (name: string) => {
 	return `
@@ -23,49 +22,21 @@ const getTemplate = (name: string) => {
 				<button class="bg-blue-300 hover:bg-blue:500 p-2">reset</button>
 			</div>
 		</div>
-		<div class="bg-blue-500/40 w-2/6 h-10/12"></div>
+		<div class="bg-blue-500/40 w-2/6 flex flex-col gap-3 justify-start items-center pt-[2%] px-4 h-10/12">
+
+			<h1 class="">Join a game</h1>
+
+			<div class="bg-red-500/40 w-[95%] h-[83%] grid grid-cols-2 gap-4 justify-start items-start pt-[2%] px-6 overflow-y-scroll" id=available-games>
+				<div class="bg-green-400 h-32">Test</div>
+				<div class="bg-green-400 h-32">Test</div>
+			</div>
+
+		</div>
 	</div>
 
 		`;
 }
-
 	
-const getAvailableGames = async () => {
-
-	try {
-		const token = getAuthToken();
-		if (!token) {
-			alert('❌ Token d\'authentification manquant');
-			window.history.pushState({}, '', '/login');
-			window.dispatchEvent(new PopStateEvent('popstate'));
-			return '';
-		}
-
-		const response = await fetch('/api/games/available', {
-			method: 'GET',
-			headers: {
-				'Content-Type': 'application/json',
-				'x-access-token': token }
-		});
-	
-		if (response.ok) {
-			const result = await response.json();
-			return result.gameTables.map((game) => ({
-				game_name: sanitizeHtml(game.game_name),
-				chef: sanitizeHtml(game.chef),
-				player1: sanitizeHtml(game.player_1),
-				player2: sanitizeHtml(game.player_2),
-				player3: sanitizeHtml(game.player_3),
-				player4: sanitizeHtml(game.player_4),
-			}));
-		}
-		else 
-			console.error('Erreur lors de la récupération des données utilisateur');
-	}
-	catch (error) {
-		console.error("Error rendering profile page:", error); }
-	
-}
 
 export function renderMatchmaking() {
 
@@ -74,9 +45,11 @@ export function renderMatchmaking() {
 	setTimeout(async () => {
 		console.log('Initializing game making page');
 		try {
-			const gameList = await getAvailableGames();
-			console.log(gameList);
-
+			const gameList = await loadAvailableGames();
+			const container = document.getElementById('available-games');
+			if (container && typeof gameList === 'string') {
+				container.innerHTML = gameList;
+			}
 		}
 		catch (err:any) {
 			console.log(err);

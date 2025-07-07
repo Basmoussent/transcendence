@@ -1,3 +1,72 @@
+import { getAuthToken } from '../../utils/auth';
+import { sanitizeHtml } from '../../utils/sanitizer';
+
+interface Available {
+	game_name: string,
+	chef: string,
+	player1: string,
+	player2?: string,
+	player3?: string,
+	player4?: string,
+	users_needed: number,
+	divConverion(): string;
+};
+
+export async function loadAvailableGames(): Promise<string | -1> {
+	
+	try {
+		const token = getAuthToken();
+		if (!token) {
+			alert('❌ Token d\'authentification manquant');
+			window.history.pushState({}, '', '/login');
+			window.dispatchEvent(new PopStateEvent('popstate'));
+			return -1;
+		}
+
+		const response = await fetch('/api/games/available', {
+			method: 'GET',
+			headers: {
+				'Content-Type': 'application/json',
+				'x-access-token': token,
+			}
+		});
+		
+		if (response.ok) {
+			const result = await response.json();
+			const available: Available[] = result.games.map((game:any) => ({
+				game_name: game.game_name,
+				chef: game.chef,
+				player1: game.player1,
+				player2: game?.player2,
+				player3: game?.player3,
+				player4: game?.player4,
+				users_needed: (game.users_needed),
+				divConverion(): string {
+					return `<div class="bg-green-400 h-32">${(this.chef)}</div>`;
+				}
+			}));
+			console.log("available games: ", );
+			return (gamesToDiv(available));
+		}
+		else 
+			console.error("retrieve available game failed");
+	}
+	catch (error) {
+		console.error("retrieve available game failed", error); }
+	return -1;
+}
+
+export async function gamesToDiv(games:Available[]): Promise<string> {
+
+	let tmp:string = '';
+
+	for (const game of games)
+		tmp += game.divConverion();
+
+	console.log("available games div: ", tmp);
+	return tmp;
+}
+
 export class matchmaking {
 
 	private pong: boolean;
