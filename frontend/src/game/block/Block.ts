@@ -1,5 +1,5 @@
-import { brick, Ball, Paddle, createRandomBrick, fetchUsername } from "./blockUtils.ts"
-import { postGame, logStartGame, logEndGame } from "../gameUtils.ts";
+import { brick, Ball, Paddle, createRandomBrick,  } from "./blockUtils.ts"
+import { postGame, logStartGame, logEndGame, fetchUsername } from "../gameUtils.ts";
 
 export class Block {
 	private canvas: HTMLCanvasElement;

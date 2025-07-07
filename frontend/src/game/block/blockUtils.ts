@@ -219,54 +219,6 @@ export function	createRandomBrick(it:number, _x:number, _y:number): brick {
 	return (new blue(it, _x, _y));
 }
 
-let userData = {
-	username: 'Username',
-	email: 'email@example.com',
-	avatar: 'avatar.png',
-	wins: 0,
-	games: 0,
-	rating: 0,
-	preferred_language: 'en'
-};
 
-export async function fetchUsername() {
-	
-	try {
-		const token = getAuthToken();
-		if (!token) {
-			alert('❌ Token d\'authentification manquant');
-			window.history.pushState({}, '', '/login');
-			window.dispatchEvent(new PopStateEvent('popstate'));
-			return '';
-		}
-
-		const response = await fetch('/api/me', {
-			method: 'GET',
-			headers: {
-				'Content-Type': 'application/json',
-				'x-access-token': token }
-		});
-	
-		if (response.ok) {
-			const result = await response.json();
-			userData = {
-				username: sanitizeHtml(result.user?.username) || 'Username',
-				email: sanitizeHtml(result.user?.email) || 'email@example.com',
-				avatar: sanitizeHtml(result.user?.avatar_url) || 'avatar.png',
-				wins: (result.stats?.wins) || 0,
-				games: (result.stats?.games) || 0,
-				rating: (result.stats?.rating) || 0,
-				preferred_language: sanitizeHtml(result.user?.language) || 'en'
-				
-			};
-			console.log(userData);
-			return (userData.username);
-		}
-		else 
-			console.error('Erreur lors de la récupération des données utilisateur');
-	}
-	catch (error) {
-		console.error("Error rendering profile page:", error); }
-}
 
 // export async function updateStats(gameId:number)

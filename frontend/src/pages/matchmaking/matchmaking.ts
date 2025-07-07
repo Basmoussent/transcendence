@@ -1,3 +1,4 @@
+import { Game, fetchUsername, postGame } from '../../game/gameUtils'
 import { getAuthToken } from '../../utils/auth';
 import { sanitizeHtml } from '../../utils/sanitizer';
 
@@ -86,6 +87,7 @@ export class matchmaking {
 	private launchBtn: HTMLElement;
 	private resetBtn: HTMLElement;
 	private options: HTMLElement;
+	private username: string;
 
 	constructor() {
 		this.homeBtn = this.getElement('homeBtn');
@@ -101,19 +103,30 @@ export class matchmaking {
 
 		this.pong = false;
 		this.brick = false;
+		this.username = "prout";
 		this._1player = false;
 		this._2player = false;
 		this._3player = false;
 		this._4player = false;
 
+		this.loadUsername();
 		this.setEvents();
+	}
+
+	private async loadUsername() {
+		try {
+			const name = await fetchUsername();
+			this.username = name || 'unknown';
+			console.log("C'est MOI", this.username);
+		}
+		catch (err) {
+			console.error("Erreur fetchUsername :", err); }
 	}
 
 	private getElement(id: string): HTMLElement {
 		const el = document.getElementById(id);
 		if (!el)
 			throw new Error(`Element "${id}" not found`);
-		console.log(`je trouve ${id}`)
 		return el;
 	}
 
@@ -255,10 +268,17 @@ export class matchmaking {
 		this.launchBtn.addEventListener('click', () => {
 
 			// creer le body pour la requete POST
-
 			
+			let tmp:Game = {
+				game_name: this.pong ? "pong" : "block",
+				chef: this.username,
+				player1: this.username,
+				users_needed: this._1player ? 1 : this._2player ? 2 : this._3player ? 3 : 4
+			}
 
 			this.options.style.display = "none"
+
+			postGame(tmp);
 
 			//afficher msg de chargementg
 

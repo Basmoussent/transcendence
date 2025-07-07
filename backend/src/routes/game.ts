@@ -93,45 +93,6 @@ async function gameRoutes(app: FastifyInstance) {
 
 	})
 
-	// app.put('/', async function (request: FastifyRequest, reply: FastifyReply) {
-
-	// 	console.log("enregistrer une game");
-
-	// 	try {
-	// 		const database = db.getDatabase();
-
-	// 		const { game_name, player2, player3, player4, winner, end_time, gameId } = request.body;
-
-	// 		if (!gameId)
-	// 			throw new Error("zignew faut l'id de la game")
-
-	// 		const games = await new Promise<void>((resolve, reject) => {
-	// 			database.run(
-	// 				`UPDATE games 
-	// 				SET game_name = ?, player2 = ?, player3 = ?, player4 = ?, winner = ?, end_time = ?
-	// 				WHERE id = ?`,
-	// 				[game_name, player2, player3, player4, winner, end_time, gameId],
-	// 				(err: any) => {
-	// 					err ? reject(err) : resolve(); },
-	// 			);
-	// 		});
-
-
-	// 		return reply.send({
-	// 			message: 'update une game avec succès',
-	// 			games: games,
-	// 		});
-	// 	}
-
-	// 	catch (err: any) {
-	// 		console.error('Erreur retrieve game tables :', err);
-	// 		if (err.name === 'JsonWebTokenError')
-	// 			return reply.status(401).send({ error: 'Token invalide ou expiré' });
-	// 		return reply.status(500).send({ error: 'dans le mauvais pour update la game mgl', details: err.message });
-	// 	}
-
-	// })
-
 	app.put('/', async function (request: FastifyRequest, reply: FastifyReply) {
 		try {
 			const database = db.getDatabase();
@@ -143,10 +104,8 @@ async function gameRoutes(app: FastifyInstance) {
 			// Garde uniquement les champs définis (non null, non undefined)
 			const keys = Object.keys(fields).filter(key => fields[key] !== undefined && fields[key] !== null);
 
-			if (keys.length === 0) {
-				// Rien à mettre à jour
+			if (keys.length === 0)
 				return reply.send({ message: "Aucun champ à mettre à jour." });
-			}
 
 			// Construis la partie SET de la requête dynamique : "col1 = ?, col2 = ?, ..."
 			const setClause = keys.map(key => `${key} = ?`).join(', ');
@@ -168,7 +127,8 @@ async function gameRoutes(app: FastifyInstance) {
 			return reply.send({
 				message: 'Update réussie',
 			});
-		} catch (err: any) {
+		}
+		catch (err: any) {
 			console.error('erreur PUT /games', err);
 			if (err.name === 'JsonWebTokenError')
 				return reply.status(401).send({ error: 'Token invalide ou expiré' });

@@ -16,10 +16,11 @@ CREATE TABLE IF NOT EXISTS games (
   player2 TEXT,
   player3 TEXT,
   player4 TEXT,
-  winner TEXT,
   users_needed INTEGER,
+  ai INTEGER DEFAULT 0,
   start_time TEXT,
   end_time TEXT
+  winner TEXT,
 );
 
 CREATE TABLE IF NOT EXISTS chats (
