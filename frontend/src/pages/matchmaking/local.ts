@@ -13,20 +13,22 @@ const getTemplate = (name: string) => {
 			Home
 		</button>
 		<div class="bg-yellow-500/40 w-4/6 flex flex-col gap-8 justify-center items-center px-42 h-10/12 options-container">
-			<div class="flex gap-6 border-2 rounded-xl px-8 py-4">
-				<button class="p-2 button pong-button" id=pongBtn>Pong</button>
-				<button class="p-2 button block-button" id=blockBtn>Block</button>
-			</div>
-			<div class="flex gap-6 border-2 rounded-xl px-8 py-4">
-				<button class="p-2 button player-button" id="1playerBtn">1 player</button>
-				<button class="p-2 button player-button" id="2playerBtn">2 player</button>
-				<button class="p-2 button player-button" id="3playerBtn">3 player</button>
-				<button class="p-2 button player-button" id="4playerBtn">4 player</button>
-			</div>
+			<div id="game-options" class="flex flex-col gap-8 justify-center items-center">
+				<div class="flex gap-6 border-2 rounded-xl px-8 py-4">
+					<button class="p-2 button pong-button" id=pongBtn>Pong</button>
+					<button class="p-2 button block-button" id=blockBtn>Block</button>
+				</div>
+				<div class="flex gap-6 border-2 rounded-xl px-8 py-4">
+					<button class="p-2 button player-button" id="1playerBtn">1 player</button>
+					<button class="p-2 button player-button" id="2playerBtn">2 player</button>
+					<button class="p-2 button player-button" id="3playerBtn">3 player</button>
+					<button class="p-2 button player-button" id="4playerBtn">4 player</button>
+				</div>
 
-			<div class="flex gap-6 border-2 rounded-xl px-8 py-4">
-				<button class="p-2 button launch-button" id="launchBtn">Launch</button>
-				<button class="p-2 button reset-button" id="resetBtn">Reset</button>
+				<div class="flex gap-6 border-2 rounded-xl px-8 py-4">
+					<button class="p-2 button launch-button" id="launchBtn">Launch</button>
+					<button class="p-2 button reset-button" id="resetBtn">Reset</button>
+				</div>
 			</div>
 		</div>
 		<div class="bg-blue-500/40 w-2/6 flex flex-col gap-3 justify-start items-center pt-[2%] px-4 h-10/12">

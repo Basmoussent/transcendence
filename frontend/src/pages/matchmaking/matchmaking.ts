@@ -85,6 +85,7 @@ export class matchmaking {
 	private _4playerBtn: HTMLElement;
 	private launchBtn: HTMLElement;
 	private resetBtn: HTMLElement;
+	private options: HTMLElement;
 
 	constructor() {
 		this.homeBtn = this.getElement('homeBtn');
@@ -96,6 +97,7 @@ export class matchmaking {
 		this._4playerBtn = this.getElement('4playerBtn');
 		this.launchBtn = this.getElement('launchBtn');
 		this.resetBtn = this.getElement('resetBtn');
+		this.options = this.getElement("game-options");
 
 		this.pong = false;
 		this.brick = false;
@@ -252,11 +254,22 @@ export class matchmaking {
 
 		this.launchBtn.addEventListener('click', () => {
 
-			if (this.pong)
-				window.history.pushState({}, '', '/pong');
-			else
-				window.history.pushState({}, '', '/block');
-			window.dispatchEvent(new PopStateEvent('popstate'));
+			// creer le body pour la requete POST
+
+			
+
+			this.options.style.display = "none"
+
+			//afficher msg de chargementg
+
+			// <H3 id="loadingmsg" class="flex flex-col gap-8 justify-center items-center">Looking for opponents</H3>
+
+
+			// if (this.pong)
+			// 	window.history.pushState({}, '', '/pong');
+			// else
+			// 	window.history.pushState({}, '', '/block');
+			// window.dispatchEvent(new PopStateEvent('popstate'));
 		});
 
 		this.resetBtn.addEventListener('click', () => {
