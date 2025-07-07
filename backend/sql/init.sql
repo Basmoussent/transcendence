@@ -19,8 +19,8 @@ CREATE TABLE IF NOT EXISTS games (
   users_needed INTEGER,
   ai INTEGER DEFAULT 0,
   start_time TEXT,
-  end_time TEXT
-  winner TEXT,
+  end_time TEXT,
+  winner TEXT
 );
 
 CREATE TABLE IF NOT EXISTS chats (

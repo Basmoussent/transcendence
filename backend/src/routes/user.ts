@@ -8,7 +8,7 @@ import { pipeline } from 'stream'
 import path from 'path';
 
 interface stats {
-    win: number,
+    wins: number,
     pong_games: number,
     block_games: number,
     rating: number
@@ -66,12 +66,12 @@ async function userRoutes(app: FastifyInstance) {
 
             // Récupération des statistiques (pour l'instant des valeurs par défaut)
             // TODO: Implémenter la vraie logique des statistiques
-            const stats = {
-                win: user.stats.win,
-                pong_games: user.stats.pong_games,
-                block_games: user.stats.block_games,
-                rating: user.stats.rating
-            };
+            // const stats = {
+            //     win: user.stats.wins,
+            //     pong_games: user.stats.pong_games,
+            //     block_games: user.stats.block_games,
+            //     rating: user.stats.rating
+            // };
 
             return reply.send({
                 user: {
@@ -81,7 +81,7 @@ async function userRoutes(app: FastifyInstance) {
                     avatar_url: user.avatar_url || 'avatar.png',
                     language: user.language
                 },
-                stats: stats
+                // stats: stats
             });
         } catch (err: any) {
             console.error('❌ Error in /me endpoint:', err);
