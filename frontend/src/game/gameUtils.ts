@@ -45,7 +45,7 @@ export async function postGame(input:Game): Promise<number> {
 	return -1;
 }
 
-export async function logStartingGame(gameId:number): Promise<number> {
+export async function logStartGame(gameId:number): Promise<number> {
 	
 	try {
 		const token = getAuthToken();

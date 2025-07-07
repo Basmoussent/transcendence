@@ -37,7 +37,7 @@ ball touche droite/gauche
 
 pouvoir qui fait que ta balle traverse et tues toutes les bricks
 
-creer une nouvelle game:  -> this.gameId = await logStartingGame(this.username);
+creer une nouvelle game:  -> this.gameId = await logStartGame(this.username);
 
 	eteins ca cree plusieurs game vue que la fonction est async
 	moyen pour recuperer l'id de la game
