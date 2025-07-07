@@ -1,4 +1,5 @@
-import { brick, Ball, Paddle, createRandomBrick, fetchUsername, logStartingGame, logEndGame } from "./blockUtils.ts"
+import { brick, Ball, Paddle, createRandomBrick, fetchUsername } from "./blockUtils.ts"
+import { postGame, logStartingGame, logEndGame } from "../gameUtils.ts";
 
 export class Block {
 	private canvas: HTMLCanvasElement;
@@ -153,7 +154,7 @@ export class Block {
 			ball.reset(this.width / 2, (this.height / 4) + 50, 3, 6)
 			this.status = true;
 
-			this.gameId = await logStartingGame(this.username);
+			this.gameId = await postGame(this.username);
 			// proteger si on arrive pas
 			this.bricks = [];
 			for (let it = 0; it < 100; ++it)

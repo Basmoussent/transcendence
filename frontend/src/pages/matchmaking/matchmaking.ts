@@ -111,6 +111,7 @@ export class matchmaking {
 		const el = document.getElementById(id);
 		if (!el)
 			throw new Error(`Element "${id}" not found`);
+		console.log(`je trouve ${id}`)
 		return el;
 	}
 
@@ -123,6 +124,14 @@ export class matchmaking {
 			_3player: this._3player,
 			_4player: this._4player
 			});
+	}
+
+	private changeStyle(el:HTMLElement, style:string): void {
+
+		el.className = 'button';
+		el.classList.add(style);
+
+
 	}
 
 	private setEvents(): void {
@@ -144,12 +153,16 @@ export class matchmaking {
 			this._1playerBtn.classList.add("player-button-grise");
 			this._3playerBtn.classList.remove("player-button-grise");
 			this._4playerBtn.classList.remove("player-button-grise");
-			this.pongBtn.classList.add("chosen-button");
 
 			if (this.brick) {
 				this.brick = false;
 				this.blockBtn.classList.remove("chosen-button");
+				this.blockBtn.classList.add("block-button");
 			}
+
+			this.pongBtn.classList.remove("pong-button");
+			this.pongBtn.classList.add("chosen-button");
+			console.log("pongBtn classes:", this.pongBtn.classList);
 
 		});
 
@@ -163,12 +176,17 @@ export class matchmaking {
 			this._1playerBtn.classList.remove("player-button-grise");
 			this._3playerBtn.classList.add("player-button-grise");
 			this._4playerBtn.classList.add("player-button-grise");
-			this.blockBtn.classList.add("chosen-button");
 
 			if (this.pong) {
 				this.pong = false;
 				this.pongBtn.classList.remove("chosen-button");
+				this.pongBtn.classList.add("pong-button");
+
 			}
+
+			this.blockBtn.classList.remove("block-button");
+			this.blockBtn.classList.add("chosen-button");
+			console.log("blockBtn classes:", this.blockBtn.classList);
 
 		});
 
@@ -181,7 +199,7 @@ export class matchmaking {
 				this._3player = false;
 				this._4player = false;
 			}
-			// this._1playerBtn.classList.add("chosen-button");
+			this._1playerBtn.classList.add("chosen-button");
 		});
 
 		this._2playerBtn.addEventListener('click', () => {
@@ -193,7 +211,7 @@ export class matchmaking {
 				this._3player = false;
 				this._4player = false;
 			}
-			// this._2playerBtn.classList.add("chosen-button");
+			this._2playerBtn.classList.add("chosen-button");
 		});
 
 		this._3playerBtn.addEventListener('click', () => {
@@ -210,7 +228,7 @@ export class matchmaking {
 				this._2player = false;
 				this._4player = false;
 			}
-			// this._3playerBtn.classList.add("chosen-button");
+			this._3playerBtn.classList.add("chosen-button");
 
 		});
 
@@ -228,7 +246,7 @@ export class matchmaking {
 				this._2player = false;
 				this._3player = false;
 			}
-			// this._4playerBtn.classList.add("chosen-button");
+			this._4playerBtn.classList.add("chosen-button");
 
 		});
 
@@ -257,24 +275,16 @@ export class matchmaking {
 			this._2playerBtn.classList.remove("chosen-button");
 			this._3playerBtn.classList.remove("chosen-button");
 			this._4playerBtn.classList.remove("chosen-button");
+			this._1playerBtn.classList.remove("player-button-grise");
+			this._2playerBtn.classList.remove("player-button-grise");
 			this._3playerBtn.classList.remove("player-button-grise");
 			this._4playerBtn.classList.remove("player-button-grise");
+
+			console.log("pongBtn classes:", this.pongBtn.classList);
+			console.log("_1playerBtn classes:", this._1playerBtn.classList);
 
 		});
 
 
 	}
-}
-
-
-export class GameList {
-	private container: HTMLElement;
-	private games: Game[] = [];
-	private refreshInterval: number | null = null;
-
-	constructor() {
-
-	}
-
-
 }
