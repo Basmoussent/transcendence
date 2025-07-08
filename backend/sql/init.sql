@@ -48,8 +48,10 @@ CREATE TABLE IF NOT EXISTS messages (
 
 CREATE TABLE IF NOT EXISTS statistics (
   user_id INTEGER REFERENCES chats(id) ON DELETE CASCADE,
-  win INTEGER DEFAULT 0,
+  mmr INTEGER DEFAULT 800,
   pong_games INTEGER DEFAULT 0,
+  pong_wins INTEGER DEFAULT 0,
   block_games INTEGER DEFAULT 0,
+  block_wins INTEGER DEFAULT 0,
   rating INTEGER
 )

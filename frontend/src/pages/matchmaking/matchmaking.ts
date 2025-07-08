@@ -285,9 +285,14 @@ export class matchmaking {
 
 			postGame(tmp);
 
+			// nbre de joueur --> user + ia
+			// leur username dans player(n) --> modif a user id et faire une fonction pour retrieve le username
+			// combien d'ia
+			// pouvoirs oui ou non
+
 			
 
-			//afficher msg de chargementg
+			// afficher msg de chargementg
 
 			// <H3 id="loadingmsg" class="flex flex-col gap-8 justify-center items-center">Looking for opponents</H3>
 
@@ -297,6 +302,10 @@ export class matchmaking {
 			// else
 			// 	window.history.pushState({}, '', '/block');
 			// window.dispatchEvent(new PopStateEvent('popstate'));
+
+
+			// a la fin de la game appeler une fonction pour update les stats de chaque joueur
+			
 		});
 
 		this.resetBtn.addEventListener('click', () => {

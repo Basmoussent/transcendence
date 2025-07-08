@@ -14,8 +14,5 @@
 6M7m
 	# ◦ Major module: 2FA
 
-
-
-
 # ◦ Major module: Multiplayer (more than 2 players in the same game).
 # ◦ Minor module: Support on all devices.
