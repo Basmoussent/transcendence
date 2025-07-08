@@ -16,8 +16,6 @@ import webSocketRoutes from './routes/web-socket';
 import { getSecretFromVault } from './utils/vault';
 import barRoutes from './routes/testrouter';
 
-
-
 const fastify = Fastify({ logger: { level: 'debug' } });
 
 async function setup() {
@@ -32,9 +30,9 @@ async function setup() {
   console.log('🌐 Registering CORS...');
   await fastify.register(cors, {
     origin: [
-      'https://localhost:2443', 
-      'https://fr.localhost:5173', 
-      'https://en.localhost:5173', 
+      'https://localhost:2443',
+      'https://fr.localhost:5173',
+      'https://en.localhost:5173',
       'https://es.localhost:5173',
       'https://fr.entropy.local',
       'https://en.entropy.local',
@@ -107,8 +105,6 @@ async function setup() {
     }
   });
 
-
-
   console.log('✅ Basic routes set up');
 
   console.log('🌍 Starting server...');
@@ -120,6 +116,13 @@ async function setup() {
 
 }
 
+// setInterval(() => {
+//   fastify.websocketServer.clients.forEach((client: any) => {
+//     if (client.readyState === 1) {
+//       client.send("test bonjour !");
+//     }
+//   })
+// }, 1000);
 
 process.on('SIGTERM', () => {
   db.close();

@@ -7,17 +7,18 @@ export class Test {
 
 	constructor() {
 
+		this.input = this.getElement('messageInput') as HTMLInputElement;
+		this.messages = this.getElement('chatMessages');
+		this.sendBtn = this.getElement('sendButton')
 		this.ws = new WebSocket(`${window.location.protocol === "https:" ? "wss" : "ws"}://${window.location.host}/ws`);
 		this.ws.onopen = () => this.ws.send('hello server');
-		this.ws.onmessage = event => console.log('Received:', event.data);
+		this.ws.onmessage = (event) => this.onMessage(event, this.messages);
 		this.ws.onerror = (error) => {
 			console.error('❌ WebSocket error:', error)}
 		this.ws.onclose = (event) => {
 			console.log('🔌 Connection closed:', event.code, event.reason)}
 
-		this.input = this.getElement('messageInput') as HTMLInputElement;
-		this.messages = this.getElement('chatMessages');
-		this.sendBtn = this.getElement('sendButton')
+		
 
 		this.setEvents();
 	}
@@ -42,6 +43,17 @@ export class Test {
 		console.log("Message sent:", message);
 	}
 
+	private onMessage(event: MessageEvent<any>, messages: any): void {
+
+		const message = event.data.toString().trim();
+		const newMsg = document.createElement('div');
+		
+		newMsg.classList.add('message');
+		newMsg.textContent = message;
+		messages.appendChild(newMsg);
+		messages.scrollTop = messages.scrollHeight;
+	}
+
 	private setEvents(): void {
 		this.input.addEventListener("keydown", (e: KeyboardEvent) => {
 			if (e.key === "Enter") {
@@ -50,6 +62,7 @@ export class Test {
 
 		this.sendBtn.addEventListener("click", () => {
 			this.sendMessage();
+
 		});
 	}
 
