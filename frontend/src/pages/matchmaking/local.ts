@@ -5,7 +5,7 @@ import { sanitizeHtml } from '../../utils/sanitizer';
 	// <div class="flex gap-12 h-screen justify-center items-center px-8" id=options-container>
 
 
-const getTemplate = (name: string) => {
+const getTemplate = () => {
 	return `
 	<div class="flex gap-12 h-screen justify-center items-center px-8" id=options-container>
 		<button class="home-button" id="homeBtn">
@@ -148,6 +148,6 @@ export function renderMatchmaking() {
 
 
 
-	return getTemplate("Hello !");
+	return getTemplate();
 
 }

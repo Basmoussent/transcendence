@@ -10,7 +10,7 @@ import { renderMultiplayer, initializeMultiplayerEvents } from '../pages/game/mu
 import { renderMatchmaking } from '../pages/matchmaking/local';
 import { renderBlock } from '../pages/block/main';
 import { renderBlock1v1 } from '../pages/block/block1v1';
-import { renderTest } from '../pages/test/main';
+import { renderTest } from '../pages/test/test';
 import { renderChangePassword, initializeChangePasswordEvents } from '../pages/auth/change-password';
 import { renderEditProfil, initializeEditProfileEvents } from '../pages/social/edit-profil';
 import { getAuthToken } from './auth';
@@ -111,6 +111,9 @@ export async function router() {
       break;
     case '/pong':
       view = renderPong();
+      break;
+    case '/test':
+      view = renderTest();
       break;
     default:
       view = render404();

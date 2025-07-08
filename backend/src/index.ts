@@ -12,6 +12,7 @@ import authRoutes from "./routes/authentication"
 import gameRoutes from './routes/game';
 import editRoutes from './routes/reset-pwd';
 import userRoutes from './routes/user';
+import webSocketRoutes from './routes/web-socket';
 import { getSecretFromVault } from './utils/vault';
 import barRoutes from './routes/testrouter';
 
@@ -73,7 +74,7 @@ async function setup() {
   
   // Register WebSocket
   console.log('🔌 Registering WebSocket...');
-  await fastify.register(websocket);
+  await fastify.register(webSocketRoutes, {prefix: "/ws"});
   console.log('✅ WebSocket registered');
 
   // Register JWT
