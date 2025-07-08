@@ -66,8 +66,6 @@ export async function gamesToDiv(games:Available[]): Promise<string> {
 
 	for (const game of games) {
 
-		this
-
 		tmp += game.divConverion();
 	}
 
@@ -286,6 +284,8 @@ export class matchmaking {
 			this.options.style.display = "none"
 
 			postGame(tmp);
+
+			
 
 			//afficher msg de chargementg
 

@@ -118,7 +118,7 @@ async function authRoutes(app: FastifyInstance) {
       database.get(
         'SELECT * FROM users WHERE username = ?',
         [username],
-        async (err, user: User | undefined) => {
+        async (err:any, user: User | undefined) => {
           // Gestion des erreurs de base de données
           if (err) {
             console.error('❌ Database error:', err);

@@ -8,7 +8,7 @@ import util from 'util'
 import { pipeline } from 'stream'
 import path from 'path';
 
-interface GameTables {
+interface Game {
 	id: number,
 	game_name: string,
 	player1: string,
@@ -16,6 +16,7 @@ interface GameTables {
 	player3: string,
 	player4: string,
 	winner: string,
+	users_needed: number,
 	start_time: string,
 	end_time: string
 }
@@ -29,19 +30,19 @@ async function gameRoutes(app: FastifyInstance) {
 		try {
 			const database = db.getDatabase();
 
-			const gameTables = await new Promise<GameTables[] | null>((resolve, reject) => {
+			const gameTable = await new Promise<Game[] | null>((resolve, reject) => {
 
 				database.all(
 					'SELECT * FROM games',
-					(err: any, row: GameTables[] | undefined) => {
+					(err: any, row: Game[] | undefined) => {
 						err ? reject(err) : resolve(row || null); }
 				);
 			});
-			console.log("gameTables", gameTables);
+			console.log("gameTable", gameTable);
 
 			return reply.send({
-				message: 'gameTables recu avec succès',
-				gameTables: gameTables,
+				message: 'gameTable recu avec succès',
+				gameTable: gameTable,
 			});
 		}
 
@@ -85,10 +86,10 @@ async function gameRoutes(app: FastifyInstance) {
 		}
 
 		catch (err: any) {
-			console.error('erreur PUT /games :', err);
+			console.error('erreur POST /games :', err);
 			if (err.name === 'JsonWebTokenError')
 				return reply.status(401).send({ error: 'Token invalide ou expiré' });
-			return reply.status(500).send({ error: 'erreur PUT /games', details: err.message });
+			return reply.status(500).send({ error: 'erreur POST /games', details: err.message });
 		}
 
 	})
@@ -143,11 +144,11 @@ async function gameRoutes(app: FastifyInstance) {
 		try {
 			const database = db.getDatabase();
 
-			const games = await new Promise<GameTables[] | null>((resolve, reject) => {
+			const games = await new Promise<Game[] | null>((resolve, reject) => {
 
 				database.all(
 					'SELECT * FROM games where start_time IS NULL',
-					(err: any, row: GameTables[] | undefined) => {
+					(err: any, row: Game[] | undefined) => {
 						err ? reject(err) : resolve(row || null); }
 				);
 			});
@@ -164,6 +165,42 @@ async function gameRoutes(app: FastifyInstance) {
 			if (err.name === 'JsonWebTokenError')
 				return reply.status(401).send({ error: 'Token invalide ou expiré' });
 			return reply.status(500).send({ error: 'pblm GET /games/available', details: err.message });
+		}
+
+	})
+
+	app.get('/specific', async function (request: FastifyRequest, reply: FastifyReply) {
+
+		console.log("récupérer une game precise games");
+
+		try {
+			const database = db.getDatabase();
+
+			const { gameId } = request.query as { gameId?: string};
+
+			if (!gameId)
+				throw new Error ("missing gameId in the request body");
+
+			const game = await new Promise<Game | null>((resolve, reject) => {
+
+				database.all(
+					'SELECT * FROM games WHERE id = ?',
+					[ gameId ],
+					(err: any, row: Game | undefined) => {
+						err ? reject(err) : resolve(row || null); }
+				);
+			});
+			return reply.send({
+				message: 'Voici la game demande',
+				game: game,
+			});
+		}
+
+		catch (err: any) {
+			console.error('erreur GET /games :', err);
+			if (err.name === 'JsonWebTokenError')
+				return reply.status(401).send({ error: 'Token invalide ou expiré' });
+			return reply.status(500).send({ error: 'erreur GET /games', details: err.message });
 		}
 
 	})

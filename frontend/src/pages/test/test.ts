@@ -115,14 +115,14 @@ const getTemplate = () => {
 
 export function renderTest() {
 
-	setTimeout(async () => {
-		console.log('Initializing test page');
-		try {
-		}
-		catch (err:any) {
-			console.log(err);
-		}
-	}, 0);
+	// setTimeout(async () => {
+	// 	console.log('Initializing test page');
+	// 	try {
+	// 	}
+	// 	catch (err:any) {
+	// 		console.log(err);
+	// 	}
+	// }, 0);
 
 	return getTemplate();
 

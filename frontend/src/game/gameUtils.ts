@@ -93,7 +93,7 @@ export async function logEndGame(gameId: number, winner:string) {
 			return '';
 		}
 
-		const response = await fetch('http://localhost:8000/games', {
+		const response = await fetch('/api/games', {
 			method: 'PUT',
 			headers: {
 				'Content-Type': 'application/json',
@@ -165,4 +165,35 @@ export async function fetchUsername() {
 	}
 	catch (error) {
 		console.error("Error rendering profile page:", error); }
+}
+
+export async function getGame(gameId: number) {
+	
+	try {
+		const token = getAuthToken();
+		if (!token) {
+			alert('❌ Token d\'authentification manquant');
+			window.history.pushState({}, '', '/login');
+			window.dispatchEvent(new PopStateEvent('popstate'));
+			return '';
+		}
+
+		const response = await fetch(`/api/games/specific/${gameId}`, {
+			method: 'GET',
+			headers: {
+				'Content-Type': 'application/json',
+				'x-access-token': token,
+			},
+		});
+	
+		if (response.ok) {
+			const result = await response.json();
+			console.log("on a bien recup la game", result);
+			return result.game
+		}
+		else 
+			console.error("erreur specific getGame");
+	}
+	catch (error) {
+		console.error("erreur specific getGame: ", error); }
 }
