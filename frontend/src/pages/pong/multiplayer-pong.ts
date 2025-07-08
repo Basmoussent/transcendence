@@ -4,7 +4,7 @@ export function renderPong() {
   const html = `
     <div class="pong-game-container">
       <div class="game-wrapper">
-        <canvas id="pongGameCanvas" width="800" height="600"></canvas>
+        <canvas id="pongGameCanvas" width="600" height="600"></canvas>
       </div>
     </div>
 
@@ -19,8 +19,8 @@ export function renderPong() {
       }
 
       .game-wrapper {
-        width: 90vw;
-        height: 90vh;
+        width: 90vmin;
+        aspect-ratio: 1 / 1;
         background: rgba(255, 255, 255, 0.1);
         border-radius: 10px;
         padding: 20px;
@@ -94,3 +94,5 @@ export function renderPong() {
 
   return html;
 }
+
+

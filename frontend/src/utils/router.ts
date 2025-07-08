@@ -13,7 +13,7 @@ import { renderChangePassword, initializeChangePasswordEvents } from '../pages/a
 import { renderEditProfil, initializeEditProfileEvents } from '../pages/social/edit-profil';
 import { getAuthToken } from './auth';
 import { clearTranslationCache } from './translations';
-import { renderPong } from '../pages/pong/main';
+import { renderPong } from '../pages/pong/pong';
 import { renderChooseGame } from '../pages/game/choose-game';
 
 export async function router() {

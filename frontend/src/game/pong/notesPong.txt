@@ -7,7 +7,13 @@ https://dooglz.github.io/set09121/pong2.html
 
 
 // a faire
+    // idee: faire apparaitre un msg lors des pouvoirs pour qu'on comprenne un peu il se passe quoi
+    // idee: pour l'IA, faire un truc ou a chaque collision de la balle, je calcule le prochain point d'impact,
+        si c'est sur sa ligne il y a va sinon osef il reste au milieu
+    // faire une page /pong-multiplayer pour que ca soit un peu plus clean
+        // carre pour pas que les 2 soient desavantages
     // faire en sorte que les joueurs haut bas aussi recoivent la balle au debut du point
+        // revoir logique de la balle pcq elle s'adapte pas bien au multiplayer
     // ajouter l'offset aux ia
     // reprendre backend/src/routes/game.ts
     // stocker les scores API
@@ -20,6 +26,7 @@ https://dooglz.github.io/set09121/pong2.html
             // on en active un random
         // power ups - aleatoire entre : (peut etre annonce en fond)
                 // paddle + grand/+ petit pour l'adversaire
+                // vitesse + pour celui qui gagne
                 // balle en trop
                 // commandes de l'adversaire sont inversees pendant 4/5 sec
 

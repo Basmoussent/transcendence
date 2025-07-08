@@ -1,4 +1,4 @@
-import { PADDLE_OFFSET } from "./const";
+import { PADDLE_OFFSET, Player } from "./const";
 import { PaddleAI } from "./paddle-ai";
 
 export class Paddle {
@@ -12,13 +12,13 @@ export class Paddle {
     scorex: number;
     scorey: number;
 
-    constructor(width: number, height: number, x: number, y: number, speed: number) {
+    constructor(width: number, height: number) {
         this.name = "Player";
         this.width = width;
         this.height = height;
-        this.x = x;
-        this.y = y;
-        this.speed = speed;
+        this.x = 0;
+        this.y = 0;
+        this.speed = 8;
         this.score = 0;
         this.scorex = 0;
         this.scorey = 0;
@@ -105,7 +105,7 @@ export class Paddle {
           this.x = PADDLE_OFFSET + player1.width;
     }
     
-    updatePaddleUpDown(keys: { [key: string]: boolean }, upKey: string, downKey: string, paddles: [Paddle, Paddle | PaddleAI, (Paddle | PaddleAI | null)?, (Paddle | PaddleAI | null)?], canvasWidth: number): void {
+    updatePaddleUpDown(keys: { [key: string]: boolean }, upKey: string, downKey: string, paddles: [Paddle, Paddle | PaddleAI, Player?, Player?], canvasWidth: number): void {
 
         if (keys[downKey])
             this.checkAndMoveRight(paddles[1], canvasWidth);
@@ -148,7 +148,7 @@ export class Paddle {
             this.y = canvasHeight - PADDLE_OFFSET - player4.height - this.height; // eviter collision avec player4
     }
 
-    updatePaddleRightLeft(keys: { [key: string]: boolean }, upKey: string, downKey: string, paddles: [Paddle, Paddle | PaddleAI, (Paddle | PaddleAI | null)?, (Paddle | PaddleAI | null)?], canvasHeight: number): void {
+    updatePaddleRightLeft(keys: { [key: string]: boolean }, upKey: string, downKey: string, paddles: [Paddle, Paddle | PaddleAI, Player?, Player?], canvasHeight: number): void {
         if (keys[upKey])
             this.checkAndMoveUp(paddles[2]);
 
