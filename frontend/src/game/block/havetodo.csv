@@ -38,3 +38,30 @@ appuyer sur un boutton pour rejoindre la game
 
 pour ca ->
 	page en websocket
+
+
+//   allowedHosts: ['frontend', 'localhost', 'fr.entropy.local', 'en.entropy.local', 'es.entropy.local']
+// si on laise ca on peut pas acceder depuis un autre poste
+// pour tester websocket https:// + poste de celui qui a lance le server
+
+
+pour remote --> faire la logique du jeu cote serveur
+	a chaque event envoyer les notif au server de qui a bouge quoi
+	pour chaque client, juste render les infos du game (ou sont les pad, ou est la balle etc...)
+
+
+
+pour update les games available
+
+	rendre la page matchmaking en websocket
+
+	si quelqu'un launch une game et qu'elle ne start pas direct,
+
+	notifier a tous les socket des personnes sur la page que ya une nouvelle game:
+	injecter du div dynamiquement avec les infos de la game que je me passerais en json
+
+
+
+creer une page room avec uuid qui genere une string random
+
+	lorsque quelqu'un join la game, le rediriger vers la room cree, afficher l'avatar des membres de la game, combien de personnes il manque
