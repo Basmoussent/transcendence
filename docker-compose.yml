@@ -6,6 +6,7 @@ services:
     ports:
       - '2200:2200'
       - '2443:2443'
+      - '8000:2443'
     volumes:
       - ./docker/nginx/nginx.conf.template:/etc/nginx/templates/nginx.conf.template:ro
       - ./docker/nginx/cors.conf.template:/etc/nginx/templates/includes/cors.conf.template:ro
@@ -26,6 +27,7 @@ services:
       - MODSECURITY_PARANOIA_LEVEL=1
       - MODSECURITY_ANOMALY_SCORE_THRESHOLD=5
       - MODSECURITY_CRS_RULES=on
+      
     depends_on:
       - backend
     networks:
@@ -62,7 +64,7 @@ services:
       - backend
     environment:
       - NODE_ENV=development
-      - VITE_API_URL=http://localhost:8000
+      - VITE_API_URL=https://localhost:8000
     networks:
       - app-network
 
@@ -70,8 +72,6 @@ services:
     build:
       context: ./backend
       dockerfile: Dockerfile
-    ports:
-      - "8000:8000"
     volumes:
       - ./backend:/app:delegated
       - backend_node_modules:/app/node_modules

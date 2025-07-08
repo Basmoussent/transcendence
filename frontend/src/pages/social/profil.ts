@@ -49,8 +49,6 @@ export async function renderProfil() {
     console.error("Error rendering profile page:", error);
   }
 
-  console.log("dans le bon", userData);
-
   // Construire l'URL de l'avatar
   const avatarUrl = userData.avatar.startsWith('http') || userData.avatar.startsWith('/api/') 
     ? userData.avatar 

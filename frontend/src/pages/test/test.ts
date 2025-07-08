@@ -1,39 +1,18 @@
+import { Test } from './testws'
+
 const getTemplate = () => {
   return `
 	<div class="chat-container">
 		<div class="messages" id="chatMessages">
-		<!-- Messages s'afficheront ici -->
 			<div class="message">Bienvenue dans le chat !</div>
 		</div>
 		<div class="input-container">
 			<input type="text" id="messageInput" placeholder="Écris ton message..." />
-			<button onclick="sendMessage()">Envoyer</button>
+			<button onclick="" id="sendButton">Envoyer</button>
 		</div>
 	</div>
 
-	<script>
-		function sendMessage() {
-		const input = document.getElementById('messageInput');
-		const message = input.value.trim();
-		if (message !== '') {
-			const chatMessages = document.getElementById('chatMessages');
-			const newMsg = document.createElement('div');
-			newMsg.classList.add('message');
-			newMsg.textContent = message;
-			chatMessages.appendChild(newMsg);
-			chatMessages.scrollTop = chatMessages.scrollHeight;
-			input.value = '';
-		}
-		}
-
-		// Optionnel : Entrée clavier pour envoyer
-		document.getElementById("messageInput").addEventListener("keydown", function(e) {
-		if (e.key === "Enter") {
-			sendMessage();
-		}
-		});
-	</script>
-	</body>
+	<script src="test.js"></script>
 
 	<style>
 		* {
@@ -106,24 +85,21 @@ const getTemplate = () => {
 		.input-container button:hover {
 			background-color: #0056b3;
 		}
-	</style>
-
-
-	</html>`;
+	</style>`;
 }
 
 
 export function renderTest() {
 
-	// setTimeout(async () => {
-	// 	console.log('Initializing test page');
-	// 	try {
-	// 	}
-	// 	catch (err:any) {
-	// 		console.log(err);
-	// 	}
-	// }, 0);
+	setTimeout(async () => {
+		console.log(`test page c'est parti`);
+		try {
+			const render = new Test();
+		}
+		catch (err:any) {
+			console.log(err);
+		}
+	}, 0);
 
 	return getTemplate();
-
 }

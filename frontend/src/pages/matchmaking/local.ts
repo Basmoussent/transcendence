@@ -129,8 +129,6 @@ const getTemplate = () => {
 
 export function renderMatchmaking() {
 
-
-
 	setTimeout(async () => {
 		console.log('Initializing game making page');
 		try {
@@ -145,8 +143,6 @@ export function renderMatchmaking() {
 			console.log(err);
 		}
 	}, 0);
-
-
 
 	return getTemplate();
 
