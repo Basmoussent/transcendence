@@ -18,8 +18,6 @@ export class Test {
 		this.ws.onclose = (event) => {
 			console.log('🔌 Connection closed:', event.code, event.reason)}
 
-		
-
 		this.setEvents();
 	}
 

@@ -1,5 +1,6 @@
 import { db } from '../database';
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
+import { v4 as uuidv4, validate as uuidValidate } from 'uuid';
 import sqlite3 from 'sqlite3';
 import jwt from '@fastify/jwt';
 import bcrypt from 'bcrypt';
@@ -62,16 +63,16 @@ async function gameRoutes(app: FastifyInstance) {
 		try {
 			const database = db.getDatabase();
 
+			let uuid = uuidv4(); // id de la room
 			const { game_name, chef, player1, users_needed } = request.body;
 
-
-			if (!game_name || !chef || !player1 || !users_needed)
+			if (!uuidValidate(uuid) || !game_name || !chef || !player1 || !users_needed)
 				throw new Error("Mandatory info needed to prelog game");
 
 			const gameId = await new Promise<void>((resolve, reject) => {
 				database.run(
-					'INSERT INTO games (game_name, chef, player1, users_needed) VALUES (?, ?, ?, ?)',
-					[game_name, chef, player1, users_needed],
+					'INSERT INTO games (uuid, game_name, chef, player1, users_needed) VALUES (?, ?, ?, ?, ?)',
+					[uuid, game_name, chef, player1, users_needed],
 					(err: any) => {
 						err ? reject(err) : resolve(); },
 					database.get('SELECT last_insert_rowid() as id', (err: any, row: any) => {

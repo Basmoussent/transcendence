@@ -81,6 +81,8 @@ export class matchmaking {
 	private _2player: boolean;
 	private _3player: boolean;
 	private _4player: boolean;
+	private ws: WebSocket;
+
 
 	private homeBtn: HTMLElement;
 	private pongBtn: HTMLElement;
@@ -95,6 +97,10 @@ export class matchmaking {
 	private username: string;
 
 	constructor() {
+
+
+		this.ws = new WebSocket(`${window.location.protocol === "https:" ? "wss" : "ws"}://${window.location.host}/matchmaking`);
+
 		this.homeBtn = this.getElement('homeBtn');
 		this.pongBtn = this.getElement('pongBtn');
 		this.blockBtn = this.getElement('blockBtn');
