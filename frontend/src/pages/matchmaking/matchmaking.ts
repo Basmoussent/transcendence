@@ -336,12 +336,12 @@ export class matchmaking {
 		try {
 			let id = await postGame(tmp);
 			var uuid = await getUuid(id);
+
+			renderRoom(uuid);
+
 		}
 		catch (err: any) {
 			console.error('❌ Error retrieve game uuid', err); }
 
-		window.history.pushState({}, '', `/room/${uuid}`);
-		window.dispatchEvent(new PopStateEvent('popstate'));
-		renderRoom();
 	}
 }

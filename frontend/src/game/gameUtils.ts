@@ -209,18 +209,20 @@ export async function getUuid(gameId: number) {
 			return '';
 		}
 
-		const response = await fetch(`/api/games/specific/${gameId}`, {
+		const response = await fetch(`/api/games/specific?gameId=${gameId}`, {
 			method: 'GET',
 			headers: {
 				'Content-Type': 'application/json',
 				'x-access-token': token,
 			},
+
 		});
 	
 		if (response.ok) {
 			const result = await response.json();
-			console.log(`game ${gameId} : ${result.uuid}`, result);
-			return result.uuid
+			const uuid = result?.game?.[0]?.uuid;
+			console.log(`game ${gameId} : ${uuid}`);
+			return uuid
 		}
 		else 
 			console.error("error retrieve game uuid");

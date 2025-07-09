@@ -113,9 +113,6 @@ export async function router() {
     case '/test':
       view = renderTest();
       break;
-    case '/room':
-      view = renderRoom();
-      break;
     default:
       view = render404();
   }

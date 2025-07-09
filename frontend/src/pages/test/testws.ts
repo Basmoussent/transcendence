@@ -11,7 +11,6 @@ export class Test {
 		this.messages = this.getElement('chatMessages');
 		this.sendBtn = this.getElement('sendButton')
 		this.ws = new WebSocket(`${window.location.protocol === "https:" ? "wss" : "ws"}://${window.location.host}/ws`);
-		this.ws.onopen = () => this.ws.send('hello server');
 		this.ws.onmessage = (event) => this.onMessage(event, this.messages);
 		this.ws.onerror = (error) => {
 			console.error('❌ WebSocket error:', error)}

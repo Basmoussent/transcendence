@@ -1,23 +1,24 @@
 import { getAuthToken } from '../../utils/auth';
 import { sanitizeHtml } from '../../utils/sanitizer';
+import { Room } from '../room/class'
 
 interface User {
-  id: string;
-  username: string;
-  avatar?: string;
-  status: 'online' | 'away' | 'playing';
-  isReady: boolean;
+	id: string;
+	username: string;
+	avatar?: string;
+	status: 'online' | 'away' | 'playing';
+	isReady: boolean;
 }
 
 interface RoomData {
-  id: string;
-  name: string;
-  gameType: 'pong' | 'block';
-  maxPlayers: number;
-  currentPlayers: number;
-  users: User[];
-  isStarted: boolean;
-  host: string;
+	id: string;
+	name: string;
+	gameType: 'pong' | 'block';
+	maxPlayers: number;
+	currentPlayers: number;
+	users: User[];
+	isStarted: boolean;
+	host: string;
 }
 
 let ws: WebSocket | null = null;
@@ -25,728 +26,744 @@ let roomData: RoomData | null = null;
 let currentUserId: string | null = null;
 
 const getTemplate = () => {
-  return `
-    <div class="flex flex-col h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900">
-      <button class="home-button" id="homeBtn">
-        <i class="fas fa-home"></i>
-        Home
-      </button>
-      
-      <div class="flex-1 flex gap-6 p-6 pt-20">
-        <!-- Left Panel - Room Info -->
-        <div class="w-1/3 bg-white/10 backdrop-blur-lg rounded-xl p-6 border border-white/20 shadow-lg">
-          <div class="room-header mb-6">
-            <h1 class="text-2xl font-bold text-white mb-2" id="roomName">Room Name</h1>
-            <div class="flex items-center gap-4 text-white/80">
-              <div class="flex items-center gap-2">
-                <i class="fas fa-gamepad"></i>
-                <span id="gameType">Pong</span>
-              </div>
-              <div class="flex items-center gap-2">
-                <i class="fas fa-users"></i>
-                <span id="playerCount">0/4</span>
-              </div>
-            </div>
-          </div>
-          
-          <div class="room-controls mb-6">
-            <button class="control-btn ready-btn" id="readyBtn">
-              <i class="fas fa-check"></i>
-              Ready
-            </button>
-            <button class="control-btn leave-btn" id="leaveBtn">
-              <i class="fas fa-sign-out-alt"></i>
-              Leave Room
-            </button>
-          </div>
-          
-          <div class="room-settings" id="roomSettings">
-            <h3 class="text-lg font-semibold text-white mb-3">Room Settings</h3>
-            <div class="settings-grid">
-              <div class="setting-item">
-                <label class="text-white/80">Max Players</label>
-                <select class="setting-select" id="maxPlayersSelect">
-                  <option value="2">2</option>
-                  <option value="3">3</option>
-                  <option value="4">4</option>
-                </select>
-              </div>
-              <div class="setting-item">
-                <label class="text-white/80">Game Type</label>
-                <select class="setting-select" id="gameTypeSelect">
-                  <option value="pong">Pong</option>
-                  <option value="block">Block</option>
-                </select>
-              </div>
-            </div>
-          </div>
-        </div>
-        
-        <!-- Center Panel - Players -->
-        <div class="flex-1 bg-white/10 backdrop-blur-lg rounded-xl p-6 border border-white/20 shadow-lg">
-          <div class="flex items-center justify-between mb-6">
-            <h2 class="text-xl font-bold text-white">Players</h2>
-            <div class="status-indicator" id="gameStatus">
-              <span class="status-dot waiting"></span>
-              <span class="text-white/80">Waiting for players...</span>
-            </div>
-          </div>
-          
-          <div class="players-grid" id="playersContainer">
-            <!-- Players will be dynamically added here -->
-          </div>
-          
-          <div class="game-actions mt-6" id="gameActions">
-            <button class="action-btn start-btn" id="startGameBtn" disabled>
-              <i class="fas fa-play"></i>
-              Start Game
-            </button>
-          </div>
-        </div>
-        
-        <!-- Right Panel - Chat -->
-        <div class="w-1/3 bg-white/10 backdrop-blur-lg rounded-xl p-6 border border-white/20 shadow-lg flex flex-col">
-          <h2 class="text-xl font-bold text-white mb-4">Chat</h2>
-          
-          <div class="chat-messages flex-1 overflow-y-auto mb-4" id="chatMessages">
-            <!-- Chat messages will be dynamically added here -->
-          </div>
-          
-          <div class="chat-input-container">
-            <input type="text" class="chat-input" id="chatInput" placeholder="Type a message..." maxlength="200">
-            <button class="send-btn" id="sendBtn">
-              <i class="fas fa-paper-plane"></i>
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
+	return `
+	<div class="flex flex-col h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900">
+	<button class="home-button" id="homeBtn">
+		<i class="fas fa-home"></i>
+		Home
+	</button>
+	
+	<div class="flex-1 flex gap-6 p-6 pt-20">
+		<!-- Left Panel - Room Info -->
+		<div class="w-1/3 bg-white/10 backdrop-blur-lg rounded-xl p-6 border border-white/20 shadow-lg">
+		<div class="room-header mb-6">
+		<h1 class="text-2xl font-bold text-white mb-2" id="roomName">Room Name</h1>
+		<div class="flex items-center gap-4 text-white/80">
+		<div class="flex items-center gap-2">
+			<i class="fas fa-gamepad"></i>
+			<span id="gameType">Pong</span>
+		</div>
+		<div class="flex items-center gap-2">
+			<i class="fas fa-users"></i>
+			<span id="playerCount">0/4</span>
+		</div>
+		</div>
+		</div>
+		
+		<div class="room-controls mb-6">
+		<button class="control-btn ready-btn" id="readyBtn">
+		<i class="fas fa-check"></i>
+		Ready
+		</button>
+		<button class="control-btn leave-btn" id="leaveBtn">
+		<i class="fas fa-sign-out-alt"></i>
+		Leave Room
+		</button>
+		</div>
+		
+		<div class="room-settings" id="roomSettings">
+		<h3 class="text-lg font-semibold text-white mb-3">Room Settings</h3>
+		<div class="settings-grid">
+		<div class="setting-item">
+			<label class="text-white/80">Max Players</label>
+			<select class="setting-select" id="maxPlayersSelect">
+			<option value="2">2</option>
+			<option value="3">3</option>
+			<option value="4">4</option>
+			</select>
+		</div>
+		<div class="setting-item">
+			<label class="text-white/80">Game Type</label>
+			<select class="setting-select" id="gameTypeSelect">
+			<option value="pong">Pong</option>
+			<option value="block">Block</option>
+			</select>
+		</div>
+		</div>
+		</div>
+		</div>
+		
+		<!-- Center Panel - Players -->
+		<div class="flex-1 bg-white/10 backdrop-blur-lg rounded-xl p-6 border border-white/20 shadow-lg">
+		<div class="flex items-center justify-between mb-6">
+		<h2 class="text-xl font-bold text-white">Players</h2>
+		<div class="status-indicator" id="gameStatus">
+		<span class="status-dot waiting"></span>
+		<span class="text-white/80">Waiting for players...</span>
+		</div>
+		</div>
+		
+		<div class="players-grid" id="playersContainer">
+		<!-- Players will be dynamically added here -->
+		</div>
+		
+		<div class="game-actions mt-6" id="gameActions">
+		<button class="action-btn start-btn" id="startGameBtn" disabled>
+		<i class="fas fa-play"></i>
+		Start Game
+		</button>
+		</div>
+		</div>
+		
+		<!-- Right Panel - Chat -->
+		<div class="w-1/3 bg-white/10 backdrop-blur-lg rounded-xl p-6 border border-white/20 shadow-lg flex flex-col">
+		<h2 class="text-xl font-bold text-white mb-4">Chat</h2>
+		
+		<div class="chat-messages flex-1 overflow-y-auto mb-4" id="chatMessages">
+		<!-- Chat messages will be dynamically added here -->
+		</div>
+		
+		<div class="chat-input-container">
+		<input type="text" class="chat-input" id="chatInput" placeholder="Type a message..." maxlength="200">
+		<button class="send-btn" id="sendBtn">
+		<i class="fas fa-paper-plane"></i>
+		</button>
+		</div>
+		</div>
+	</div>
+	</div>
 
-    <style>
-      .home-button {
-        position: fixed;
-        top: 20px;
-        left: 20px;
-        padding: 10px 15px;
-        font-size: 1em;
-        border: none;
-        border-radius: 10px;
-        background: rgba(255, 255, 255, 0.1);
-        color: white;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        z-index: 100;
-      }
+	<style>
+	.home-button {
+		position: fixed;
+		top: 20px;
+		left: 20px;
+		padding: 10px 15px;
+		font-size: 1em;
+		border: none;
+		border-radius: 10px;
+		background: rgba(255, 255, 255, 0.1);
+		color: white;
+		display: flex;
+		align-items: center;
+		gap: 8px;
+		cursor: pointer;
+		transition: all 0.3s ease;
+		z-index: 100;
+	}
 
-      .home-button:hover {
-        background: rgba(255, 255, 255, 0.2);
-        transform: translateY(-2px);
-      }
+	.home-button:hover {
+		background: rgba(255, 255, 255, 0.2);
+		transform: translateY(-2px);
+	}
 
-      .control-btn {
-        width: 100%;
-        padding: 12px;
-        border: none;
-        border-radius: 10px;
-        font-size: 1em;
-        font-weight: bold;
-        color: white;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 8px;
-        margin-bottom: 10px;
-      }
+	.control-btn {
+		width: 100%;
+		padding: 12px;
+		border: none;
+		border-radius: 10px;
+		font-size: 1em;
+		font-weight: bold;
+		color: white;
+		cursor: pointer;
+		transition: all 0.3s ease;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		gap: 8px;
+		margin-bottom: 10px;
+	}
 
-      .ready-btn {
-        background: linear-gradient(135deg, #10B981 0%, #059669 100%);
-      }
+	.ready-btn {
+		background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+	}
 
-      .ready-btn.active {
-        background: linear-gradient(135deg, #EF4444 0%, #DC2626 100%);
-      }
+	.ready-btn.active {
+		background: linear-gradient(135deg, #EF4444 0%, #DC2626 100%);
+	}
 
-      .ready-btn:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 8px 20px rgba(16, 185, 129, 0.3);
-      }
+	.ready-btn:hover {
+		transform: translateY(-2px);
+		box-shadow: 0 8px 20px rgba(16, 185, 129, 0.3);
+	}
 
-      .leave-btn {
-        background: linear-gradient(135deg, #6B7280 0%, #4B5563 100%);
-      }
+	.leave-btn {
+		background: linear-gradient(135deg, #6B7280 0%, #4B5563 100%);
+	}
 
-      .leave-btn:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 8px 20px rgba(107, 114, 128, 0.3);
-      }
+	.leave-btn:hover {
+		transform: translateY(-2px);
+		box-shadow: 0 8px 20px rgba(107, 114, 128, 0.3);
+	}
 
-      .settings-grid {
-        display: grid;
-        gap: 15px;
-      }
+	.settings-grid {
+		display: grid;
+		gap: 15px;
+	}
 
-      .setting-item {
-        display: flex;
-        flex-direction: column;
-        gap: 5px;
-      }
+	.setting-item {
+		display: flex;
+		flex-direction: column;
+		gap: 5px;
+	}
 
-      .setting-select {
-        padding: 8px 12px;
-        border: 1px solid rgba(255, 255, 255, 0.2);
-        border-radius: 8px;
-        background: rgba(255, 255, 255, 0.1);
-        color: white;
-        font-size: 0.9em;
-      }
+	.setting-select {
+		padding: 8px 12px;
+		border: 1px solid rgba(255, 255, 255, 0.2);
+		border-radius: 8px;
+		background: rgba(255, 255, 255, 0.1);
+		color: white;
+		font-size: 0.9em;
+	}
 
-      .setting-select option {
-        background: #1F2937;
-        color: white;
-      }
+	.setting-select option {
+		background: #1F2937;
+		color: white;
+	}
 
-      .status-indicator {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-      }
+	.status-indicator {
+		display: flex;
+		align-items: center;
+		gap: 8px;
+	}
 
-      .status-dot {
-        width: 12px;
-        height: 12px;
-        border-radius: 50%;
-        animation: pulse 2s infinite;
-      }
+	.status-dot {
+		width: 12px;
+		height: 12px;
+		border-radius: 50%;
+		animation: pulse 2s infinite;
+	}
 
-      .status-dot.waiting {
-        background: #F59E0B;
-      }
+	.status-dot.waiting {
+		background: #F59E0B;
+	}
 
-      .status-dot.ready {
-        background: #10B981;
-      }
+	.status-dot.ready {
+		background: #10B981;
+	}
 
-      .status-dot.playing {
-        background: #3B82F6;
-      }
+	.status-dot.playing {
+		background: #3B82F6;
+	}
 
-      .players-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-        gap: 20px;
-        min-height: 300px;
-      }
+	.players-grid {
+		display: grid;
+		grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+		gap: 20px;
+		min-height: 300px;
+	}
 
-      .player-card {
-        background: rgba(255, 255, 255, 0.1);
-        border: 2px solid rgba(255, 255, 255, 0.2);
-        border-radius: 15px;
-        padding: 20px;
-        text-align: center;
-        transition: all 0.3s ease;
-        position: relative;
-        overflow: hidden;
-      }
+	.player-card {
+		background: rgba(255, 255, 255, 0.1);
+		border: 2px solid rgba(255, 255, 255, 0.2);
+		border-radius: 15px;
+		padding: 20px;
+		text-align: center;
+		transition: all 0.3s ease;
+		position: relative;
+		overflow: hidden;
+	}
 
-      .player-card.ready {
-        border-color: #10B981;
-        background: rgba(16, 185, 129, 0.1);
-      }
+	.player-card.ready {
+		border-color: #10B981;
+		background: rgba(16, 185, 129, 0.1);
+	}
 
-      .player-card.host {
-        border-color: #F59E0B;
-        background: rgba(245, 158, 11, 0.1);
-      }
+	.player-card.host {
+		border-color: #F59E0B;
+		background: rgba(245, 158, 11, 0.1);
+	}
 
-      .player-card.host::before {
-        content: "HOST";
-        position: absolute;
-        top: 5px;
-        right: 5px;
-        background: #F59E0B;
-        color: white;
-        padding: 2px 6px;
-        border-radius: 4px;
-        font-size: 0.7em;
-        font-weight: bold;
-      }
+	.player-card.host::before {
+		content: "HOST";
+		position: absolute;
+		top: 5px;
+		right: 5px;
+		background: #F59E0B;
+		color: white;
+		padding: 2px 6px;
+		border-radius: 4px;
+		font-size: 0.7em;
+		font-weight: bold;
+	}
 
-      .player-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 10px 30px rgba(255, 255, 255, 0.1);
-      }
+	.player-card:hover {
+		transform: translateY(-5px);
+		box-shadow: 0 10px 30px rgba(255, 255, 255, 0.1);
+	}
 
-      .player-avatar {
-        width: 60px;
-        height: 60px;
-        border-radius: 50%;
-        margin: 0 auto 10px;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 1.5em;
-        color: white;
-        font-weight: bold;
-      }
+	.player-avatar {
+		width: 60px;
+		height: 60px;
+		border-radius: 50%;
+		margin: 0 auto 10px;
+		background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		font-size: 1.5em;
+		color: white;
+		font-weight: bold;
+	}
 
-      .player-name {
-        color: white;
-        font-weight: bold;
-        margin-bottom: 5px;
-      }
+	.player-name {
+		color: white;
+		font-weight: bold;
+		margin-bottom: 5px;
+	}
 
-      .player-status {
-        color: rgba(255, 255, 255, 0.7);
-        font-size: 0.9em;
-      }
+	.player-status {
+		color: rgba(255, 255, 255, 0.7);
+		font-size: 0.9em;
+	}
 
-      .empty-slot {
-        background: rgba(255, 255, 255, 0.05);
-        border: 2px dashed rgba(255, 255, 255, 0.2);
-        border-radius: 15px;
-        padding: 20px;
-        text-align: center;
-        color: rgba(255, 255, 255, 0.5);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-style: italic;
-      }
+	.empty-slot {
+		background: rgba(255, 255, 255, 0.05);
+		border: 2px dashed rgba(255, 255, 255, 0.2);
+		border-radius: 15px;
+		padding: 20px;
+		text-align: center;
+		color: rgba(255, 255, 255, 0.5);
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		font-style: italic;
+	}
 
-      .action-btn {
-        padding: 15px 30px;
-        border: none;
-        border-radius: 10px;
-        font-size: 1.1em;
-        font-weight: bold;
-        color: white;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 10px;
-      }
+	.action-btn {
+		padding: 15px 30px;
+		border: none;
+		border-radius: 10px;
+		font-size: 1.1em;
+		font-weight: bold;
+		color: white;
+		cursor: pointer;
+		transition: all 0.3s ease;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		gap: 10px;
+	}
 
-      .start-btn {
-        background: linear-gradient(135deg, #3B82F6 0%, #1D4ED8 100%);
-      }
+	.start-btn {
+		background: linear-gradient(135deg, #3B82F6 0%, #1D4ED8 100%);
+	}
 
-      .start-btn:hover:not(:disabled) {
-        transform: translateY(-2px);
-        box-shadow: 0 8px 20px rgba(59, 130, 246, 0.3);
-      }
+	.start-btn:hover:not(:disabled) {
+		transform: translateY(-2px);
+		box-shadow: 0 8px 20px rgba(59, 130, 246, 0.3);
+	}
 
-      .start-btn:disabled {
-        background: linear-gradient(135deg, #6B7280 0%, #4B5563 100%);
-        cursor: not-allowed;
-        opacity: 0.5;
-      }
+	.start-btn:disabled {
+		background: linear-gradient(135deg, #6B7280 0%, #4B5563 100%);
+		cursor: not-allowed;
+		opacity: 0.5;
+	}
 
-      .chat-messages {
-        max-height: 400px;
-        padding: 10px;
-        background: rgba(0, 0, 0, 0.2);
-        border-radius: 10px;
-        border: 1px solid rgba(255, 255, 255, 0.1);
-      }
+	.chat-messages {
+		max-height: 400px;
+		padding: 10px;
+		background: rgba(0, 0, 0, 0.2);
+		border-radius: 10px;
+		border: 1px solid rgba(255, 255, 255, 0.1);
+	}
 
-      .chat-message {
-        margin-bottom: 15px;
-        padding: 10px;
-        border-radius: 10px;
-        background: rgba(255, 255, 255, 0.1);
-        animation: slideIn 0.3s ease;
-      }
+	.chat-message {
+		margin-bottom: 15px;
+		padding: 10px;
+		border-radius: 10px;
+		background: rgba(255, 255, 255, 0.1);
+		animation: slideIn 0.3s ease;
+	}
 
-      .chat-message.system {
-        background: rgba(59, 130, 246, 0.2);
-        border-left: 3px solid #3B82F6;
-      }
+	.chat-message.system {
+		background: rgba(59, 130, 246, 0.2);
+		border-left: 3px solid #3B82F6;
+	}
 
-      .chat-message-author {
-        font-weight: bold;
-        color: #60A5FA;
-        margin-bottom: 5px;
-      }
+	.chat-message-author {
+		font-weight: bold;
+		color: #60A5FA;
+		margin-bottom: 5px;
+	}
 
-      .chat-message-content {
-        color: white;
-      }
+	.chat-message-content {
+		color: white;
+	}
 
-      .chat-message-time {
-        color: rgba(255, 255, 255, 0.5);
-        font-size: 0.8em;
-        margin-top: 5px;
-      }
+	.chat-message-time {
+		color: rgba(255, 255, 255, 0.5);
+		font-size: 0.8em;
+		margin-top: 5px;
+	}
 
-      .chat-input-container {
-        display: flex;
-        gap: 10px;
-      }
+	.chat-input-container {
+		display: flex;
+		gap: 10px;
+	}
 
-      .chat-input {
-        flex: 1;
-        padding: 12px;
-        border: 1px solid rgba(255, 255, 255, 0.2);
-        border-radius: 10px;
-        background: rgba(255, 255, 255, 0.1);
-        color: white;
-        font-size: 0.9em;
-      }
+	.chat-input {
+		flex: 1;
+		padding: 12px;
+		border: 1px solid rgba(255, 255, 255, 0.2);
+		border-radius: 10px;
+		background: rgba(255, 255, 255, 0.1);
+		color: white;
+		font-size: 0.9em;
+	}
 
-      .chat-input::placeholder {
-        color: rgba(255, 255, 255, 0.5);
-      }
+	.chat-input::placeholder {
+		color: rgba(255, 255, 255, 0.5);
+	}
 
-      .send-btn {
-        padding: 12px 15px;
-        border: none;
-        border-radius: 10px;
-        background: linear-gradient(135deg, #10B981 0%, #059669 100%);
-        color: white;
-        cursor: pointer;
-        transition: all 0.3s ease;
-      }
+	.send-btn {
+		padding: 12px 15px;
+		border: none;
+		border-radius: 10px;
+		background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+		color: white;
+		cursor: pointer;
+		transition: all 0.3s ease;
+	}
 
-      .send-btn:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 8px 20px rgba(16, 185, 129, 0.3);
-      }
+	.send-btn:hover {
+		transform: translateY(-2px);
+		box-shadow: 0 8px 20px rgba(16, 185, 129, 0.3);
+	}
 
-      @keyframes pulse {
-        0%, 100% { opacity: 1; }
-        50% { opacity: 0.5; }
-      }
+	@keyframes pulse {
+		0%, 100% { opacity: 1; }
+		50% { opacity: 0.5; }
+	}
 
-      @keyframes slideIn {
-        from {
-          opacity: 0;
-          transform: translateY(10px);
-        }
-        to {
-          opacity: 1;
-          transform: translateY(0);
-        }
-      }
+	@keyframes slideIn {
+		from {
+		opacity: 0;
+		transform: translateY(10px);
+		}
+		to {
+		opacity: 1;
+		transform: translateY(0);
+		}
+	}
 
-      @keyframes fadeIn {
-        from { opacity: 0; }
-        to { opacity: 1; }
-      }
+	@keyframes fadeIn {
+		from { opacity: 0; }
+		to { opacity: 1; }
+	}
 
-      .room-header, .players-grid, .chat-messages {
-        animation: fadeIn 0.5s ease-out;
-      }
-    </style>
-  `;
-};
+	.room-header, .players-grid, .chat-messages {
+		animation: fadeIn 0.5s ease-out;
+	}
+	</style>
+	`;
+	};
 
 function connectWebSocket() {
-  const token = getAuthToken();
-  const roomId = new URLSearchParams(window.location.search).get('id');
-  
-  if (!roomId) {
-    console.error('Room ID not found');
-    return;
-  }
+	const token = getAuthToken();
+	const roomId = new URLSearchParams(window.location.search).get('id');
+	
+	if (!roomId) {
+	console.error('Room ID not found');
+	return;
+}
 
-  const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-  const wsUrl = `${protocol}//${window.location.host}/ws/room/${roomId}?token=${token}`;
-  
-  ws = new WebSocket(wsUrl);
+const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+const wsUrl = `${protocol}//${window.location.host}/ws/room/${roomId}?token=${token}`;
 
-  ws.onopen = () => {
-    console.log('Connected to room WebSocket');
-    addSystemMessage('Connected to room');
-  };
+ws = new WebSocket(wsUrl);
 
-  ws.onmessage = (event) => {
-    const data = JSON.parse(event.data);
-    handleWebSocketMessage(data);
-  };
+ws.onopen = () => {
+	console.log('Connected to room WebSocket');
+	addSystemMessage('Connected to room');
+};
 
-  ws.onclose = () => {
-    console.log('Disconnected from room WebSocket');
-    addSystemMessage('Disconnected from room');
-  };
+ws.onmessage = (event) => {
+	const data = JSON.parse(event.data);
+	handleWebSocketMessage(data);
+};
 
-  ws.onerror = (error) => {
-    console.error('WebSocket error:', error);
-    addSystemMessage('Connection error');
-  };
+ws.onclose = () => {
+	console.log('Disconnected from room WebSocket');
+	addSystemMessage('Disconnected from room');
+};
+
+ws.onerror = (error) => {
+	console.error('WebSocket error:', error);
+	addSystemMessage('Connection error');
+};
 }
 
 function handleWebSocketMessage(data: any) {
-  switch (data.type) {
-    case 'room_update':
-      roomData = data.room;
-      updateRoomDisplay();
-      break;
-    case 'user_joined':
-      addSystemMessage(`${data.user.username} joined the room`);
-      break;
-    case 'user_left':
-      addSystemMessage(`${data.user.username} left the room`);
-      break;
-    case 'user_ready':
-      addSystemMessage(`${data.user.username} is ${data.ready ? 'ready' : 'not ready'}`);
-      break;
-    case 'chat_message':
-      addChatMessage(data.message);
-      break;
-    case 'game_started':
-      addSystemMessage('Game started!');
-      // Redirect to game page
-      window.history.pushState({}, '', `/game?room=${roomData?.id}`);
-      break;
-    case 'error':
-      addSystemMessage(`Error: ${data.message}`);
-      break;
-  }
+	switch (data.type) {
+		case 'room_update':
+			roomData = data.room;
+			updateRoomDisplay();
+			break;
+		case 'user_joined':
+			addSystemMessage(`${data.user.username} joined the room`);
+			break;
+		case 'user_left':
+			addSystemMessage(`${data.user.username} left the room`);
+			break;
+		case 'user_ready':
+			addSystemMessage(`${data.user.username} is ${data.ready ? 'ready' : 'not ready'}`);
+			break;
+		case 'chat_message':
+			addChatMessage(data.message);
+			break;
+		case 'game_started':
+			addSystemMessage('Game started!');
+			// Redirect to game page
+			window.history.pushState({}, '', `/game?room=${roomData?.id}`);
+			break;
+		case 'error':
+			addSystemMessage(`Error: ${data.message}`);
+			break;
+	}
 }
 
 function updateRoomDisplay() {
-  if (!roomData) return;
+if (!roomData) return;
 
-  // Update room info
-  document.getElementById('roomName')!.textContent = roomData.name;
-  document.getElementById('gameType')!.textContent = roomData.gameType.charAt(0).toUpperCase() + roomData.gameType.slice(1);
-  document.getElementById('playerCount')!.textContent = `${roomData.currentPlayers}/${roomData.maxPlayers}`;
+// Update room info
+document.getElementById('roomName')!.textContent = roomData.name;
+document.getElementById('gameType')!.textContent = roomData.gameType.charAt(0).toUpperCase() + roomData.gameType.slice(1);
+document.getElementById('playerCount')!.textContent = `${roomData.currentPlayers}/${roomData.maxPlayers}`;
 
-  // Update players display
-  updatePlayersDisplay();
+// Update players display
+updatePlayersDisplay();
 
-  // Update game status
-  updateGameStatus();
+// Update game status
+updateGameStatus();
 
-  // Update controls
-  updateControls();
+// Update controls
+updateControls();
 }
 
 function updatePlayersDisplay() {
-  const container = document.getElementById('playersContainer');
-  if (!container || !roomData) return;
+	const container = document.getElementById('playersContainer');
+	if (!container || !roomData)
+		return;
 
-  container.innerHTML = '';
+	container.innerHTML = '';
 
-  // Add current players
-  roomData.users.forEach(user => {
-    const playerCard = document.createElement('div');
-    playerCard.className = `player-card ${user.isReady ? 'ready' : ''} ${user.id === roomData!.host ? 'host' : ''}`;
-    
-    const avatar = user.avatar || user.username.charAt(0).toUpperCase();
-    
-    playerCard.innerHTML = `
-      <div class="player-avatar">${avatar}</div>
-      <div class="player-name">${sanitizeHtml(user.username)}</div>
-      <div class="player-status">${user.isReady ? 'Ready' : 'Not Ready'}</div>
-    `;
-    
-    container.appendChild(playerCard);
-  });
+	// Add current players
+	roomData.users.forEach(user => {
+		const playerCard = document.createElement('div');
+		playerCard.className = `player-card ${user.isReady ? 'ready' : ''} ${user.id === roomData!.host ? 'host' : ''}`;
+		
+		const avatar = user.avatar || user.username.charAt(0).toUpperCase();
+		
+		playerCard.innerHTML = `
+		<div class="player-avatar">${avatar}</div>
+		<div class="player-name">${sanitizeHtml(user.username)}</div>
+		<div class="player-status">${user.isReady ? 'Ready' : 'Not Ready'}</div>
+		`;
+		
+		container.appendChild(playerCard);
+	});
 
-  // Add empty slots
-  const emptySlots = roomData.maxPlayers - roomData.currentPlayers;
-  for (let i = 0; i < emptySlots; i++) {
-    const emptySlot = document.createElement('div');
-    emptySlot.className = 'empty-slot';
-    emptySlot.textContent = 'Waiting for player...';
-    container.appendChild(emptySlot);
-  }
+	// Add empty slots
+	const emptySlots = roomData.maxPlayers - roomData.currentPlayers;
+
+	for (let i = 0; i < emptySlots; i++) {
+		const emptySlot = document.createElement('div');
+		emptySlot.className = 'empty-slot';
+		emptySlot.textContent = 'Waiting for player...';
+		container.appendChild(emptySlot);
+	}
 }
 
 function updateGameStatus() {
-  const statusIndicator = document.getElementById('gameStatus');
-  if (!statusIndicator || !roomData) return;
+	const statusIndicator = document.getElementById('gameStatus');
 
-  const dot = statusIndicator.querySelector('.status-dot');
-  const text = statusIndicator.querySelector('span:last-child');
+	if (!statusIndicator || !roomData)
+		return;
 
-  if (roomData.isStarted) {
-    dot!.className = 'status-dot playing';
-    text!.textContent = 'Game in progress...';
-  } else if (roomData.users.every(user => user.isReady) && roomData.users.length >= 2) {
-    dot!.className = 'status-dot ready';
-    text!.textContent = 'Ready to start!';
-  } else {
-    dot!.className = 'status-dot waiting';
-    text!.textContent = 'Waiting for players...';
-  }
+	const dot = statusIndicator.querySelector('.status-dot');
+	const text = statusIndicator.querySelector('span:last-child');
+
+	if (roomData.isStarted) {
+		dot!.className = 'status-dot playing';
+		text!.textContent = 'Game in progress...';
+	}
+	else if (roomData.users.every(user => user.isReady) && roomData.users.length >= 2) {
+		dot!.className = 'status-dot ready';
+		text!.textContent = 'Ready to start!';
+	}
+	else {
+		dot!.className = 'status-dot waiting';
+		text!.textContent = 'Waiting for players...';
+	}
 }
 
 function updateControls() {
-  const readyBtn = document.getElementById('readyBtn') as HTMLButtonElement;
-  const startBtn = document.getElementById('startGameBtn') as HTMLButtonElement;
-  const settingsContainer = document.getElementById('roomSettings');
+	const readyBtn = document.getElementById('readyBtn') as HTMLButtonElement;
+	const startBtn = document.getElementById('startGameBtn') as HTMLButtonElement;
+	const settingsContainer = document.getElementById('roomSettings');
 
-  if (!roomData || !currentUserId) return;
+	if (!roomData || !currentUserId) return;
 
-  // Update ready button
-  const currentUser = roomData.users.find(user => user.id === currentUserId);
-  if (currentUser) {
-    readyBtn.textContent = currentUser.isReady ? 'Not Ready' : 'Ready';
-    readyBtn.className = `control-btn ready-btn ${currentUser.isReady ? 'active' : ''}`;
-  }
+	// Update ready button
+	const currentUser = roomData.users.find(user => user.id === currentUserId);
+	if (currentUser) {
+		readyBtn.textContent = currentUser.isReady ? 'Not Ready' : 'Ready';
+		readyBtn.className = `control-btn ready-btn ${currentUser.isReady ? 'active' : ''}`;
+	}
 
-  // Update start button
-  const canStart = roomData.users.every(user => user.isReady) && 
-                  roomData.users.length >= 2 && 
-                  currentUserId === roomData.host;
-  startBtn.disabled = !canStart;
+	// Update start button
+	const canStart = roomData.users.every(user => user.isReady) && 
+			roomData.users.length >= 2 && 
+			currentUserId === roomData.host;
+	startBtn.disabled = !canStart;
 
-  // Show/hide settings for host
-  if (settingsContainer) {
-    settingsContainer.style.display = currentUserId === roomData.host ? 'block' : 'none';
-  }
+	// Show/hide settings for host
+	if (settingsContainer)
+		settingsContainer.style.display = currentUserId === roomData.host ? 'block' : 'none';
 }
 
 function addChatMessage(message: any) {
-  const chatContainer = document.getElementById('chatMessages');
-  if (!chatContainer) return;
+	const chatContainer = document.getElementById('chatMessages');
+	if (!chatContainer)
+		return;
 
-  const messageElement = document.createElement('div');
-  messageElement.className = 'chat-message';
-  
-  const time = new Date(message.timestamp).toLocaleTimeString();
-  
-  messageElement.innerHTML = `
-    <div class="chat-message-author">${sanitizeHtml(message.author)}</div>
-    <div class="chat-message-content">${sanitizeHtml(message.content)}</div>
-    <div class="chat-message-time">${time}</div>
-  `;
-  
-  chatContainer.appendChild(messageElement);
-  chatContainer.scrollTop = chatContainer.scrollHeight;
+	const messageElement = document.createElement('div');
+	messageElement.className = 'chat-message';
+	
+	const time = new Date(message.timestamp).toLocaleTimeString();
+	
+	messageElement.innerHTML = `
+	<div class="chat-message-author">${sanitizeHtml(message.author)}</div>
+	<div class="chat-message-content">${sanitizeHtml(message.content)}</div>
+	<div class="chat-message-time">${time}</div>
+	`;
+	
+	chatContainer.appendChild(messageElement);
+	chatContainer.scrollTop = chatContainer.scrollHeight;
 }
 
 function addSystemMessage(message: string) {
-  const chatContainer = document.getElementById('chatMessages');
-  if (!chatContainer) return;
+	const chatContainer = document.getElementById('chatMessages');
+	if (!chatContainer)
+		return;
 
-  const messageElement = document.createElement('div');
-  messageElement.className = 'chat-message system';
-  
-  const time = new Date().toLocaleTimeString();
-  
-  messageElement.innerHTML = `
-    <div class="chat-message-content">${sanitizeHtml(message)}</div>
-    <div class="chat-message-time">${time}</div>
-  `;
-  
-  chatContainer.appendChild(messageElement);
-  chatContainer.scrollTop = chatContainer.scrollHeight;
+	const messageElement = document.createElement('div');
+	messageElement.className = 'chat-message system';
+	
+	const time = new Date().toLocaleTimeString();
+	
+	messageElement.innerHTML = `
+	<div class="chat-message-content">${sanitizeHtml(message)}</div>
+	<div class="chat-message-time">${time}</div>
+	`;
+	
+	chatContainer.appendChild(messageElement);
+	chatContainer.scrollTop = chatContainer.scrollHeight;
 }
 
 function sendMessage() {
-  const input = document.getElementById('chatInput') as HTMLInputElement;
-  const message = input.value.trim();
-  
-  if (!message || !ws || ws.readyState !== WebSocket.OPEN) return;
+	const input = document.getElementById('chatInput') as HTMLInputElement;
+	const message = input.value.trim();
+	
+	if (!message || !ws || ws.readyState !== WebSocket.OPEN) return;
 
-  ws.send(JSON.stringify({
-    type: 'chat_message',
-    content: message
-  }));
+	ws.send(JSON.stringify({
+		type: 'chat_message',
+		content: message
+	}));
 
-  input.value = '';
+	input.value = '';
 }
 
 function toggleReady() {
-  if (!ws || ws.readyState !== WebSocket.OPEN) return;
+	if (!ws || ws.readyState !== WebSocket.OPEN)
+		return;
 
-  ws.send(JSON.stringify({
-    type: 'toggle_ready'
-  }));
+	ws.send(JSON.stringify({
+		type: 'toggle_ready'
+	}));
 }
 
 function startGame() {
-  if (!ws || ws.readyState !== WebSocket.OPEN) return;
+	if (!ws || ws.readyState !== WebSocket.OPEN)
+		return;
 
-  ws.send(JSON.stringify({
-    type: 'start_game'
-  }));
+	ws.send(JSON.stringify({
+		type: 'start_game'
+	}));
 }
 
 function leaveRoom() {
-  if (ws && ws.readyState === WebSocket.OPEN) {
-    ws.send(JSON.stringify({
-      type: 'leave_room'
-    }));
-    ws.close();
-  }
-  
-  window.history.pushState({}, '', '/matchmaking');
-  // Trigger router update
-  window.dispatchEvent(new Event('popstate'));
+	if (ws && ws.readyState === WebSocket.OPEN) {
+		ws.send(JSON.stringify({
+			type: 'leave_room'
+		}));
+		ws.close();
+	}
+	
+	window.history.pushState({}, '', '/matchmaking');
+	// Trigger router update
+	window.dispatchEvent(new Event('popstate'));
 }
 
 export function initializeRoomEvents() {
-  // Get current user ID
-  fetch('/api/me', {
-    headers: {
-      'x-access-token': getAuthToken()
-    }
-  })
-  .then(response => response.json())
-  .then(data => {
-    currentUserId = data.user.id;
-    connectWebSocket();
-  });
+	// Get current user ID
+	fetch('/api/me', {
+		headers: {
+			'x-access-token': getAuthToken()
+		}
+	})
+	.then(response => response.json())
+	.then(data => {
+		currentUserId = data.user.id;
+		connectWebSocket();
+	});
 
-  // Event listeners
-  document.getElementById('homeBtn')?.addEventListener('click', () => {
-    leaveRoom();
-  });
+	// Event listeners
+	document.getElementById('homeBtn')?.addEventListener('click', () => {leaveRoom();});
 
-  document.getElementById('readyBtn')?.addEventListener('click', toggleReady);
-  document.getElementById('startGameBtn')?.addEventListener('click', startGame);
-  document.getElementById('leaveBtn')?.addEventListener('click', leaveRoom);
+	document.getElementById('readyBtn')?.addEventListener('click', toggleReady);
+	document.getElementById('startGameBtn')?.addEventListener('click', startGame);
+	document.getElementById('leaveBtn')?.addEventListener('click', leaveRoom);
 
-  document.getElementById('chatInput')?.addEventListener('keypress', (e) => {
-    if (e.key === 'Enter') {
-      sendMessage();
-    }
-  });
+	document.getElementById('chatInput')?.addEventListener('keypress', (e) => {
+		if (e.key === 'Enter')
+			sendMessage();
+	});
 
-  document.getElementById('sendBtn')?.addEventListener('click', sendMessage);
+	document.getElementById('sendBtn')?.addEventListener('click', sendMessage);
 
-  // Settings change handlers
-  document.getElementById('maxPlayersSelect')?.addEventListener('change', (e) => {
-    const target = e.target as HTMLSelectElement;
-    if (ws && ws.readyState === WebSocket.OPEN) {
-      ws.send(JSON.stringify({
-        type: 'update_settings',
-        maxPlayers: parseInt(target.value)
-      }));
-    }
-  });
+	// Settings change handlers
+	document.getElementById('maxPlayersSelect')?.addEventListener('change', (e) => {
+		const target = e.target as HTMLSelectElement;
+		if (ws && ws.readyState === WebSocket.OPEN) {
+			ws.send(JSON.stringify({
+				type: 'update_settings',
+				maxPlayers: parseInt(target.value)
+			}));
+		}
+	});
 
-  document.getElementById('gameTypeSelect')?.addEventListener('change', (e) => {
-    const target = e.target as HTMLSelectElement;
-    if (ws && ws.readyState === WebSocket.OPEN) {
-      ws.send(JSON.stringify({
-        type: 'update_settings',
-        gameType: target.value
-      }));
-    }
-  });
+	document.getElementById('gameTypeSelect')?.addEventListener('change', (e) => {
+	const target = e.target as HTMLSelectElement;
+		if (ws && ws.readyState === WebSocket.OPEN) {
+			ws.send(JSON.stringify({
+				type: 'update_settings',
+				gameType: target.value
+			}));
+		}
+	});
 
-  // Cleanup on page unload
-  window.addEventListener('beforeunload', () => {
-    if (ws) {
-      ws.close();
-    }
-  });
+	// Cleanup on page unload
+	window.addEventListener('beforeunload', () => {
+		if (ws)
+			ws.close();
+	});
 }
 
-export function renderRoom() {
-	console.log("render room called")
-  return getTemplate();
+export function renderRoom(uuid:number) {
+
+	setTimeout(async () => {
+		console.log(`room page c'est parti ${uuid}`);
+		try {
+			window.history.pushState({}, '', `/room/${uuid}`);
+			window.dispatchEvent(new PopStateEvent('popstate'));
+			const render = new Room(uuid);
+		}
+		catch (err:any) {
+			console.log(err);
+		}
+	}, 0);
+	return getTemplate();
 }
