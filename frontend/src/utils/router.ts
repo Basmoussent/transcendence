@@ -100,9 +100,6 @@ export async function router() {
     case '/block1v1':
       view = renderBlock1v1();
       break;
-    case '/test':
-      view = renderTest();
-      break;
     case '/change-password':
       view = renderChangePassword();
       break;

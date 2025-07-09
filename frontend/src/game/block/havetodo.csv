@@ -64,4 +64,18 @@ pour update les games available
 
 creer une page room avec uuid qui genere une string random
 
+
+Universally Unique IDentifers (UUIDs)
+
+
+
+
+
+
+
+
+
+
+
+
 	lorsque quelqu'un join la game, le rediriger vers la room cree, afficher l'avatar des membres de la game, combien de personnes il manque

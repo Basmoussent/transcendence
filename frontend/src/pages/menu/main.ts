@@ -273,8 +273,8 @@ function initializeMainEvents() {
 
   if (friendsBtn) {
     friendsBtn.addEventListener('click', () => {
-      // window.history.pushState({}, '', '/friends');
-      // window.dispatchEvent(new PopStateEvent('popstate'));
+      window.history.pushState({}, '', '/friends');
+      window.dispatchEvent(new PopStateEvent('popstate'));
       loadAvailableGames();
     });
   }

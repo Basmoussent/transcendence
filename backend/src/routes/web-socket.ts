@@ -1,9 +1,14 @@
 import { db } from '../database';
 import { FastifyInstance, FastifyRequest } from 'fastify';
+import {v4 as uuidv4} from 'uuid';
 
 async function webSocketRoutes(app: FastifyInstance) {
 
 	let clients = [];
+
+	let uuid = uuidv4();
+
+	console.log(`le uuid de la page est ${uuid}`);
 
 	app.get('/ws', { websocket: true }, (socket: any , req: FastifyRequest) => {
 
