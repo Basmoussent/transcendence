@@ -22,6 +22,15 @@ interface Game {
 	end_time: string
 }
 
+interface BodyType {
+  game_name:string,
+  chef: string,
+  player1: string,
+  users_needed:string,
+}
+
+// check que ca soit plus surligne typage request.body
+
 async function gameRoutes(app: FastifyInstance) {
 
 	app.get('/', async function (request: FastifyRequest, reply: FastifyReply) {
@@ -56,7 +65,7 @@ async function gameRoutes(app: FastifyInstance) {
 
 	})
 
-	app.post('/', async function (request: FastifyRequest, reply: FastifyReply) {
+	app.post('/', async function (request: FastifyRequest<{ Body: BodyType }>, reply: FastifyReply) {
 
 		console.log("enregistrer une game");
 
