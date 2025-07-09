@@ -197,3 +197,34 @@ export async function getGame(gameId: number) {
 	catch (error) {
 		console.error("erreur specific getGame: ", error); }
 }
+
+export async function getUuid(gameId: number) {
+	
+	try {
+		const token = getAuthToken();
+		if (!token) {
+			alert('❌ Token d\'authentification manquant');
+			window.history.pushState({}, '', '/login');
+			window.dispatchEvent(new PopStateEvent('popstate'));
+			return '';
+		}
+
+		const response = await fetch(`/api/games/specific/${gameId}`, {
+			method: 'GET',
+			headers: {
+				'Content-Type': 'application/json',
+				'x-access-token': token,
+			},
+		});
+	
+		if (response.ok) {
+			const result = await response.json();
+			console.log(`game ${gameId} : ${result.uuid}`, result);
+			return result.uuid
+		}
+		else 
+			console.error("error retrieve game uuid");
+	}
+	catch (error) {
+		console.error("error retrieve game uuid: ", error); }
+}

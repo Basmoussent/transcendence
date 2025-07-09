@@ -206,6 +206,43 @@ async function gameRoutes(app: FastifyInstance) {
 
 	})
 
+	app.get('/room:uuid', async function (request: FastifyRequest, reply: FastifyReply) {
+
+		console.log("récupérer une game precise games");
+
+		try {
+			const database = db.getDatabase();
+
+			const { uuid } = request.params as { uuid?: string };
+
+
+			if (!uuid)
+				throw new Error ("missing uuid in the request body");
+
+			const game = await new Promise<Game | null>((resolve, reject) => {
+
+				database.all(
+					'SELECT * FROM games WHERE uuid = ?',
+					[ uuid ],
+					(err: any, row: Game | undefined) => {
+						err ? reject(err) : resolve(row || null); }
+				);
+			});
+			return reply.send({
+				message: 'Voici la game demande',
+				game: game,
+			});
+		}
+
+		catch (err: any) {
+			console.error('erreur GET /games :', err);
+			if (err.name === 'JsonWebTokenError')
+				return reply.status(401).send({ error: 'Token invalide ou expiré' });
+			return reply.status(500).send({ error: 'erreur GET /games', details: err.message });
+		}
+
+	})
+
 }
 
 

@@ -11,6 +11,7 @@ import { renderMatchmaking } from '../pages/matchmaking/local';
 import { renderBlock } from '../pages/block/main';
 import { renderBlock1v1 } from '../pages/block/block1v1';
 import { renderTest } from '../pages/test/test';
+import { renderRoom } from '../pages/room/room';
 import { renderChangePassword, initializeChangePasswordEvents } from '../pages/auth/change-password';
 import { renderEditProfil, initializeEditProfileEvents } from '../pages/social/edit-profil';
 import { getAuthToken } from './auth';
@@ -111,6 +112,9 @@ export async function router() {
       break;
     case '/test':
       view = renderTest();
+      break;
+    case '/room':
+      view = renderRoom();
       break;
     default:
       view = render404();

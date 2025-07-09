@@ -1,6 +1,7 @@
-import { Game, fetchUsername, postGame } from '../../game/gameUtils'
+import { Game, fetchUsername, getUuid, postGame } from '../../game/gameUtils'
 import { getAuthToken } from '../../utils/auth';
 import { sanitizeHtml } from '../../utils/sanitizer';
+import { renderRoom } from '../room/room'
 
 interface Available {
 	game_name: string,
@@ -164,8 +165,8 @@ export class matchmaking {
 
 
 		this.homeBtn.addEventListener('click', () => {
-			// window.history.pushState({}, '', '/main');
-			// window.dispatchEvent(new PopStateEvent('popstate'));
+			window.history.pushState({}, '', '/main');
+			window.dispatchEvent(new PopStateEvent('popstate'));
 			this.currentOptions();
 		});
 
@@ -278,8 +279,12 @@ export class matchmaking {
 
 		this.launchBtn.addEventListener('click', () => {
 
-			// creer le body pour la requete POST
 			
+			
+
+			this.options.style.display = "none"
+
+			// creer le body pour la requete POST
 			let tmp:Game = {
 				game_name: this.pong ? "pong" : "block",
 				chef: this.username,
@@ -287,29 +292,7 @@ export class matchmaking {
 				users_needed: this._1player ? 1 : this._2player ? 2 : this._3player ? 3 : 4
 			}
 
-			this.options.style.display = "none"
-
-			postGame(tmp);
-
-			// nbre de joueur --> user + ia
-			// leur username dans player(n) --> modif a user id et faire une fonction pour retrieve le username
-			// combien d'ia
-			// pouvoirs oui ou non
-
-			
-
-			// afficher msg de chargementg
-
-			// <H3 id="loadingmsg" class="flex flex-col gap-8 justify-center items-center">Looking for opponents</H3>
-
-
-			// if (this.pong)
-			// 	window.history.pushState({}, '', '/pong');
-			// else
-			// 	window.history.pushState({}, '', '/block');
-			// window.dispatchEvent(new PopStateEvent('popstate'));
-
-
+			this.joinRoom(tmp);
 			// a la fin de la game appeler une fonction pour update les stats de chaque joueur
 			
 		});
@@ -346,9 +329,19 @@ export class matchmaking {
 		// => requete PUT vers api/games
 		//	mettre le gameId dans le body
 		//	rajouter mon username en tant que player --> comment savoir quel player !!
+	}
 
-		
+	private async joinRoom(tmp: Game) {
 
+		try {
+			let id = await postGame(tmp);
+			var uuid = await getUuid(id);
+		}
+		catch (err: any) {
+			console.error('❌ Error retrieve game uuid', err); }
 
+		window.history.pushState({}, '', `/room/${uuid}`);
+		window.dispatchEvent(new PopStateEvent('popstate'));
+		renderRoom();
 	}
 }

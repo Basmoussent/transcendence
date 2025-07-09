@@ -64,16 +64,16 @@ pour update les games available
 
 creer une page room avec uuid qui genere une string random
 
+quand la game est lancee fermer la room avec l'uuid et le suppr ?
+
 
 Universally Unique IDentifers (UUIDs)
 
 
-
-
-
-
-
-
+nbre de joueur --> user + ia
+leur username dans player(n) --> modif a user id et faire une fonction pour retrieve le username
+combien d'ia
+pouvoirs oui ou non
 
 
 

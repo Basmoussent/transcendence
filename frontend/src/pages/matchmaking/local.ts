@@ -130,7 +130,7 @@ const getTemplate = () => {
 export function renderMatchmaking() {
 
 	setTimeout(async () => {
-		console.log('Initializing game making page');
+		console.log('Initializing matchmaking page');
 		try {
 			const gameList = await loadAvailableGames();
 			const container = document.getElementById('available-games');
