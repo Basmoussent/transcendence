@@ -57,7 +57,7 @@ export async function logStartGame(gameId:number): Promise<number> {
 			return -1;
 		}
 
-		const response = await fetch('games', {
+		const response = await fetch('/api/games', {
 			method: 'PUT',
 			headers: {
 				'Content-Type': 'application/json',
