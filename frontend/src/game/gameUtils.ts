@@ -3,7 +3,6 @@ import { sanitizeHtml } from '../utils/sanitizer';
 
 export interface Game {
 	game_name: string,
-	chef: string,
 	player1: string,
 	users_needed: number,
 }
@@ -27,7 +26,6 @@ export async function postGame(input:Game): Promise<number> {
 			},
 			body: JSON.stringify({
 				game_name: input.game_name,
-				chef: input.chef,
 				player1: input.player1,
 				users_needed: input.users_needed,
 			})

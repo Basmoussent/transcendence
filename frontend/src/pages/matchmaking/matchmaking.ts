@@ -5,7 +5,6 @@ import { renderRoom } from '../room/room'
 
 interface Available {
 	game_name: string,
-	chef: string,
 	player1: string,
 	player2?: string,
 	player3?: string,
@@ -38,14 +37,13 @@ export async function loadAvailableGames(): Promise<string | -1> {
 			const available: Available[] = result.games.map((game:any) => ({
 				gameId: sanitizeHtml(game.id),
 				game_name: sanitizeHtml(game.game_name),
-				chef: sanitizeHtml(game.chef),
 				player1: sanitizeHtml(game.player1),
 				player2: sanitizeHtml(game?.player2),
 				player3: sanitizeHtml(game?.player3),
 				player4: sanitizeHtml(game?.player4),
 				users_needed:(sanitizeHtml(game.users_needed)),
 				divConverion(): string {
-					return `<div class="bg-black h-32">${(this.chef)}
+					return `<div class="bg-black h-32">${(this.player1)}
 						<button class="p-2 button launch-button" id="join${this.gameId}Btn">Join</button>
 						</div>`;
 				}
@@ -287,7 +285,6 @@ export class matchmaking {
 			// creer le body pour la requete POST
 			let tmp:Game = {
 				game_name: this.pong ? "pong" : "block",
-				chef: this.username,
 				player1: this.username,
 				users_needed: this._1player ? 1 : this._2player ? 2 : this._3player ? 3 : 4
 			}

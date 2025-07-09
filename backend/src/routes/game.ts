@@ -24,7 +24,6 @@ interface Game {
 
 interface BodyType {
   game_name:string,
-  chef: string,
   player1: string,
   users_needed:string,
 }
@@ -73,15 +72,15 @@ async function gameRoutes(app: FastifyInstance) {
 			const database = db.getDatabase();
 
 			let uuid = uuidv4(); // id de la room
-			const { game_name, chef, player1, users_needed } = request.body;
+			const { game_name, player1, users_needed } = request.body;
 
-			if (!uuidValidate(uuid) || !game_name || !chef || !player1 || !users_needed)
+			if (!uuidValidate(uuid) || !game_name || !player1 || !users_needed)
 				throw new Error("Mandatory info needed to prelog game");
 
 			const gameId = await new Promise<void>((resolve, reject) => {
 				database.run(
-					'INSERT INTO games (uuid, game_name, chef, player1, users_needed) VALUES (?, ?, ?, ?, ?)',
-					[uuid, game_name, chef, player1, users_needed],
+					'INSERT INTO games (uuid, game_name, player1, users_needed) VALUES (?, ?, ?, ?)',
+					[uuid, game_name, player1, users_needed],
 					(err: any) => {
 						err ? reject(err) : resolve(); },
 					database.get('SELECT last_insert_rowid() as id', (err: any, row: any) => {
