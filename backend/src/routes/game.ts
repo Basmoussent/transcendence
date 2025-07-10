@@ -214,7 +214,8 @@ async function gameRoutes(app: FastifyInstance) {
 
 	})
 
-	app.get('/room:uuid', async function (request: FastifyRequest, reply: FastifyReply) {
+	// fonctionne comme il faut
+	app.get('/room/:uuid', async function (request: FastifyRequest, reply: FastifyReply) {
 
 		console.log("récupérer une game precise games");
 
@@ -237,7 +238,7 @@ async function gameRoutes(app: FastifyInstance) {
 				);
 			});
 			return reply.send({
-				message: 'Voici la game demande',
+				message: 'acceder a la room par uuid',
 				game: game,
 			});
 		}

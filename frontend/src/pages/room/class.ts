@@ -1,8 +1,5 @@
 export class Room {
 
-	private input: HTMLInputElement;
-	private messages: HTMLElement;
-	private sendBtn: HTMLElement;
 	private ws: WebSocket;
 
 	constructor(uuid: number) {
@@ -15,7 +12,7 @@ export class Room {
 		this.ws.onclose = (event) => {
 			console.log('🔌 Connection closed:', event.code, event.reason)}
 
-		this.setEvents();
+		// this.setEvents();
 	}
 
 	private getElement(id: string): HTMLElement {

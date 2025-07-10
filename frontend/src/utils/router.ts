@@ -17,18 +17,29 @@ import { renderEditProfil, initializeEditProfileEvents } from '../pages/social/e
 import { getAuthToken } from './auth';
 import { clearTranslationCache } from './translations';
 import { renderPong } from '../pages/pong/main';
+import { getGame } from '@/game/gameUtils';
 
 export async function router() {
   // Clear translation cache to ensure fresh translations
   clearTranslationCache();
   
-  const path = window.location.pathname;
+  let path = window.location.pathname;
   const app = document.getElementById('app');
   if (!app) return;
 
   const publicRoutes = ['/', '/login', '/create-account', '/forgot-password', '/block'];
   const token = getAuthToken();
 
+
+  let uuid: string | null = null;
+
+  if (path.startsWith('/room/')) {
+    uuid = path.substring(6);
+    console.log ('on extraie le uuid: ', uuid);
+    path = '/room'
+    console.log("le path est set a /room")
+  }
+  
   if (!publicRoutes.includes(path) && !token) {
     window.history.pushState({}, '', '/login');
     app.innerHTML = renderLogin();
@@ -112,6 +123,10 @@ export async function router() {
       break;
     case '/test':
       view = renderTest();
+      break;
+    case '/room':
+      console.log("on render room")
+      view = renderRoom(uuid);
       break;
     default:
       view = render404();

@@ -752,7 +752,7 @@ export function initializeRoomEvents() {
 	});
 }
 
-export function renderRoom(uuid:number) {
+export function renderRoom(uuid:any) {
 
 	setTimeout(async () => {
 		console.log(`room page c'est parti ${uuid}`);
