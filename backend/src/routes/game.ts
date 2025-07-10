@@ -11,6 +11,7 @@ import path from 'path';
 
 interface Game {
 	id: number,
+	uuid: string,
 	game_name: string,
 	player1: string,
 	player2: string,
@@ -23,9 +24,9 @@ interface Game {
 }
 
 interface BodyType {
-  game_name:string,
-  player1: string,
-  users_needed:string,
+	game_name:string,
+	player1: string,
+	users_needed:string,
 }
 
 // check que ca soit plus surligne typage request.body
@@ -91,6 +92,7 @@ async function gameRoutes(app: FastifyInstance) {
 			return reply.send({
 				message: 'crée une game avec succès',
 				gameId: gameId,
+				uuid: uuid,
 			});
 		}
 
@@ -192,7 +194,7 @@ async function gameRoutes(app: FastifyInstance) {
 
 			const game = await new Promise<Game | null>((resolve, reject) => {
 
-				database.all(
+				database.get(
 					'SELECT * FROM games WHERE id = ?',
 					[ gameId ],
 					(err: any, row: Game | undefined) => {
@@ -206,10 +208,10 @@ async function gameRoutes(app: FastifyInstance) {
 		}
 
 		catch (err: any) {
-			console.error('erreur GET /games :', err);
+			console.error('erreur GET /games/specific :', err);
 			if (err.name === 'JsonWebTokenError')
 				return reply.status(401).send({ error: 'Token invalide ou expiré' });
-			return reply.status(500).send({ error: 'erreur GET /games', details: err.message });
+			return reply.status(500).send({ error: 'erreur GET /games/specific :', details: err.message });
 		}
 
 	})
@@ -224,13 +226,12 @@ async function gameRoutes(app: FastifyInstance) {
 
 			const { uuid } = request.params as { uuid?: string };
 
-
 			if (!uuid)
 				throw new Error ("missing uuid in the request body");
 
 			const game = await new Promise<Game | null>((resolve, reject) => {
 
-				database.all(
+				database.get(
 					'SELECT * FROM games WHERE uuid = ?',
 					[ uuid ],
 					(err: any, row: Game | undefined) => {

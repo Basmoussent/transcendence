@@ -79,3 +79,13 @@ pouvoirs oui ou non
 
 
 	lorsque quelqu'un join la game, le rediriger vers la room cree, afficher l'avatar des membres de la game, combien de personnes il manque
+
+
+
+
+launch --> cree la game dans la db, avec son uuid et popstate la room specific au createur
+
+stocker les socket qui se connecte a la room dans une variable specific a cette room (room.uuid par ex.)
+
+pouvoir recevoir des msg
+

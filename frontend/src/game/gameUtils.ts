@@ -33,7 +33,8 @@ export async function postGame(input:Game): Promise<number> {
 	
 		if (response.ok) {
 			const result = await response.json();
-			console.log("game launch, en attente d'autre joueurs", result);
+			console.log("game cree: ", result);
+			console.log("le post return ", result.gameId)
 			return (result.gameId);
 		}
 		else 
@@ -218,7 +219,9 @@ export async function getUuid(gameId: number) {
 	
 		if (response.ok) {
 			const result = await response.json();
-			const uuid = result?.game?.[0]?.uuid;
+			console.log('le result', result)
+			console.log('la game', result.game)
+			const uuid = result.game.uuid;
 			console.log(`game ${gameId} : ${uuid}`);
 			return uuid
 		}

@@ -332,9 +332,14 @@ export class matchmaking {
 
 		try {
 			let id = await postGame(tmp);
-			var uuid = await getUuid(id);
 
-			renderRoom(uuid);
+			var uuid = await getUuid(id);
+			console.log("dans le bon uuid", uuid)
+
+			window.history.pushState({}, '', `/room/${uuid}`);
+			window.dispatchEvent(new PopStateEvent('popstate'));
+
+			// renderRoom(uuid);
 
 		}
 		catch (err: any) {
