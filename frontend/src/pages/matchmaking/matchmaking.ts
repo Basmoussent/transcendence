@@ -92,6 +92,7 @@ export class matchmaking {
 
 		this.username = "tmp";
 		this.loadUsername();
+		this.setupMutationObserver();
 
 		this.homeBtn = this.getElement('homeBtn');
 		this.pongBtn = this.getElement('pongBtn');
@@ -114,6 +115,7 @@ export class matchmaking {
 
 				const btn = this.getElement(`join${game.gameId}Btn`);
 				if (btn) {
+					console.log(`game ${game.gameId}, btn : ${btn}`)
 					this.joinBtn.set(game.gameId, btn);
 				}
 			})
@@ -145,6 +147,28 @@ export class matchmaking {
 		// 	const data = JSON.parse(event.data);
 		// 	this.handleEvents(data);}
 
+	}
+	
+	private setupMutationObserver() {
+		const observer = new MutationObserver((mutations) => {
+			mutations.forEach((mutation) => {
+			mutation.addedNodes.forEach((node) => {
+				if (node.nodeType === Node.ELEMENT_NODE) {
+				const element = node as Element;
+				const joinButtons = element.querySelectorAll('[id^="join"][id$="Btn"]');
+				
+				joinButtons.forEach((btn) => {
+					const gameId = btn.id.replace('join', '').replace('Btn', '');
+					btn.addEventListener('click', () => {
+					this.joinRoom(Number(gameId));
+					});
+				});
+				}
+			});
+			});
+		});
+		
+		observer.observe(document.body, { childList: true, subtree: true });
 	}
 
 	private async loadUsername() {
