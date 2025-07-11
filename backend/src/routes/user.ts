@@ -114,6 +114,7 @@ async function userRoutes(app: FastifyInstance) {
         return reply.type(contentType).send(fs.createReadStream(filePath));
     });
 
+
     app.post('/upload/avatar', async function (request: FastifyRequest, reply: FastifyReply) {
         try {
             let token = request.headers['x-access-token'] as string;

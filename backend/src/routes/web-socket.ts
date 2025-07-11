@@ -56,7 +56,7 @@ async function webSocketRoutes(app: FastifyInstance) {
 
 		socket.on('message', (message: any) => {
 			dict.get("room").get(uuid).forEach((client: any) => {
-				if (client !== socket)
+				// if (client !== socket)
 					client.send(message.toString())
 			})
 		})

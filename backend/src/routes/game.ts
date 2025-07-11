@@ -78,20 +78,16 @@ async function gameRoutes(app: FastifyInstance) {
 			if (!uuidValidate(uuid) || !game_name || !player1 || !users_needed)
 				throw new Error("Mandatory info needed to prelog game");
 
-			const gameId = await new Promise<void>((resolve, reject) => {
+			await new Promise<void>((resolve, reject) => {
 				database.run(
 					'INSERT INTO games (uuid, game_name, player1, users_needed) VALUES (?, ?, ?, ?)',
 					[uuid, game_name, player1, users_needed],
 					(err: any) => {
 						err ? reject(err) : resolve(); },
-					database.get('SELECT last_insert_rowid() as id', (err: any, row: any) => {
-						err ? reject(err) : resolve(row.id); })
 				);
 			});
 
 			return reply.send({
-				message: 'crée une game avec succès',
-				gameId: gameId,
 				uuid: uuid,
 			});
 		}

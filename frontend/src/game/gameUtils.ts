@@ -34,8 +34,8 @@ export async function postGame(input:Game): Promise<number> {
 		if (response.ok) {
 			const result = await response.json();
 			console.log("game cree: ", result);
-			console.log("le post return ", result.gameId)
-			return (result.gameId);
+			console.log("le post return ", result.uuid)
+			return (result.uuid);
 		}
 		else 
 			console.error("Erreur lors de creer une game");

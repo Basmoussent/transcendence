@@ -359,9 +359,7 @@ export class matchmaking {
 				users_needed: this._1player ? 1 : this._2player ? 2 : this._3player ? 3 : 4
 			}
 
-			let id = await postGame(tmp);
-
-			var uuid = await getUuid(id);
+			var uuid = await postGame(tmp);
 
 			this.options.style.display = "none"
 

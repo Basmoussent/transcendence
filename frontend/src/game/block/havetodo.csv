@@ -81,8 +81,6 @@ pouvoirs oui ou non
 	lorsque quelqu'un join la game, le rediriger vers la room cree, afficher l'avatar des membres de la game, combien de personnes il manque
 
 
-
-
 launch --> cree la game dans la db, avec son uuid et popstate la room specific au createur
 
 stocker les socket qui se connecte a la room dans une variable specific a cette room (room.uuid par ex.)
@@ -97,3 +95,6 @@ getuuid(0) renvoie undefined alors que la game 0 existe ?
 
 
 theory !!!!! postgame renvoie l'id de la game creee juste avant ce zig
+
+
+creer la une instance statistics avec le userid qui vient d'etre cree en fetchant /api/me

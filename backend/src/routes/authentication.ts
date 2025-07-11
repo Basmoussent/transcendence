@@ -66,6 +66,8 @@ async function authRoutes(app: FastifyInstance) {
       );
 
       stmt.run(username, email, password_hash);
+
+      // stmt.run(username, email, password_hash);
       // INSERT INTO statistics (l'id du user qui vient d'être créé)
       
       // Retourne un succès si l'insertion a réussi
