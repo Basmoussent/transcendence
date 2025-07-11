@@ -138,6 +138,10 @@ export function renderMain() {
         background: linear-gradient(135deg, #ff8000 0%, #f39c12 100%);
       }
 
+      .multi-pong-game-button {
+        background: linear-gradient(135deg, #ff8000 0%, #f39c12 100%);
+      }
+
       .logout-button {
         background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
         margin-top: 10px;
@@ -247,6 +251,7 @@ function initializeMainEvents() {
   const friendsBtn = document.getElementById('friendsBtn');
   const blockGameBtn = document.getElementById('blockBtn');
   const pongGameBtn = document.getElementById('pongBtn');
+  const multiPongGameBtn = document.getElementById('multiPongBtn');
   const logoutBtn = document.getElementById('logoutBtn');
 
   if (profileBtn) {
@@ -286,6 +291,13 @@ function initializeMainEvents() {
 
   if (pongGameBtn) {
     pongGameBtn.addEventListener('click', () => {
+      window.history.pushState({}, '', '/pong');
+      window.dispatchEvent(new PopStateEvent('popstate'));
+    });
+  }
+
+  if (multiPongGameBtn) {
+    multiPongGameBtn.addEventListener('click', () => {
       window.history.pushState({}, '', '/pong');
       window.dispatchEvent(new PopStateEvent('popstate'));
     });

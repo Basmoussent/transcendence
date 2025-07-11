@@ -31,6 +31,13 @@ export class Ball {
       this.speedX -= 0.25;
   }
 
+  addBallSpeedMulti(): void {
+    if (this.speedY > 0)
+					this.speedY += 0.25;
+				else
+					this.speedY -= 0.25;
+  }
+
   adjustBallDir(paddle: Paddle | PaddleAI): void {
     const hitY = this.y;
 
@@ -55,15 +62,14 @@ export class Ball {
     this.x = canvasWidth / 2;
     this.y = canvasHeight / 2;
 
-    // celui qui gagne recoit la balle en premier
-    this.speedX *= -1;
-    this.speedY = 1;
+    // // celui qui gagne recoit la balle en premier
 
     // on reset a la vitesse de base
     if (this.speedX > 0)
       this.speedX = 6;
     else
       this.speedX = -6;
+    this.speedY = 0;
   }
 
 }

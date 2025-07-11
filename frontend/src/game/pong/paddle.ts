@@ -11,8 +11,9 @@ export class Paddle {
     score: number;
     scorex: number;
     scorey: number;
+    color: string;
 
-    constructor(width: number, height: number) {
+    constructor(width: number, height: number, color: string) {
         this.name = "Player";
         this.width = width;
         this.height = height;
@@ -22,6 +23,7 @@ export class Paddle {
         this.score = 0;
         this.scorex = 0;
         this.scorey = 0;
+        this.color = color;
     }
 
     moveUp(): void {
@@ -53,13 +55,13 @@ export class Paddle {
     }
 
     displayScore(ctx: CanvasRenderingContext2D): void {
-        ctx.fillStyle = 'white';
+        ctx.fillStyle = this.color;
         ctx.font = '48px sans-serif'; // changer police
         ctx.fillText(this.score.toString(), this.scorex, this.scorey);
     }
 
     drawPaddle(ctx: CanvasRenderingContext2D): void {
-        ctx.fillStyle = '#4a90e2';
+        ctx.fillStyle = this.color;
         ctx.fillRect(
         this.x,
         this.y,

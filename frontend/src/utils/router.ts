@@ -14,6 +14,7 @@ import { renderEditProfil, initializeEditProfileEvents } from '../pages/social/e
 import { getAuthToken } from './auth';
 import { clearTranslationCache } from './translations';
 import { renderPong } from '../pages/pong/pong';
+import { renderMultiPong } from '../pages/pong/multiplayer-pong';
 import { renderChooseGame } from '../pages/game/choose-game';
 
 export async function router() {
@@ -106,6 +107,9 @@ export async function router() {
       break;
     case '/pong':
       view = renderPong();
+      break;
+    case '/multi-pong':
+      view = renderMultiPong();
       break;
     default:
       view = render404();

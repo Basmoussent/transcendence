@@ -7,6 +7,7 @@ https://dooglz.github.io/set09121/pong2.html
 
 
 // a faire
+    // dans reset ball info faire en sorte que celui qui a gagne le dernier point recup la balle en premier
     // idee: faire apparaitre un msg lors des pouvoirs pour qu'on comprenne un peu il se passe quoi
     // idee: pour l'IA, faire un truc ou a chaque collision de la balle, je calcule le prochain point d'impact,
         si c'est sur sa ligne il y a va sinon osef il reste au milieu

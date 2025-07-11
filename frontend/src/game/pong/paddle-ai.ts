@@ -12,6 +12,7 @@ export class PaddleAI {
   score: number;
   scorex: number;
   scorey: number;
+  color: string;
 
   // ai
   lastRefresh: number | null;
@@ -21,7 +22,7 @@ export class PaddleAI {
   targetY: number;
   // mode: number; // easy = 0 / middle = 1 / hard = 2
 
-  constructor(width: number, height: number) {
+  constructor(width: number, height: number, color: string) {
       this.name = "AI Player";
       this.width = width;
       this.height = height;
@@ -31,6 +32,7 @@ export class PaddleAI {
       this.score = 0;
       this.scorex = 0;
       this.scorey = 0;
+      this.color = color;
 
       // ia
       this.lastRefresh = null;
@@ -70,13 +72,13 @@ export class PaddleAI {
   }
 
   displayScore(ctx: CanvasRenderingContext2D): void {
-      ctx.fillStyle = 'white';
+      ctx.fillStyle = this.color;
       ctx.font = '48px sans-serif'; // changer police
       ctx.fillText(this.score.toString(), this.scorex, this.scorey);
   }
 
   drawPaddle(ctx: CanvasRenderingContext2D): void {
-      ctx.fillStyle = '#4a90e2';
+      ctx.fillStyle = this.color;
       ctx.fillRect(
       this.x,
       this.y,

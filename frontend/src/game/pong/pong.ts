@@ -1,7 +1,7 @@
 import { Ball } from "./ball";
 import { Paddle } from "./paddle";
 import { PaddleAI } from "./paddle-ai";
-import { Power } from "./power";
+// import { Power } from "./power";
 import { PADDLE_OFFSET, Player } from "./const";
 
 export class Pong {
@@ -12,12 +12,11 @@ export class Pong {
 	private start: boolean;
 	private end: boolean;
 	private lastPlayerColl: number; // pour savoir qui va gagner le point
-	private paddleReboundCount: number;
 
 	private paddles: [Paddle, Paddle | PaddleAI, Player?, Player?];
 
 	private ball: Ball;
-	private power: Power;
+	// private power: Power | null;
 
 	private keys: { [key: string]: boolean };
 
@@ -34,18 +33,18 @@ export class Pong {
 		this.start = false;
 		this.end = false;
 		this.lastPlayerColl = -1;
-		this.paddleReboundCount = 0;
 
 		// !!! modifier ca avec les infos de la partie
 		this.paddles = [
-			new Paddle(20, 100),
-			new PaddleAI(20, 100),
-			new PaddleAI(100, 20),
-			new PaddleAI(100, 20),
+			new Paddle(20, 100, '#914D76'),
+			new PaddleAI(20, 100, '#4a90e2'),
+			new PaddleAI(100, 20, '#A4AF69'),
+			new PaddleAI(100, 20, '#F991CC'),
 		];
 
 		this.ball = new Ball(this.height, this.width);
-		this.power = new Power(this.height, this.width);
+		// this.power = null;
+		// this.power = new Power(this.height, this.width); // if powers actives
 		this.keys = {};
 	}
 
@@ -119,17 +118,13 @@ export class Pong {
 	private async startGameLoop(): Promise<void> {
 	console.log('Starting game loop...');
 
-	// recup les infos des joueurs
-	// nbr de joueurs
-	// s'il y a une ou plusieurs IA dans la partie
-
 	// fleche au lieu de function() pour que this fasse ref a Pong
 	const gameLoop = () => {
 			if (this.keys['enter'])
 				this.start = true;
 			if (this.start && !this.end) {
 				this.update();
-				this.power.handlePower(this.ball, this.paddles, this.lastPlayerColl);
+				// this.power?.handlePower(this.ball, this.paddles, this.lastPlayerColl, this.width, this.height); // tester
 			}
 			this.render();
 			requestAnimationFrame(gameLoop);
@@ -162,23 +157,33 @@ export class Pong {
 		if (this.paddles[2] === null && this.paddles[3] === null )
 			this.drawLine();
 
-		// faut faire un POST pour update score et etat de la partie
-		for (let i = 0; i < 4; i++) {
-			const paddle = this.paddles[i];
-			if (paddle && paddle?.winsGame() === true) {
-			this.end = true;
-			return;
-			}
+		// les scores
+		this.ctx.globalAlpha = 1;
+
+		this.ctx.textAlign = 'center';
+		this.ctx.textBaseline = 'middle';
+
+		// afficher chaque score avec la couleur du paddle
+		this.ctx.fillStyle = this.paddles[0].color;
+		this.ctx.fillText(this.paddles[0].score.toString(), this.width / 2 - (3 * 30), this.height / 2);
+
+		this.ctx.fillStyle = this.paddles[1].color;
+		this.ctx.fillText(this.paddles[1].score.toString(), this.width / 2 - (1 * 30), this.height / 2);
+
+		if (this.paddles[2]) {
+			this.ctx.fillStyle = this.paddles[2].color;
+			this.ctx.fillText(this.paddles[2].score.toString(), this.width / 2 + (1 * 30), this.height / 2);
 		}
 
-		// les scores
-		for (let i = 0; i < 4; i++) {
-			const paddle = this.paddles[i];
-			if (paddle)
-			paddle?.displayScore(this.ctx);
-	}
+		if (this.paddles[3]) {
+			this.ctx.fillStyle = this.paddles[3].color;
+			this.ctx.fillText(this.paddles[3].score.toString(), this.width / 2 + (3 * 30), this.height / 2);
+		}
 
-	this.ctx.globalAlpha = 1;
+		// remet aux params par defaut
+		this.ctx.textAlign = 'start';
+		this.ctx.textBaseline = 'alphabetic';
+		this.ctx.globalAlpha = 1;
 	}
 
 	private displayResult(): void {
@@ -203,12 +208,23 @@ export class Pong {
 		if (paddle)
 			paddle.score++;
 
+		// faut faire un POST pour update score et etat de la partie
+		for (let i = 0; i < 4; i++) {
+			const paddle = this.paddles[i];
+			if (paddle && paddle?.winsGame() === true) {
+			this.end = true;
+			return;
+			}
+		}
+
 		// le point est rejoue si personne ne touche la balle
 		this.lastPlayerColl = -1;
 
 		this.ball.resetBallInfo(this.width, this.height);
+		// celui qui gagne recoit la balle en premier
 
-		// !!! on annule les powers pour le nouveau point
+		// on annule les powers pour le nouveau point
+		// this.power?.endPowerEffects(this.paddles, this.width, this.height); // tester
 	}
 
 	private adjustBallDirMultiplayer(ball: typeof this.ball, paddle: typeof this.paddles[2] | typeof this.paddles[3] | null): void {
@@ -224,13 +240,13 @@ export class Pong {
 		const edgeZone = paddle.width * 0.2;
 
 		if (hitX <= paddleLeft + edgeZone) // touche bord gauche
-			ball.speedX -= 3;
+			ball.speedX -= 4;
 		else if (hitX >= paddleRight - edgeZone) // touche bord droit
-			ball.speedX += 3;
+			ball.speedX += 4;
 		else if (hitX <= paddleCenter) // touche côté gauche (mais pas bord)
-			ball.speedX -= 1;
+			ball.speedX -= 2;
 		else if (hitX > paddleCenter) // touche côté droit (mais pas bord)
-			ball.speedX += 1;
+			ball.speedX += 2;
 	}
 
 	private ballPaddleCollision(): void {
@@ -241,7 +257,8 @@ export class Pong {
 			this.ball.x = this.paddles[0].x + this.paddles[0].width + this.ball.radius;
 
 			this.lastPlayerColl = 0;
-			this.paddleReboundCount++;
+			// if (this.power)
+			// 	this.power.paddleReboundCount++;
 		}
 		if (this.ball.x + this.ball.radius >= this.paddles[1].x && this.ball.y + this.ball.radius >= this.paddles[1].y && this.ball.y - this.ball.radius <= this.paddles[1].y + this.paddles[1].height && this.ball.x < this.paddles[1].x + this.paddles[1].width) {
 			this.ball.addBallSpeed();
@@ -250,7 +267,8 @@ export class Pong {
 			this.ball.x = this.paddles[1].x - this.ball.radius;
 
 			this.lastPlayerColl = 1;
-			this.paddleReboundCount++;
+			// if (this.power)
+			// 	this.power.paddleReboundCount++;
 		}
 	}
 
@@ -262,17 +280,17 @@ export class Pong {
 			this.ball.x + this.ball.radius >= player3.x &&
 			this.ball.x - this.ball.radius <= player3.x + player3.width &&
 			this.ball.y > player3.y) {
-				this.ball.addBallSpeed();
+
 				this.ball.speedY *= -1;
+				this.ball.addBallSpeedMulti();
 				this.adjustBallDirMultiplayer(this.ball, player3);
 				
 				// repositionner balle pour eviter comportement bizarre
 				this.ball.y = player3.y + player3.height + this.ball.radius + 0.1;
 				
-				this.ball.speedY = Math.abs(this.ball.speedY);
-
 				this.lastPlayerColl = 2;
-				this.paddleReboundCount++;
+				// if (this.power)
+				// 	this.power.paddleReboundCount++;
 		}
 
 		const player4 = this.paddles[3]; // bas
@@ -282,17 +300,17 @@ export class Pong {
 			this.ball.x + this.ball.radius >= player4.x &&
 			this.ball.x - this.ball.radius <= player4.x + player4.width &&
 			this.ball.y < player4.y + player4.height) {
-				this.ball.addBallSpeed();
+				
 				this.ball.speedY *= -1;
+				this.ball.addBallSpeedMulti();
 				this.adjustBallDirMultiplayer(this.ball, player4);
 
 				// repositionner balle pour eviter comportement bizarre
 				this.ball.y = player4.y - this.ball.radius - 0.1;
 
-				this.ball.speedY = -Math.abs(this.ball.speedY);
-
 				this.lastPlayerColl = 3;
-				this.paddleReboundCount++;
+				// if (this.power)
+				// 	this.power.paddleReboundCount++;
 		}
 	}
 
@@ -322,24 +340,15 @@ export class Pong {
 	}
 
 	private	updatePlayer1(): void {
-		// if (this.paddles[0].reverseCmd)
-			// this.paddles[0].updatePaddleRightLeft(this.keys, 's', 'w', this.paddles, this.height);
-		// else
 			this.paddles[0].updatePaddleRightLeft(this.keys, 'w', 's', this.paddles, this.height);
 	}
 
 	private	updatePlayer2(): void {
 		if (this.paddles[1] instanceof PaddleAI) // si player3 est une IA
 		{
-			// if (this.paddles[1].reverseCmd)
-				// this.paddles[1].middleRightLeft(this.ball, this.paddles, this.height, this.paddles[1].down, this.paddles[1].up);
-			// else
 				this.paddles[1].middleRightLeft(this.ball, this.paddles, this.height);
 		}
 		else {
-			// if (this.paddles[1].reverseCmd)
-				// this.paddles[1].updatePaddleRightLeft(this.keys, 'arrowdown', 'arrowup', this.paddles, this.height);
-			// else
 				this.paddles[1].updatePaddleRightLeft(this.keys, 'arrowup', 'arrowdown', this.paddles, this.height);
 		}
 	}
@@ -347,15 +356,9 @@ export class Pong {
 	private	updatePlayer3(): void {
 		const player3 = this.paddles[2];
 		if (player3 && player3 instanceof PaddleAI) {
-			// if (player3.reverseCmd)
-			// 	player3?.middleUpDown(this.ball, this.paddles, this.width, this.height, player3.down, player3.up);
-			// else
 				player3?.middleUpDown(this.ball, this.paddles, this.width, this.height);
 		}
 		else if (player3) {
-			// if (player3.reverseCmd)
-			// 	player3?.updatePaddleUpDown(this.keys, 'l', 'k', this.paddles, this.width);
-			// else
 				player3?.updatePaddleUpDown(this.keys, 'k', 'l', this.paddles, this.width);
 		}
 	}
@@ -363,15 +366,9 @@ export class Pong {
 	private	updatePlayer4(): void {
 		const player4 = this.paddles[3];
 		if (player4 && player4 instanceof PaddleAI) {
-			// if (player4.reverseCmd)
-			// 	player4?.middleUpDown(this.ball, this.paddles, this.width, this.height, player4.down, player4.up);
-			// else
 				player4?.middleUpDown(this.ball, this.paddles, this.width, this.height);
 		}
 		else if (player4) {
-			// if (player4.reverseCmd)
-			// 	player4?.updatePaddleUpDown(this.keys, '6', '5', this.paddles, this.width);
-			// else
 				player4?.updatePaddleUpDown(this.keys, '5', '6', this.paddles, this.width);
 		}
 	}
@@ -405,8 +402,8 @@ export class Pong {
 			this.ball.drawBall(this.ctx, this.ball.x, this.ball.y, this.ball.radius);
 			this.displayScore();
 
-			if (this.power.display)
-				this.power.drawPower(this.ctx);
+			// if (this.power && this.power.display)
+			// 	this.power.drawPower(this.ctx);
 		}
 		else {
 			if (this.end)

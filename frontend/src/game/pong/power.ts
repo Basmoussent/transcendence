@@ -14,18 +14,18 @@ export class Power {
   y: number;
   active: boolean;
   display: boolean;
-  spawnTime: number;
-  collisionTime: number | null;
+	paddleReboundCount: number;
+  powerColl: number | null;
 
   constructor(canvasHeight: number, canvasWidth: number) {
       this.width = 20;
       this.height = 20;
       this.x = randomInt((canvasWidth / 5) * 2, (canvasWidth / 5) * 4);
-      this.y = randomInt(0, canvasHeight);
+      this.y = randomInt(canvasHeight / 5 * 2, canvasHeight / 5 * 4);
       this.active = false;
       this.display = false;
-      this.spawnTime = Date.now() / 1000;
-      this.collisionTime = null;
+      this.paddleReboundCount = 0;
+      this.powerColl = null;
   }
 
   powerCollision(ballx: number, bally: number, ballradius: number) {
@@ -59,19 +59,18 @@ export class Power {
   }
 
   randomPaddle(nbrOfPlayers: number): number {
-    if (nbrOfPlayers < 1 || nbrOfPlayers > 4)
+    if (nbrOfPlayers < 2 || nbrOfPlayers > 4)
       return -1;
 
-    return (Math.floor(Math.random() * nbrOfPlayers - 1));
+    return (Math.floor(Math.random() * nbrOfPlayers));
   }
 
   activateRandomPower(paddles: [Paddle, Paddle | PaddleAI, Player?, Player?], lastPlayerColl: number): void {
-	  const rand = Math.floor(Math.random() * 2);
+	  const rand = Math.floor(Math.random() * 3); // tester a la main chaque pouvoir
     const malusPlayer = this.randomPaddle(paddles.length);
-    console.log('paddle malus = ', malusPlayer);
 
     // paddle plus grand pour celui qui a active le pouvoir
-    if (rand == 1 && paddles[lastPlayerColl]) {
+    if (rand == 0 && paddles[lastPlayerColl]) {
       if (lastPlayerColl == 0 || lastPlayerColl == 1)
         paddles[lastPlayerColl].height = paddles[lastPlayerColl]?.height / 3 * 4;
       else if (lastPlayerColl == 2 || lastPlayerColl == 3)
@@ -79,7 +78,7 @@ export class Power {
     }
 
     // paddle plus petit pour un joueur random qui n'a pas active le pouvoir
-    if (rand == 2 && malusPlayer > 0 && paddles[malusPlayer]) {
+    if (rand == 1 && malusPlayer > 0 && paddles[malusPlayer]) {
       if (malusPlayer == 0 || malusPlayer == 1)
         paddles[malusPlayer].height = paddles[malusPlayer]?.height / 3 * 2;
       else if (malusPlayer == 2 || malusPlayer == 3)
@@ -92,10 +91,11 @@ export class Power {
     }
   }
 
-  endPowerEffects(paddles: [Paddle, Paddle | PaddleAI, Player?, Player?]): void {
+  endPowerEffects(paddles: [Paddle, Paddle | PaddleAI, Player?, Player?], canvasWidth: number, canvasHeight: number): void {
     for (let i = 0; i < 2; i++) {
 			const paddle = paddles[i];
 			if (paddle) {
+        paddle.speed = 8;
         paddle.height = 100;
         paddle.width = 20;
       }
@@ -109,31 +109,32 @@ export class Power {
         paddle.width = 100;
       }
 		}
+
+    // prochain pouvoir spawn a un autre endroit
+    this.x = randomInt((canvasWidth / 5) * 2, (canvasWidth / 5) * 4);
+    this.y = randomInt(canvasHeight / 5 * 2, canvasHeight / 5 * 4);
   }
 
-  handlePower(ball: Ball, paddles: [Paddle, Paddle | PaddleAI, Player?, Player?], lastPlayerColl: number): void {
-    const now = Date.now() / 1000;
+  handlePower(ball: Ball, paddles: [Paddle, Paddle | PaddleAI, Player?, Player?], lastPlayerColl: number, canvasWidth: number, canvasHeight: number): void {
     
-    if (now - this.spawnTime >= 15) {
-      console.log('cest le moment dactiver un power');
+    if (this.paddleReboundCount > 10) {
       this.active = true;
       this.display = true;
-      this.spawnTime = now;
     }
 
     if (this.active) {
 
       if (this.powerCollision(ball.x, ball.y, ball.radius)) {
         this.display = false;
-        this.collisionTime = now;
+        this.powerColl = this.paddleReboundCount;
 
         this.activateRandomPower(paddles, lastPlayerColl);
       }
 
-      if (this.collisionTime && now - this.collisionTime >= 8) {
+      if (this.powerColl && this.paddleReboundCount - this.powerColl > 10) {
         this.active = false;
         this.display = false;
-        this.endPowerEffects(paddles);
+        this.endPowerEffects(paddles, canvasWidth, canvasHeight);
       }
     }
   }
