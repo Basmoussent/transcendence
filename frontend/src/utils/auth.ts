@@ -22,44 +22,6 @@ function getCookieDomain(): string | undefined {
   return undefined;
 }
 
-// Fonction pour obtenir le domaine de base (sans sous-domaine)
-function getBaseDomain(): string {
-  const hostname = window.location.hostname;
-  const parts = hostname.split('.');
-  
-  if (hostname.includes('localhost')) {
-    if (parts.length > 1) {
-      return parts.slice(-1).join('.'); // localhost
-    }
-    return hostname;
-  }
-  
-  if (parts.length >= 2) {
-    return parts.slice(-2).join('.'); // entropy.local
-  }
-  
-  return hostname;
-}
-
-// Fonction pour obtenir le sous-domaine actuel
-function getCurrentSubdomain(): string {
-  const hostname = window.location.hostname;
-  const parts = hostname.split('.');
-  
-  if (hostname.includes('localhost')) {
-    if (parts.length > 1) {
-      return parts[0]; // fr, en, es
-    }
-    return 'en'; // Par défaut
-  }
-  
-  if (parts.length >= 3) {
-    return parts[0]; // fr, en, es
-  }
-  
-  return 'en'; // Par défaut
-}
-
 export function getAuthToken(): string | null {
   const localToken = localStorage.getItem('x-access-token');
   if (localToken) {

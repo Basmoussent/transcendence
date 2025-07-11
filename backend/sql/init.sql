@@ -10,13 +10,17 @@ CREATE TABLE IF NOT EXISTS users (
 
 CREATE TABLE IF NOT EXISTS games (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
-  status VARCHAR NOT NULL,
-  player1 INTEGER NOT NULL REFERENCES users(id),
-  player2 INTEGER NOT NULL REFERENCES users(id),
-  winner INTEGER,
-  score VARCHAR,
-  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-  ended_at DATETIME
+  uuid TEXT UNIQUE NOT NULL,
+  game_name TEXT NOT NULL,
+  player1 TEXT NOT NULL,
+  player2 TEXT,
+  player3 TEXT,
+  player4 TEXT,
+  users_needed INTEGER,
+  ai INTEGER DEFAULT 0,
+  start_time TEXT,
+  end_time TEXT,
+  winner TEXT
 );
 
 CREATE TABLE IF NOT EXISTS chats (
@@ -30,8 +34,8 @@ CREATE TABLE IF NOT EXISTS friends (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   user_1 INTEGER REFERENCES users(id),
   user_2 INTEGER REFERENCES users(id),
-  user1_state VARCHAR(36) users(id),
-  user2_state VARCHAR(36) users(id),
+  user1_state VARCHAR(36),
+  user2_state VARCHAR(36)
 );
 
 CREATE TABLE IF NOT EXISTS messages (
@@ -41,3 +45,19 @@ CREATE TABLE IF NOT EXISTS messages (
   content TEXT NOT NULL,
   sent_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
+
+CREATE TABLE IF NOT EXISTS statistics (
+  user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+  mmr INTEGER DEFAULT 800,
+  pong_games INTEGER DEFAULT 0,
+  pong_wins INTEGER DEFAULT 0,
+  block_games INTEGER DEFAULT 0,
+  block_wins INTEGER DEFAULT 0,
+  rating INTEGER
+)
+
+-- CREATE TABLE IF NOT EXISTS tournaments (
+--   tournaments_id INTEGER PRIMARY KEY AUTOINCREMENT,
+--   player_ids TEXT NOT NULL,
+--   state INTEGER DEFAULT 0
+-- )

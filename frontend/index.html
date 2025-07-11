@@ -118,7 +118,9 @@
         
         isChangingLanguage = true;
         
-        const hostname = window.location.hostname;
+        const host = window.location.hostname;
+        const port = window.location.port ? `:${window.location.port}` : '';
+        const hostname = host + port;
         const parts = hostname.split('.');
         
         let baseDomain;
@@ -140,35 +142,34 @@
         }
         
         const newUrl = `${window.location.protocol}//${newHostname}${window.location.pathname}${window.location.search}${window.location.hash}`;
-
+        console.log(`🔄 Changement de langue -> ${newHostname}`);
         try {
           const authToken = window.getAuthToken();
-          
-          const response = await fetch('/api/edit/change-language', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'x-access-token': authToken
-            },
-            body: JSON.stringify({ language: lang })
-          });
+          const response = {"": null};
+          if (authToken) {
+            response = await fetch('/api/edit/change-language', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'x-access-token': authToken
+              },
+              body: JSON.stringify({ language: lang })
+            });
 
-          if (!response.ok) {
-            console.error('Erreur lors du changement de langue:', response.statusText);
-            isChangingLanguage = false;
-            return;
+            if (!response.ok) {
+              console.error('Erreur lors du changement de langue:', response.statusText);
+              isChangingLanguage = false;
+              return;
+            }
           }
           
-          // Update the URL without full page reload using history API
-          window.history.pushState({}, '', newUrl);
           
           const buttons = document.querySelectorAll('.language-btn');
           buttons.forEach(btn => btn.classList.remove('active'));
           const activeBtn = document.querySelector(`.${lang}-flag`);
           if (activeBtn) activeBtn.classList.add('active');
           
-          // Trigger a custom event to notify the SPA router
-          window.dispatchEvent(new CustomEvent('languageChanged', { detail: { language: lang } }));
+          window.location.href = newUrl;
           
         } catch (error) {
           console.error('Erreur lors du changement de langue:', error);
@@ -198,7 +199,7 @@
       }
 
       async function ensureSubdomain() {
-        if (isChangingLanguage) return; // Prevent execution during language change
+        if (isChangingLanguage) return;
         
         if (window.getAuthToken().length > 0) {
           const preferredLanguage = await getPreferedLanguage();
@@ -232,9 +233,8 @@
           const newUrl = window.location.protocol + '//' + newHost + window.location.pathname + window.location.search + window.location.hash;
           console.log(`🔄 Redirection vers sous-domaine par défaut: ${hostname} -> ${newHost}`);
           
-          // Use SPA navigation instead of full page redirect
-          window.history.pushState({}, '', newUrl);
-          window.dispatchEvent(new CustomEvent('languageChanged', { detail: { language: 'en' } }));
+          window.location.href = newUrl;
+
         }
       }
 
@@ -243,11 +243,7 @@
         const lang = hostname.split('.')[0];
         const buttons = document.querySelectorAll('.language-btn');
         
-<<<<<<< HEAD
         await ensureSubdomain();
-=======
-        // ensureSubdomain();
->>>>>>> ines
         
         buttons.forEach(btn => {
           if (btn.classList.contains(`${lang}-flag`)) {
