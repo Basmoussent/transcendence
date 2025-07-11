@@ -44,3 +44,5 @@ backend/uploads/*
 backend/data/*
 
 docker/nginx/logs/*
+
+task.csv

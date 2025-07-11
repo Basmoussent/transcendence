@@ -1,3 +1,4 @@
+import { getGame, getGameUuid } from '../../game/gameUtils';
 import { sanitizeHtml } from '../../utils/sanitizer';
 
 export class Room {
@@ -9,6 +10,8 @@ export class Room {
 	private startBtn: HTMLButtonElement;
 	private leaveBtn: HTMLButtonElement;
 	private sendBtn: HTMLButtonElement;
+	private playerCountEl: HTMLButtonElement;
+	private uuid: string;
 
 	// private settingsContainer: HTMLElement;
 	// private chatContainer: HTMLElement;
@@ -16,10 +19,10 @@ export class Room {
 
 	private username: string;
 
-	constructor(uuid: number) {
+	constructor(user: string, uuid: string) {
 
-
-		this.username = "espandju"
+		this.uuid = uuid;
+		this.username = user;
 
 		this.ws = new WebSocket(`${window.location.protocol === "https:" ? "wss" : "ws"}://${window.location.host}/api/room/${uuid}`);
 
@@ -29,6 +32,7 @@ export class Room {
 		this.sendBtn = this.getElement('sendBtn') as HTMLButtonElement;
 		this.homeBtn = this.getElement('homeBtn') as HTMLButtonElement;
 		this.leaveBtn = this.getElement('leaveBtn') as HTMLButtonElement;
+		this.playerCountEl = this.getElement('playerCount') as HTMLButtonElement;
 		// this.settingsContainer = this.getElement('roomSettings');
 		// this.chatContainer = this.getElement('chatMessages');
 		this.input = this.getElement('chatInput') as HTMLInputElement ;
@@ -38,6 +42,10 @@ export class Room {
 		this.ws.onopen = () => {
 			this.addSystemMessage(`${this.username} just arrived`);
 			console.log(`${this.username} vient de se connecter a la room ${uuid}`)
+			this.ws.send(JSON.stringify({
+				type: 'player_joined',
+				username: this.username,
+			}));
 		}
 
 		this.ws.onerror = (error) => {
@@ -77,11 +85,6 @@ export class Room {
 	private handleEvents(data: any) {
 
 
-		if (!this.ws || this.ws.readyState !== WebSocket.OPEN) {
-			console.log("le websocket n'est pas du tout ready l'ancien")
-			return;
-		}
-
 		switch (data.type) {
 
 
@@ -90,12 +93,15 @@ export class Room {
 				break;
 
 			case 'leave':
-				this.updateRoomMembers(data);
+				this.updateRoomMembers();
 				break;
 
 			case 'player_joined':
-				this.updateRoomMembers(data);
+				this.updateRoomMembers();
 				break;
+
+			// case 'ready':
+			// 	this.update
 		}
 
 	}
@@ -178,13 +184,16 @@ export class Room {
 		chatContainer.scrollTop = chatContainer.scrollHeight;
 	}
 
-	private updateRoomMembers(data: any) {
-		if (data.type == 'leave') {
-			console.log('faire des choses');
-		}
-		else if (data.typ == 'player_joined') {
-			this.addSystemMessage(`${data.username} joined the room`);
-		}
+	private updateRoomMembers() {
+
+
+		// console.log(info);
+
+	}
+
+	private updatePlayerCount(data: string) {
+
+
 	}
 
 	

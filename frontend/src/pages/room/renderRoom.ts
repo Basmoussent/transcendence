@@ -1,6 +1,7 @@
 import { getAuthToken } from '../../utils/auth';
 import { sanitizeHtml } from '../../utils/sanitizer';
 import { Room } from './room'
+import { fetchUsername } from '../../game/gameUtils';
 
 interface User {
 	id: string;
@@ -21,103 +22,107 @@ interface RoomData {
 	host: string;
 }
 
+	// <div class="bg-gradient-to-br from-[#AEB8FE] via-[#4b0082] to-[#000080]">
+
+
 const getTemplate = () => {
 	return `
-	<div class="flex flex-col h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900">
-	<button class="home-button" id="homeBtn">
-		<i class="fas fa-home"></i>
-		Home
-	</button>
+	<div class="flex flex-col h-screen bg-gradient-to-br from-[#C3423F] to-[#03254e]">
+
+		<button class="home-button" id="homeBtn">
+			<i class="fas fa-home"></i>
+			Home
+		</button>
+		
+		<div class="flex-1 flex gap-6 p-6 pt-20">
+			<!-- Left Panel - Room Info -->
+			<div class="w-1/3 bg-white/10 backdrop-blur-lg rounded-xl p-6 border border-white/20 shadow-lg">
+				<div class="room-header mb-6">
+					<h1 class="text-2xl font-bold text-white mb-2" id="roomName">Room Name</h1>
+					<div class="flex items-center gap-4 text-white/80">
+						<div class="flex items-center gap-2">
+							<i class="fas fa-gamepad"></i>
+							<span id="gameType">Pong</span>
+						</div>
+						<div class="flex items-center gap-2">
+							<i class="fas fa-users"></i>
+							<span id="playerCount">1/4</span>
+						</div>
+					</div>
+				</div>
+			
+				<div class="room-controls mb-6">
+					<button class="control-btn ready-btn" id="readyBtn">
+						<i class="fas fa-check"></i>
+						Ready
+					</button>
+					<button class="control-btn leave-btn" id="leaveBtn">
+						<i class="fas fa-sign-out-alt"></i>
+						Leave Room
+					</button>
+				</div>
+			
+				<div class="room-settings" id="roomSettings">
+					<h3 class="text-lg font-semibold text-white mb-3">Room Settings</h3>
+					<div class="settings-grid">
+						<div class="setting-item">
+							<label class="text-white/80">Max Players</label>
+							<select class="setting-select" id="maxPlayersSelect">
+								<option value="2">2</option>
+								<option value="3">3</option>
+								<option value="4">4</option>
+							</select>
+						</div>
+						<div class="setting-item">
+							<label class="text-white/80">Game Type</label>
+							<select class="setting-select" id="gameTypeSelect">
+								<option value="pong">Pong</option>
+								<option value="block">Block</option>
+							</select>
+						</div>
+					</div>
+				</div>
+			</div>
+			
+			<!-- Center Panel - Players -->
+			<div class="flex-1 bg-white/10 backdrop-blur-lg rounded-xl p-6 border border-white/20 shadow-lg">
+				<div class="flex items-center justify-between mb-6">
+					<h2 class="text-xl font-bold text-white">Players</h2>
+					<div class="status-indicator" id="gameStatus">
+						<span class="status-dot waiting"></span>
+						<span class="text-white/80">Waiting for players...</span>
+					</div>
+				</div>
+			
+				<div class="players-grid" id="playersContainer">
+					<!-- Players will be dynamically added here -->
+				</div>
+				
+				<div class="game-actions mt-6" id="gameActions">
+					<button class="action-btn start-btn" id="startGameBtn" disabled>
+						<i class="fas fa-play"></i>
+						Start Game
+					</button>
+				</div>
+			</div>
+			
+			<!-- Right Panel - Chat -->
+			<div class="w-1/3 bg-white/10 backdrop-blur-lg rounded-xl p-6 border border-white/20 shadow-lg flex flex-col">
+				<h2 class="text-xl font-bold text-white mb-4">Chat</h2>
+			
+				<div class="chat-messages flex-1 overflow-y-auto mb-4" id="chatMessages">
+					<!-- Chat messages will be dynamically added here -->
+				</div>
+			
+				<div class="chat-input-container">
+					<input type="text" class="chat-input" id="chatInput" placeholder="Type a message..." maxlength="200">
+					<button class="send-btn" id="sendBtn">
+						<i class="fas fa-paper-plane"></i>
+					</button>
+				</div>
+			</div>
+		</div>
 	
-	<div class="flex-1 flex gap-6 p-6 pt-20">
-		<!-- Left Panel - Room Info -->
-		<div class="w-1/3 bg-white/10 backdrop-blur-lg rounded-xl p-6 border border-white/20 shadow-lg">
-		<div class="room-header mb-6">
-		<h1 class="text-2xl font-bold text-white mb-2" id="roomName">Room Name</h1>
-		<div class="flex items-center gap-4 text-white/80">
-		<div class="flex items-center gap-2">
-			<i class="fas fa-gamepad"></i>
-			<span id="gameType">Pong</span>
-		</div>
-		<div class="flex items-center gap-2">
-			<i class="fas fa-users"></i>
-			<span id="playerCount">0/4</span>
-		</div>
-		</div>
-		</div>
-		
-		<div class="room-controls mb-6">
-		<button class="control-btn ready-btn" id="readyBtn">
-		<i class="fas fa-check"></i>
-		Ready
-		</button>
-		<button class="control-btn leave-btn" id="leaveBtn">
-		<i class="fas fa-sign-out-alt"></i>
-		Leave Room
-		</button>
-		</div>
-		
-		<div class="room-settings" id="roomSettings">
-		<h3 class="text-lg font-semibold text-white mb-3">Room Settings</h3>
-		<div class="settings-grid">
-		<div class="setting-item">
-			<label class="text-white/80">Max Players</label>
-			<select class="setting-select" id="maxPlayersSelect">
-			<option value="2">2</option>
-			<option value="3">3</option>
-			<option value="4">4</option>
-			</select>
-		</div>
-		<div class="setting-item">
-			<label class="text-white/80">Game Type</label>
-			<select class="setting-select" id="gameTypeSelect">
-			<option value="pong">Pong</option>
-			<option value="block">Block</option>
-			</select>
-		</div>
-		</div>
-		</div>
-		</div>
-		
-		<!-- Center Panel - Players -->
-		<div class="flex-1 bg-white/10 backdrop-blur-lg rounded-xl p-6 border border-white/20 shadow-lg">
-		<div class="flex items-center justify-between mb-6">
-		<h2 class="text-xl font-bold text-white">Players</h2>
-		<div class="status-indicator" id="gameStatus">
-		<span class="status-dot waiting"></span>
-		<span class="text-white/80">Waiting for players...</span>
-		</div>
-		</div>
-		
-		<div class="players-grid" id="playersContainer">
-		<!-- Players will be dynamically added here -->
-		</div>
-		
-		<div class="game-actions mt-6" id="gameActions">
-		<button class="action-btn start-btn" id="startGameBtn" disabled>
-		<i class="fas fa-play"></i>
-		Start Game
-		</button>
-		</div>
-		</div>
-		
-		<!-- Right Panel - Chat -->
-		<div class="w-1/3 bg-white/10 backdrop-blur-lg rounded-xl p-6 border border-white/20 shadow-lg flex flex-col">
-		<h2 class="text-xl font-bold text-white mb-4">Chat</h2>
-		
-		<div class="chat-messages flex-1 overflow-y-auto mb-4" id="chatMessages">
-		<!-- Chat messages will be dynamically added here -->
-		</div>
-		
-		<div class="chat-input-container">
-		<input type="text" class="chat-input" id="chatInput" placeholder="Type a message..." maxlength="200">
-		<button class="send-btn" id="sendBtn">
-		<i class="fas fa-paper-plane"></i>
-		</button>
-		</div>
-		</div>
-	</div>
-	</div>
 
 	<style>
 	.home-button {
@@ -141,6 +146,25 @@ const getTemplate = () => {
 	.home-button:hover {
 		background: rgba(255, 255, 255, 0.2);
 		transform: translateY(-2px);
+	}
+
+	#chatMessages::-webkit-scrollbar {
+		width: 8px;
+	}
+
+	#chatMessages::-webkit-scrollbar-track {
+		background: rgba(255, 255, 255, 0.05); /* arrière-plan discret */
+		border-radius: 8px;
+	}
+
+	#chatMessages::-webkit-scrollbar-thumb {
+		background-color: rgba(255, 255, 255, 0.3); /* poignée blanche translucide */
+		border-radius: 8px;
+		border: 2px solid rgba(255, 255, 255, 0.1); /* bord flouté */
+	}
+
+	#chatMessages::-webkit-scrollbar-thumb:hover {
+		background-color: rgba(255, 255, 255, 0.5); /* effet hover */
 	}
 
 	.control-btn {
@@ -444,12 +468,16 @@ const getTemplate = () => {
 	</style>`;
 };
 
-export function renderRoom(uuid:any) {
+export function renderRoom(uuid: string) {
 
 
 	setTimeout(async () => {
 		try {
-			const render = new Room(uuid);
+
+			const username = await fetchUsername();
+			if (username !== undefined) {
+				const render = new Room(username, uuid);
+			}
 		}
 		catch (err:any) {
 			console.log(err);

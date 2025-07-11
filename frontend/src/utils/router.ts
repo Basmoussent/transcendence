@@ -36,6 +36,7 @@ export async function router() {
   if (path.startsWith('/room/')) {
     uuid = path.substring(6);
     path = '/room'
+
   }
   
   if (!publicRoutes.includes(path) && !token) {
@@ -123,6 +124,8 @@ export async function router() {
       view = renderTest();
       break;
     case '/room':
+      if (!uuid)
+        return ;
       view = renderRoom(uuid);
       break;
     default:

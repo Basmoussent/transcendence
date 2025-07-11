@@ -98,3 +98,4 @@ theory !!!!! postgame renvoie l'id de la game creee juste avant ce zig
 
 
 creer la une instance statistics avec le userid qui vient d'etre cree en fetchant /api/me
+
