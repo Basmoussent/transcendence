@@ -1,105 +1,70 @@
-import { Test } from './testws'
+export class Test {
 
-const getTemplate = () => {
-  return `
-	<div class="chat-container">
-		<div class="messages" id="chatMessages">
-			<div class="message">Bienvenue dans le chat !</div>
-		</div>
-		<div class="input-container">
-			<input type="text" id="messageInput" placeholder="Écris ton message..." />
-			<button onclick="" id="sendButton">Envoyer</button>
-		</div>
-	</div>
+	private input: HTMLInputElement;
+	private messages: HTMLElement;
+	private sendBtn: HTMLElement;
+	private ws: WebSocket;
 
-	<script src="test.js"></script>
+	constructor() {
 
-	<style>
-		* {
-			box-sizing: border-box;
-			margin: 0;
-			padding: 0;
-			font-family: sans-serif;
-		}
+		this.input = this.getElement('messageInput') as HTMLInputElement;
+		this.messages = this.getElement('chatMessages');
+		this.sendBtn = this.getElement('sendButton')
+		this.ws = new WebSocket(`${window.location.protocol === "https:" ? "wss" : "ws"}://${window.location.host}/ws`);
+		this.ws.onmessage = (event) => this.onMessage(event, this.messages);
 
-		body, html {
-			height: 100%;
-			background: #f0f0f0;
-		}
+		this.ws.onopen = () => {
+			console.log(` vient de se connecter a la room`)}
 
-		.chat-container {
-			display: flex;
-			flex-direction: column;
-			height: 100%;
-			width: 100%;
-		}
+		this.ws.onerror = (error) => {
+			console.error('❌ WebSocket error:', error)}
+		this.ws.onclose = (event) => {
+			console.log('🔌 Connection closed:', event.code, event.reason)}
 
-		.messages {
-			flex: 1;
-			padding: 16px;
-			overflow-y: auto;
-			background: #2c2c2c;
+		this.setupEvents();
+	}
 
-		}
+	private getElement(id: string): HTMLElement {
+		const el = document.getElementById(id);
+		if (!el)
+			throw new Error(`Element "${id}" not found`);
+		return el;
+	}
 
-		.message {
-			margin-bottom: 12px;
-			padding: 10px 14px;
-			border-radius: 10px;
-			max-width: 70%;
-			background: #3a3a3a;
-			color: white;
-		}
+	private sendMessage(): void {
+		const message = this.input.value.trim();
+		const newMsg = document.createElement('div');
+		
+		newMsg.classList.add('message');
+		newMsg.textContent = message;
+		this.messages.appendChild(newMsg);
+		this.messages.scrollTop = this.messages.scrollHeight;
+		this.input.value = '';
+		this.ws.send(message);
+		console.log("Message sent:", message);
+	}
 
-		.input-container {
-			display: flex;
-			padding: 10px;
-			border-top: 1px solid #ccc;
-			background: #1e1e1e;
-		}
+	private onMessage(event: MessageEvent<any>, messages: any): void {
 
-		.input-container input[type="text"] {
-			flex: 1;
-			padding: 10px;
-			border: 1px solid #ccc;
-			border-radius: 20px;
-			font-size: 16px;
-			outline: none;
-			background-color: #333;
-			color: #f0f0f0;
-			border: 1px solid #555;
-		}
+		const message = event.data.toString().trim();
+		const newMsg = document.createElement('div');
+		
+		newMsg.classList.add('message');
+		newMsg.textContent = message;
+		messages.appendChild(newMsg);
+		messages.scrollTop = messages.scrollHeight;
+	}
 
-		.input-container button {
-			margin-left: 10px;
-			padding: 10px 20px;
-			background-color: #007bff;
-			border: none;
-			border-radius: 20px;
-			color: white;
-			cursor: pointer;
-			font-size: 16px;
-			transition: background-color 0.3s;
-		}
+	private setupEvents(): void {
+		this.input.addEventListener("keydown", (e: KeyboardEvent) => {
+			if (e.key === "Enter") {
+				this.sendMessage();}
+		});
 
-		.input-container button:hover {
-			background-color: #0056b3;
-		}
-	</style>`;
-}
+		this.sendBtn.addEventListener("click", () => {
+			this.sendMessage();
 
+		});
+	}
 
-export function renderTest() {
-
-	setTimeout(async () => {
-		console.log(`test page c'est parti`);
-		try {
-			const render = new Test();
-		}
-		catch (err:any) {
-			console.log(err);
-		}
-	}, 0);
-
-	return getTemplate();
 }

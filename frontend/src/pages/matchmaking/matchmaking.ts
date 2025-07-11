@@ -1,7 +1,7 @@
 import { Game, fetchUsername, getUuid, postGame } from '../../game/gameUtils'
 import { getAuthToken } from '../../utils/auth';
 import { sanitizeHtml } from '../../utils/sanitizer';
-import { renderRoom } from '../room/room'
+import { renderRoom } from '../room/renderRoom'
 
 interface Available {
 	game_name: string,
