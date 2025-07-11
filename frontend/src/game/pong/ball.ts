@@ -1,3 +1,4 @@
+import { BALL_BASE_SPEED } from "./const";
 import { Paddle } from "./paddle";
 import { PaddleAI } from "./paddle-ai";
 
@@ -12,7 +13,7 @@ export class Ball {
     this.radius = 10;
     this.x = canvasWidth / 2;
     this.y = canvasHeight / 2;
-    this.speedX = 6;
+    this.speedX = BALL_BASE_SPEED;
     this.speedY = 0;
   }
 
@@ -57,19 +58,43 @@ export class Ball {
       this.speedY += 1;
   }
 
-  resetBallInfo(canvasWidth: number, canvasHeight: number): void {
+  resetBallInfo(canvasWidth: number, canvasHeight: number, lastWinner: number): void {
     // replace la balle au centre
     this.x = canvasWidth / 2;
     this.y = canvasHeight / 2;
-
-    // // celui qui gagne recoit la balle en premier
-
-    // on reset a la vitesse de base
-    if (this.speedX > 0)
-      this.speedX = 6;
+    
+    // celui qui gagne reçoit la balle en premier
+    if (lastWinner !== -1)
+    {
+        switch (lastWinner) {
+            case 0: // gauche
+                this.speedX = -BALL_BASE_SPEED;
+                this.speedY = 0;
+                break;
+            case 1: // droite
+                this.speedX = BALL_BASE_SPEED;
+                this.speedY = 0;
+                break;
+            case 2: // haut
+                this.speedX = 0;
+                this.speedY = -BALL_BASE_SPEED;
+                break;
+            case 3: // bas
+                this.speedX = 0;
+                this.speedY = BALL_BASE_SPEED;
+                break;
+            default:
+                this.speedX = BALL_BASE_SPEED;
+                this.speedY = 0;
+        }
+    }
     else
-      this.speedX = -6;
-    this.speedY = 0;
+    {
+        if (this.speedX > 0)
+            this.speedX = BALL_BASE_SPEED;
+        else
+            this.speedX = -BALL_BASE_SPEED;
+        this.speedY = 0;
+    }
   }
-
 }

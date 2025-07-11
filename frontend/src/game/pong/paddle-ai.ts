@@ -10,8 +10,6 @@ export class PaddleAI {
   y: number;
   speed: number;
   score: number;
-  scorex: number;
-  scorey: number;
   color: string;
 
   // ai
@@ -28,10 +26,8 @@ export class PaddleAI {
       this.height = height;
       this.x = 0;
       this.y = 0;
-      this.speed = 8;
+      this.speed = 9;
       this.score = 0;
-      this.scorex = 0;
-      this.scorey = 0;
       this.color = color;
 
       // ia
@@ -71,10 +67,10 @@ export class PaddleAI {
       return this.score === 5;
   }
 
-  displayScore(ctx: CanvasRenderingContext2D): void {
+  displayScore(ctx: CanvasRenderingContext2D, x: number, y: number): void {
       ctx.fillStyle = this.color;
       ctx.font = '48px sans-serif'; // changer police
-      ctx.fillText(this.score.toString(), this.scorex, this.scorey);
+      ctx.fillText(this.score.toString(), x, y);
   }
 
   drawPaddle(ctx: CanvasRenderingContext2D): void {
@@ -231,7 +227,8 @@ export class PaddleAI {
 
 		if (this.canRefresh()) {
 			const impactTime = (this.y - ball.y) / ball.speedY;
-			this.targetX = ball.x + ball.speedX * impactTime;
+			const ballImpact = ball.x + ball.speedX * impactTime;
+      this.targetX = ballImpact - (this.width / 2) - 0.1;
 
 			// si la balle ne vient pas vers nous et qu'on est le player3
 			if (ball.speedY > 0 && this.y == PADDLE_OFFSET)
@@ -263,16 +260,16 @@ export class PaddleAI {
 	middleRightLeft(ball: Ball, paddles: [Paddle, Paddle | PaddleAI, Player?, Player?], canvasHeight: number): void {
 		
     // decalage de this.height / 2 pour que la balle touche le milieu du paddle
-    if (this.up && this.y + this.height / 2 > this.targetY)
+    if (this.up && this.y > this.targetY)
 			this.checkAndMoveUp(paddles[2]);
-		else if (this.down && this.y + this.height / 2 < this.targetY)
+		else if (this.down && this.y < this.targetY)
 			this.checkAndMoveDown(paddles[3], canvasHeight);
 		
 		// the AI can only refresh its view of the game once per second
 		if (this.canRefresh()) {
 			const impactTime = (this.x - ball.x) / ball.speedX;
-			console.log('impact time = ', impactTime);
-			this.targetY = ball.y + ball.speedY * impactTime;
+      const ballImpact = ball.y + ball.speedY * impactTime;
+			this.targetY = ballImpact - this.height / 2 - 0.1;
 
 			// si la balle est pas en train de venir vers nous on se replace au milieu
 			if (ball.speedX < 0) {

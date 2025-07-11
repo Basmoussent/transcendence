@@ -1,4 +1,4 @@
-import { Pong } from '../../game/pong/pong';
+import { MultiPong } from '../../game/pong/multi-pong';
 
 export function renderMultiPong() {
   const html = `
@@ -68,7 +68,7 @@ export function renderMultiPong() {
       return;
     }
     console.log('Canvas found, creating game instance...');
-    const game = new Pong(canvas);
+    const game = new MultiPong(canvas);
     game.init();
   }, 0);
 

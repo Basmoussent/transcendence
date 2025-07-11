@@ -9,8 +9,6 @@ export class Paddle {
     y: number;
     speed: number;
     score: number;
-    scorex: number;
-    scorey: number;
     color: string;
 
     constructor(width: number, height: number, color: string) {
@@ -19,10 +17,8 @@ export class Paddle {
         this.height = height;
         this.x = 0;
         this.y = 0;
-        this.speed = 8;
+        this.speed = 9;
         this.score = 0;
-        this.scorex = 0;
-        this.scorey = 0;
         this.color = color;
     }
 
@@ -54,10 +50,10 @@ export class Paddle {
         return this.score === 5;
     }
 
-    displayScore(ctx: CanvasRenderingContext2D): void {
+    displayScore(ctx: CanvasRenderingContext2D, x: number, y: number): void {
         ctx.fillStyle = this.color;
         ctx.font = '48px sans-serif'; // changer police
-        ctx.fillText(this.score.toString(), this.scorex, this.scorey);
+        ctx.fillText(this.score.toString(), x, y);
     }
 
     drawPaddle(ctx: CanvasRenderingContext2D): void {

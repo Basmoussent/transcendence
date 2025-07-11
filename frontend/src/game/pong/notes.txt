@@ -7,33 +7,15 @@ https://dooglz.github.io/set09121/pong2.html
 
 
 // a faire
-    // dans reset ball info faire en sorte que celui qui a gagne le dernier point recup la balle en premier
-    // idee: faire apparaitre un msg lors des pouvoirs pour qu'on comprenne un peu il se passe quoi
     // idee: pour l'IA, faire un truc ou a chaque collision de la balle, je calcule le prochain point d'impact,
-        si c'est sur sa ligne il y a va sinon osef il reste au milieu
-    // faire une page /pong-multiplayer pour que ca soit un peu plus clean
-        // carre pour pas que les 2 soient desavantages
-    // faire en sorte que les joueurs haut bas aussi recoivent la balle au debut du point
-        // revoir logique de la balle pcq elle s'adapte pas bien au multiplayer
-    // ajouter l'offset aux ia
-    // reprendre backend/src/routes/game.ts
-    // stocker les scores API
+        si c'est sur sa ligne il y a va sinon
+            // soit il se replace au milieu (moyen)
+            // soit il calcule le prochain rebond a partir de ces infos
+                // et la si c'est sur lui y va sinon osef (si possible tester plusieurs rebonds sinon ca y est)
     // police avec l'API
         // ajuster texte au milieu pcq la c'est bancal
 
-    // pour les pouvoirs:
-        // garder une seule struct de base avec toutes les infos
-        // seule diff sera au moment de la collision avec le power
-            // on en active un random
-        // power ups - aleatoire entre : (peut etre annonce en fond)
-                // paddle + grand/+ petit pour l'adversaire
-                // vitesse + pour celui qui gagne
-                // balle en trop
-                // commandes de l'adversaire sont inversees pendant 4/5 sec
-
     // IA
-        // calculer ou le paddle va aller plutot que de check sa pos par rapport a la balle
-            // pcq sinon interdit??
         // si grosse diff entre middle et hard je degage easy
         // si la balle est pas en train de venir vers lui se replacer au milieu
             // sauf si c'est un paddle up down
@@ -49,11 +31,6 @@ https://dooglz.github.io/set09121/pong2.html
 
         // calculer a l'avance mouvements de balle et aller a l'endroit de la collision
 
-    // une page d'accueil du jeu ou le joueur peut choisir:
-        // activer les powers ups dans la partie
-        // choisir d'ajouter des ia ou non
-        // nombre de joueurs
-
     // amis
       // paires d'amis avec chacun son etat
         // savoir qui a fait la demande
@@ -62,3 +39,7 @@ https://dooglz.github.io/set09121/pong2.html
 
     // la page principale du site renvoie vers la liste de boutons pas vers login
     // la page edit profile pourrait etre + lisible
+
+    // sur la page profile
+        // ajouter un bouton activer 2FA
+        // ajouter un bouton home

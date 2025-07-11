@@ -44,4 +44,4 @@ backend/uploads/*
 # BDD
 backend/data/*
 
-docker/nginx/logs/*
+docker/nginx/logs

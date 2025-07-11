@@ -1,8 +1,7 @@
 import { Ball } from "./ball";
 import { Paddle } from "./paddle";
 import { PaddleAI } from "./paddle-ai";
-// import { Power } from "./power";
-import { PADDLE_OFFSET, Player } from "./const";
+import { PADDLE_OFFSET, Player, PADDLE1_COLOR, PADDLE2_COLOR, PADDLE3_COLOR, PADDLE4_COLOR } from "./const";
 
 export class Pong {
 	private canvas: HTMLCanvasElement;
@@ -12,12 +11,8 @@ export class Pong {
 	private start: boolean;
 	private end: boolean;
 	private lastPlayerColl: number; // pour savoir qui va gagner le point
-
 	private paddles: [Paddle, Paddle | PaddleAI, Player?, Player?];
-
 	private ball: Ball;
-	// private power: Power | null;
-
 	private keys: { [key: string]: boolean };
 
 	constructor(canvas: HTMLCanvasElement) {
@@ -36,15 +31,13 @@ export class Pong {
 
 		// !!! modifier ca avec les infos de la partie
 		this.paddles = [
-			new Paddle(20, 100, '#914D76'),
-			new PaddleAI(20, 100, '#4a90e2'),
-			new PaddleAI(100, 20, '#A4AF69'),
-			new PaddleAI(100, 20, '#F991CC'),
+			new Paddle(20, 100, PADDLE1_COLOR),
+			new PaddleAI(20, 100, PADDLE2_COLOR),
+			new PaddleAI(100, 20, PADDLE3_COLOR),
+			new PaddleAI(100, 20, PADDLE4_COLOR)
 		];
 
 		this.ball = new Ball(this.height, this.width);
-		// this.power = null;
-		// this.power = new Power(this.height, this.width); // if powers actives
 		this.keys = {};
 	}
 
@@ -65,33 +58,27 @@ export class Pong {
 		console.log('Setting up paddles...');
 		this.paddles[0].x = PADDLE_OFFSET;
 		this.paddles[0].y = (this.height - this.paddles[0].height) / 2;
-		this.paddles[0].scorex = (this.width / 2) / 2;
-		this.paddles[0].scorey = this.height / 2;
 
 		this.paddles[1].x = this.width - this.paddles[1].width - PADDLE_OFFSET;
 		this.paddles[1].y = (this.height - this.paddles[1].height) / 2;
-		this.paddles[1].scorex = (this.width / 4) * 3;
-		this.paddles[1].scorey = this.height / 2;
 
 		const player3 = this.paddles[2];
 		if (player3) {
 			player3.x = this.width / 2 - player3.width / 2;
 			player3.y = PADDLE_OFFSET;
-			player3.scorex = this.width / 2;
-			player3.scorey = this.height - this.height + 100;
 		}
 
 		const player4 = this.paddles[3];
 		if (player4) {
 			player4.x = this.width / 2 - player4.width / 2;
 			player4.y = this.height - player4.height - PADDLE_OFFSET;
-			player4.scorex = this.width / 2;
-			player4.scorey = this.height - 100;
 		}
 	}
 
 	private setupCanvas(): void {
 		console.log('Setting up canvas...');
+		console.log('this.width = ', this.width)
+		console.log('this.height = ', this.height)
 		this.canvas.width = this.canvas.clientWidth || 800;
 		this.canvas.height = this.canvas.clientHeight || 600;
 		this.width = this.canvas.width;
@@ -124,7 +111,6 @@ export class Pong {
 				this.start = true;
 			if (this.start && !this.end) {
 				this.update();
-				// this.power?.handlePower(this.ball, this.paddles, this.lastPlayerColl, this.width, this.height); // tester
 			}
 			this.render();
 			requestAnimationFrame(gameLoop);
@@ -150,40 +136,53 @@ export class Pong {
 		this.ctx.stroke();
 	}
 
-	private displayScore(): void {
-		this.ctx.globalAlpha = 0.2;
-
-		// ligne du milieu que si y'a 2 joueurs
-		if (this.paddles[2] === null && this.paddles[3] === null )
-			this.drawLine();
-
-		// les scores
-		this.ctx.globalAlpha = 1;
-
+	private	multiScore(): void {
 		this.ctx.textAlign = 'center';
 		this.ctx.textBaseline = 'middle';
 
-		// afficher chaque score avec la couleur du paddle
-		this.ctx.fillStyle = this.paddles[0].color;
-		this.ctx.fillText(this.paddles[0].score.toString(), this.width / 2 - (3 * 30), this.height / 2);
+		const activePlayers = this.paddles.filter(paddle => paddle !== null && paddle !== undefined);
+		const playerCount = activePlayers.length;
 
-		this.ctx.fillStyle = this.paddles[1].color;
-		this.ctx.fillText(this.paddles[1].score.toString(), this.width / 2 - (1 * 30), this.height / 2);
+		const spacing = 60; // entre chaque score
+		const totalWidth = (playerCount - 1) * spacing;
+		const startX = this.width / 2 - (totalWidth / 2);
 
-		if (this.paddles[2]) {
-			this.ctx.fillStyle = this.paddles[2].color;
-			this.ctx.fillText(this.paddles[2].score.toString(), this.width / 2 + (1 * 30), this.height / 2);
+		// affiche score au milieu avec couleur du joueur
+		let activeIndex = 0;
+		for (let i = 0; i < this.paddles.length; i++) {
+			const paddle = this.paddles[i];
+			if (paddle) {
+				this.ctx.fillStyle = paddle.color;
+				this.ctx.fillText(
+					paddle.score.toString(), 
+					startX + (activeIndex * spacing), 
+					this.height / 2
+				);
+				activeIndex++;
+			}
 		}
 
-		if (this.paddles[3]) {
-			this.ctx.fillStyle = this.paddles[3].color;
-			this.ctx.fillText(this.paddles[3].score.toString(), this.width / 2 + (3 * 30), this.height / 2);
-		}
-
-		// remet aux params par defaut
+		// remet params par défaut
 		this.ctx.textAlign = 'start';
 		this.ctx.textBaseline = 'alphabetic';
+	}
+
+	private displayScore(): void {
+		this.ctx.globalAlpha = 0.2;
+
+		// ligne du milieu que si y'a 2 joueurs avec transparance
+		if (this.paddles[2] === null && this.paddles[3] === null )
+			this.drawLine();
+
 		this.ctx.globalAlpha = 1;
+
+		// les scores
+		if (this.paddles[2] || this.paddles[3])
+			this.multiScore();
+		else {
+			this.paddles[0].displayScore(this.ctx, (this.width / 2) / 2, this.height / 2);
+			this.paddles[1].displayScore(this.ctx, (this.width / 4) * 3, this.height / 2);
+		}
 	}
 
 	private displayResult(): void {
@@ -217,14 +216,11 @@ export class Pong {
 			}
 		}
 
-		// le point est rejoue si personne ne touche la balle
-		this.lastPlayerColl = -1;
-
-		this.ball.resetBallInfo(this.width, this.height);
+		this.ball.resetBallInfo(this.width, this.height, this.lastPlayerColl);
 		// celui qui gagne recoit la balle en premier
 
-		// on annule les powers pour le nouveau point
-		// this.power?.endPowerEffects(this.paddles, this.width, this.height); // tester
+		// le point est rejoue si personne ne touche la balle
+		this.lastPlayerColl = -1;
 	}
 
 	private adjustBallDirMultiplayer(ball: typeof this.ball, paddle: typeof this.paddles[2] | typeof this.paddles[3] | null): void {
@@ -251,24 +247,20 @@ export class Pong {
 
 	private ballPaddleCollision(): void {
 		if (this.ball.x - this.ball.radius <= this.paddles[0].x + this.paddles[0].width && this.ball.y + this.ball.radius >= this.paddles[0].y && this.ball.y - this.ball.radius <= this.paddles[0].y + this.paddles[0].height && this.ball.x > this.paddles[0].x) {
-			this.ball.addBallSpeed();
 			this.ball.speedX *= -1;
 			this.ball.adjustBallDir(this.paddles[0]);
+			this.ball.addBallSpeed();
 			this.ball.x = this.paddles[0].x + this.paddles[0].width + this.ball.radius;
 
 			this.lastPlayerColl = 0;
-			// if (this.power)
-			// 	this.power.paddleReboundCount++;
 		}
 		if (this.ball.x + this.ball.radius >= this.paddles[1].x && this.ball.y + this.ball.radius >= this.paddles[1].y && this.ball.y - this.ball.radius <= this.paddles[1].y + this.paddles[1].height && this.ball.x < this.paddles[1].x + this.paddles[1].width) {
-			this.ball.addBallSpeed();
 			this.ball.speedX *= -1;
 			this.ball.adjustBallDir(this.paddles[1]);
+			this.ball.addBallSpeed();
 			this.ball.x = this.paddles[1].x - this.ball.radius;
 
 			this.lastPlayerColl = 1;
-			// if (this.power)
-			// 	this.power.paddleReboundCount++;
 		}
 	}
 
@@ -282,15 +274,13 @@ export class Pong {
 			this.ball.y > player3.y) {
 
 				this.ball.speedY *= -1;
-				this.ball.addBallSpeedMulti();
 				this.adjustBallDirMultiplayer(this.ball, player3);
+				this.ball.addBallSpeedMulti();
 				
 				// repositionner balle pour eviter comportement bizarre
 				this.ball.y = player3.y + player3.height + this.ball.radius + 0.1;
 				
 				this.lastPlayerColl = 2;
-				// if (this.power)
-				// 	this.power.paddleReboundCount++;
 		}
 
 		const player4 = this.paddles[3]; // bas
@@ -302,15 +292,13 @@ export class Pong {
 			this.ball.y < player4.y + player4.height) {
 				
 				this.ball.speedY *= -1;
-				this.ball.addBallSpeedMulti();
 				this.adjustBallDirMultiplayer(this.ball, player4);
+				this.ball.addBallSpeedMulti();
 
 				// repositionner balle pour eviter comportement bizarre
 				this.ball.y = player4.y - this.ball.radius - 0.1;
 
 				this.lastPlayerColl = 3;
-				// if (this.power)
-				// 	this.power.paddleReboundCount++;
 		}
 	}
 
@@ -401,9 +389,6 @@ export class Pong {
 		if (this.start && !this.end) {
 			this.ball.drawBall(this.ctx, this.ball.x, this.ball.y, this.ball.radius);
 			this.displayScore();
-
-			// if (this.power && this.power.display)
-			// 	this.power.drawPower(this.ctx);
 		}
 		else {
 			if (this.end)
