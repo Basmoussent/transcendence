@@ -98,7 +98,7 @@ export class matchmaking {
 	constructor() {
 
 
-		this.ws = new WebSocket(`${window.location.protocol === "https:" ? "wss" : "ws"}://${window.location.host}/matchmaking`);
+		this.ws = new WebSocket(`${window.location.protocol === "https:" ? "wss" : "ws"}://${window.location.host}/api/matchmaking`);
 
 		this.homeBtn = this.getElement('homeBtn');
 		this.pongBtn = this.getElement('pongBtn');

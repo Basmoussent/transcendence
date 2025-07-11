@@ -12,12 +12,16 @@ export class Test {
 		this.sendBtn = this.getElement('sendButton')
 		this.ws = new WebSocket(`${window.location.protocol === "https:" ? "wss" : "ws"}://${window.location.host}/ws`);
 		this.ws.onmessage = (event) => this.onMessage(event, this.messages);
+
+		this.ws.onopen = () => {
+			console.log(` vient de se connecter a la room`)}
+
 		this.ws.onerror = (error) => {
 			console.error('❌ WebSocket error:', error)}
 		this.ws.onclose = (event) => {
 			console.log('🔌 Connection closed:', event.code, event.reason)}
 
-		this.setEvents();
+		this.setupEvents();
 	}
 
 	private getElement(id: string): HTMLElement {
@@ -51,7 +55,7 @@ export class Test {
 		messages.scrollTop = messages.scrollHeight;
 	}
 
-	private setEvents(): void {
+	private setupEvents(): void {
 		this.input.addEventListener("keydown", (e: KeyboardEvent) => {
 			if (e.key === "Enter") {
 				this.sendMessage();}

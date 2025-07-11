@@ -34,21 +34,28 @@ async function webSocketRoutes(app: FastifyInstance) {
 					client.send(message.toString())
 			})
 		})
+		socket.on('close', () => {
+		const index = dict.get("clients").indexOf(socket);
+		if (index !== -1) {
+			dict.get("clients").splice(index, 1); // Supprimer le client de la liste
+			console.log("a user just disconnected from /matchmaking");
+		}
+	});
 	});
 
 	app.get('/room/:uuid', { websocket: true }, (socket: any , req: FastifyRequest) => {
 
-		const roomId = (req.params as any).roomId;
+		const uuid = (req.params as any).uuid;
 
-		if (!dict.get("room").has(roomId)) {
-			dict.get("room").set(roomId, []);
+		if (!dict.get("room").has(uuid)) {
+			dict.get("room").set(uuid, []);
 		}
 
-		dict.get("room").get(roomId).push(socket);
+		dict.get("room").get(uuid).push(socket);
+		console.log(`a user just connected on the room ${uuid}`);
 
-		console.log(`a user just connected on the room ${roomId}`);
 		socket.on('message', (message: any) => {
-			dict.get("room").get(roomId).forEach((client: any) => {
+			dict.get("room").get(uuid).forEach((client: any) => {
 				if (client !== socket)
 					client.send(message.toString())
 			})

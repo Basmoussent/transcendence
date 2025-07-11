@@ -3,8 +3,6 @@ import { getAuthToken } from '../../utils/auth';
 import { sanitizeHtml } from '../../utils/sanitizer';
 
 	// <div class="flex gap-12 h-screen justify-center items-center px-8" id=options-container>
-
-
 const getTemplate = () => {
 	return `
 	<div class="flex gap-12 h-screen justify-center items-center px-8" id=options-container>

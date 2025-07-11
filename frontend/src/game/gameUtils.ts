@@ -219,8 +219,6 @@ export async function getUuid(gameId: number) {
 	
 		if (response.ok) {
 			const result = await response.json();
-			console.log('le result', result)
-			console.log('la game', result.game)
 			const uuid = result.game.uuid;
 			console.log(`game ${gameId} : ${uuid}`);
 			return uuid
