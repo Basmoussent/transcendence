@@ -12,7 +12,7 @@ export class Paddle {
 	constructor(_x:number, _y:number, _speed:number) {
 		this.x = _x
 		this.y = _y
-		this.width = 100
+		this.width = 10000
 		this.height = 20
 		this.speed = _speed
 	}

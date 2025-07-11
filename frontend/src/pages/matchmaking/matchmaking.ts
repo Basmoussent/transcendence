@@ -92,7 +92,6 @@ export class matchmaking {
 
 		this.username = "tmp";
 		this.loadUsername();
-		this.setupMutationObserver();
 
 		this.homeBtn = this.getElement('homeBtn');
 		this.pongBtn = this.getElement('pongBtn');
@@ -106,20 +105,21 @@ export class matchmaking {
 		this.options = this.getElement("game-options");
 
 
+		this.setupMutationObserver();
 
 
-		loadAvailableGames().then((available) => {
-			if (available === -1)
-				return;
-			available.forEach((game) => {
+		// loadAvailableGames().then((available) => {
+		// 	if (available === -1)
+		// 		return;
+		// 	available.forEach((game) => {
 
-				const btn = this.getElement(`join${game.gameId}Btn`);
-				if (btn) {
-					console.log(`game ${game.gameId}, btn : ${btn}`)
-					this.joinBtn.set(game.gameId, btn);
-				}
-			})
-		})
+		// 		const btn = this.getElement(`join${game.gameId}Btn`);
+		// 		if (btn) {
+		// 			console.log(`game ${game.gameId}, btn : ${btn}`)
+		// 			this.joinBtn.set(game.gameId, btn);
+		// 		}
+		// 	})
+		// })
 
 
 		this.pong = false;
@@ -143,9 +143,9 @@ export class matchmaking {
 		this.ws.onclose = (event) => {
 			console.log(`${this.username} part de la page matchmaking`)}
 
-		// this.ws.onmessage = (event) =>  {
-		// 	const data = JSON.parse(event.data);
-		// 	this.handleEvents(data);}
+		this.ws.onmessage = (event) =>  {
+			const data = JSON.parse(event.data);
+			this.handleEvents(data);}
 
 	}
 	
@@ -315,8 +315,6 @@ export class matchmaking {
 
 		});
 
-		
-
 		this.resetBtn.addEventListener('click', () => {
 
 			this.pong = false;
@@ -355,7 +353,6 @@ export class matchmaking {
 
 		this.launchBtn.addEventListener('click', async () => {
 
-
 			let tmp:Game = {
 				game_name: this.pong ? "pong" : "block",
 				player1: this.username,
@@ -372,6 +369,11 @@ export class matchmaking {
 
 			window.history.pushState({}, '', `/room/${uuid}`);
 			window.dispatchEvent(new PopStateEvent('popstate'));
+
+			this.ws.send(JSON.stringify({
+				type: 'new_game',
+				game: tmp
+			}));
 
 		});
 
@@ -405,5 +407,24 @@ export class matchmaking {
 
 		}
 	}
+	private handleEvents(data: any) {
+
+
+		if (!this.ws || this.ws.readyState !== WebSocket.OPEN) {
+			console.log("le websocket n'est pas du tout ready l'ancien")
+			return;
+		}
+
+		switch (data.type) {
+
+			case 'new_game':
+				console.log(`il y a une nouvelle game, il faut update`);
+				console.log(`${data.game}`)
+				
+
+		}
+
+	}
+
 
 }

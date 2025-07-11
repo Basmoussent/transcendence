@@ -151,7 +151,7 @@ export class Block {
 
 		if (this.keys['enter'] && !this.status) {
 			
-			ball.reset(this.width / 2, (this.height / 4) + 50, 3, 6)
+			ball.reset(this.width / 2, (this.height / 4) + 50, 10, 12)
 			this.status = true;
 
 			this.gameId = await postGame(this.username);
@@ -175,7 +175,7 @@ export class Block {
 		ball.collisionPadd1(this.paddle);
 
 		// collision ball bricks
-		if (ball.y + ball.speedy <= this.height / 4 && ball.y > 0) {
+		if (ball.y + ball.speedy - (ball.radius / 2) <= this.height / 4 && ball.y > 0) {
 
 			for (const brick of this.bricks) {
 
