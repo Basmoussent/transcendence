@@ -94,3 +94,6 @@ pouvoir recevoir des msg
 postgame renvoie 0 alors que ya deja deux games de cree
 
 getuuid(0) renvoie undefined alors que la game 0 existe ?
+
+
+theory !!!!! postgame renvoie l'id de la game creee juste avant ce zig

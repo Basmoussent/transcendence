@@ -3,7 +3,8 @@ import { getAuthToken } from '../../utils/auth';
 import { sanitizeHtml } from '../../utils/sanitizer';
 import { renderRoom } from '../room/renderRoom'
 
-interface Available {
+export interface Available {
+	gameId: number,
 	game_name: string,
 	player1: string,
 	player2?: string,
@@ -13,7 +14,7 @@ interface Available {
 	divConverion(): string;
 };
 
-export async function loadAvailableGames(): Promise<string | -1> {
+export async function loadAvailableGames(): Promise<Available[] | -1> {
 	
 	try {
 		const token = getAuthToken();
@@ -49,7 +50,7 @@ export async function loadAvailableGames(): Promise<string | -1> {
 				}
 			}));
 			console.log("available games: ", );
-			return (gamesToDiv(available));
+			return (available);
 		}
 		else 
 			console.error("retrieve available game failed");
@@ -59,18 +60,7 @@ export async function loadAvailableGames(): Promise<string | -1> {
 	return -1;
 }
 
-export async function gamesToDiv(games:Available[]): Promise<string> {
 
-	let tmp:string = '';
-
-	for (const game of games) {
-
-		tmp += game.divConverion();
-	}
-
-	console.log("available games div: ", tmp);
-	return tmp;
-}
 
 export class matchmaking {
 
@@ -81,7 +71,6 @@ export class matchmaking {
 	private _3player: boolean;
 	private _4player: boolean;
 	private ws: WebSocket;
-
 
 	private homeBtn: HTMLElement;
 	private pongBtn: HTMLElement;
@@ -95,10 +84,14 @@ export class matchmaking {
 	private options: HTMLElement;
 	private username: string;
 
+	private joinBtn: Map<number,HTMLElement> = new Map();
+
 	constructor() {
 
-
 		this.ws = new WebSocket(`${window.location.protocol === "https:" ? "wss" : "ws"}://${window.location.host}/api/matchmaking`);
+
+		this.username = "tmp";
+		this.loadUsername();
 
 		this.homeBtn = this.getElement('homeBtn');
 		this.pongBtn = this.getElement('pongBtn');
@@ -111,16 +104,47 @@ export class matchmaking {
 		this.resetBtn = this.getElement('resetBtn');
 		this.options = this.getElement("game-options");
 
+
+
+
+		loadAvailableGames().then((available) => {
+			if (available === -1)
+				return;
+			available.forEach((game) => {
+
+				const btn = this.getElement(`join${game.gameId}Btn`);
+				if (btn) {
+					this.joinBtn.set(game.gameId, btn);
+				}
+			})
+		})
+
+
 		this.pong = false;
 		this.brick = false;
-		this.username = "prout";
 		this._1player = false;
 		this._2player = false;
 		this._3player = false;
 		this._4player = false;
 
-		this.loadUsername();
-		this.setEvents();
+		this.gameOptions();
+		this.setJoinBtns();
+		this.launchRoom();
+
+		this.ws.onopen = () => {
+			console.log(`${this.username} est arrive sur matchmaking`)
+		}
+
+		this.ws.onerror = (error) => {
+			console.error(`❌ ${this.username} n'a pas pu creer de websocket:`, error)}
+
+		this.ws.onclose = (event) => {
+			console.log(`${this.username} part de la page matchmaking`)}
+
+		// this.ws.onmessage = (event) =>  {
+		// 	const data = JSON.parse(event.data);
+		// 	this.handleEvents(data);}
+
 	}
 
 	private async loadUsername() {
@@ -151,22 +175,14 @@ export class matchmaking {
 			});
 	}
 
-	private changeStyle(el:HTMLElement, style:string): void {
+	// this.homeBtn.addEventListener('click', () => {
+	// 		window.history.pushState({}, '', '/main');
+	// 		window.dispatchEvent(new PopStateEvent('popstate'));
+	// 		this.currentOptions();
+		// });
 
-		el.className = 'button';
-		el.classList.add(style);
+	private gameOptions(): void {
 
-
-	}
-
-	private setEvents(): void {
-
-
-		this.homeBtn.addEventListener('click', () => {
-			window.history.pushState({}, '', '/main');
-			window.dispatchEvent(new PopStateEvent('popstate'));
-			this.currentOptions();
-		});
 
 		this.pongBtn.addEventListener('click', () => {
 
@@ -275,24 +291,7 @@ export class matchmaking {
 
 		});
 
-		this.launchBtn.addEventListener('click', () => {
-
-			
-			
-
-			this.options.style.display = "none"
-
-			// creer le body pour la requete POST
-			let tmp:Game = {
-				game_name: this.pong ? "pong" : "block",
-				player1: this.username,
-				users_needed: this._1player ? 1 : this._2player ? 2 : this._3player ? 3 : 4
-			}
-
-			this.joinRoom(tmp);
-			// a la fin de la game appeler une fonction pour update les stats de chaque joueur
-			
-		});
+		
 
 		this.resetBtn.addEventListener('click', () => {
 
@@ -328,22 +327,59 @@ export class matchmaking {
 		//	rajouter mon username en tant que player --> comment savoir quel player !!
 	}
 
-	private async joinRoom(tmp: Game) {
+	private async launchRoom() {
 
-		try {
+		this.launchBtn.addEventListener('click', async () => {
+
+
+			let tmp:Game = {
+				game_name: this.pong ? "pong" : "block",
+				player1: this.username,
+				users_needed: this._1player ? 1 : this._2player ? 2 : this._3player ? 3 : 4
+			}
+
 			let id = await postGame(tmp);
 
 			var uuid = await getUuid(id);
+
+			this.options.style.display = "none"
+
 			console.log("dans le bon uuid", uuid)
 
 			window.history.pushState({}, '', `/room/${uuid}`);
 			window.dispatchEvent(new PopStateEvent('popstate'));
 
-			// renderRoom(uuid);
+		});
 
+	}
+
+	private async joinRoom(gameId: number) {
+
+		try {
+			let uuid = await getUuid(gameId);
+
+			window.history.pushState({}, '', `/room/${uuid}`);
+			window.dispatchEvent(new PopStateEvent('popstate'));
 		}
 		catch (err: any) {
 			console.error('❌ Error retrieve game uuid', err); }
-
 	}
+
+	private setJoinBtns() {
+
+
+			console.log('ca passe')
+
+
+		for (let [id, btn] of this.joinBtn) {
+			
+			console.log('ca passe')
+			btn.addEventListener('click', () => {
+				console.log(`je passe pour le btn ${id}`)
+				this.joinRoom(Number(id));
+			});
+
+		}
+	}
+
 }

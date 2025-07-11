@@ -1,4 +1,4 @@
-import { loadAvailableGames, matchmaking,  } from "./matchmaking";
+import { Available, loadAvailableGames, matchmaking,  } from "./matchmaking";
 import { getAuthToken } from '../../utils/auth';
 import { sanitizeHtml } from '../../utils/sanitizer';
 
@@ -123,7 +123,19 @@ const getTemplate = () => {
 
 		`;
 }
-	
+
+async function gamesToDiv(games:Available[]): Promise<string> {
+
+	let tmp:string = '';
+
+	for (const game of games) {
+
+		tmp += game.divConverion();
+	}
+
+	console.log("available games div: ", tmp);
+	return tmp;
+}
 
 export function renderMatchmaking() {
 
@@ -131,9 +143,16 @@ export function renderMatchmaking() {
 		console.log('Initializing matchmaking page');
 		try {
 			const gameList = await loadAvailableGames();
+
+			if (gameList === -1) {
+				return ;
+			}
+			const inject = await gamesToDiv(gameList);
+			
 			const container = document.getElementById('available-games');
-			if (container && typeof gameList === 'string') {
-				container.innerHTML = gameList;
+
+			if (container && typeof inject === 'string') {
+				container.innerHTML = inject;
 			}
 			const render = new matchmaking();
 		}
@@ -145,3 +164,5 @@ export function renderMatchmaking() {
 	return getTemplate();
 
 }
+
+

@@ -275,7 +275,6 @@ function initializeMainEvents() {
     friendsBtn.addEventListener('click', () => {
       window.history.pushState({}, '', '/friends');
       window.dispatchEvent(new PopStateEvent('popstate'));
-      loadAvailableGames();
     });
   }
 
