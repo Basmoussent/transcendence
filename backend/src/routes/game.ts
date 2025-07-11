@@ -9,7 +9,7 @@ import util from 'util'
 import { pipeline } from 'stream'
 import path from 'path';
 
-interface Game {
+export interface Game {
 	id: number,
 	uuid: string,
 	game_name: string,

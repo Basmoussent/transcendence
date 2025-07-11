@@ -353,7 +353,7 @@ export class matchmaking {
 
 		this.launchBtn.addEventListener('click', async () => {
 
-			let tmp:Game = {
+			let tmp = {
 				game_name: this.pong ? "pong" : "block",
 				player1: this.username,
 				users_needed: this._1player ? 1 : this._2player ? 2 : this._3player ? 3 : 4
@@ -391,10 +391,6 @@ export class matchmaking {
 
 	private setJoinBtns() {
 
-
-			console.log('ca passe')
-
-
 		for (let [id, btn] of this.joinBtn) {
 			
 			console.log('ca passe')
@@ -405,8 +401,8 @@ export class matchmaking {
 
 		}
 	}
-	private handleEvents(data: any) {
 
+	private handleEvents(data: any) {
 
 		if (!this.ws || this.ws.readyState !== WebSocket.OPEN) {
 			console.log("le websocket n'est pas du tout ready l'ancien")
@@ -414,12 +410,9 @@ export class matchmaking {
 		}
 
 		switch (data.type) {
-
 			case 'new_game':
 				console.log(`il y a une nouvelle game, il faut update`);
 				console.log(`${data.game}`)
-				
-
 		}
 
 	}

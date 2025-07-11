@@ -1,10 +1,19 @@
+import { promises } from 'dns';
 import { getAuthToken } from '../utils/auth';
 import { sanitizeHtml } from '../utils/sanitizer';
 
 export interface Game {
+	id?: number,
+	uuid?: string,
 	game_name: string,
 	player1: string,
+	player2?: string,
+	player3?: string,
+	player4?: string,
+	winner?: string,
 	users_needed: number,
+	start_time?: string,
+	end_time?: string
 }
 
 export async function postGame(input:Game): Promise<number> {
@@ -166,7 +175,7 @@ export async function fetchUsername() {
 		console.error("Error rendering profile page:", error); }
 }
 
-export async function getGame(gameId: number) {
+export async function getGame(gameId: number): Promise<Game | null> {
 	
 	try {
 		const token = getAuthToken();
@@ -174,7 +183,7 @@ export async function getGame(gameId: number) {
 			alert('❌ Token d\'authentification manquant');
 			window.history.pushState({}, '', '/login');
 			window.dispatchEvent(new PopStateEvent('popstate'));
-			return '';
+			return null;
 		}
 
 		const response = await fetch(`/api/games/specific/${gameId}`, {
@@ -188,13 +197,27 @@ export async function getGame(gameId: number) {
 		if (response.ok) {
 			const result = await response.json();
 			console.log("on a bien recup la game", result);
-			return result.game
+			const game: Game = {
+				id: Number(result.id),
+				uuid: sanitizeHtml(result.uuid),
+				game_name: sanitizeHtml(result.game_name),
+				player1: sanitizeHtml(result.player1),
+				player2: sanitizeHtml(result?.player2),
+				player3: sanitizeHtml(result?.player3),
+				player4: sanitizeHtml(result?.player4),
+				winner: sanitizeHtml(result?.winner),
+				users_needed:(Number(result.users_needed)),
+				start_time: sanitizeHtml(result?.start_time),
+				end_time: sanitizeHtml(result?.end_time),
+			};
+			return game;
 		}
 		else 
 			console.error("erreur specific getGame");
 	}
 	catch (error) {
 		console.error("erreur specific getGame: ", error); }
+	return null
 }
 
 export async function getUuid(gameId: number) {
@@ -223,9 +246,37 @@ export async function getUuid(gameId: number) {
 			console.log(`game ${gameId} : ${uuid}`);
 			return uuid
 		}
-		else 
+		else {
 			console.error("error retrieve game uuid");
+			return null;
+		}
+
 	}
 	catch (error) {
 		console.error("error retrieve game uuid: ", error); }
+}
+
+export async function getGameByUuid(uuid: string): Promise<number> {
+
+	try {
+		const response = await fetch(`api/games/room/${uuid}`, {
+			method: 'GET',
+			headers: {
+				'Content-Type': 'application/json',
+			},
+		});
+
+		if (response.ok) {
+			const data = await response.json();
+
+			console.log(`on return ${data.game.id}`);
+			return (data.game.id);
+		}
+		else 
+			console.error('Erreur lors de la récupération de la game')
+		
+	}
+	catch (error) {
+		console.error('Erreur réseau ou autre problème :', error); }
+	return (-1);
 }

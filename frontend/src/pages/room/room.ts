@@ -1,4 +1,4 @@
-import { getGame, getGameUuid } from '../../game/gameUtils';
+import { getGame, getGameByUuid, getGameUuid } from '../../game/gameUtils';
 import { sanitizeHtml } from '../../utils/sanitizer';
 
 export class Room {
@@ -12,6 +12,7 @@ export class Room {
 	private sendBtn: HTMLButtonElement;
 	private playerCountEl: HTMLButtonElement;
 	private uuid: string;
+	private gameId: number;
 
 	// private settingsContainer: HTMLElement;
 	// private chatContainer: HTMLElement;
@@ -22,6 +23,13 @@ export class Room {
 	constructor(user: string, uuid: string) {
 
 		this.uuid = uuid;
+
+		const tmp = getGameByUuid(this.uuid);
+		if (tmp)
+			this.gameId = tmp.id;
+
+		
+
 		this.username = user;
 
 		this.ws = new WebSocket(`${window.location.protocol === "https:" ? "wss" : "ws"}://${window.location.host}/api/room/${uuid}`);
@@ -31,11 +39,11 @@ export class Room {
 		this.leaveBtn = this.getElement('leaveBtn') as HTMLButtonElement;
 		this.sendBtn = this.getElement('sendBtn') as HTMLButtonElement;
 		this.homeBtn = this.getElement('homeBtn') as HTMLButtonElement;
-		this.leaveBtn = this.getElement('leaveBtn') as HTMLButtonElement;
 		this.playerCountEl = this.getElement('playerCount') as HTMLButtonElement;
 		// this.settingsContainer = this.getElement('roomSettings');
 		// this.chatContainer = this.getElement('chatMessages');
 		this.input = this.getElement('chatInput') as HTMLInputElement ;
+		this.input.focus();
 
 		this.setupEvents();
 
@@ -93,10 +101,12 @@ export class Room {
 				break;
 
 			case 'leave':
+				this.updatePlayerCount();
 				this.updateRoomMembers();
 				break;
 
 			case 'player_joined':
+				this.updatePlayerCount();
 				this.updateRoomMembers();
 				break;
 
@@ -162,6 +172,8 @@ export class Room {
 			username: this.username,
 			content: message
 		}));
+
+		this.addSystemMessage(`you: ${message}`);
 		this.input.value = '';
 	}
 	
@@ -191,8 +203,23 @@ export class Room {
 
 	}
 
-	private updatePlayerCount(data: string) {
+	private updatePlayerCount() {
 
+		const game = getGame(this.gameId);
+
+		console.log(game);
+		
+		// let i = 0;
+		// if (game?.player1)
+		// 	++i;
+		// if (game?.player2)
+		// 	++i;
+		// if (game?.player3)
+		// 	++i;
+		// if (game?.player4)
+		// 	++i;
+
+		// this.playerCountEl.textContent = `${i}/${game?.users_needed}`;
 
 	}
 
