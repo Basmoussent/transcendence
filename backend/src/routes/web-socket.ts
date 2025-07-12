@@ -21,14 +21,91 @@ const rooms = new Map<string, Room>();
 
 async function webSocketRoutes(app: FastifyInstance) {
 
+	const dict = new Map();
+
+	dict.set("clients", [])
+	dict.set("test", [])
+
+
+	app.get('/ws', { websocket: true }, (socket: any , req: FastifyRequest) => {
+
+		dict.get("test").push(socket)
+		console.log("a user just connected on /ws");
+		socket.on('message', (message: any) => {
+			dict.get("test").forEach((client: any) => {
+				if (client !== socket)
+					client.send(message.toString())
+			})
+		})
+	});
+
+	app.get('/matchmaking', { websocket: true }, (socket: any , req: FastifyRequest) => {
+
+		dict.get("clients").push(socket);
+		console.log("a user just connected on /matchmaking");
+		socket.on('message', (message: any) => {
+			dict.get("clients").forEach((client: any) => {
+				if (client !== socket)
+					client.send(message.toString())
+			})
+		})
+		socket.on('close', () => {
+			const index = dict.get("clients").indexOf(socket);
+			if (index !== -1) {
+				dict.get("clients").splice(index, 1); // Supprimer le client de la liste
+				console.log("a user just disconnected from /matchmaking");
+			}
+		});
+	});
+
+	/*
+	app.get('/matchmaking', { websocket: true }, (socket: WebSocket, req: FastifyRequest) => {
+
+		let token = req.headers['x-access-token'] as string;
+        
+		if (!token) {
+			token = req.cookies['x-access-token'];
+		}
+		
+		if (!token) {
+			socket.send(JSON.stringify({
+				type: 'notLog',
+				message: 'the user is not log' }))
+			return ;
+		}
+
+		socket.on('message', (message: string) => {
+
+
+		});
+	});
+	*/
+
 	app.get('/room/:uuid', { websocket: true }, (socket: WebSocket, req: FastifyRequest) => {
+
+		let token = req.headers['x-access-token'] as string;
+        
+		if (!token) {
+			token = req.cookies['x-access-token'];
+		}
+		
+		if (!token) {
+			socket.send(JSON.stringify({
+				type: 'notLog',
+				message: 'the user is not log' }))
+			return ;
+		}
+
+		const decoded = app.jwt.verify(token) as { user: string };
+		const username = decoded.name;
 
 		const { uuid } = req.params as { uuid: string };
 
-		const username = "Idrissa";
 		// recup le bon usernam en faisant un appel /api/me ?
 
 		let room = rooms.get(uuid);
+
+
 
 		if (!room) {
 			room = {
@@ -40,6 +117,7 @@ async function webSocketRoutes(app: FastifyInstance) {
 				host: username,
 				isGameStarted: false,
 			};
+
 			rooms.set(uuid, room);
 		}
 
@@ -47,9 +125,12 @@ async function webSocketRoutes(app: FastifyInstance) {
 			socket.send(JSON.stringify({
 				type: 'error',
 				message: 'Room is full' }));
+				console.log('je vais close le socket')
 			socket.close();
-		return;
+			return;
 		}
+
+
 
 		const user: User = {
 			username: username,
@@ -83,7 +164,7 @@ async function webSocketRoutes(app: FastifyInstance) {
 						
 						currentRoom.users.forEach(u => {
 							// check que le socket du joueur est bien ouvert
-							if (u.socket.readyState === WebSocket.OPEN)
+							// if (u.socket.readyState === WebSocket.OPEN)
 								u.socket.send(chatMessage);
 						});
 						break;

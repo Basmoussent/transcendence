@@ -413,6 +413,13 @@ export class matchmaking {
 			case 'new_game':
 				console.log(`il y a une nouvelle game, il faut update`);
 				console.log(`${data.game}`)
+				break;
+			case 'notLog':
+				this.ws.close();
+				window.history.pushState({}, '', '/login');
+				window.dispatchEvent(new Event('popstate'));
+				break;
+
 		}
 
 	}

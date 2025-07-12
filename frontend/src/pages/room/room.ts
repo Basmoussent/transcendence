@@ -75,7 +75,7 @@ export class Room {
 		};
 
 		this.ws.onerror = (error) => console.error(`${this.username} onerror ${this.uuid}:`, error);
-		this.ws.onclose = (event) => console.log(`${this.username} websocket ferme ${this.username}:`, event.code, event.reason);
+		this.ws.onclose = (event) => console.log(`${this.username} ferme ${this.username}:`, event.code, event.reason);
 		
 		this.ws.onmessage = (event) => {
 			try {
@@ -101,7 +101,9 @@ export class Room {
 	}
 
 	private handleEvent(data: any) {
+		console.log(`dqouiwdouqbwdo \t`, data.type)
 		switch (data.type) {
+
 			case 'room_update':
 				this.roomData = data.room;
 				this.updateUI();
@@ -117,6 +119,12 @@ export class Room {
 
 			case 'game_starting':
 				this.launchGamePage(data.gameType);
+				break;
+
+			case 'notLog':
+				this.ws.close();
+				window.history.pushState({}, '', '/login');
+				window.dispatchEvent(new Event('popstate'));
 				break;
 			
 			default:
