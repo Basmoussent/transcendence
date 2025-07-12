@@ -3,6 +3,12 @@ import { Paddle } from "./paddle";
 import { PaddleAI } from "./paddle-ai";
 import { PADDLE_OFFSET, PADDLE1_COLOR, PADDLE2_COLOR } from "./const";
 
+
+interface player1{
+	name : string;
+	score: number;
+}
+
 export class Pong {
 	private canvas: HTMLCanvasElement;
 	private ctx: CanvasRenderingContext2D;
@@ -33,14 +39,14 @@ export class Pong {
 		// !!! modifier ca avec les infos de la partie
 		this.paddles = [
 			new Paddle(20, 100, PADDLE1_COLOR),
-			new PaddleAI(20, 100, PADDLE2_COLOR),
+			new Paddle(20, 100, PADDLE2_COLOR),
 		];
 
 		this.ball = new Ball(this.height, this.width);
 		this.keys = {};
 	}
 
-	public init(): void {
+	public init(): { player1: player1, player2: player1 } {
 		console.log('Initializing paddle game...');
 		this.setupCanvas();
 		this.setupEventListeners();
@@ -51,9 +57,10 @@ export class Pong {
 			this.setupCanvas();
 		});
 
-		// return les scores
-	}
-
+		const player1 = {name: this.paddles[0].name, score: this.paddles[0].score} as player1;
+		const player2 = {name: this.paddles[1].name, score: this.paddles[1].score} as player1;
+		return {player1, player2};
+	};
 	// positions et tailles de base en fonction de la taille du canvas
 	private setupPaddles(): void {
 		console.log('Setting up paddles...');

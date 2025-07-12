@@ -113,13 +113,9 @@ export async function router() {
     case '/pong':
       view = renderPong();
       break;
-<<<<<<< HEAD
-    
-=======
     case '/multi-pong':
       view = renderMultiPong();
       break;
->>>>>>> ines
     default:
       view = render404();
   }
