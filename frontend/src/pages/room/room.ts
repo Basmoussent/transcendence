@@ -9,7 +9,7 @@ interface User {
 interface RoomData {
 	id: string;
 	name: string;
-	gameType: 'pong' | 'block';
+	gameType: 'Pong' | 'Block';
 	maxPlayers: number;
 	users: User[];
 	host: string;
