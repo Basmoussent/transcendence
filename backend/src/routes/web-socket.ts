@@ -109,7 +109,7 @@ async function webSocketRoutes(app: FastifyInstance) {
 			room = {
 				id: uuid,
 				name: `Room ${uuid.substring(0, 5)}`,
-				gameType: 'pong',
+				gameType: 'Pong',
 				maxPlayers: 4,
 				users: new Map(),
 				host: username,
@@ -173,7 +173,7 @@ async function webSocketRoutes(app: FastifyInstance) {
 						break;
 
 					case 'start_game':
-						if (currentRoom.host !== username)
+						if (currentRoom.host !== username || currentRoom.users.size < 2)
 							return;
 
 						const allReady = Array.from(currentRoom.users.values()).every(u => u.isReady);

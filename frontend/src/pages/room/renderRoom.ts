@@ -14,7 +14,7 @@ interface User {
 interface RoomData {
 	id: string;
 	name: string;
-	gameType: 'pong' | 'block';
+	gameType: 'Pong' | 'Block';
 	maxPlayers: number;
 	currentPlayers: number;
 	users: User[];
@@ -22,12 +22,9 @@ interface RoomData {
 	host: string;
 }
 
-	// <div class="bg-gradient-to-br from-[#AEB8FE] via-[#4b0082] to-[#000080]">
-
 
 const getTemplate = () => {
 	return `
-	<div class="flex flex-col h-screen bg-gradient-to-br from-[#C3423F] to-[#03254e]">
 
 		<button class="home-button" id="homeBtn">
 			<i class="fas fa-home"></i>

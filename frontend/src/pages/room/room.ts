@@ -207,7 +207,8 @@ export class Room {
 
 		const allReady = this.roomData.users.every(u => u.isReady);
 		const isHost = this.roomData.host === this.username;
-		this.startGameBtn.disabled = !isHost || !allReady;
+		if (this.roomData.users.length >= 2)
+			this.startGameBtn.disabled = !isHost || !allReady;
 
 		if (isHost)
 			this.roomSettings.classList.remove('hidden')
