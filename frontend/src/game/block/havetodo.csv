@@ -107,3 +107,7 @@ a chaque evenement:
 	dans websocket.ts je prend en compte le changement et modifie roomData en fonction
 	je broadcast à tout le monde qu'il faut update la room en leur tendant roomData
 	chaque client a sa fonction updateUI qui charge l'html 
+
+
+
+yes
