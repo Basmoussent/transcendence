@@ -15,7 +15,9 @@ import { renderChangePassword, initializeChangePasswordEvents } from '../pages/a
 import { renderEditProfil, initializeEditProfileEvents } from '../pages/social/edit-profil';
 import { getAuthToken } from './auth';
 import { clearTranslationCache } from './translations';
-import { renderPong } from '../pages/pong/main';
+import { renderPong } from '../pages/pong/pong';
+import { renderMultiPong } from '../pages/pong/multiplayer-pong';
+import { renderChooseGame } from '../pages/game/choose-game';
 
 export async function router() {
   // Clear translation cache to ensure fresh translations
@@ -25,7 +27,7 @@ export async function router() {
   const app = document.getElementById('app');
   if (!app) return;
 
-  const publicRoutes = ['/', '/login', '/create-account', '/forgot-password', '/pong', '/block'];
+  const publicRoutes = ['/', '/login', '/create-account', '/forgot-password', '/block'];
   const token = getAuthToken();
 
   if (!publicRoutes.includes(path) && !token) {
@@ -99,6 +101,8 @@ export async function router() {
       break;
     case '/block':
       view = renderBlock();
+    case '/game':
+      view = renderChooseGame();
       break;
     case '/change-password':
       view = renderChangePassword();
@@ -109,7 +113,13 @@ export async function router() {
     case '/pong':
       view = renderPong();
       break;
+<<<<<<< HEAD
     
+=======
+    case '/multi-pong':
+      view = renderMultiPong();
+      break;
+>>>>>>> ines
     default:
       view = render404();
   }

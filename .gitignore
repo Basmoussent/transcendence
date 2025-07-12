@@ -40,3 +40,8 @@ docker/nginx/modsecurity/audit/
 # Vault credentials
 backend/vault-credentials/
 backend/uploads/*
+
+# BDD
+backend/data/*
+
+docker/nginx/logs

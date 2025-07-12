@@ -1,4 +1,4 @@
-import { Pong } from '../../game/Pong';
+import { Pong } from '../../game/pong/pong';
 
 export function renderPong() {
   const html = `

@@ -16,7 +16,6 @@ export abstract class brick {
 
 }
 
-
 class blue extends brick {
 	constructor() {
 		super(1, "blue", "#91B8D4"); }
