@@ -15,6 +15,7 @@ export class Pong {
 	private ball: Ball;
 	private keys: { [key: string]: boolean };
 
+	// constructor(canvas: HTMLCanvasElement, player1ID: number, player2ID: number) {
 	constructor(canvas: HTMLCanvasElement) {
 		this.canvas = canvas;
 		const context = canvas.getContext('2d');
@@ -51,6 +52,8 @@ export class Pong {
 		window.addEventListener('resize', () => {
 			this.setupCanvas();
 		});
+
+		// return les scores
 	}
 
 	// positions et tailles de base en fonction de la taille du canvas
@@ -223,32 +226,34 @@ export class Pong {
 		this.lastPlayerColl = -1;
 	}
 
+	private getNbrOfPlayers(): number {
+        return this.paddles.filter(paddle => paddle !== null && paddle !== undefined).length;
+    }
+
 	private adjustBallDirMultiplayer(ball: typeof this.ball, paddle: typeof this.paddles[2] | typeof this.paddles[3] | null): void {
 		if (!paddle)
 			return ;
 
 		const hitX = ball.x;
-
 		const paddleLeft = paddle.x;
 		const paddleRight = paddle.x + paddle.width;
 		const paddleCenter = paddle.x + paddle.width / 2;
-
 		const edgeZone = paddle.width * 0.2;
 
-		if (hitX <= paddleLeft + edgeZone) // touche bord gauche
+		if (hitX <= paddleLeft + edgeZone) // bord gauche
 			ball.speedX -= 4;
-		else if (hitX >= paddleRight - edgeZone) // touche bord droit
+		else if (hitX >= paddleRight - edgeZone) // bord droit
 			ball.speedX += 4;
-		else if (hitX <= paddleCenter) // touche côté gauche (mais pas bord)
+		else if (hitX <= paddleCenter) // cote gauche
 			ball.speedX -= 2;
-		else if (hitX > paddleCenter) // touche côté droit (mais pas bord)
+		else if (hitX > paddleCenter) // cote droit
 			ball.speedX += 2;
 	}
 
 	private ballPaddleCollision(): void {
 		if (this.ball.x - this.ball.radius <= this.paddles[0].x + this.paddles[0].width && this.ball.y + this.ball.radius >= this.paddles[0].y && this.ball.y - this.ball.radius <= this.paddles[0].y + this.paddles[0].height && this.ball.x > this.paddles[0].x) {
 			this.ball.speedX *= -1;
-			this.ball.adjustBallDir(this.paddles[0]);
+			this.ball.adjustBallDir(this.paddles[0], this.getNbrOfPlayers());
 			this.ball.addBallSpeed();
 			this.ball.x = this.paddles[0].x + this.paddles[0].width + this.ball.radius;
 
@@ -256,7 +261,7 @@ export class Pong {
 		}
 		if (this.ball.x + this.ball.radius >= this.paddles[1].x && this.ball.y + this.ball.radius >= this.paddles[1].y && this.ball.y - this.ball.radius <= this.paddles[1].y + this.paddles[1].height && this.ball.x < this.paddles[1].x + this.paddles[1].width) {
 			this.ball.speedX *= -1;
-			this.ball.adjustBallDir(this.paddles[1]);
+			this.ball.adjustBallDir(this.paddles[1], this.getNbrOfPlayers());
 			this.ball.addBallSpeed();
 			this.ball.x = this.paddles[1].x - this.ball.radius;
 

@@ -103,10 +103,10 @@ export class MultiPong {
     }
 
     private async startGameLoop(): Promise<void> {
-    console.log('Starting game loop...');
+        console.log('Starting game loop...');
 
-    // fleche au lieu de function() pour que this fasse ref a Pong
-    const gameLoop = () => {
+        // fleche au lieu de function() pour que this fasse ref a Pong
+        const gameLoop = () => {
             if (this.keys['enter'])
                 this.start = true;
             if (this.start && !this.end) {
@@ -125,9 +125,9 @@ export class MultiPong {
         this.ctx.fillText('PRESS ENTER', this.width / 2 - 150, this.height / 2 - 30);
         this.ctx.fillText('TO START', this.width / 2 - 100, this.height / 2 + 50);
         this.ctx.globalAlpha = 1;
-        }
+    }
 
-        private drawLine(): void {
+    private drawLine(): void {
         this.ctx.beginPath();
         this.ctx.moveTo(this.width / 2, 30);
         this.ctx.lineTo(this.width / 2, this.height - 30);
@@ -136,12 +136,11 @@ export class MultiPong {
         this.ctx.stroke();
     }
 
-    private	multiScore(): void {
+    private multiScore(): void {
         this.ctx.textAlign = 'center';
         this.ctx.textBaseline = 'middle';
 
-        const activePlayers = this.paddles.filter(paddle => paddle !== null && paddle !== undefined);
-        const playerCount = activePlayers.length;
+        const playerCount = this.getNbrOfPlayers();
 
         const spacing = 60; // entre chaque score
         const totalWidth = (playerCount - 1) * spacing;
@@ -154,8 +153,8 @@ export class MultiPong {
             if (paddle) {
                 this.ctx.fillStyle = paddle.color;
                 this.ctx.fillText(
-                    paddle.score.toString(), 
-                    startX + (activeIndex * spacing), 
+                    paddle.score.toString(),
+                    startX + (activeIndex * spacing),
                     this.height / 2
                 );
                 activeIndex++;
@@ -171,7 +170,7 @@ export class MultiPong {
         this.ctx.globalAlpha = 0.2;
 
         // ligne du milieu que si y'a 2 joueurs avec transparance
-        if (this.paddles[2] === null && this.paddles[3] === null )
+        if (this.paddles[2] === null && this.paddles[3] === null)
             this.drawLine();
 
         this.ctx.globalAlpha = 1;
@@ -193,8 +192,8 @@ export class MultiPong {
         for (let i = 0; i < 4; i++) {
             const paddle = this.paddles[i];
             if (paddle && paddle?.winsGame() === true) {
-            this.ctx.fillText(paddle.name, this.width / 2 - 70, this.height / 2);
-            break;
+                this.ctx.fillText(paddle.name, this.width / 2 - 70, this.height / 2);
+                break;
             }
         }
         this.ctx.fillText("WINS", this.width / 2 - 70, this.height / 2 + 50);
@@ -211,45 +210,54 @@ export class MultiPong {
         for (let i = 0; i < 4; i++) {
             const paddle = this.paddles[i];
             if (paddle && paddle?.winsGame() === true) {
-            this.end = true;
-            return;
+                this.end = true;
+                return;
             }
         }
 
         this.ball.resetBallInfo(this.width, this.height, this.lastPlayerColl);
-        // celui qui gagne recoit la balle en premier
 
         // le point est rejoue si personne ne touche la balle
         this.lastPlayerColl = -1;
     }
 
+    private getNbrOfPlayers(): number {
+        return this.paddles.filter(paddle => paddle !== null && paddle !== undefined).length;
+    }
+
     private adjustBallDirMultiplayer(ball: typeof this.ball, paddle: typeof this.paddles[2] | typeof this.paddles[3] | null): void {
         if (!paddle)
-            return ;
+            return;
 
         const hitX = ball.x;
 
         const paddleLeft = paddle.x;
         const paddleRight = paddle.x + paddle.width;
         const paddleCenter = paddle.x + paddle.width / 2;
-
         const edgeZone = paddle.width * 0.2;
 
-        if (hitX <= paddleLeft + edgeZone) // touche bord gauche
-            ball.speedX -= 4;
-        else if (hitX >= paddleRight - edgeZone) // touche bord droit
-            ball.speedX += 4;
-        else if (hitX <= paddleCenter) // touche côté gauche (mais pas bord)
-            ball.speedX -= 2;
-        else if (hitX > paddleCenter) // touche côté droit (mais pas bord)
-            ball.speedX += 2;
+        const multiplier = 1.5;
+
+        if (hitX <= paddleLeft + edgeZone) // bord gauche
+            ball.speedX -= 4 * multiplier;
+        else if (hitX >= paddleRight - edgeZone) // bord droit
+            ball.speedX += 4 * multiplier;
+        else if (hitX <= paddleCenter) // cote gauche
+            ball.speedX -= 2 * multiplier;
+        else if (hitX > paddleCenter) // cote droit
+            ball.speedX += 2 * multiplier;
     }
 
     private ballPaddleCollision(): void {
         if (this.ball.x - this.ball.radius <= this.paddles[0].x + this.paddles[0].width && this.ball.y + this.ball.radius >= this.paddles[0].y && this.ball.y - this.ball.radius <= this.paddles[0].y + this.paddles[0].height && this.ball.x > this.paddles[0].x) {
+
             this.ball.addBallSpeed();
             this.ball.speedX *= -1;
-            this.ball.adjustBallDir(this.paddles[0]);
+            this.ball.adjustBallDir(this.paddles[0], this.getNbrOfPlayers());
+
+            if (this.getNbrOfPlayers() > 2)
+                this.addBallDeviation();
+
             this.ball.x = this.paddles[0].x + this.paddles[0].width + this.ball.radius;
 
             this.lastPlayerColl = 0;
@@ -257,7 +265,11 @@ export class MultiPong {
         if (this.ball.x + this.ball.radius >= this.paddles[1].x && this.ball.y + this.ball.radius >= this.paddles[1].y && this.ball.y - this.ball.radius <= this.paddles[1].y + this.paddles[1].height && this.ball.x < this.paddles[1].x + this.paddles[1].width) {
             this.ball.addBallSpeed();
             this.ball.speedX *= -1;
-            this.ball.adjustBallDir(this.paddles[1]);
+            this.ball.adjustBallDir(this.paddles[1], this.getNbrOfPlayers());
+
+            if (this.getNbrOfPlayers() > 2)
+                this.addBallDeviation();
+
             this.ball.x = this.paddles[1].x - this.ball.radius;
 
             this.lastPlayerColl = 1;
@@ -273,14 +285,14 @@ export class MultiPong {
             this.ball.x - this.ball.radius <= player3.x + player3.width &&
             this.ball.y > player3.y) {
 
-                this.ball.speedY *= -1;
-                this.ball.addBallSpeedMulti();
-                this.adjustBallDirMultiplayer(this.ball, player3);
-                
-                // repositionner balle pour eviter comportement bizarre
-                this.ball.y = player3.y + player3.height + this.ball.radius + 0.1;
-                
-                this.lastPlayerColl = 2;
+            this.ball.speedY *= -1;
+            this.ball.addBallSpeedMulti();
+            this.adjustBallDirMultiplayer(this.ball, player3);
+            this.addBallDeviation();
+            // repositionner balle pour eviter comportement bizarre
+            this.ball.y = player3.y + player3.height + this.ball.radius + 0.1;
+
+            this.lastPlayerColl = 2;
         }
 
         const player4 = this.paddles[3]; // bas
@@ -290,15 +302,34 @@ export class MultiPong {
             this.ball.x + this.ball.radius >= player4.x &&
             this.ball.x - this.ball.radius <= player4.x + player4.width &&
             this.ball.y < player4.y + player4.height) {
-                
-                this.ball.speedY *= -1;
-                this.ball.addBallSpeedMulti();
-                this.adjustBallDirMultiplayer(this.ball, player4);
 
-                // repositionner balle pour eviter comportement bizarre
-                this.ball.y = player4.y - this.ball.radius - 0.1;
+            this.ball.speedY *= -1;
+            this.ball.addBallSpeedMulti();
+            this.adjustBallDirMultiplayer(this.ball, player4);
+            this.addBallDeviation();
 
-                this.lastPlayerColl = 3;
+            // repositionner balle pour eviter comportement bizarre
+            this.ball.y = player4.y - this.ball.radius - 0.1;
+
+            this.lastPlayerColl = 3;
+        }
+    }
+
+    private addBallDeviation(): void {
+        const deviationStrength = 1.5;
+
+        // pour rendre mvmt de balle moins previsible
+        const randomFactor = (Math.random() - 0.5) * 0.5;
+
+        // si la balle va principalement horizontalement, ajouter plus de vitesse verticale
+        if (Math.abs(this.ball.speedX) > Math.abs(this.ball.speedY)) {
+            const verticalBoost = deviationStrength + randomFactor;
+            this.ball.speedY += this.ball.speedY > 0 ? verticalBoost : -verticalBoost;
+        }
+        // si la balle va principalement verticalement, ajouter plus de vitesse horizontale
+        else {
+            const horizontalBoost = deviationStrength + randomFactor;
+            this.ball.speedX += this.ball.speedX > 0 ? horizontalBoost : -horizontalBoost;
         }
     }
 
@@ -327,37 +358,37 @@ export class MultiPong {
             ball.speedY *= -1;
     }
 
-    private	updatePlayer1(): void {
-            this.paddles[0].updatePaddleRightLeft(this.keys, 'w', 's', this.paddles, this.height);
+    private updatePlayer1(): void {
+        this.paddles[0].updatePaddleRightLeft(this.keys, 'w', 's', this.paddles, this.height);
     }
 
-    private	updatePlayer2(): void {
+    private updatePlayer2(): void {
         if (this.paddles[1] instanceof PaddleAI) // si player3 est une IA
         {
-                this.paddles[1].middleRightLeft(this.ball, this.paddles, this.height);
+            this.paddles[1].middleRightLeft(this.ball, this.paddles, this.height);
         }
         else {
-                this.paddles[1].updatePaddleRightLeft(this.keys, 'arrowup', 'arrowdown', this.paddles, this.height);
+            this.paddles[1].updatePaddleRightLeft(this.keys, 'arrowup', 'arrowdown', this.paddles, this.height);
         }
     }
 
-    private	updatePlayer3(): void {
+    private updatePlayer3(): void {
         const player3 = this.paddles[2];
         if (player3 && player3 instanceof PaddleAI) {
-                player3?.middleUpDown(this.ball, this.paddles, this.width, this.height);
+            player3?.middleUpDown(this.ball, this.paddles, this.width, this.height);
         }
         else if (player3) {
-                player3?.updatePaddleUpDown(this.keys, 'k', 'l', this.paddles, this.width);
+            player3?.updatePaddleUpDown(this.keys, 'k', 'l', this.paddles, this.width);
         }
     }
 
-    private	updatePlayer4(): void {
+    private updatePlayer4(): void {
         const player4 = this.paddles[3];
         if (player4 && player4 instanceof PaddleAI) {
-                player4?.middleUpDown(this.ball, this.paddles, this.width, this.height);
+            player4?.middleUpDown(this.ball, this.paddles, this.width, this.height);
         }
         else if (player4) {
-                player4?.updatePaddleUpDown(this.keys, '5', '6', this.paddles, this.width);
+            player4?.updatePaddleUpDown(this.keys, '5', '6', this.paddles, this.width);
         }
     }
 
@@ -383,7 +414,7 @@ export class MultiPong {
         for (let i = 0; i < 4; i++) {
             const paddle = this.paddles[i];
             if (paddle)
-            this.paddles[i]?.drawPaddle(this.ctx);
+                this.paddles[i]?.drawPaddle(this.ctx);
         }
 
         if (this.start && !this.end) {

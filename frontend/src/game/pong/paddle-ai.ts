@@ -228,6 +228,7 @@ export class PaddleAI {
 		if (this.canRefresh()) {
 			const impactTime = (this.y - ball.y) / ball.speedY;
 			const ballImpact = ball.x + ball.speedX * impactTime;
+      // const randomFactor = Math.random() * 0.2 + 0.1; // pour ne pas tjrs toucher la balle avec le milieu du paddle
       this.targetX = ballImpact - (this.width / 2) - 0.1;
 
 			// si la balle ne vient pas vers nous et qu'on est le player3
@@ -269,6 +270,7 @@ export class PaddleAI {
 		if (this.canRefresh()) {
 			const impactTime = (this.x - ball.x) / ball.speedX;
       const ballImpact = ball.y + ball.speedY * impactTime;
+      // const randomFactor = Math.random() * 0.2 + 0.1; // pour ne pas tjrs toucher la balle avec le milieu du paddle
 			this.targetY = ballImpact - this.height / 2 - 0.1;
 
 			// si la balle est pas en train de venir vers nous on se replace au milieu

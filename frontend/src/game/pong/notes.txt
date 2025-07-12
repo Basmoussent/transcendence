@@ -4,38 +4,19 @@ https://dooglz.github.io/set09121/pong2.html
 
 // pour que ca fonctionne bien
     // le jeu ne doit jamais etre lance avec paddles[0] ou paddles[1] null/undefined
-
+    // /pong doit etre utilise que pour les 1v1 et /multi-pong pour le reste
 
 // a faire
-    // idee: pour l'IA, faire un truc ou a chaque collision de la balle, je calcule le prochain point d'impact,
-        si c'est sur sa ligne il y a va sinon
-            // soit il se replace au milieu (moyen)
-            // soit il calcule le prochain rebond a partir de ces infos
-                // et la si c'est sur lui y va sinon osef (si possible tester plusieurs rebonds sinon ca y est)
+    // ajouter les players id au constructeur de Pong + return les scores a la fin de la partie
     // police avec l'API
         // ajuster texte au milieu pcq la c'est bancal
 
     // IA
-        // si grosse diff entre middle et hard je degage easy
-        // si la balle est pas en train de venir vers lui se replacer au milieu
-            // sauf si c'est un paddle up down
-                // let time: number = Date.now() / 1000;
-                // console.log('time = ', time);
-        // j'ai besoin de savoir qu'un de mes joueurs est une IA 
-    // recup le timestamp et laisser une seconde sans rien faire
-        // if lastTS + 1s < currentTS -> return
-        // et a la fin de la fct lastTS = currentTS
-    // tester
-        // si la balle est au dessus du paddle monter
-        // si la balle est en dessous du paddle descendre
-
-        // calculer a l'avance mouvements de balle et aller a l'endroit de la collision
-
-    // amis
-      // paires d'amis avec chacun son etat
-        // savoir qui a fait la demande
-        // qui a bloque l'autre
-
+        // idee pour le hard: pour l'IA, faire un truc ou a chaque collision de la balle, je calcule le prochain point d'impact,
+        si c'est sur sa ligne il y a va sinon
+            // soit il se replace au milieu (moyen)
+            // soit il calcule le prochain rebond a partir de ces infos
+                // et la si c'est sur lui y va sinon osef (si possible tester plusieurs rebonds sinon ca y est)
 
     // la page principale du site renvoie vers la liste de boutons pas vers login
     // la page edit profile pourrait etre + lisible

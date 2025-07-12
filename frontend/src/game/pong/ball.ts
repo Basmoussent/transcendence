@@ -27,35 +27,36 @@ export class Ball {
 
   addBallSpeed(): void {
     if (this.speedX > 0 && this.speedX < 12)
-      this.speedX += 0.25;
+      this.speedX += 0.20;
     else if (this.speedX < 0 && this.speedX > -12)
-      this.speedX -= 0.25;
+      this.speedX -= 0.20;
   }
 
   addBallSpeedMulti(): void {
-    if (this.speedY > 0)
-					this.speedY += 0.25;
-				else
-					this.speedY -= 0.25;
+    if (this.speedY > 0 && this.speedY < 12)
+					this.speedY += 0.20;
+    else if (this.speedY < 0 && this.speedY > -12)
+      this.speedY -= 0.20;
   }
 
-  adjustBallDir(paddle: Paddle | PaddleAI): void {
+  adjustBallDir(paddle: Paddle | PaddleAI, nbrOfPlayers: number): void {
     const hitY = this.y;
 
     const paddleTop = paddle.y;
     const paddleBottom = paddle.y + paddle.height;
     const paddleCenter = paddle.y + paddle.height / 2;
-
     const edgeZone = paddle.height * 0.2;
 
-    if (hitY <= paddleTop + edgeZone) // touche le bord haut
-      this.speedY -= 3;
-    else if (hitY >= paddleBottom - edgeZone) // touche le bord bas
-      this.speedY += 3;
-    else if (hitY <= paddleCenter) // touche cote haut (mais pas bord)
-      this.speedY -= 1;
-    else if (hitY > paddleCenter) // touche cote bas (mais pas bord)
-      this.speedY += 1;
+    const multiplier = nbrOfPlayers > 2 ? 1.5 : 1;
+
+    if (hitY <= paddleTop + edgeZone) // bord haut
+      this.speedY -= 3 * multiplier;
+    else if (hitY >= paddleBottom - edgeZone) // bord bas
+      this.speedY += 3 * multiplier;
+    else if (hitY <= paddleCenter) // cote haut
+      this.speedY -= 1 * multiplier;
+    else if (hitY > paddleCenter) // cote bas
+      this.speedY += 1 * multiplier;
   }
 
   resetBallInfo(canvasWidth: number, canvasHeight: number, lastWinner: number): void {
