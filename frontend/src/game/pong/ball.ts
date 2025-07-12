@@ -27,9 +27,10 @@ export class Ball {
 
   addBallSpeed(): void {
     if (this.speedX > 0 && this.speedX < 12)
-      this.speedX += 0.20;
+      this.speedX += 0.25;
     else if (this.speedX < 0 && this.speedX > -12)
-      this.speedX -= 0.20;
+      this.speedX -= 0.25;
+    console.log('ball speed = ', this.speedX)
   }
 
   adjustBallDir(paddle: Paddle | PaddleAI): void {
@@ -41,13 +42,13 @@ export class Ball {
     const edgeZone = paddle.height * 0.2;
 
     if (hitY <= paddleTop + edgeZone) // bord haut
-      this.speedY -= 3;
+      this.speedY -= 3.5;
     else if (hitY >= paddleBottom - edgeZone) // bord bas
-      this.speedY += 3;
+      this.speedY += 3.5;
     else if (hitY <= paddleCenter) // cote haut
-      this.speedY -= 1;
+      this.speedY -= 1.5;
     else if (hitY > paddleCenter) // cote bas
-      this.speedY += 1;
+      this.speedY += 1.5;
   }
 
   resetBallInfo(canvasWidth: number, canvasHeight: number, lastWinner: number): void {

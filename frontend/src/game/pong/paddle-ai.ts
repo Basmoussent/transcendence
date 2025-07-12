@@ -219,19 +219,91 @@ export class PaddleAI {
         }
     }
 
-    // au moment de la collision paddle, calcule tous les prochains mouvements/rebonds de la balle jusqu'au point d'impact
-    // l'ia a acces au resultat du calcul 1 fois par sec, faudra peut etre reduire sa speed pour compenser ou autre
-    // hardRightLeft(ball: Ball, paddles: [Paddle, Paddle | PaddleAI, Player?, Player?], canvasHeight: number): void {
-    // 	if (this.up && this.y > this.targetY)
-    // 		this.checkAndMoveUp(paddles[2]);
-    // 	else if (this.down && this.y < this.targetY)
-    // 		this.checkAndMoveDown(paddles[3], canvasHeight);
+    private calculateBounces(ball: Ball, canvasHeight: number): number {
+        // pos et vitesse de base
+        let currentX = ball.x;
+        let currentY = ball.y;
+        let currentSpeedX = ball.speedX;
+        let currentSpeedY = ball.speedY;
 
-    // 	// the AI can only refresh its view of the game once per second
-    // 	if (this.canRefresh()) {
-    // 		// calculer targetY et se diriger vers lui 
-    // 		// else if la dir de la balle est pas vers nous alors on met les deux a false
-    // 		this.lastRefresh = Date.now() / 1000;
-    // 	}
-    // }
+        // distance balle/paddle
+        const distanceToTravel = this.x - currentX;
+        let remainingDistance = distanceToTravel;
+
+        while (remainingDistance > 0) {
+            let timeToWall: number;
+            let nextWallY: number;
+
+            if (currentSpeedY >= 0) {
+                // balle va vers le bas
+                timeToWall = (canvasHeight - ball.radius - currentY) / currentSpeedY;
+                nextWallY = canvasHeight - ball.radius;
+            }
+            else {
+                // balle va vers le haut
+                timeToWall = (ball.radius - currentY) / currentSpeedY;
+                nextWallY = ball.radius;
+            }
+
+            const timeToPaddle = remainingDistance / currentSpeedX;
+
+            // si prochain rebond est sur la ligne du paddle (pas un mur)
+            if (timeToPaddle <= timeToWall) {
+                const finalY = currentY + currentSpeedY * timeToPaddle;
+                return Math.max(ball.radius, Math.min(canvasHeight - ball.radius, finalY));
+            } else { // si prochain rebond est sur un mur
+                // on continue la boucle pour calculer prochain rebond
+                const distanceTraveled = currentSpeedX * timeToWall;
+                remainingDistance -= distanceTraveled;
+
+                currentX += distanceTraveled;
+                currentY = nextWallY;
+                currentSpeedY *= -1;
+
+                if (remainingDistance <= 0) {
+                    break;
+                }
+            }
+        }
+
+        // point d'impact
+        return currentY;
+    }
+
+    // chaque sec, utilise les infos de la balle pour calculer le point d'impact
+    // si le point d'impact est un mur, va calculer prochain impact en boucle
+    // jusqu'a que ca soit le point d'impact balle/paddle et se place dessus
+    botPlayer(ball: Ball, canvasHeight: number): void {
+        if (this.up && this.y > this.targetY)
+            this.moveUp();
+        else if (this.down && this.y < this.targetY)
+            this.moveDown(canvasHeight);
+
+        // the AI can only refresh its view of the game once per second
+        if (this.canRefresh()) {
+
+            if (ball.speedX < 0) { // si la balle vient pas vers nous on se replace au milieu
+                this.targetY = (canvasHeight - this.height) / 2;
+                this.up = false;
+                this.down = false;
+            }
+            else {
+                const impactPoint = this.calculateBounces(ball, canvasHeight);
+                const errorMargin = 1.15;
+                const randomFactor = (Math.random() - 0.5) * errorMargin * 100; // pour qu'il se trompe un peu des fois
+                this.targetY = impactPoint - this.height / 2 + randomFactor;
+            }
+
+            if (this.y > this.targetY) {
+                this.up = true;
+                this.down = false;
+            }
+            else if (this.y < this.targetY) {
+                this.up = false;
+                this.down = true;
+            }
+
+            this.lastRefresh = Date.now() / 1000;
+        }
+    }
 }

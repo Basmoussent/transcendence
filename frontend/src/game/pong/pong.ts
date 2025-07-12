@@ -219,13 +219,10 @@ export class Pong {
 	}
 
 	private	updatePlayer2(): void {
-		if (this.paddles[1] instanceof PaddleAI) // si player3 est une IA
-		{
-				this.paddles[1].middleRightLeft(this.ball, this.height);
-		}
-		else {
-				this.paddles[1].updatePaddleRightLeft(this.keys, 'arrowup', 'arrowdown', this.height);
-		}
+		if (this.paddles[1] instanceof PaddleAI)
+			this.paddles[1].botPlayer(this.ball, this.height);
+		else
+			this.paddles[1].updatePaddleRightLeft(this.keys, 'arrowup', 'arrowdown', this.height);
 	}
 
 	private update(): void {

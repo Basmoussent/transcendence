@@ -363,9 +363,9 @@ export class MultiPong {
     }
 
     private updatePlayer2(): void {
-        if (this.paddles[1] instanceof PaddleAI) // si player3 est une IA
+        if (this.paddles[1] instanceof PaddleAI)
         {
-            this.paddles[1].middleRightLeft(this.ball, this.paddles, this.height);
+            this.paddles[1].botPlayer2(this.ball, this.paddles, this.height);
         }
         else {
             this.paddles[1].updatePaddleRightLeft(this.keys, 'arrowup', 'arrowdown', this.paddles, this.height);
@@ -375,7 +375,7 @@ export class MultiPong {
     private updatePlayer3(): void {
         const player3 = this.paddles[2];
         if (player3 && player3 instanceof PaddleAI) {
-            player3?.middleUpDown(this.ball, this.paddles, this.width, this.height);
+            player3?.botPlayer(this.ball, this.paddles, this.width, this.height);
         }
         else if (player3) {
             player3?.updatePaddleUpDown(this.keys, 'k', 'l', this.paddles, this.width);
@@ -385,7 +385,7 @@ export class MultiPong {
     private updatePlayer4(): void {
         const player4 = this.paddles[3];
         if (player4 && player4 instanceof PaddleAI) {
-            player4?.middleUpDown(this.ball, this.paddles, this.width, this.height);
+            player4?.botPlayer(this.ball, this.paddles, this.width, this.height);
         }
         else if (player4) {
             player4?.updatePaddleUpDown(this.keys, '5', '6', this.paddles, this.width);
