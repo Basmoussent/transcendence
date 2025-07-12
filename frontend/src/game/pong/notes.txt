@@ -7,7 +7,11 @@ https://dooglz.github.io/set09121/pong2.html
     // /pong doit etre utilise que pour les 1v1 et /multi-pong pour le reste
 
 // a faire
+    // probleme quand 2 players sans AI
+        // fleche du bas fais descendre la page pas que le paddle
+
     // ajouter les players id au constructeur de Pong + return les scores a la fin de la partie
+    
     // police avec l'API
         // ajuster texte au milieu pcq la c'est bancal
 
@@ -15,5 +19,9 @@ https://dooglz.github.io/set09121/pong2.html
     // la page edit profile pourrait etre + lisible
 
     // sur la page profile
-        // ajouter un bouton activer 2FA
-        // ajouter un bouton home
+        // bouger logout vers la gauche un peu
+        // retirer bloc qui fait que l'anim bouge pas
+
+    // pour les amis
+        // y'a deja une page /friends
+        // ajouter bouton home dessus

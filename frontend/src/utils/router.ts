@@ -101,6 +101,7 @@ export async function router() {
       break;
     case '/block':
       view = renderBlock();
+      break;
     case '/game':
       view = renderChooseGame();
       break;
