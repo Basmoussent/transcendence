@@ -141,8 +141,6 @@ export class Room {
 			}));
 			this.chatInput.value = '';
 		}
-
-		this.addChatMessage(this.username, message);
 	}
 
 	private toggleReadyState() {

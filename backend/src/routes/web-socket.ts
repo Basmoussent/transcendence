@@ -164,7 +164,7 @@ async function webSocketRoutes(app: FastifyInstance) {
 						
 						currentRoom.users.forEach(u => {
 							// check que le socket du joueur est bien ouvert
-							// if (u.socket.readyState === WebSocket.OPEN)
+							if (u.socket.readyState === WebSocket.OPEN)
 								u.socket.send(chatMessage);
 						});
 						break;
