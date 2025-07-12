@@ -1,6 +1,6 @@
-import { BALL_BASE_SPEED } from "./const";
-import { Paddle } from "./paddle";
-import { PaddleAI } from "./paddle-ai";
+import { BALL_BASE_SPEED } from "../const";
+import { Paddle } from "./multi-paddle";
+import { PaddleAI } from "./multi-paddle-ai";
 
 export class Ball {
   radius: number;
@@ -32,7 +32,14 @@ export class Ball {
       this.speedX -= 0.20;
   }
 
-  adjustBallDir(paddle: Paddle | PaddleAI): void {
+  addBallSpeedMulti(): void {
+    if (this.speedY > 0 && this.speedY < 12)
+					this.speedY += 0.20;
+    else if (this.speedY < 0 && this.speedY > -12)
+      this.speedY -= 0.20;
+  }
+
+  adjustBallDir(paddle: Paddle | PaddleAI, nbrOfPlayers: number): void {
     const hitY = this.y;
 
     const paddleTop = paddle.y;
@@ -40,14 +47,16 @@ export class Ball {
     const paddleCenter = paddle.y + paddle.height / 2;
     const edgeZone = paddle.height * 0.2;
 
+    const multiplier = nbrOfPlayers > 2 ? 1.5 : 1;
+
     if (hitY <= paddleTop + edgeZone) // bord haut
-      this.speedY -= 3;
+      this.speedY -= 3 * multiplier;
     else if (hitY >= paddleBottom - edgeZone) // bord bas
-      this.speedY += 3;
+      this.speedY += 3 * multiplier;
     else if (hitY <= paddleCenter) // cote haut
-      this.speedY -= 1;
+      this.speedY -= 1 * multiplier;
     else if (hitY > paddleCenter) // cote bas
-      this.speedY += 1;
+      this.speedY += 1 * multiplier;
   }
 
   resetBallInfo(canvasWidth: number, canvasHeight: number, lastWinner: number): void {
@@ -66,6 +75,14 @@ export class Ball {
             case 1: // droite
                 this.speedX = BALL_BASE_SPEED;
                 this.speedY = 0;
+                break;
+            case 2: // haut
+                this.speedX = 0;
+                this.speedY = -BALL_BASE_SPEED;
+                break;
+            case 3: // bas
+                this.speedX = 0;
+                this.speedY = BALL_BASE_SPEED;
                 break;
             default:
                 this.speedX = BALL_BASE_SPEED;

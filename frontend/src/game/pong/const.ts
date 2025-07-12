@@ -1,5 +1,5 @@
-import { Paddle } from "./paddle";
-import { PaddleAI } from "./paddle-ai";
+import { Paddle } from "./multiplayer/multi-paddle";
+import { PaddleAI } from "./multiplayer/multi-paddle-ai";
 
 export const PADDLE_OFFSET = 2; // ca correspond au contour de mes paddles
 export type Player = Paddle | PaddleAI | null;

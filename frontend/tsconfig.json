@@ -23,5 +23,5 @@
       "@/*": ["src/*"]
     }
   },
-  "include": ["src", "../backend/src/routes/reset-pwd.ts", "src/game/pong/ball.ts"]
+  "include": ["src", "../backend/src/routes/reset-pwd.ts", "src/game/pong/multiplayer/multi-ball.ts"]
 }

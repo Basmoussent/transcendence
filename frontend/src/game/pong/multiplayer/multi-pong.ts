@@ -1,7 +1,7 @@
-import { Ball } from "./ball";
-import { Paddle } from "./paddle";
-import { PaddleAI } from "./paddle-ai";
-import { PADDLE_OFFSET, Player, PADDLE1_COLOR, PADDLE2_COLOR, PADDLE3_COLOR, PADDLE4_COLOR } from "./const";
+import { Ball } from "./multi-ball";
+import { Paddle } from "./multi-paddle";
+import { PaddleAI } from "./multi-paddle-ai";
+import { PADDLE_OFFSET, Player, PADDLE1_COLOR, PADDLE2_COLOR, PADDLE3_COLOR, PADDLE4_COLOR } from "../const";
 
 export class MultiPong {
     private canvas: HTMLCanvasElement;

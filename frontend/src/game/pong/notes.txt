@@ -7,6 +7,9 @@ https://dooglz.github.io/set09121/pong2.html
     // /pong doit etre utilise que pour les 1v1 et /multi-pong pour le reste
 
 // a faire
+    // separer /pong et /multi-pong
+        // middle ai devient multi ai
+        // hard ai qui predit plusieurs rebonds a l'avance pour le /pong
     // ajouter les players id au constructeur de Pong + return les scores a la fin de la partie
     // police avec l'API
         // ajuster texte au milieu pcq la c'est bancal

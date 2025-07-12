@@ -1,5 +1,5 @@
-import { PADDLE_OFFSET, Player } from "./const";
-import { PaddleAI } from "./paddle-ai";
+import { PADDLE_OFFSET, Player } from "../const";
+import { PaddleAI } from "./multi-paddle-ai";
 
 export class Paddle {
     name: string;
@@ -103,7 +103,7 @@ export class Paddle {
           this.x = PADDLE_OFFSET + player1.width;
     }
     
-    updatePaddleUpDown(keys: { [key: string]: boolean }, upKey: string, downKey: string, paddles: [Paddle, Paddle | PaddleAI], canvasWidth: number): void {
+    updatePaddleUpDown(keys: { [key: string]: boolean }, upKey: string, downKey: string, paddles: [Paddle, Paddle | PaddleAI, Player?, Player?], canvasWidth: number): void {
 
         if (keys[downKey])
             this.checkAndMoveRight(paddles[1], canvasWidth);
@@ -112,11 +112,45 @@ export class Paddle {
             this.checkAndMoveLeft(paddles[0]);
     }
 
-    updatePaddleRightLeft(keys: { [key: string]: boolean }, upKey: string, downKey: string, canvasHeight: number): void {
-        if (keys[upKey])
+    private   checkAndMoveUp(player3: Paddle | PaddleAI | null | undefined): void {
+        let canMove = true;
+
+        if (player3) {
+            const horizontalOverlap = this.x < player3.x + player3.width && this.x + this.width > player3.x;
+            const verticalCollision = this.y <= player3.y + player3.height + PADDLE_OFFSET;
+
+            if (horizontalOverlap && verticalCollision)
+                canMove = false;
+        }
+
+        if (canMove)
             this.moveUp();
+        else if (player3)
+            this.y = PADDLE_OFFSET + player3.height; // eviter collision avec player3
+    }
+
+    private   checkAndMoveDown(player4: Paddle | PaddleAI | null | undefined, canvasHeight: number): void {
+        let canMove = true;
+
+        if (player4) {
+            const horizontalOverlap = this.x < player4.x + player4.width && this.x + this.width > player4.x;
+            const verticalCollision = this.y + this.height >= player4.y - PADDLE_OFFSET;
+
+            if (horizontalOverlap && verticalCollision)
+                canMove = false;
+        }
+
+        if (canMove)
+            this.moveDown(canvasHeight);
+        else if (player4)
+            this.y = canvasHeight - PADDLE_OFFSET - player4.height - this.height; // eviter collision avec player4
+    }
+
+    updatePaddleRightLeft(keys: { [key: string]: boolean }, upKey: string, downKey: string, paddles: [Paddle, Paddle | PaddleAI, Player?, Player?], canvasHeight: number): void {
+        if (keys[upKey])
+            this.checkAndMoveUp(paddles[2]);
 
         if (keys[downKey])
-            this.moveDown(canvasHeight);
+            this.checkAndMoveDown(paddles[3], canvasHeight);
     }
 }

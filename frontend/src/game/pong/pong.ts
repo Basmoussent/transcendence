@@ -1,7 +1,7 @@
 import { Ball } from "./ball";
 import { Paddle } from "./paddle";
 import { PaddleAI } from "./paddle-ai";
-import { PADDLE_OFFSET, Player, PADDLE1_COLOR, PADDLE2_COLOR, PADDLE3_COLOR, PADDLE4_COLOR } from "./const";
+import { PADDLE_OFFSET, PADDLE1_COLOR, PADDLE2_COLOR } from "./const";
 
 export class Pong {
 	private canvas: HTMLCanvasElement;
@@ -11,7 +11,7 @@ export class Pong {
 	private start: boolean;
 	private end: boolean;
 	private lastPlayerColl: number; // pour savoir qui va gagner le point
-	private paddles: [Paddle, Paddle | PaddleAI, Player?, Player?];
+	private paddles: [Paddle, Paddle | PaddleAI];
 	private ball: Ball;
 	private keys: { [key: string]: boolean };
 
@@ -34,8 +34,6 @@ export class Pong {
 		this.paddles = [
 			new Paddle(20, 100, PADDLE1_COLOR),
 			new PaddleAI(20, 100, PADDLE2_COLOR),
-			new PaddleAI(100, 20, PADDLE3_COLOR),
-			new PaddleAI(100, 20, PADDLE4_COLOR)
 		];
 
 		this.ball = new Ball(this.height, this.width);
@@ -64,18 +62,6 @@ export class Pong {
 
 		this.paddles[1].x = this.width - this.paddles[1].width - PADDLE_OFFSET;
 		this.paddles[1].y = (this.height - this.paddles[1].height) / 2;
-
-		const player3 = this.paddles[2];
-		if (player3) {
-			player3.x = this.width / 2 - player3.width / 2;
-			player3.y = PADDLE_OFFSET;
-		}
-
-		const player4 = this.paddles[3];
-		if (player4) {
-			player4.x = this.width / 2 - player4.width / 2;
-			player4.y = this.height - player4.height - PADDLE_OFFSET;
-		}
 	}
 
 	private setupCanvas(): void {
@@ -131,61 +117,23 @@ export class Pong {
 		}
 
 		private drawLine(): void {
+		this.ctx.globalAlpha = 0.2;
 		this.ctx.beginPath();
 		this.ctx.moveTo(this.width / 2, 30);
 		this.ctx.lineTo(this.width / 2, this.height - 30);
 		this.ctx.strokeStyle = 'white';
 		this.ctx.lineWidth = 2;
 		this.ctx.stroke();
-	}
-
-	private	multiScore(): void {
-		this.ctx.textAlign = 'center';
-		this.ctx.textBaseline = 'middle';
-
-		const activePlayers = this.paddles.filter(paddle => paddle !== null && paddle !== undefined);
-		const playerCount = activePlayers.length;
-
-		const spacing = 60; // entre chaque score
-		const totalWidth = (playerCount - 1) * spacing;
-		const startX = this.width / 2 - (totalWidth / 2);
-
-		// affiche score au milieu avec couleur du joueur
-		let activeIndex = 0;
-		for (let i = 0; i < this.paddles.length; i++) {
-			const paddle = this.paddles[i];
-			if (paddle) {
-				this.ctx.fillStyle = paddle.color;
-				this.ctx.fillText(
-					paddle.score.toString(), 
-					startX + (activeIndex * spacing), 
-					this.height / 2
-				);
-				activeIndex++;
-			}
-		}
-
-		// remet params par défaut
-		this.ctx.textAlign = 'start';
-		this.ctx.textBaseline = 'alphabetic';
+		this.ctx.globalAlpha = 1;
 	}
 
 	private displayScore(): void {
-		this.ctx.globalAlpha = 0.2;
-
-		// ligne du milieu que si y'a 2 joueurs avec transparance
-		if (this.paddles[2] === null && this.paddles[3] === null )
-			this.drawLine();
-
-		this.ctx.globalAlpha = 1;
+		// ligne du milieu
+		this.drawLine();
 
 		// les scores
-		if (this.paddles[2] || this.paddles[3])
-			this.multiScore();
-		else {
-			this.paddles[0].displayScore(this.ctx, (this.width / 2) / 2, this.height / 2);
-			this.paddles[1].displayScore(this.ctx, (this.width / 4) * 3, this.height / 2);
-		}
+		this.paddles[0].displayScore(this.ctx, (this.width / 2) / 2, this.height / 2);
+		this.paddles[1].displayScore(this.ctx, (this.width / 4) * 3, this.height / 2);
 	}
 
 	private displayResult(): void {
@@ -226,34 +174,10 @@ export class Pong {
 		this.lastPlayerColl = -1;
 	}
 
-	private getNbrOfPlayers(): number {
-        return this.paddles.filter(paddle => paddle !== null && paddle !== undefined).length;
-    }
-
-	private adjustBallDirMultiplayer(ball: typeof this.ball, paddle: typeof this.paddles[2] | typeof this.paddles[3] | null): void {
-		if (!paddle)
-			return ;
-
-		const hitX = ball.x;
-		const paddleLeft = paddle.x;
-		const paddleRight = paddle.x + paddle.width;
-		const paddleCenter = paddle.x + paddle.width / 2;
-		const edgeZone = paddle.width * 0.2;
-
-		if (hitX <= paddleLeft + edgeZone) // bord gauche
-			ball.speedX -= 4;
-		else if (hitX >= paddleRight - edgeZone) // bord droit
-			ball.speedX += 4;
-		else if (hitX <= paddleCenter) // cote gauche
-			ball.speedX -= 2;
-		else if (hitX > paddleCenter) // cote droit
-			ball.speedX += 2;
-	}
-
 	private ballPaddleCollision(): void {
 		if (this.ball.x - this.ball.radius <= this.paddles[0].x + this.paddles[0].width && this.ball.y + this.ball.radius >= this.paddles[0].y && this.ball.y - this.ball.radius <= this.paddles[0].y + this.paddles[0].height && this.ball.x > this.paddles[0].x) {
 			this.ball.speedX *= -1;
-			this.ball.adjustBallDir(this.paddles[0], this.getNbrOfPlayers());
+			this.ball.adjustBallDir(this.paddles[0]);
 			this.ball.addBallSpeed();
 			this.ball.x = this.paddles[0].x + this.paddles[0].width + this.ball.radius;
 
@@ -261,7 +185,7 @@ export class Pong {
 		}
 		if (this.ball.x + this.ball.radius >= this.paddles[1].x && this.ball.y + this.ball.radius >= this.paddles[1].y && this.ball.y - this.ball.radius <= this.paddles[1].y + this.paddles[1].height && this.ball.x < this.paddles[1].x + this.paddles[1].width) {
 			this.ball.speedX *= -1;
-			this.ball.adjustBallDir(this.paddles[1], this.getNbrOfPlayers());
+			this.ball.adjustBallDir(this.paddles[1]);
 			this.ball.addBallSpeed();
 			this.ball.x = this.paddles[1].x - this.ball.radius;
 
@@ -269,108 +193,44 @@ export class Pong {
 		}
 	}
 
-	private ballMultiplayerCollision(): void {
-		const player3 = this.paddles[2]; // haut
-
-		if (player3 &&
-			this.ball.y - this.ball.radius <= player3.y + player3.height &&
-			this.ball.x + this.ball.radius >= player3.x &&
-			this.ball.x - this.ball.radius <= player3.x + player3.width &&
-			this.ball.y > player3.y) {
-
-				this.ball.speedY *= -1;
-				this.adjustBallDirMultiplayer(this.ball, player3);
-				this.ball.addBallSpeedMulti();
-				
-				// repositionner balle pour eviter comportement bizarre
-				this.ball.y = player3.y + player3.height + this.ball.radius + 0.1;
-				
-				this.lastPlayerColl = 2;
-		}
-
-		const player4 = this.paddles[3]; // bas
-
-		if (player4 &&
-			this.ball.y + this.ball.radius >= player4.y &&
-			this.ball.x + this.ball.radius >= player4.x &&
-			this.ball.x - this.ball.radius <= player4.x + player4.width &&
-			this.ball.y < player4.y + player4.height) {
-				
-				this.ball.speedY *= -1;
-				this.adjustBallDirMultiplayer(this.ball, player4);
-				this.ball.addBallSpeedMulti();
-
-				// repositionner balle pour eviter comportement bizarre
-				this.ball.y = player4.y - this.ball.radius - 0.1;
-
-				this.lastPlayerColl = 3;
-		}
-	}
-
 	private updateBall(ball: typeof this.ball): void {
-		const player3 = this.paddles[2];
-		const player4 = this.paddles[3];
 
 		ball.x += ball.speedX;
 		ball.y += ball.speedY;
 
 		// check paddles collision + la balle prends en vitesse a chaque collision paddle + ajuster dir
 		this.ballPaddleCollision();
-		if (player3 || player4)
-			this.ballMultiplayerCollision();
 
 		// check scored point et relancer si oui
-		if (ball.x - ball.radius > this.width || ball.x + ball.radius <= 0 || (player3 && ball.y + ball.radius < 0) || (player4 && ball.y - ball.radius > this.height))
+		if (ball.x - ball.radius > this.width || ball.x + ball.radius <= 0)
 			this.startPoint();
 
 		// check wall collision haut
-		if (!player3 && ball.y - ball.radius <= 0)
+		if (ball.y - ball.radius <= 0)
 			ball.speedY *= -1;
 
 		// check wall collision bas
-		if (!player4 && ball.y + ball.radius >= this.height)
+		if (ball.y + ball.radius >= this.height)
 			ball.speedY *= -1;
 	}
 
 	private	updatePlayer1(): void {
-			this.paddles[0].updatePaddleRightLeft(this.keys, 'w', 's', this.paddles, this.height);
+			this.paddles[0].updatePaddleRightLeft(this.keys, 'w', 's', this.height);
 	}
 
 	private	updatePlayer2(): void {
 		if (this.paddles[1] instanceof PaddleAI) // si player3 est une IA
 		{
-				this.paddles[1].middleRightLeft(this.ball, this.paddles, this.height);
+				this.paddles[1].middleRightLeft(this.ball, this.height);
 		}
 		else {
-				this.paddles[1].updatePaddleRightLeft(this.keys, 'arrowup', 'arrowdown', this.paddles, this.height);
-		}
-	}
-
-	private	updatePlayer3(): void {
-		const player3 = this.paddles[2];
-		if (player3 && player3 instanceof PaddleAI) {
-				player3?.middleUpDown(this.ball, this.paddles, this.width, this.height);
-		}
-		else if (player3) {
-				player3?.updatePaddleUpDown(this.keys, 'k', 'l', this.paddles, this.width);
-		}
-	}
-
-	private	updatePlayer4(): void {
-		const player4 = this.paddles[3];
-		if (player4 && player4 instanceof PaddleAI) {
-				player4?.middleUpDown(this.ball, this.paddles, this.width, this.height);
-		}
-		else if (player4) {
-				player4?.updatePaddleUpDown(this.keys, '5', '6', this.paddles, this.width);
+				this.paddles[1].updatePaddleRightLeft(this.keys, 'arrowup', 'arrowdown', this.height);
 		}
 	}
 
 	private update(): void {
 		this.updatePlayer1();
 		this.updatePlayer2();
-		this.updatePlayer3();
-		this.updatePlayer4();
 
 		this.updateBall(this.ball);
 	}

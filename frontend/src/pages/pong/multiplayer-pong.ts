@@ -1,4 +1,4 @@
-import { MultiPong } from '../../game/pong/multi-pong';
+import { MultiPong } from '../../game/pong/multiplayer/multi-pong';
 
 export function renderMultiPong() {
   const html = `
