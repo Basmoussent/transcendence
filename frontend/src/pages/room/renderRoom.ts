@@ -61,7 +61,7 @@ const getTemplate = () => {
 				<div class="room-settings hidden" id="roomSettings">
 					<h3 class="text-lg font-semibold text-white mb-3">Room Settings</h3>
 					<div class="settings-grid">
-						<div class="setting-item">
+						<div class="setting-item" id="max-player">
 							<label class="text-white/80">Max Players</label>
 							<select class="setting-select" id="maxPlayersSelect">
 								<option value="2">2</option>
@@ -76,7 +76,7 @@ const getTemplate = () => {
 								<option value="block">Block</option>
 							</select>
 						</div>
-						<div class="setting-item">
+						<div class="setting-item" id="ai-setting">
 							<label class="text-white/80 mb-2 block">AI</label>
 							<div class="flex items-center gap-3">
 								<button type="button" class="ai-button control-button" id="decreaseAI"
@@ -108,8 +108,8 @@ const getTemplate = () => {
 					<!-- Players will be dynamically added here -->
 				</div>
 				
-				<div class="game-actions mt-6" id="gameActions">
-					<button class="action-btn start-btn" id="startGameBtn" disabled>
+				<div class="game-actions mt-6 hidden" id="gameActions">
+					<button class="action-btn start-btn " id="startGameBtn" disabled>
 						<i class="fas fa-play"></i>
 						Start Game
 					</button>

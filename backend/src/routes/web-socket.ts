@@ -135,6 +135,7 @@ async function webSocketRoutes(app: FastifyInstance) {
 
 					case 'game_type':
 						currentRoom.gameType === 'Pong' ? currentRoom.gameType = 'Block' : currentRoom.gameType = 'Pong';
+						currentRoom.ai = 0;
 						broadcastRoomUpdate(currentRoom);
 						break;
 

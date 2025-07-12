@@ -88,7 +88,7 @@ export function renderPong() {
       return;
     }
     console.log('Canvas found, creating game instance...');
-    const game = new Pong(canvas, data);
+    const game = new Pong(canvas);
     game.init();
   }, 0);
 
