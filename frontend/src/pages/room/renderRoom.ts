@@ -62,7 +62,7 @@ const getTemplate = () => {
 					</button>
 				</div>
 			
-				<div class="room-settings" id="roomSettings">
+				<div class="room-settings hidden" id="roomSettings">
 					<h3 class="text-lg font-semibold text-white mb-3">Room Settings</h3>
 					<div class="settings-grid">
 						<div class="setting-item">

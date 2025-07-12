@@ -34,8 +34,9 @@ export class Room {
 	private gameTypeEl: HTMLElement;
 	private playerCountEl: HTMLElement;
 	private gameStatusEl: HTMLElement;
+	private roomSettings: HTMLElement;
 	private startGameBtn: HTMLButtonElement;
-
+	private gameTypeSelect: HTMLElement;
 
 	constructor(user: string, uuid: string) {
 		this.username = user;
@@ -51,10 +52,12 @@ export class Room {
 		this.startGameBtn = this.getElement('startGameBtn') as HTMLButtonElement;
 		this.chatInput = this.getElement('chatInput') as HTMLInputElement;
 		this.playersContainer = this.getElement('playersContainer');
+		this.roomSettings = this.getElement('roomSettings');
 		this.roomNameEl = this.getElement('roomName');
 		this.gameTypeEl = this.getElement('gameType');
 		this.playerCountEl = this.getElement('playerCount');
 		this.gameStatusEl = this.getElement('gameStatus');
+		this.gameTypeSelect = this.getElement("gameTypeSelect");
 
 		this.chatInput.focus();
 		this.setupWsEvents();
@@ -97,7 +100,8 @@ export class Room {
 		this.readyBtn.addEventListener('click', () => this.toggleReadyState());
 		this.startBtn.addEventListener('click', () => this.startGame());
 		this.leaveBtn.addEventListener('click', () => this.leaveRoom());
-		this.homeBtn.addEventListener('click', () => this.leaveRoom());
+		this.homeBtn.addEventListener('click', () => this.goHome());
+		this.gameTypeSelect.addEventListener('change', () => this.gameTypeChanged());
 	}
 
 	private handleEvent(data: any) {
@@ -151,12 +155,25 @@ export class Room {
 		this.ws.send(JSON.stringify({ type: 'start_game' }));
 	}
 
+	private gameTypeChanged() {
+		this.ws.send(JSON.stringify({ type: 'game_type' }))
+	}	
+
 	private leaveRoom() {
 		if (this.ws.readyState === WebSocket.OPEN) {
 			this.ws.send(JSON.stringify({ type: 'leave_room' }));
 		}
 		this.ws.close();
 		window.history.pushState({}, '', '/matchmaking');
+		window.dispatchEvent(new Event('popstate'));
+	}
+
+	private goHome() {
+		if (this.ws.readyState === WebSocket.OPEN) {
+			this.ws.send(JSON.stringify({ type: 'leave_room' }));
+		}
+		this.ws.close();
+		window.history.pushState({}, '', '/main');
 		window.dispatchEvent(new Event('popstate'));
 	}
 
@@ -191,6 +208,9 @@ export class Room {
 		const allReady = this.roomData.users.every(u => u.isReady);
 		const isHost = this.roomData.host === this.username;
 		this.startGameBtn.disabled = !isHost || !allReady;
+
+		if (isHost)
+			this.roomSettings.classList.remove('hidden')
 
 		if (allReady)
 			this.gameStatusEl.innerHTML = `<span class="status-dot ready"></span><span class="text-white/80">Ready to start!</span>`;

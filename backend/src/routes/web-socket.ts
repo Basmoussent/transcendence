@@ -10,7 +10,7 @@ interface User {
 interface Room {
 	id: string;
 	name: string;
-	gameType: 'pong' | 'block';
+	gameType: 'Pong' | 'Block';
 	maxPlayers: number;
 	users: Map<string, User>;
 	host: string;
@@ -105,8 +105,6 @@ async function webSocketRoutes(app: FastifyInstance) {
 
 		let room = rooms.get(uuid);
 
-
-
 		if (!room) {
 			room = {
 				id: uuid,
@@ -153,6 +151,11 @@ async function webSocketRoutes(app: FastifyInstance) {
 					case 'toggle_ready':
 						currentUser.isReady = !currentUser.isReady;
 						console.log(`${username} --> isready == ${currentUser.isReady}`);
+						broadcastRoomUpdate(currentRoom);
+						break;
+
+					case 'game_type':
+						currentRoom.gameType === 'Pong' ? currentRoom.gameType = 'Block' : currentRoom.gameType = 'Pong';
 						broadcastRoomUpdate(currentRoom);
 						break;
 
