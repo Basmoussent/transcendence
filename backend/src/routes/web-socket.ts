@@ -58,29 +58,6 @@ async function webSocketRoutes(app: FastifyInstance) {
 		});
 	});
 
-	/*
-	app.get('/matchmaking', { websocket: true }, (socket: WebSocket, req: FastifyRequest) => {
-
-		let token = req.headers['x-access-token'] as string;
-        
-		if (!token) {
-			token = req.cookies['x-access-token'];
-		}
-		
-		if (!token) {
-			socket.send(JSON.stringify({
-				type: 'notLog',
-				message: 'the user is not log' }))
-			return ;
-		}
-
-		socket.on('message', (message: string) => {
-
-
-		});
-	});
-	*/
-
 	app.get('/room/:uuid', { websocket: true }, (socket: WebSocket, req: FastifyRequest) => {
 
 		let token = req.headers['x-access-token'] as string;
@@ -90,6 +67,7 @@ async function webSocketRoutes(app: FastifyInstance) {
 		}
 		
 		if (!token) {
+			console.log('ya pas de token pour lassui')
 			socket.send(JSON.stringify({
 				type: 'notLog',
 				message: 'the user is not log' }))
