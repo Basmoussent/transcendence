@@ -415,9 +415,9 @@ export class matchmaking {
 				console.log(`${data.game}`)
 				break;
 			case 'notLog':
-				this.ws.close();
 				window.history.pushState({}, '', '/login');
 				window.dispatchEvent(new Event('popstate'));
+				this.ws.close();
 				break;
 
 		}

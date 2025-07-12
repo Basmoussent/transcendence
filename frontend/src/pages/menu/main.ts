@@ -23,22 +23,17 @@ export function renderMain() {
             <i class="fas fa-users"></i>
             ${t('menu.multiplayer')}
           </button>
+
+          <button class="menu-button tournament-button" id="tournamentBtn">
+            <i class="fa-solid fa-medal"></i>
+            tournament
+          </button>
           
           <button class="menu-button friends-button" id="friendsBtn">
             <i class="fas fa-user-friends"></i>
             ${t('menu.friends')}
           </button>
 
-          <button class="menu-button pong-game-button" id="pongBtn">
-            <i class="fa-solid fa-trophy"></i>
-            Pong Game
-          </button>
-
-          <button class="menu-button block-game-button" id="blockBtn">
-            <i class="fas fa-cube"></i>
-            Block Game
-          </button>
-          
           <button class="menu-button logout-button" id="logoutBtn">
             <i class="fas fa-sign-out-alt"></i>
             Logout
@@ -136,6 +131,10 @@ export function renderMain() {
       }
 
       .pong-game-button {
+        background: linear-gradient(135deg, #ff8000 0%, #f39c12 100%);
+      }
+
+      .multi-pong-game-button {
         background: linear-gradient(135deg, #ff8000 0%, #f39c12 100%);
       }
 
@@ -248,7 +247,10 @@ function initializeMainEvents() {
   const friendsBtn = document.getElementById('friendsBtn');
   const blockGameBtn = document.getElementById('blockBtn');
   const pongGameBtn = document.getElementById('pongBtn');
+  const multiPongGameBtn = document.getElementById('multiPongBtn');
   const logoutBtn = document.getElementById('logoutBtn');
+  const tournamentBtn = document.getElementById('tournamentBtn');
+
 
   if (profileBtn) {
     profileBtn.addEventListener('click', () => {
@@ -260,6 +262,13 @@ function initializeMainEvents() {
   if (matchmakingBtn) {
     matchmakingBtn.addEventListener('click', () => {
       window.history.pushState({}, '', '/matchmaking');
+      window.dispatchEvent(new PopStateEvent('popstate'));
+    });
+  }
+
+  if (tournamentBtn) {
+    tournamentBtn.addEventListener('click', () => {
+      window.history.pushState({}, '', '/tournament');
       window.dispatchEvent(new PopStateEvent('popstate'));
     });
   }
@@ -287,6 +296,13 @@ function initializeMainEvents() {
 
   if (pongGameBtn) {
     pongGameBtn.addEventListener('click', () => {
+      window.history.pushState({}, '', '/pong');
+      window.dispatchEvent(new PopStateEvent('popstate'));
+    });
+  }
+
+  if (multiPongGameBtn) {
+    multiPongGameBtn.addEventListener('click', () => {
       window.history.pushState({}, '', '/pong');
       window.dispatchEvent(new PopStateEvent('popstate'));
     });

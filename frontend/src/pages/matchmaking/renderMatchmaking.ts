@@ -154,16 +154,15 @@ export function renderMatchmaking() {
 		try {
 			const gameList = await loadAvailableGames();
 
-			if (gameList === -1) {
-				return ;
-			}
-			const inject = await gamesToDiv(gameList);
+			if (gameList !== -1) {
+				const inject = await gamesToDiv(gameList);
 			
-			const container = document.getElementById('available-games');
+				const container = document.getElementById('available-games');
 
-			if (container && typeof inject === 'string') {
-				container.innerHTML = inject;
+				if (container && typeof inject === 'string')
+					container.innerHTML = inject;
 			}
+
 			const render = new matchmaking();
 		}
 		catch (err:any) {

@@ -8,6 +8,8 @@ import { renderSocial } from '../pages/social/social';
 import { renderProfil } from '../pages/social/profil';
 import { renderMultiplayer, initializeMultiplayerEvents } from '../pages/game/multiplayer';
 import { renderMatchmaking } from '../pages/matchmaking/renderMatchmaking';
+import { renderTournaments, initializeTournamentEvents } from '../pages/game/tournament';
+
 import { renderBlock } from '../pages/block/main';
 import { renderBlock1v1 } from '../pages/block/block1v1';
 import { renderTest } from '../pages/test/renderTest';
@@ -16,8 +18,11 @@ import { renderChangePassword, initializeChangePasswordEvents } from '../pages/a
 import { renderEditProfil, initializeEditProfileEvents } from '../pages/social/edit-profil';
 import { getAuthToken } from './auth';
 import { clearTranslationCache } from './translations';
-import { renderPong } from '../pages/pong/main';
+// import { renderPong } from '../pages/pong/main';
 import { getGame } from '@/game/gameUtils';
+import { renderPong } from '../pages/pong/pong';
+import { renderMultiPong } from '../pages/pong/multiplayer-pong';
+import { renderChooseGame } from '../pages/game/choose-game';
 
 export async function router() {
   // Clear translation cache to ensure fresh translations
@@ -105,8 +110,14 @@ export async function router() {
     case '/matchmaking':
       view = renderMatchmaking();
       break;
+    case '/tournament':
+      view = renderTournaments();
+      break;
     case '/block':
       view = renderBlock();
+      break;
+    case '/game':
+      view = renderChooseGame();
       break;
     case '/block1v1':
       view = renderBlock1v1();
@@ -127,6 +138,9 @@ export async function router() {
       if (!uuid)
         return ;
       view = renderRoom(uuid);
+      break;
+    case '/multi-pong':
+      view = renderMultiPong();
       break;
     default:
       view = render404();
@@ -153,6 +167,9 @@ export async function router() {
         break;
       case '/multiplayer':
         initializeMultiplayerEvents();
+        break;
+      case '/tournament':
+        initializeTournamentEvents();
         break;
       case '/change-password':
         initializeChangePasswordEvents();

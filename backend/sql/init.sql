@@ -55,3 +55,9 @@ CREATE TABLE IF NOT EXISTS statistics (
   block_wins INTEGER DEFAULT 0,
   rating INTEGER
 )
+
+-- CREATE TABLE IF NOT EXISTS tournaments (
+--   tournaments_id INTEGER PRIMARY KEY AUTOINCREMENT,
+--   player_ids TEXT NOT NULL,
+--   state INTEGER DEFAULT 0
+-- )

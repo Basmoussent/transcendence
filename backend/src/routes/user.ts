@@ -92,7 +92,6 @@ async function userRoutes(app: FastifyInstance) {
         }
     });
 
-    // Endpoint pour servir les images uploadées
     app.get('/uploads/:filename', async (request: FastifyRequest, reply: FastifyReply) => {
         const { filename } = request.params as { filename: string };
         const uploadsDir = path.join(__dirname, '../../uploads');
@@ -212,6 +211,43 @@ async function userRoutes(app: FastifyInstance) {
         }
     });
 
+    app.get('/user/:username', async (request: FastifyRequest, reply: FastifyReply) => {
+        const data  = request.params as string;
+        console.log('Récupération des données pour l\'utilisateur:', data.username );
+        try {
+            const database = db.getDatabase();
+            if (!database) {
+                return reply.status(500).send({ error: 'Erreur de connexion à la base de données' });
+            }
+
+            const user = await new Promise<UserData | null>((resolve, reject) => {
+                database.get(
+                    'SELECT id FROM users WHERE username = ?',
+                    [data.username],
+                    (err: any, row: UserData | undefined) => {
+                        if (err) {
+                            reject(err);
+                        } else {
+                            resolve(row || null);
+                        }
+                    }
+                );
+            });
+
+            if (!user) {
+                return reply.send({ error: 'Utilisateur non trouvé' });
+            }
+
+            return reply.send({username: data.username, user_id: user.id})
+        } 
+        catch (err: any) {
+            console.error('❌ Error in /user/:id endpoint:', err);
+            if (err.name === 'JsonWebTokenError') {
+                return reply.status(401).send({ error: 'Token invalide ou expiré' });
+            }
+            return reply.status(500).send({ error: 'Erreur serveur interne' });
+        }
+    });
 }
 
 export default userRoutes;

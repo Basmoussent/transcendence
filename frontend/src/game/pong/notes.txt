@@ -1,0 +1,29 @@
+https://stackoverflow.com/questions/4577814/pong-how-does-the-paddle-know-where-the-ball-will-hit
+
+https://dooglz.github.io/set09121/pong2.html
+
+// pour que ca fonctionne bien
+    // le jeu ne doit jamais etre lance avec paddles[0] ou paddles[1] null/undefined
+    // /pong doit etre utilise que pour les 1v1 et /multi-pong pour le reste
+
+// a faire
+    // separer /pong et /multi-pong
+        // middle ai devient multi ai
+        // hard ai qui predit plusieurs rebonds a l'avance pour le /pong
+    // ajouter les players id au constructeur de Pong + return les scores a la fin de la partie
+    // police avec l'API
+        // ajuster texte au milieu pcq la c'est bancal
+
+    // IA
+        // idee pour le hard: pour l'IA, faire un truc ou a chaque collision de la balle, je calcule le prochain point d'impact,
+        si c'est sur sa ligne il y a va sinon
+            // soit il se replace au milieu (moyen)
+            // soit il calcule le prochain rebond a partir de ces infos
+                // et la si c'est sur lui y va sinon osef (si possible tester plusieurs rebonds sinon ca y est)
+
+    // la page principale du site renvoie vers la liste de boutons pas vers login
+    // la page edit profile pourrait etre + lisible
+
+    // sur la page profile
+        // ajouter un bouton activer 2FA
+        // ajouter un bouton home

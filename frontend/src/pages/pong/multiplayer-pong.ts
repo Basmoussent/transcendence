@@ -1,13 +1,12 @@
-import { Pong } from '../../game/pong/pong';
+import { MultiPong } from '../../game/pong/multiplayer/multi-pong';
 
-export function renderPong() {
+export function renderMultiPong() {
   const html = `
     <div class="pong-game-container">
       <div class="game-wrapper">
-        <canvas id="pongGameCanvas" width="800" height="600"></canvas>
+        <canvas id="pongGameCanvas" width="800" height="800"></canvas>
       </div>
     </div>
-
     <style>
       .pong-game-container {
         display: flex;
@@ -17,10 +16,7 @@ export function renderPong() {
         background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
         padding: 20px;
       }
-
       .game-wrapper {
-        width: 90vw;
-        height: 90vh;
         background: rgba(255, 255, 255, 0.1);
         border-radius: 10px;
         padding: 20px;
@@ -29,51 +25,35 @@ export function renderPong() {
         display: flex;
         justify-content: center;
         align-items: center;
+        width: 90vmin;
+        height: 90vmin;
       }
-
       #pongGameCanvas {
         width: 100%;
         height: 100%;
-        display: pong;
+        display: block;
         background-color: #1a1a2e;
+        border-radius: 5px;
       }
-
-      /* Desktop Layout */
-      @media (min-width: 1280px) {
-        .game-wrapper {
-          width: 80vw;
-          height: 85vh;
-          padding: 30px;
-        }
-      }
-
-      /* Tablet Layout */
-      @media (max-width: 1279px) {
-        .game-wrapper {
-          width: 90vw;
-          height: 80vh;
-          padding: 15px;
-        }
-      }
-
+      
       /* Mobile Layout */
       @media (max-width: 767px) {
         .pong-game-container {
           padding: 10px;
         }
         .game-wrapper {
-          width: 95vw;
-          height: 75vh;
-          padding: 10px;
+          width: 95vmin;
+          height: 95vmin;
+          padding: 15px;
         }
       }
-
-      /* Small Mobile Layout */
+      
+      /* Très petits écrans */
       @media (max-width: 480px) {
         .game-wrapper {
-          width: 98vw;
-          height: 70vh;
-          padding: 5px;
+          width: 98vmin;
+          height: 98vmin;
+          padding: 10px;
         }
       }
     </style>
@@ -88,7 +68,7 @@ export function renderPong() {
       return;
     }
     console.log('Canvas found, creating game instance...');
-    const game = new Pong(canvas, data);
+    const game = new MultiPong(canvas);
     game.init();
   }, 0);
 
