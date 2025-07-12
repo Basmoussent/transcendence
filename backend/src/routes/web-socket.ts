@@ -15,6 +15,7 @@ interface Room {
 	users: Map<string, User>;
 	host: string;
 	isGameStarted: boolean;
+	ai: number;
 }
 
 const rooms = new Map<string, Room>();
@@ -58,29 +59,6 @@ async function webSocketRoutes(app: FastifyInstance) {
 		});
 	});
 
-	/*
-	app.get('/matchmaking', { websocket: true }, (socket: WebSocket, req: FastifyRequest) => {
-
-		let token = req.headers['x-access-token'] as string;
-        
-		if (!token) {
-			token = req.cookies['x-access-token'];
-		}
-		
-		if (!token) {
-			socket.send(JSON.stringify({
-				type: 'notLog',
-				message: 'the user is not log' }))
-			return ;
-		}
-
-		socket.on('message', (message: string) => {
-
-
-		});
-	});
-	*/
-
 	app.get('/room/:uuid', { websocket: true }, (socket: WebSocket, req: FastifyRequest) => {
 
 		let token = req.headers['x-access-token'] as string;
@@ -114,6 +92,7 @@ async function webSocketRoutes(app: FastifyInstance) {
 				users: new Map(),
 				host: username,
 				isGameStarted: false,
+				ai: 0,
 			};
 
 			rooms.set(uuid, room);
@@ -127,8 +106,6 @@ async function webSocketRoutes(app: FastifyInstance) {
 			socket.close();
 			return;
 		}
-
-
 
 		const user: User = {
 			username: username,
@@ -147,6 +124,8 @@ async function webSocketRoutes(app: FastifyInstance) {
 				const currentRoom = rooms.get(uuid)!;
 				const currentUser = currentRoom.users.get(username)!;
 
+				console.log()
+
 				switch (data.type) {
 					case 'toggle_ready':
 						currentUser.isReady = !currentUser.isReady;
@@ -156,6 +135,18 @@ async function webSocketRoutes(app: FastifyInstance) {
 
 					case 'game_type':
 						currentRoom.gameType === 'Pong' ? currentRoom.gameType = 'Block' : currentRoom.gameType = 'Pong';
+						broadcastRoomUpdate(currentRoom);
+						break;
+
+					case 'increase':
+						currentRoom.ai += 1;
+						console.log(currentRoom.ai)
+						broadcastRoomUpdate(currentRoom);
+						break;
+					
+					case 'decrease':
+						currentRoom.ai -= 1;
+						console.log(currentRoom.ai)
 						broadcastRoomUpdate(currentRoom);
 						break;
 
@@ -230,6 +221,7 @@ function broadcastRoomUpdate(room: Room) {
 		users: Array.from(room.users.values()).map(u => ({ username: u.username, isReady: u.isReady })),
 		host: room.host,
 		isGameStarted: room.isGameStarted,
+		ai: room.ai,
 	};
 
 	const message = JSON.stringify({

@@ -44,9 +44,54 @@ export async function loadAvailableGames(): Promise<Available[] | -1> {
 				player4: sanitizeHtml(game?.player4),
 				users_needed:(sanitizeHtml(game.users_needed)),
 				divConverion(): string {
-					return `<div class="bg-black h-32">${(this.player1)}
-						<button class="p-2 button launch-button" id="join${this.gameId}Btn">Join</button>
-						</div>`;
+					// Calculer le nombre de joueurs actuels
+					const currentPlayers = [this.player1, this.player2, this.player3, this.player4]
+						.filter(player => player && player.trim() !== '').length;
+					
+					// Déterminer le statut
+					const totalSlots = parseInt(this.users_needed) || 2;
+					const isWaiting = currentPlayers < totalSlots;
+					const isFull = currentPlayers >= totalSlots;
+					
+					const statusClass = isFull ? 'status-full' : (currentPlayers > 1 ? 'status-playing' : 'status-waiting');
+					const statusText = isFull ? 'Full' : (currentPlayers > 1 ? 'Playing' : 'Waiting');
+					
+					// Générer la liste des joueurs
+					const playersList = [this.player1, this.player2, this.player3, this.player4]
+						.filter(player => player && player.trim() !== '')
+						.join(', ');
+					
+					return `
+						<div class="game-card" ${!isFull ? `onclick="joinGame('${this.gameId}')"` : ''}>
+							<div class="game-header">
+								<h3 class="game-title">${this.game_name}</h3>
+								<span class="game-status ${statusClass}">${statusText}</span>
+							</div>
+							<div class="game-info">
+								<div class="game-type">
+									<i class="fas ${this.game_name.toLowerCase() === 'pong' ? 'fa-table-tennis' : 'fa-cubes'}"></i>
+									<span>${this.game_name}</span>
+								</div>
+								<div class="player-count">
+									<i class="fas fa-users"></i>
+									<span>${currentPlayers}/${totalSlots}</span>
+								</div>
+							</div>
+							${playersList ? `
+								<div class="players-list">
+									<i class="fas fa-user"></i>
+									<span>${playersList}</span>
+								</div>
+							` : ''}
+							${!isFull ? `
+								<button class="join-button" id="join${this.gameId}Btn">
+									<i class="fas fa-sign-in-alt"></i>
+									Join Game
+								</button>
+							` : ''}
+						</div>
+					`;
+
 				}
 			}));
 			console.log("available games: ", );

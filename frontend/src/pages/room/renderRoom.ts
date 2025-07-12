@@ -22,7 +22,6 @@ interface RoomData {
 	host: string;
 }
 
-
 const getTemplate = () => {
 	return `
 
@@ -76,6 +75,20 @@ const getTemplate = () => {
 								<option value="pong">Pong</option>
 								<option value="block">Block</option>
 							</select>
+						</div>
+						<div class="setting-item">
+							<label class="text-white/80 mb-2 block">AI</label>
+							<div class="flex items-center gap-3">
+								<button type="button" class="ai-button control-button" id="decreaseAI"
+									class="px-3 py-1 bg-white/10 border border-white/30 text-white rounded-lg hover:bg-white/20 transition">
+									-
+								</button>
+								<span id="aiCount" class="text-white text-lg font-semibold w-6 text-center">0</span>
+								<button type="button" class="ai-button control-button" id="increaseAI"
+									class="px-3 py-1 bg-white/10 border border-white/30 text-white rounded-lg hover:bg-white/20 transition">
+									+
+								</button>
+							</div>
 						</div>
 					</div>
 				</div>
@@ -201,6 +214,22 @@ const getTemplate = () => {
 	.leave-btn:hover {
 		transform: translateY(-2px);
 		box-shadow: 0 8px 20px rgba(107, 114, 128, 0.3);
+	}
+
+	.ai-button {
+		padding: 0.25rem 0.75rem;
+		background-color: rgba(255, 255, 255, 0.1);
+		border: 1px solid rgba(255, 255, 255, 0.3);
+		color: white;
+		border-radius: 0.5rem;
+		transition: all 0.2s ease-in-out;
+	}
+
+	.ai-button:hover {
+		background-color: rgba(255, 255, 255, 0.2);
+		transform: scale(1.05);
+		box-shadow: 0 0 6px rgba(255, 255, 255, 0.2);
+		cursor: pointer
 	}
 
 	.settings-grid {

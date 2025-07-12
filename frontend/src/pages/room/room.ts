@@ -14,6 +14,7 @@ interface RoomData {
 	users: User[];
 	host: string;
 	isGameStarted: boolean;
+	ai: number;
 }
 
 export class Room {
@@ -28,6 +29,10 @@ export class Room {
 	private startBtn: HTMLButtonElement;
 	private leaveBtn: HTMLButtonElement;
 	private sendBtn: HTMLButtonElement;
+	private increaseAiBtn: HTMLButtonElement;
+	private decreaseAiBtn: HTMLButtonElement;
+
+
 	private chatInput: HTMLInputElement;
 	private playersContainer: HTMLElement;
 	private roomNameEl: HTMLElement;
@@ -35,8 +40,11 @@ export class Room {
 	private playerCountEl: HTMLElement;
 	private gameStatusEl: HTMLElement;
 	private roomSettings: HTMLElement;
-	private startGameBtn: HTMLButtonElement;
+
+	private aiCountSpan: HTMLElement;
+	
 	private gameTypeSelect: HTMLElement;
+	
 
 	constructor(user: string, uuid: string) {
 		this.username = user;
@@ -49,7 +57,8 @@ export class Room {
 		this.startBtn = this.getElement('startGameBtn') as HTMLButtonElement;
 		this.leaveBtn = this.getElement('leaveBtn') as HTMLButtonElement;
 		this.sendBtn = this.getElement('sendBtn') as HTMLButtonElement;
-		this.startGameBtn = this.getElement('startGameBtn') as HTMLButtonElement;
+		this.increaseAiBtn = this.getElement('increaseAI') as HTMLButtonElement;
+		this.decreaseAiBtn = this.getElement('decreaseAI') as HTMLButtonElement;
 		this.chatInput = this.getElement('chatInput') as HTMLInputElement;
 		this.playersContainer = this.getElement('playersContainer');
 		this.roomSettings = this.getElement('roomSettings');
@@ -58,6 +67,8 @@ export class Room {
 		this.playerCountEl = this.getElement('playerCount');
 		this.gameStatusEl = this.getElement('gameStatus');
 		this.gameTypeSelect = this.getElement("gameTypeSelect");
+		this.aiCountSpan = this.getElement('aiCount');
+		
 
 		this.chatInput.focus();
 		this.setupWsEvents();
@@ -101,6 +112,8 @@ export class Room {
 		this.startBtn.addEventListener('click', () => this.startGame());
 		this.leaveBtn.addEventListener('click', () => this.leaveRoom());
 		this.homeBtn.addEventListener('click', () => this.goHome());
+		this.increaseAiBtn.addEventListener('click', () => this.increase());
+		this.decreaseAiBtn.addEventListener('click', () => this.decrease());
 		this.gameTypeSelect.addEventListener('change', () => this.gameTypeChanged());
 	}
 
@@ -150,6 +163,16 @@ export class Room {
 	private toggleReadyState() {
 		this.ws.send(JSON.stringify({ type: 'toggle_ready' }));
 	}
+	
+	private increase() {
+		console.log(`je suis touche`)
+		this.ws.send(JSON.stringify({ type: 'increase' }));
+	}
+
+	private decrease() {
+		console.log(`je suis touche`)
+		this.ws.send(JSON.stringify({ type: 'decrease' }));
+	}
 
 	private startGame() {
 		this.ws.send(JSON.stringify({ type: 'start_game' }));
@@ -184,6 +207,7 @@ export class Room {
 
 		this.roomNameEl.textContent = this.roomData.name;
 		this.gameTypeEl.textContent = this.roomData.gameType;
+		this.aiCountSpan.textContent = String(this.roomData.ai);
 		this.playerCountEl.textContent = `${this.roomData.users.length}/${this.roomData.maxPlayers}`;
 
 		this.playersContainer.innerHTML = '';
@@ -208,10 +232,19 @@ export class Room {
 		const allReady = this.roomData.users.every(u => u.isReady);
 		const isHost = this.roomData.host === this.username;
 		if (this.roomData.users.length >= 2)
-			this.startGameBtn.disabled = !isHost || !allReady;
+			this.startBtn.disabled = !isHost || !allReady;
 
-		if (isHost)
+		if (isHost) {
 			this.roomSettings.classList.remove('hidden')
+			if (this.roomData.users.length + this.roomData.ai === this.roomData.maxPlayers)
+				this.increaseAiBtn.disabled = true;
+			else
+				this.increaseAiBtn.disabled = false;
+			if (this.roomData.ai === 0)
+				this.decreaseAiBtn.disabled = true;
+			else
+				this.decreaseAiBtn.disabled = false;
+		}
 
 		if (allReady)
 			this.gameStatusEl.innerHTML = `<span class="status-dot ready"></span><span class="text-white/80">Ready to start!</span>`;
