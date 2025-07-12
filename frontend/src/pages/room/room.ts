@@ -1,72 +1,64 @@
-import { getGame, getGameByUuid, getGameUuid } from '../../game/gameUtils';
 import { sanitizeHtml } from '../../utils/sanitizer';
+
+interface User {
+	username: string;
+	isReady: boolean;
+	avatar?: string;
+}
+
+interface RoomData {
+	id: string;
+	name: string;
+	gameType: 'pong' | 'block';
+	maxPlayers: number;
+	users: User[];
+	host: string;
+	isGameStarted: boolean;
+}
 
 export class Room {
 
 	private ws: WebSocket;
+	private username: string;
+	private uuid: string;
+	private roomData: RoomData | null = null;
 
 	private homeBtn: HTMLButtonElement;
 	private readyBtn: HTMLButtonElement;
 	private startBtn: HTMLButtonElement;
 	private leaveBtn: HTMLButtonElement;
 	private sendBtn: HTMLButtonElement;
-	private playerCountEl: HTMLButtonElement;
-	private uuid: string;
-	private gameId: number;
+	private chatInput: HTMLInputElement;
+	private playersContainer: HTMLElement;
+	private roomNameEl: HTMLElement;
+	private gameTypeEl: HTMLElement;
+	private playerCountEl: HTMLElement;
+	private gameStatusEl: HTMLElement;
+	private startGameBtn: HTMLButtonElement;
 
-	// private settingsContainer: HTMLElement;
-	// private chatContainer: HTMLElement;
-	private input: HTMLInputElement;
-
-	private username: string;
 
 	constructor(user: string, uuid: string) {
-
-		this.uuid = uuid;
-
-		const tmp = getGameByUuid(this.uuid);
-		if (tmp)
-			this.gameId = tmp.id;
-
-		
-
 		this.username = user;
+		this.uuid = uuid;
 
 		this.ws = new WebSocket(`${window.location.protocol === "https:" ? "wss" : "ws"}://${window.location.host}/api/room/${uuid}`);
 
+		this.homeBtn = this.getElement('homeBtn') as HTMLButtonElement;
 		this.readyBtn = this.getElement('readyBtn') as HTMLButtonElement;
 		this.startBtn = this.getElement('startGameBtn') as HTMLButtonElement;
 		this.leaveBtn = this.getElement('leaveBtn') as HTMLButtonElement;
 		this.sendBtn = this.getElement('sendBtn') as HTMLButtonElement;
-		this.homeBtn = this.getElement('homeBtn') as HTMLButtonElement;
-		this.playerCountEl = this.getElement('playerCount') as HTMLButtonElement;
-		// this.settingsContainer = this.getElement('roomSettings');
-		// this.chatContainer = this.getElement('chatMessages');
-		this.input = this.getElement('chatInput') as HTMLInputElement ;
-		this.input.focus();
+		this.startGameBtn = this.getElement('startGameBtn') as HTMLButtonElement;
+		this.chatInput = this.getElement('chatInput') as HTMLInputElement;
+		this.playersContainer = this.getElement('playersContainer');
+		this.roomNameEl = this.getElement('roomName');
+		this.gameTypeEl = this.getElement('gameType');
+		this.playerCountEl = this.getElement('playerCount');
+		this.gameStatusEl = this.getElement('gameStatus');
 
-		this.setupEvents();
-
-		this.ws.onopen = () => {
-			this.addSystemMessage(`${this.username} just arrived`);
-			console.log(`${this.username} vient de se connecter a la room ${uuid}`)
-			this.ws.send(JSON.stringify({
-				type: 'player_joined',
-				username: this.username,
-			}));
-		}
-
-		this.ws.onerror = (error) => {
-			console.error(`❌ room ${uuid}\nWebSocket error:`, error)}
-
-		this.ws.onclose = (event) => {
-			this.addSystemMessage(`${this.username} just left`);
-			console.log(`🔌 room ${uuid}\nConnection closed for ${this.username}:`, event.code, event.reason)}
-
-		this.ws.onmessage = (event) =>  {
-			const data = JSON.parse(event.data);
-			this.handleEvents(data);}
-
+		this.chatInput.focus();
+		this.setupWsEvents();
+		this.setupClickEvents();
 	}
 
 	private getElement(id: string): HTMLElement {
@@ -76,152 +68,176 @@ export class Room {
 		return el;
 	}
 
-	private setupEvents() {
+	private setupWsEvents() {
 
-		this.input.addEventListener('keypress', (e) => {
-			if (e.key === 'Enter')
-				this.sendMsg();
+		this.ws.onopen = () => {
+			console.log(`✅ WebSocket connection established for room ${this.uuid}`);
+		};
+
+		this.ws.onerror = (error) => console.error(`${this.username} onerror ${this.uuid}:`, error);
+		this.ws.onclose = (event) => console.log(`${this.username} websocket ferme ${this.username}:`, event.code, event.reason);
+		
+		this.ws.onmessage = (event) => {
+			try {
+				const data = JSON.parse(event.data);
+				this.handleEvent(data);
+			}
+			catch (error) {
+				console.error("Error JSON.parse onmessage:", error); }
+		};
+	}
+
+	private setupClickEvents() {
+
+		this.chatInput.addEventListener('keypress', (e) => {
+			if (e.key === 'Enter') this.sendChatMessage();
 		});
 
+		this.sendBtn.addEventListener('click', () => this.sendChatMessage());
+		this.readyBtn.addEventListener('click', () => this.toggleReadyState());
 		this.startBtn.addEventListener('click', () => this.startGame());
-		this.readyBtn.addEventListener('click', () => this.beReady());
-		this.sendBtn.addEventListener('click', () => this.sendMsg());
-		this.homeBtn.addEventListener('click', () => this.leaveRoom());
 		this.leaveBtn.addEventListener('click', () => this.leaveRoom());
+		this.homeBtn.addEventListener('click', () => this.leaveRoom());
 	}
 
-	private handleEvents(data: any) {
-
-
+	private handleEvent(data: any) {
 		switch (data.type) {
-
-
+			case 'room_update':
+				this.roomData = data.room;
+				this.updateUI();
+				break;
+			
 			case 'chat_message':
-				this.addSystemMessage(`${data.username}: ${data.content}`);
+				this.addChatMessage(data.username, data.content);
 				break;
 
-			case 'leave':
-				this.updatePlayerCount();
-				this.updateRoomMembers();
+			case 'system_message':
+				this.addSystemMessage(data.content);
 				break;
 
-			case 'player_joined':
-				this.updatePlayerCount();
-				this.updateRoomMembers();
+			case 'game_starting':
+				this.launchGamePage(data.gameType);
 				break;
-
-			// case 'ready':
-			// 	this.update
+			
+			default:
+				console.warn(`Unknown event type received: ${data.type}`);
 		}
-
 	}
 
-	// start la game
+	private sendChatMessage() {
+		const message = this.chatInput.value.trim();
+		if (message && this.ws.readyState === WebSocket.OPEN) {
+			this.ws.send(JSON.stringify({
+				type: 'chat_message',
+				content: message
+			}));
+			this.chatInput.value = '';
+		}
+
+		this.addChatMessage(this.username, message);
+	}
+
+	private toggleReadyState() {
+		this.ws.send(JSON.stringify({ type: 'toggle_ready' }));
+	}
+
 	private startGame() {
-		console.log(`startGame appele`);
-		this.ws.send(JSON.stringify({
-			type: 'start',
-		}));
+		this.ws.send(JSON.stringify({ type: 'start_game' }));
 	}
 
-	// make myself ready
-	private beReady() {
-
-		if (this.ws.readyState !== WebSocket.OPEN) {
-			console.warn("WebSocket not open yet.");
-			return ;
-		}
-
-
-		console.log(`beReady appele`);
-
-		this.ws.send(JSON.stringify({
-			type: 'ready',
-			content: this.username
-		}));
-	}
-
-	// quitter la room
 	private leaveRoom() {
-
-		console.log(`leaveRoom appele`);
-
-		this.ws.send(JSON.stringify({
-			type: 'leave',
-			content: this.username
-		}));
-
+		if (this.ws.readyState === WebSocket.OPEN) {
+			this.ws.send(JSON.stringify({ type: 'leave_room' }));
+		}
 		this.ws.close();
 		window.history.pushState({}, '', '/matchmaking');
 		window.dispatchEvent(new Event('popstate'));
 	}
 
-	// envoyer un msg dans le chat
-	private sendMsg() {
-		console.log(`sendMsg appele`);
+	private updateUI() {
 
-		const message = this.input.value.trim();
-
-		console.log(`msg = ${message}`)
-	
-		if (!message || !this.ws || this.ws.readyState !== WebSocket.OPEN)
+		if (!this.roomData)
 			return;
 
-		this.ws.send(JSON.stringify({
-			type: 'chat_message',
-			username: this.username,
-			content: message
-		}));
+		this.roomNameEl.textContent = this.roomData.name;
+		this.gameTypeEl.textContent = this.roomData.gameType;
+		this.playerCountEl.textContent = `${this.roomData.users.length}/${this.roomData.maxPlayers}`;
 
-		this.addSystemMessage(`you: ${message}`);
-		this.input.value = '';
+		this.playersContainer.innerHTML = '';
+		this.roomData.users.forEach(user => {
+			this.playersContainer.innerHTML += this.playerCard(user);
+		});
+
+		for (let i = this.roomData.users.length; i < this.roomData.maxPlayers; i++)
+			this.playersContainer.innerHTML += '<div class="empty-slot">Waiting for player...</div>';
+
+		const currentUser = this.roomData.users.find(u => u.username === this.username);
+
+		if (currentUser?.isReady) {
+			this.readyBtn.classList.add('active');
+			this.readyBtn.innerHTML = '<i class="fas fa-times"></i> Not Ready';
+		}
+		else {
+			this.readyBtn.classList.remove('active');
+			this.readyBtn.innerHTML = '<i class="fas fa-check"></i> Ready';
+		}
+
+		const allReady = this.roomData.users.every(u => u.isReady);
+		const isHost = this.roomData.host === this.username;
+		this.startGameBtn.disabled = !isHost || !allReady;
+
+		if (allReady)
+			this.gameStatusEl.innerHTML = `<span class="status-dot ready"></span><span class="text-white/80">Ready to start!</span>`;
+		else
+			this.gameStatusEl.innerHTML = `<span class="status-dot waiting"></span><span class="text-white/80">Waiting for players...</span>`;
 	}
-	
-	private addSystemMessage(message: string) {
-		const chatContainer = document.getElementById('chatMessages');
-		if (!chatContainer)
-			return;
 
-		const messageElement = document.createElement('div');
-		messageElement.className = 'chat-message system';
-		
-		const time = new Date().toLocaleTimeString();
-		
-		messageElement.innerHTML = `
-		<div class="chat-message-content">${sanitizeHtml(message)}</div>
-		<div class="chat-message-time">${time}</div>
+	private playerCard(user: User): string {
+		const isHost = this.roomData?.host === user.username;
+		const readyClass = user.isReady ? 'ready' : '';
+		const hostClass = isHost ? 'host' : '';
+		const avatarInitial = user.username.charAt(0).toUpperCase();
+
+		return `
+			<div class="player-card ${readyClass} ${hostClass}">
+				<div class="player-avatar">${avatarInitial}</div>
+				<div class="player-name">${sanitizeHtml(user.username)}</div>
+				<div class="player-status">${user.isReady ? 'Ready' : 'Not Ready'}</div>
+			</div>
 		`;
-		
+	}
+
+	private addChatMessage(username: string, message: string) {
+		const chatContainer = this.getElement('chatMessages');
+		const messageElement = document.createElement('div');
+		messageElement.className = 'chat-message';
+		const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+		messageElement.innerHTML = `
+			<div class="chat-message-author">${sanitizeHtml(username)}</div>
+			<div class="chat-message-content">${sanitizeHtml(message)}</div>
+			<div class="chat-message-time">${time}</div>
+		`;
 		chatContainer.appendChild(messageElement);
 		chatContainer.scrollTop = chatContainer.scrollHeight;
 	}
 
-	private updateRoomMembers() {
-
-
-		// console.log(info);
-
+	private addSystemMessage(message: string) {
+		const chatContainer = this.getElement('chatMessages');
+		const messageElement = document.createElement('div');
+		messageElement.className = 'chat-message system';
+		messageElement.innerHTML = `<div class="chat-message-content">${sanitizeHtml(message)}</div>`;
+		chatContainer.appendChild(messageElement);
+		chatContainer.scrollTop = chatContainer.scrollHeight;
 	}
 
-	private updatePlayerCount() {
+	private launchGamePage(gameType: 'pong' | 'block') {
 
-		const game = getGame(this.gameId);
-
-		console.log(game);
-		
-		// let i = 0;
-		// if (game?.player1)
-		// 	++i;
-		// if (game?.player2)
-		// 	++i;
-		// if (game?.player3)
-		// 	++i;
-		// if (game?.player4)
-		// 	++i;
-
-		// this.playerCountEl.textContent = `${i}/${game?.users_needed}`;
-
+		this.addSystemMessage(`The game is about to start ${gameType}...`);
+		setTimeout(() => {
+			// faire le new block ou pong avec info de la game dans le constructeur
+			window.history.pushState({}, '', `/${gameType}`);
+			window.dispatchEvent(new Event('popstate'));
+		}, 2000);
 	}
-
-	
 }
