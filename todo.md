@@ -14,4 +14,10 @@
 	# ◦ Major module: 2FA
 
 
+
+
+
+# ◦ Minor module: Support on all devices.
+
+ENLEVER LE RELOAD DANS LE CHANGEMENT DE LANGUE
 8M5m

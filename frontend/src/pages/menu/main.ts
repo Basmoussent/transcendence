@@ -22,6 +22,11 @@ export function renderMain() {
             <i class="fas fa-users"></i>
             ${t('menu.multiplayer')}
           </button>
+
+          <button class="menu-button tournament-button" id="tournamentBtn">
+            <i class="fa-solid fa-medal"></i>
+            tournament
+          </button>
           
           <button class="menu-button friends-button" id="friendsBtn">
             <i class="fas fa-user-friends"></i>
@@ -253,6 +258,8 @@ function initializeMainEvents() {
   const pongGameBtn = document.getElementById('pongBtn');
   const multiPongGameBtn = document.getElementById('multiPongBtn');
   const logoutBtn = document.getElementById('logoutBtn');
+  const tournamentBtn = document.getElementById('tournamentBtn');
+
 
   if (profileBtn) {
     profileBtn.addEventListener('click', () => {
@@ -264,6 +271,13 @@ function initializeMainEvents() {
   if (localGameBtn) {
     localGameBtn.addEventListener('click', () => {
       window.history.pushState({}, '', '/local-game');
+      window.dispatchEvent(new PopStateEvent('popstate'));
+    });
+  }
+
+  if (tournamentBtn) {
+    tournamentBtn.addEventListener('click', () => {
+      window.history.pushState({}, '', '/tournament');
       window.dispatchEvent(new PopStateEvent('popstate'));
     });
   }

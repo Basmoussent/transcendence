@@ -1,0 +1,31 @@
+2025/06/30 10:11:55 [notice] 1#1: ModSecurity-nginx v1.0.4 (rules loaded inline/local/remote: 0/10/0)
+2025/06/30 10:11:55 [notice] 1#1: libmodsecurity3 version 3.0.14
+2025/06/30 10:12:02 [warn] 4855#4855: *2 an upstream response is buffered to a temporary file /var/cache/nginx/proxy_temp/1/00/0000000001 while reading upstream, client: 172.18.0.1, server: fr.localhost, request: "GET /@vite/client HTTP/1.1", upstream: "http://172.18.0.7:5173/@vite/client", host: "en.localhost:2443", referrer: "https://en.localhost:2443/login"
+2025/07/11 15:02:08 [notice] 1#1: ModSecurity-nginx v1.0.4 (rules loaded inline/local/remote: 0/10/0)
+2025/07/11 15:02:08 [notice] 1#1: libmodsecurity3 version 3.0.14
+2025/07/11 15:17:45 [notice] 1#1: ModSecurity-nginx v1.0.4 (rules loaded inline/local/remote: 0/10/0)
+2025/07/11 15:17:45 [notice] 1#1: libmodsecurity3 version 3.0.14
+2025/07/11 15:19:26 [notice] 1#1: ModSecurity-nginx v1.0.4 (rules loaded inline/local/remote: 0/10/0)
+2025/07/11 15:19:26 [notice] 1#1: libmodsecurity3 version 3.0.14
+2025/07/11 15:34:09 [warn] 354#354: *2582 an upstream response is buffered to a temporary file /var/cache/nginx/proxy_temp/1/00/0000000001 while reading upstream, client: 172.18.0.1, server: fr.localhost, request: "GET /preview-pong.mp4 HTTP/1.1", upstream: "http://172.18.0.7:5173/preview-pong.mp4", host: "fr.localhost:2443", referrer: "https://fr.localhost:2443/"
+2025/07/11 15:34:18 [warn] 356#356: *2612 an upstream response is buffered to a temporary file /var/cache/nginx/proxy_temp/2/00/0000000002 while reading upstream, client: 172.18.0.1, server: fr.localhost, request: "GET /preview-pong.mp4 HTTP/1.1", upstream: "http://172.18.0.7:5173/preview-pong.mp4", host: "es.localhost:2443", referrer: "https://es.localhost:2443/"
+2025/07/11 18:15:48 [notice] 1#1: ModSecurity-nginx v1.0.4 (rules loaded inline/local/remote: 0/10/0)
+2025/07/11 18:15:48 [notice] 1#1: libmodsecurity3 version 3.0.14
+2025/07/11 18:37:26 [notice] 1#1: ModSecurity-nginx v1.0.4 (rules loaded inline/local/remote: 0/10/0)
+2025/07/11 18:37:26 [notice] 1#1: libmodsecurity3 version 3.0.14
+2025/07/11 18:55:47 [notice] 1#1: ModSecurity-nginx v1.0.4 (rules loaded inline/local/remote: 0/10/0)
+2025/07/11 18:55:47 [notice] 1#1: libmodsecurity3 version 3.0.14
+2025/07/11 18:57:52 [notice] 1#1: ModSecurity-nginx v1.0.4 (rules loaded inline/local/remote: 0/10/0)
+2025/07/11 18:57:52 [notice] 1#1: libmodsecurity3 version 3.0.14
+2025/07/11 19:13:41 [notice] 1#1: ModSecurity-nginx v1.0.4 (rules loaded inline/local/remote: 0/10/0)
+2025/07/11 19:13:41 [notice] 1#1: libmodsecurity3 version 3.0.14
+2025/07/12 09:44:43 [notice] 1#1: ModSecurity-nginx v1.0.4 (rules loaded inline/local/remote: 0/10/0)
+2025/07/12 09:44:43 [notice] 1#1: libmodsecurity3 version 3.0.14
+2025/07/12 09:45:53 [notice] 1#1: ModSecurity-nginx v1.0.4 (rules loaded inline/local/remote: 0/10/0)
+2025/07/12 09:45:53 [notice] 1#1: libmodsecurity3 version 3.0.14
+2025/07/12 11:06:48 [notice] 1#1: ModSecurity-nginx v1.0.4 (rules loaded inline/local/remote: 0/10/0)
+2025/07/12 11:06:48 [notice] 1#1: libmodsecurity3 version 3.0.14
+2025/07/12 14:12:03 [notice] 1#1: ModSecurity-nginx v1.0.4 (rules loaded inline/local/remote: 0/10/0)
+2025/07/12 14:12:03 [notice] 1#1: libmodsecurity3 version 3.0.14
+2025/07/12 14:29:54 [notice] 1#1: ModSecurity-nginx v1.0.4 (rules loaded inline/local/remote: 0/10/0)
+2025/07/12 14:29:54 [notice] 1#1: libmodsecurity3 version 3.0.14

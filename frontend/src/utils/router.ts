@@ -8,6 +8,8 @@ import { renderSocial } from '../pages/social/social';
 import { renderProfil } from '../pages/social/profil';
 import { renderMultiplayer, initializeMultiplayerEvents } from '../pages/game/multiplayer';
 import { renderLocal, initializeLocalEvents } from '../pages/game/local';
+import { renderTournaments, initializeTournamentEvents } from '../pages/game/tournament';
+
 import { renderBlock } from '../pages/block/main';
 import { renderChangePassword, initializeChangePasswordEvents } from '../pages/auth/change-password';
 import { renderEditProfil, initializeEditProfileEvents } from '../pages/social/edit-profil';
@@ -94,6 +96,9 @@ export async function router() {
     case '/local-game':
       view = renderLocal();
       break;
+    case '/tournament':
+      view = renderTournaments();
+      break;
     case '/block':
       view = renderBlock();
     case '/game':
@@ -139,6 +144,9 @@ export async function router() {
         break;
       case '/local-game':
         initializeLocalEvents();
+        break;
+      case '/tournament':
+        initializeTournamentEvents();
         break;
       case '/change-password':
         initializeChangePasswordEvents();
