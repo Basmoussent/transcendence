@@ -145,7 +145,7 @@
         console.log(`🔄 Changement de langue -> ${newHostname}`);
         try {
           const authToken = window.getAuthToken();
-          const response = {"": null};
+          let response;
           if (authToken) {
             response = await fetch('/api/edit/change-language', {
               method: 'POST',

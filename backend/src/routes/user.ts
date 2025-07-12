@@ -225,10 +225,10 @@ async function userRoutes(app: FastifyInstance) {
             });
 
             if (!user) {
-                return reply.status(404).send({ error: 'Utilisateur non trouvé' });
+                return reply.send({ error: 'Utilisateur non trouvé' });
             }
 
-            return reply.send(user.id)
+            return reply.send({username: data.username, user_id: user.id})
         } 
         catch (err: any) {
             console.error('❌ Error in /user/:id endpoint:', err);
