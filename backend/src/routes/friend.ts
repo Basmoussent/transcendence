@@ -11,29 +11,27 @@ interface Relation {
 
 async function friendRoutes(app: FastifyInstance) {
 
-	app.get('/:userid', async function (request: FastifyRequest, reply: FastifyReply) {
-
-		console.log("récupérer les amis d'un user");
+	app.get('/relation:userid', async function (request: FastifyRequest, reply: FastifyReply) {
 
 		try {
 			const database = db.getDatabase();
 
-			const { userId } = request.params as { userId?: number };
+			const { userid } = request.query as { userid?: number };
 
-			if (!userId)
-				throw new Error ("missing userId in the request body");
+			if (!userid)
+				throw new Error ("missing userid in the request body");
 
 			const relation = await new Promise<Relation[] | null>((resolve, reject) => {
 
 				database.get(
 					'SELECT * FROM friends WHERE user_1 = ? || user_2 = ?',
-					[ userId, userId ],
+					[ userid, userid ],
 					(err: any, row: Relation[] | undefined) => {
 						err ? reject(err) : resolve(row || null); }
 				);
 			});
 			return reply.send({
-				message: `friends du user ${userId}`,
+				message: `friends du user ${userid}`,
 				relation: relation,
 			});
 		}
@@ -43,5 +41,36 @@ async function friendRoutes(app: FastifyInstance) {
 				details: err.message });
 		}
 	});
-	
+
+	app.post('/', async function (request: FastifyRequest<{ Body: Relation }>, reply: FastifyReply) {
+
+		try {
+			const database = db.getDatabase();
+
+			const { user_1, user_2, user1_state, user2_state } = request.body;
+
+			if (!user_1 || !user_2 || !user1_state || !user2_state)
+				throw new Error("missing fields for a new friendship");
+
+			await new Promise<void>((resolve, reject) => {
+
+				database.run(
+					'INSERT INTO friends (user_1, user_2, user1_state, user2_state) VALUES (?, ?, ?, ?)',
+					[ user_1, user_2, user1_state, user2_state ],
+					(err: any, row: Relation[] | undefined) => {
+						err ? reject(err) : resolve(); }
+				);
+			});
+			return reply.send({
+				message: `nouvelle amitie entre ${user_1} et ${user_2}`,
+			});
+		}
+		catch (err: any) {
+			return reply.status(500).send({
+				error: 'erreur POST /friend',
+				details: err.message });
+		}
+	})
 }
+
+export default friendRoutes;

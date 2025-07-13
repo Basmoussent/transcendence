@@ -130,3 +130,7 @@ trouver un moyen de passer les infos a la classe pong lors de la construction
 		appele la route /pong qui appele renderPong qui cree le jeu
 			au moment du new pong() il faut lui passer les datas.
 
+
+
+
+faire le middle ware comme ca pas besoin de check le header de toutes les requetes
