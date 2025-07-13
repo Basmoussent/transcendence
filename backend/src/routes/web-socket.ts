@@ -314,16 +314,20 @@ function broadcastSystemMessageChat(content: string) {
 	});
 }
 
-function addFriend(user: string, friend: string) {
-	// 1 - check si le user n'est pas déjà amis
+async function addFriend(user: string, friend: string) {
+	// 1 - check que le user exist
+	const friendId = await retrieveUserId(friend);
+	if (friendId === -1)
+		
 
-	checkFriendshipState()
 
 
 
-	// 2 - check que l'un des deux n'a pas bloqué l'autre
-	// 3 - check que l'invitation n'a pas déjà été faites et un des deux doit accepter
-	// 4 - envoyer une demande + creer l'instance dans db friends avec userid des deux personnes
+	checkFriendshipState(user, friend);
+	// 2 - check si le user n'est pas déjà amis
+	// 3 - check que l'un des deux n'a pas bloqué l'autre
+	// 4 - check que l'invitation n'a pas déjà été faites et un des deux doit accepter
+	// 5 - envoyer une demande + creer l'instance dans db friends avec userid des deux personnes
 	//	 |__ update l'état, qui a ajouté qui
 
 	// send au user le statut de la demande
@@ -331,6 +335,31 @@ function addFriend(user: string, friend: string) {
 
 	// dans update UI livechat -- onglet demandes
 	// on passe sur tous les friends du user et afficher seulement les instances ou le state de l'autre user est à `asking`
+
+}
+
+async function retrieveUserId(user: string): Promise<number> {
+
+	try {
+		const response = await fetch(`/api/user/username?username=${user}`, {
+			method: 'GET',
+			headers: {
+				'Content-Type': 'application/json',
+				'x-access-token': token
+			}
+		});
+
+		if (response.ok) {
+			const result = await response.json();
+			return (result.data.id);
+		}
+		else
+			console.error('fetchuserinfo failed');
+	}
+	catch (error) {
+		console.error('fetchuserinfo failed: ', error);
+	}
+	return (-1);
 
 }
 

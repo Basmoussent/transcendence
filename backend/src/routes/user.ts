@@ -237,7 +237,37 @@ async function userRoutes(app: FastifyInstance) {
         }
         catch (err: any) {
             return reply.status(500).send({
-                error: 'erreur GET /friend/userId',
+                error: 'erreur GET /user:userId',
+                details: err.message });
+        }
+    })
+
+    app.get('/user/username:username', async function (request: FastifyRequest, reply: FastifyReply) {
+
+        try {
+            const database = db.getDatabase();
+
+            const { username } = request.query as { username?: string };
+
+            if (!username)
+                throw new Error ("missing username in the request body");
+
+            const user = await new Promise<UserData | null>((resolve, reject) => {
+                database.get(
+                    'SELECT * FROM users WHERE username = ?',
+                    [ username ],
+                    (err: any, row: UserData | undefined) => {
+                        err ? reject(err) : resolve(row || null); }
+                );
+            });
+            return reply.send({
+                message: `info du user ${username}`,
+                data: user,
+            });
+        }
+        catch (err: any) {
+            return reply.status(500).send({
+                error: 'erreur GET /user/username:username',
                 details: err.message });
         }
     })
