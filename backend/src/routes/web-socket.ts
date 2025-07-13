@@ -316,6 +316,11 @@ function broadcastSystemMessageChat(content: string) {
 
 function addFriend(user: string, friend: string) {
 	// 1 - check si le user n'est pas déjà amis
+
+	checkFriendshipState()
+
+
+
 	// 2 - check que l'un des deux n'a pas bloqué l'autre
 	// 3 - check que l'invitation n'a pas déjà été faites et un des deux doit accepter
 	// 4 - envoyer une demande + creer l'instance dans db friends avec userid des deux personnes
