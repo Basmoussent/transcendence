@@ -224,15 +224,17 @@ async function webSocketRoutes(app: FastifyInstance) {
 			socket: socket,	}
 
 		live.set(user.username, user);
+		// dire a tous ceux dont user.username est ami d'update leur UI
 
 		socket.on('message', (message: string) => {
 			try {
 				const data = JSON.parse(message);
 
-				console.log()
+				const sender = live.get(username)!;
 
 				switch (data.type) {
-					case 'new_message':
+					case 'chat_message':
+						sendChatMessage(username, data)
 						break;
 
 					default:
@@ -281,6 +283,31 @@ function broadcastSystemMessage(room: Room, content: string) {
 	room.users.forEach(user => {
 		if (user.socket.readyState === WebSocket.OPEN)
 			user.socket.send(message); });
+}
+
+function sendChatMessage(username: string, data: any) {
+
+	// check que le destinataire fait partie de sa liste d'amis 
+
+	const message = JSON.stringify({
+		type: 'chat_message',
+		username: username,
+		message: data.message,
+	});
+	// envoie au destinataire
+	live.get(data.dest)?.socket.send(message);
+}
+
+function broadcastSystemMessageChat(content: string) {
+	const message = JSON.stringify({
+		type: 'system_message',
+		content: content
+	});
+	live.forEach(user => {
+		if (user.socket.readyState === WebSocket.OPEN) {
+			user.socket.send(message);
+		}
+	});
 }
 
 export default webSocketRoutes;
