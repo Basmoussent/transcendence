@@ -23,98 +23,98 @@ export function renderChat() {
 const getTemplate = () => {
 	return `
 	<button class="home-button" id="homeBtn">
-        <i class="fas fa-home"></i>
-        Accueil
-    </button>
+	<i class="fas fa-home"></i>
+	Accueil
+	</button>
 
-    <div class="flex-1 flex gap-6 p-6 pt-20">
-        <!-- Left Panel - Liste des amis -->
-        <div class="w-1/3 bg-white/10 backdrop-blur-lg rounded-xl p-6 border border-white/20 shadow-lg">
-            <h1 class="text-2xl font-bold text-white mb-6">
-                <i class="fas fa-users mr-2"></i>
-                Mes Amis
-            </h1>
+	<div class="flex-1 flex gap-6 p-6 pt-20">
+	<!-- Left Panel - Liste des amis -->
+	<div class="w-1/3 bg-white/10 backdrop-blur-lg rounded-xl p-6 border border-white/20 shadow-lg">
+		<h1 class="text-2xl font-bold text-white mb-6">
+		<i class="fas fa-users mr-2"></i>
+		Mes Amis
+		</h1>
 
-            <!-- Barre de recherche -->
-            <div class="search-bar">
-                <i class="fas fa-search search-icon"></i>
-                <input type="text" class="search-input" id="searchInput" placeholder="Rechercher un ami...">
-            </div>
+		<!-- Barre de recherche -->
+		<div class="search-bar">
+		<i class="fas fa-search search-icon"></i>
+		<input type="text" class="search-input" id="searchInput" placeholder="Rechercher un ami...">
+		</div>
 
-            <!-- Onglets -->
-            <div class="tabs">
-                <div class="tab active" data-tab="friends">
-                    <i class="fas fa-user-friends mr-2"></i>
-                    Amis (<span id="friendsCount">5</span>)
-                </div>
-                <div class="tab" data-tab="requests">
-                    <i class="fas fa-user-plus mr-2"></i>
-                    Demandes (<span id="requestsCount">2</span>)
-                </div>
-                <div class="tab" data-tab="add">
-                    <i class="fas fa-plus mr-2"></i>
-                    Ajouter
-                </div>
-            </div>
+		<!-- Onglets -->
+		<div class="tabs">
+		<div class="tab active" data-tab="friends">
+			<i class="fas fa-user-friends mr-2"></i>
+			Amis (<span id="friendsCount">5</span>)
+		</div>
+		<div class="tab" data-tab="requests">
+			<i class="fas fa-user-plus mr-2"></i>
+			Demandes (<span id="requestsCount">2</span>)
+		</div>
+		<div class="tab" data-tab="add">
+			<i class="fas fa-plus mr-2"></i>
+			Ajouter
+		</div>
+		</div>
 
-            <!-- Contenu des onglets -->
-            <div class="tab-content">
-                <!-- Liste des amis -->
-                <div id="friendsTab" class="tab-pane active">
-                    <div class="friends-list" id="friendsList">
-                        <!-- Les amis seront ajoutés ici dynamiquement -->
-                    </div>
-                </div>
+		<!-- Contenu des onglets -->
+		<div class="tab-content">
+		<!-- Liste des amis -->
+		<div id="friendsTab" class="tab-pane active">
+			<div class="friends-list" id="friendsList">
+			<!-- Les amis seront ajoutés ici dynamiquement -->
+			</div>
+		</div>
 
-                <!-- Demandes d'amis -->
-                <div id="requestsTab" class="tab-pane hidden">
-                    <div class="friends-list" id="requestsList">
-                        <!-- Les demandes seront ajoutées ici dynamiquement -->
-                    </div>
-                </div>
+		<!-- Demandes d'amis -->
+		<div id="requestsTab" class="tab-pane hidden">
+			<div class="friends-list" id="requestsList">
+			<!-- Les demandes seront ajoutées ici dynamiquement -->
+			</div>
+		</div>
 
-                <!-- Ajouter un ami -->
-                <div id="addTab" class="tab-pane hidden">
-                    <div class="add-friend-form">
-                        <h3 class="text-white mb-4">Ajouter un nouvel ami</h3>
-                        <input type="text" class="add-friend-input" id="friendUsernameInput" placeholder="Nom d'utilisateur">
-                        <button class="add-friend-btn" id="addFriendBtn">
-                            <i class="fas fa-plus mr-2"></i>
-                            Envoyer une demande
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
+		<!-- Ajouter un ami -->
+		<div id="addTab" class="tab-pane hidden">
+			<div class="add-friend-form">
+			<h3 class="text-white mb-4">Ajouter un nouvel ami</h3>
+			<input type="text" class="add-friend-input" id="friendUsernameInput" placeholder="Nom d'utilisateur">
+			<button class="add-friend-btn" id="addFriendBtn">
+				<i class="fas fa-plus mr-2"></i>
+				Envoyer une demande
+			</button>
+			</div>
+		</div>
+		</div>
+	</div>
 
-        <!-- Right Panel - Chat -->
-        <div class="w-2/3 bg-white/10 backdrop-blur-lg rounded-xl p-6 border border-white/20 shadow-lg flex flex-col">
-            <div id="noChatSelected" class="empty-state">
-                <i class="fas fa-comments"></i>
-                <h3>Sélectionnez un ami pour commencer à chatter</h3>
-            </div>
+	<!-- Right Panel - Chat -->
+	<div class="w-2/3 bg-white/10 backdrop-blur-lg rounded-xl p-6 border border-white/20 shadow-lg flex flex-col">
+		<div id="noChatSelected" class="empty-state">
+		<i class="fas fa-comments"></i>
+		<h3>Sélectionnez un ami pour commencer à chatter</h3>
+		</div>
 
-            <div id="chatContainer" class="chat-container hidden">
-                <!-- En-tête du chat -->
-                <div class="chat-header" id="chatHeader">
-                    <!-- Sera rempli dynamiquement -->
-                </div>
+		<div id="chatContainer" class="chat-container hidden">
+		<!-- En-tête du chat -->
+		<div class="chat-header" id="chatHeader">
+			<!-- Sera rempli dynamiquement -->
+		</div>
 
-                <!-- Messages du chat -->
-                <div class="chat-messages flex-1" id="chatMessages">
-                    <!-- Les messages seront ajoutés ici dynamiquement -->
-                </div>
+		<!-- Messages du chat -->
+		<div class="chat-messages flex-1" id="chatMessages">
+			<!-- Les messages seront ajoutés ici dynamiquement -->
+		</div>
 
-                <!-- Zone de saisie -->
-                <div class="chat-input-container">
-                    <input type="text" class="chat-input" id="chatInput" placeholder="Tapez votre message..." maxlength="200">
-                    <button class="send-btn" id="sendBtn">
-                        <i class="fas fa-paper-plane"></i>
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
+		<!-- Zone de saisie -->
+		<div class="chat-input-container">
+			<input type="text" class="chat-input" id="chatInput" placeholder="Tapez votre message..." maxlength="200">
+			<button class="send-btn" id="sendBtn">
+			<i class="fas fa-paper-plane"></i>
+			</button>
+		</div>
+		</div>
+	</div>
+	</div>
 
 <style>
         body {

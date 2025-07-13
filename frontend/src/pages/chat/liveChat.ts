@@ -1,11 +1,13 @@
+import { escape } from 'querystring';
 import { sanitizeHtml } from '../../utils/sanitizer';
+import { fetchUserInfo } from './utils';
 
-interface UserChat {
+export interface UserChat {
 	username: string;
 	userId: number;
 	email: string;
 	avatar_url: string;
-	receiver: string; 
+	receiver?: string; 
 }
 
 export class Chat {
@@ -32,12 +34,18 @@ export class Chat {
 	private chatInput: HTMLInputElement;
 	private sendBtn: HTMLButtonElement;
 
-	private receiver?: string;
+	private me: UserChat | null = null;
 
+	private receiver?: string;
 
 	constructor(username: string) {
 
 		this.username = username
+
+		this.loadMe();
+
+		
+
 
 		this.ws = new WebSocket(`${window.location.protocol === "https:" ? "wss" : "ws"}://${window.location.host}/api/chat`);
 
