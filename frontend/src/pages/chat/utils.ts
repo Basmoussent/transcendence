@@ -1,8 +1,8 @@
-import { UserChat } from './liveChat'
+import { Chat, UserChat } from './liveChat';
 import { getAuthToken } from '../../utils/auth';
 import { sanitizeHtml } from '../../utils/sanitizer';
 
-export async function fetchUserInfo(): Promise<UserChat|void> {
+export async function fetchUserInfo(): Promise<UserChat | void> {
 
 	try {
 		const token = getAuthToken();
@@ -13,15 +13,14 @@ export async function fetchUserInfo(): Promise<UserChat|void> {
 			return;
 		}
 
-		// si token existe pas la faut chercher dans les cookies ?? comme pour la room 
-
 		const response = await fetch('/api/me', {
 			method: 'GET',
 			headers: {
 				'Content-Type': 'application/json',
-				'x-access-token': token }
+				'x-access-token': token
+			}
 		});
-	
+
 		if (response.ok) {
 			const result = await response.json();
 			const tmp: UserChat = {
@@ -30,15 +29,23 @@ export async function fetchUserInfo(): Promise<UserChat|void> {
 				avatar_url: sanitizeHtml(result.user?.avatar_url) || 'avatar.png',
 				userId: Number(sanitizeHtml(result.user?.id)) || 0,
 				receiver: 'null'
-				
+
 			};
-			console.log(`me i am ${tmp}`);
+			// console.log(`dans le bueno for real voici mes infos ${tmp.userId}, ${tmp.username}`)
 			return (tmp);
 		}
-		else 
+		else
 			console.error('fetchuserinfo failed');
 	}
 	catch (error) {
-		console.error('fetchuserinfo failed: ', error); }
+		console.error('fetchuserinfo failed: ', error);
+	}
 
+}
+
+export async function loadMe(chatInstance: Chat) {
+	const me = await fetchUserInfo();
+	if (me) {
+		chatInstance['me'] = me;
+	}
 }

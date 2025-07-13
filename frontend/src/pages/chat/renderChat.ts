@@ -8,9 +8,7 @@ export function renderChat() {
 
 	setTimeout(async () => {
 		try {
-			const username = await fetchUsername();
-			if (username !== undefined) {
-				const render = new Chat(username);}
+				const render = new Chat();
 		}
 		catch (err:any) {
 			console.log(`erreur renderChat ${err}`);

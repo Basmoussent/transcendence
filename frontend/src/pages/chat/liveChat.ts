@@ -1,13 +1,13 @@
 import { escape } from 'querystring';
 import { sanitizeHtml } from '../../utils/sanitizer';
-import { fetchUserInfo } from './utils';
+import { fetchUserInfo, loadMe } from './utils';
 
 export interface UserChat {
 	username: string;
 	userId: number;
 	email: string;
 	avatar_url: string;
-	receiver?: string; 
+	receiver?: string;
 }
 
 export class Chat {
@@ -34,18 +34,16 @@ export class Chat {
 	private chatInput: HTMLInputElement;
 	private sendBtn: HTMLButtonElement;
 
-	private me: UserChat | null = null;
+	private me: UserChat;
 
 	private receiver?: string;
 
-	constructor(username: string) {
-
-		this.username = username
+	constructor() {
 
 		this.loadMe();
 
-		
-
+		if (!this.me?.username)
+			throw new Error(`mgl j'ai pas d'infos ou quoi`)
 
 		this.ws = new WebSocket(`${window.location.protocol === "https:" ? "wss" : "ws"}://${window.location.host}/api/chat`);
 
@@ -73,6 +71,10 @@ export class Chat {
 		this.setupClickEvents();
 	}
 
+	private async loadMe() {
+		await loadMe(this);
+	}
+
 	private getElement(id: string): HTMLElement {
 		const el = document.getElementById(id);
 		if (!el)
@@ -83,15 +85,15 @@ export class Chat {
 	private setupWsEvents() {
 
 		this.ws.onopen = () => {
-			console.log(`${this.username} est connecte au live chat`)
+			console.log(`${this.me.username} est connecte au live chat`)
 		};
 
 		this.ws.onerror = (error) => {
-			console.error(`${this.username} onerror live chat: ${error}`)
+			console.error(`${this.me.username} onerror live chat: ${error}`)
 		};
 
 		this.ws.onclose = (event) => {
-			console.log(`${this.username} part du live chat: ${event.code} ${event.reason}`)
+			console.log(`${this.me.username} part du live chat: ${event.code} ${event.reason}`)
 		};
 
 		this.ws.onmessage = (event) => {
@@ -187,7 +189,7 @@ export class Chat {
 		this.chatContainer.classList.remove('hidden');
 
 		const messageElement = document.createElement('div');
-		const isSent = username === this.username;
+		const isSent = username === this.me.username;
 		messageElement.className = `chat-message ${isSent ? 'sent' : 'received'}`;
 		const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
