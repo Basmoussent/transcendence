@@ -236,6 +236,10 @@ async function webSocketRoutes(app: FastifyInstance) {
 					case 'chat_message':
 						sendChatMessage(username, data)
 						break;
+					
+					case 'friend_request':
+						addFriend(username, friend);
+						break;
 
 					default:
 						console.warn(`recoit un event inconnu`)
@@ -308,6 +312,21 @@ function broadcastSystemMessageChat(content: string) {
 			user.socket.send(message);
 		}
 	});
+}
+
+function addFriend(user: string, friend: string) {
+	// 1 - check si le user n'est pas déjà amis
+	// 2 - check que l'un des deux n'a pas bloqué l'autre
+	// 3 - check que l'invitation n'a pas déjà été faites et un des deux doit accepter
+	// 4 - envoyer une demande + creer l'instance dans db friends avec userid des deux personnes
+	//	 |__ update l'état, qui a ajouté qui
+
+	// send au user le statut de la demande
+	// send au friend l'invitation 
+
+	// dans update UI livechat -- onglet demandes
+	// on passe sur tous les friends du user et afficher seulement les instances ou le state de l'autre user est à `asking`
+
 }
 
 export default webSocketRoutes;

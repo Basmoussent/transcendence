@@ -13,21 +13,26 @@ export class Chat {
 	private username: string;
 	private ws: WebSocket;
 
+	// Left Panel
 	private homeBtn: HTMLButtonElement;
 	private searchInput: HTMLInputElement;
-	private conversationsList: HTMLElement;
+	private friendsList: HTMLElement;
+	private requestsList: HTMLElement;
+	private addFriendBtn: HTMLButtonElement;
+	private friendUsernameInput: HTMLInputElement;
+	private friendsCount: HTMLElement;
+	private requestsCount: HTMLElement;
+	private tabs: NodeListOf<HTMLElement>;
+
+	// Right Panel
+	private noChatSelected: HTMLElement;
+	private chatContainer: HTMLElement;
 	private chatHeader: HTMLElement;
-	private chatAvatar: HTMLElement;
-	private chatName: HTMLElement;
-	private statusDot: HTMLElement;
-	private statusText: HTMLElement;
 	private chatMessages: HTMLElement;
-	private emptyChat: HTMLElement;
-	private messageInputContainer: HTMLElement;
-	private messageInput: HTMLInputElement;
+	private chatInput: HTMLInputElement;
 	private sendBtn: HTMLButtonElement;
-	private receiver?: string; // le chat actuel de la personne
-				// donc si un msg est envoyé de ce user ce sera à destination de receiver
+
+	private receiver?: string;
 
 
 	constructor(username: string) {
@@ -36,21 +41,26 @@ export class Chat {
 
 		this.ws = new WebSocket(`${window.location.protocol === "https:" ? "wss" : "ws"}://${window.location.host}/api/chat`);
 
+		// Left Panel Elements
 		this.homeBtn = this.getElement('homeBtn') as HTMLButtonElement;
 		this.searchInput = this.getElement('searchInput') as HTMLInputElement;
-		this.conversationsList = this.getElement('conversationsList');
+		this.friendsList = this.getElement('friendsList');
+		this.requestsList = this.getElement('requestsList');
+		this.addFriendBtn = this.getElement('addFriendBtn') as HTMLButtonElement;
+		this.friendUsernameInput = this.getElement('friendUsernameInput') as HTMLInputElement;
+		this.friendsCount = this.getElement('friendsCount');
+		this.requestsCount = this.getElement('requestsCount');
+		this.tabs = document.querySelectorAll('.tab');
+
+		// Right Panel Elements
+		this.noChatSelected = this.getElement('noChatSelected');
+		this.chatContainer = this.getElement('chatContainer');
 		this.chatHeader = this.getElement('chatHeader');
-		this.chatAvatar = this.getElement('chatAvatar');
-		this.chatName = this.getElement('chatName');
-		this.statusDot = this.getElement('statusDot');
-		this.statusText = this.getElement('statusText');
 		this.chatMessages = this.getElement('chatMessages');
-		this.emptyChat = this.getElement('emptyChat');
-		this.messageInputContainer = this.getElement('messageInputContainer');
-		this.messageInput = this.getElement('messageInput') as HTMLInputElement;
+		this.chatInput = this.getElement('chatInput') as HTMLInputElement;
 		this.sendBtn = this.getElement('sendBtn') as HTMLButtonElement;
 
-		this.messageInput.focus();
+		this.chatInput.focus();
 		this.setupWsEvents();
 		this.setupClickEvents();
 	}
@@ -65,21 +75,25 @@ export class Chat {
 	private setupWsEvents() {
 
 		this.ws.onopen = () => {
-			console.log(`${this.username} est connecte au live chat`)};
+			console.log(`${this.username} est connecte au live chat`)
+		};
 
 		this.ws.onerror = (error) => {
-			console.error(`${this.username} onerror live chat: ${error}`)};
+			console.error(`${this.username} onerror live chat: ${error}`)
+		};
 
 		this.ws.onclose = (event) => {
-			console.log(`${this.username} part du live chat: ${event.code} ${event.reason}`)};
-		
+			console.log(`${this.username} part du live chat: ${event.code} ${event.reason}`)
+		};
+
 		this.ws.onmessage = (event) => {
 			try {
 				const data = JSON.parse(event.data);
 				this.handleEvent(data);
 			}
 			catch (error) {
-				console.error("Error JSON.parse onmessage:", error); }
+				console.error("Error JSON.parse onmessage:", error);
+			}
 		};
 	}
 
@@ -102,7 +116,7 @@ export class Chat {
 
 	private setupClickEvents() {
 		this.sendBtn.addEventListener('click', () => this.sendChatMessage());
-		this.messageInput.addEventListener('keypress', (e) => {
+		this.chatInput.addEventListener('keypress', (e) => {
 			if (e.key === 'Enter') {
 				e.preventDefault();
 				this.sendChatMessage();
@@ -112,30 +126,66 @@ export class Chat {
 			window.history.pushState({}, '', '/main');
 			window.dispatchEvent(new Event('popstate'));
 		});
+
+		this.tabs.forEach(tab => {
+			tab.addEventListener('click', () => {
+				const tabName = tab.dataset.tab;
+				if (!tabName) return;
+
+				this.tabs.forEach(t => t.classList.remove('active'));
+				tab.classList.add('active');
+
+				document.querySelectorAll('.tab-pane').forEach(pane => {
+					const htmlPane = pane as HTMLElement;
+					if (htmlPane.id === `${tabName}Tab`) {
+						htmlPane.classList.remove('hidden');
+					} else {
+						htmlPane.classList.add('hidden');
+					}
+				});
+			});
+		});
+
+		this.addFriendBtn.addEventListener('click', () => this.sendFriendRequest());
+	}
+
+	private sendFriendRequest() {
+		const friendUsername = this.friendUsernameInput.value.trim();
+		if (friendUsername && this.ws.readyState === WebSocket.OPEN) {
+			this.ws.send(JSON.stringify({
+				type: 'friend_request',
+				recipient: friendUsername
+			}));
+			this.friendUsernameInput.value = '';
+			// Optionally, provide user feedback here
+		}
 	}
 
 	private sendChatMessage() {
-		const message = this.messageInput.value.trim();
+		const message = this.chatInput.value.trim();
 		if (message && this.ws.readyState === WebSocket.OPEN) {
 			this.ws.send(JSON.stringify({
 				type: 'chat_message',
 				dest: this.receiver,
 				content: message
 			}));
-			this.messageInput.value = '';
+			this.chatInput.value = '';
 		}
 	}
 
 	private addChatMessage(username: string, message: string) {
-		this.emptyChat.style.display = 'none';
+		this.noChatSelected.style.display = 'none';
+		this.chatContainer.style.display = 'flex';
+		this.chatContainer.classList.remove('hidden');
+
 		const messageElement = document.createElement('div');
 		const isSent = username === this.username;
-		messageElement.className = isSent ? 'message sent' : 'message received';
+		messageElement.className = `chat-message ${isSent ? 'sent' : 'received'}`;
 		const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
 		messageElement.innerHTML = `
-			<div class="message-content">${sanitizeHtml(message)}</div>
-			<div class="message-time">${time}</div>
+			<div class="chat-message-content">${sanitizeHtml(message)}</div>
+			<div class="chat-message-time">${time}</div>
 		`;
 		this.chatMessages.appendChild(messageElement);
 		this.chatMessages.scrollTop = this.chatMessages.scrollHeight;
@@ -150,17 +200,58 @@ export class Chat {
 	}
 
 	private updateFriendList(users: UserChat[]) {
-
-		this.conversationsList.innerHTML = '';
+		this.friendsList.innerHTML = '';
+		this.friendsCount.textContent = users.length.toString();
 		users.forEach(user => {
 			const conversationElement = document.createElement('div');
-			conversationElement.className = 'conversation-item';
+			conversationElement.className = 'friend-card online flex items-center';
+			conversationElement.dataset.username = user.username;
 			conversationElement.innerHTML = `
-				<div class="conversation-avatar">${user.username.charAt(0).toUpperCase()}</div>
-				<div class="conversation-name">${sanitizeHtml(user.username)}</div>
-				<div class="conversation-preview">En ligne</div>
+				<div class="friend-avatar">
+                    ${user.username.charAt(0).toUpperCase()}
+                    <div class="status-dot online"></div>
+                </div>
+                <div class="friend-info">
+                    <div class="friend-name">${sanitizeHtml(user.username)}</div>
+                    <div class="friend-status">En ligne</div>
+                </div>
+                <div class="friend-actions">
+                    <button class="action-btn chat-btn">
+                        <i class="fas fa-comment-dots"></i>
+                    </button>
+                </div>
 			`;
-			this.conversationsList.appendChild(conversationElement);
+			this.friendsList.appendChild(conversationElement);
+			conversationElement.addEventListener('click', () => this.startChatWith(user));
 		});
+	}
+
+	private startChatWith(user: UserChat) {
+		
+		this.receiver = user.username;
+		this.noChatSelected.style.display = 'none';
+		this.chatContainer.style.display = 'flex';
+		this.chatContainer.classList.remove('hidden');
+
+		this.chatHeader.innerHTML = `
+		<div class="friend-avatar">
+			${user.username.charAt(0).toUpperCase()}
+			<div class="status-dot online"></div>
+		</div>
+		<div class="chat-header-info">
+			<h3>${sanitizeHtml(user.username)}</h3>
+			<p>En ligne</p>
+		</div>
+		<button class="close-chat-btn ml-auto">
+			<i class="fas fa-times"></i>
+		</button>
+		`;
+
+		this.chatMessages.innerHTML = '';
+
+		this.ws.send(JSON.stringify({
+		type: 'fetch_history',
+		with_user: user.username
+		}));
 	}
 }
