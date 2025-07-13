@@ -238,7 +238,7 @@ async function webSocketRoutes(app: FastifyInstance) {
 						break;
 					
 					case 'friend_request':
-						addFriend(username, friend);
+						addFriend(username, data.dest);
 						break;
 
 					default:

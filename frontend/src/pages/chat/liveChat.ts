@@ -34,16 +34,18 @@ export class Chat {
 	private chatInput: HTMLInputElement;
 	private sendBtn: HTMLButtonElement;
 
-	private me: UserChat;
+	private me: UserChat = {
+			username: "tmp",
+			email: "mefaispaschier@gmail.com",
+			avatar_url: "pitie",
+			userId: 3
+		};
 
 	private receiver?: string;
 
 	constructor() {
 
 		this.loadMe();
-
-		if (!this.me?.username)
-			throw new Error(`mgl j'ai pas d'infos ou quoi`)
 
 		this.ws = new WebSocket(`${window.location.protocol === "https:" ? "wss" : "ws"}://${window.location.host}/api/chat`);
 
@@ -164,7 +166,7 @@ export class Chat {
 		if (friendUsername && this.ws.readyState === WebSocket.OPEN) {
 			this.ws.send(JSON.stringify({
 				type: 'friend_request',
-				recipient: friendUsername
+				dest: friendUsername
 			}));
 			this.friendUsernameInput.value = '';
 			// Optionally, provide user feedback here
