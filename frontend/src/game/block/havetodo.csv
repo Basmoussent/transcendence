@@ -121,3 +121,12 @@ pour pong ajouter card ia pour chaque ia presente
 Error: SQLITE_CONSTRAINT: UNIQUE constraint failed: users.email
 [ERROR] 20:34:13 Error: SQLITE_CONSTRAINT: UNIQUE constraint failed: users.email
 ^C%
+
+
+trouver un moyen de passer les infos a la classe pong lors de la construction 
+	|
+	|__ un window.history.pushState({}, '', '/pong');
+
+		appele la route /pong qui appele renderPong qui cree le jeu
+			au moment du new pong() il faut lui passer les datas.
+

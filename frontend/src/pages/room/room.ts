@@ -119,7 +119,7 @@ export class Room {
 	}
 
 	private handleEvent(data: any) {
-		console.log(`ws event : ${data.type}`)
+		console.log(`room ws event : ${data.type}`)
 		switch (data.type) {
 
 			case 'room_update':

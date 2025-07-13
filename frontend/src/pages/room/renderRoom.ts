@@ -22,9 +22,27 @@ interface RoomData {
 	host: string;
 }
 
+export function renderRoom(uuid: string) {
+
+	setTimeout(async () => {
+		try {
+
+			const username = await fetchUsername();
+			if (username !== undefined) {
+				const render = new Room(username, uuid);
+			}
+		}
+		catch (err:any) {
+			console.log(err);
+		}
+	}, 0);
+	
+	return getTemplate();
+}
+
+
 const getTemplate = () => {
 	return `
-
 		<button class="home-button" id="homeBtn">
 			<i class="fas fa-home"></i>
 			Home
@@ -494,21 +512,3 @@ const getTemplate = () => {
 	</style>`;
 };
 
-export function renderRoom(uuid: string) {
-
-
-	setTimeout(async () => {
-		try {
-
-			const username = await fetchUsername();
-			if (username !== undefined) {
-				const render = new Room(username, uuid);
-			}
-		}
-		catch (err:any) {
-			console.log(err);
-		}
-	}, 0);
-	
-	return getTemplate();
-}

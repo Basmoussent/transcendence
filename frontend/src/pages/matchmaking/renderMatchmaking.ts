@@ -2,9 +2,32 @@ import { Available, loadAvailableGames, matchmaking,  } from "./matchmaking";
 import { getAuthToken } from '../../utils/auth';
 import { sanitizeHtml } from '../../utils/sanitizer';
 
+export function renderMatchmaking() {
 
+	setTimeout(async () => {
+		console.log('Initializing matchmaking page');
+		try {
+			const gameList = await loadAvailableGames();
 
-	// <div class="flex gap-12 h-screen justify-center items-center px-8" id=options-container>
+			if (gameList === -1) {
+				return ;
+			}
+			const inject = await gamesToDiv(gameList);
+			
+			const container = document.getElementById('available-games');
+
+			if (container && typeof inject === 'string') {
+				container.innerHTML = inject;
+			}
+			const render = new matchmaking();
+		}
+		catch (err:any) {
+			console.log(err);
+		}
+	}, 0);
+	return getTemplate();
+}
+
 const getTemplate = () => {
 	return `
 	<div class="flex gap-12 h-screen justify-center items-center px-8" id="options-container">
@@ -366,33 +389,3 @@ async function gamesToDiv(games:Available[]): Promise<string> {
 	console.log("available games div: ", tmp);
 	return tmp;
 }
-
-export function renderMatchmaking() {
-
-	setTimeout(async () => {
-		console.log('Initializing matchmaking page');
-		try {
-			const gameList = await loadAvailableGames();
-
-			if (gameList === -1) {
-				return ;
-			}
-			const inject = await gamesToDiv(gameList);
-			
-			const container = document.getElementById('available-games');
-
-			if (container && typeof inject === 'string') {
-				container.innerHTML = inject;
-			}
-			const render = new matchmaking();
-		}
-		catch (err:any) {
-			console.log(err);
-		}
-	}, 0);
-
-	return getTemplate();
-
-}
-
-

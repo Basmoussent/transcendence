@@ -7,6 +7,14 @@ interface User {
 	socket: WebSocket;
 }
 
+interface UserChat {
+	username: string;
+	userId: number;
+	email: string;
+	avatar_url: string;
+	socket: WebSocket;
+}
+
 interface Room {
 	id: string;
 	name: string;
@@ -19,26 +27,13 @@ interface Room {
 }
 
 const rooms = new Map<string, Room>();
+const live = new Map<string, UserChat>();
 
 async function webSocketRoutes(app: FastifyInstance) {
 
 	const dict = new Map();
 
 	dict.set("clients", [])
-	dict.set("test", [])
-
-
-	app.get('/ws', { websocket: true }, (socket: any , req: FastifyRequest) => {
-
-		dict.get("test").push(socket)
-		console.log("a user just connected on /ws");
-		socket.on('message', (message: any) => {
-			dict.get("test").forEach((client: any) => {
-				if (client !== socket)
-					client.send(message.toString())
-			})
-		})
-	});
 
 	app.get('/matchmaking', { websocket: true }, (socket: any , req: FastifyRequest) => {
 
@@ -61,11 +56,7 @@ async function webSocketRoutes(app: FastifyInstance) {
 
 	app.get('/room/:uuid', { websocket: true }, (socket: WebSocket, req: FastifyRequest) => {
 
-		let token = req.headers['x-access-token'] as string;
-        
-		if (!token) {
-			token = req.cookies['x-access-token'];
-		}
+		const token = req.headers['x-access-token'] ? req.headers['x-access-token'] : req.cookies['x-access-token']; 
 		
 		if (!token) {
 			socket.send(JSON.stringify({
@@ -78,8 +69,6 @@ async function webSocketRoutes(app: FastifyInstance) {
 		const username = decoded.name;
 
 		const { uuid } = req.params as { uuid: string };
-
-		// recup le bon usernam en faisant un appel /api/me ?
 
 		let room = rooms.get(uuid);
 
@@ -98,7 +87,7 @@ async function webSocketRoutes(app: FastifyInstance) {
 			rooms.set(uuid, room);
 		}
 
-		if (room.users.size >= room.maxPlayers) {
+		if (room.users.size >= room.maxPlayers + room.ai) {
 			socket.send(JSON.stringify({
 				type: 'error',
 				message: 'Room is full' }));
@@ -211,6 +200,55 @@ async function webSocketRoutes(app: FastifyInstance) {
 			}
 		});
 	});
+
+	app.get('/chat', { websocket: true }, (socket: WebSocket, req: FastifyRequest) => {
+
+		const token = req.headers['x-access-token'] ? req.headers['x-access-token'] : req.cookies['x-access-token']; 
+
+		if (!token) {
+			socket.send(JSON.stringify({
+				type: 'notLog',
+				message: 'the user is not log' }))
+			return ;
+		}
+
+		const decoded = app.jwt.verify(token) as { user: string };
+		const username = decoded.name;
+
+		// remplir avec les vraies infos /api/me
+		const user: UserChat = {
+			username: username,
+			userId: 0,
+			email: "talan",
+			avatar_url: "/api/uploads/fetiche.png",
+			socket: socket,	}
+
+		live.set(user.username, user);
+
+		socket.on('message', (message: string) => {
+			try {
+				const data = JSON.parse(message);
+
+				console.log()
+
+				switch (data.type) {
+					case 'new_message':
+						break;
+
+					default:
+						console.warn(`recoit un event inconnu`)
+				}
+			} catch (error) {
+				console.error('Invalid message format:', error);
+			}
+		});
+
+		socket.on('close', () => {
+			
+			live.delete(username);
+		});
+
+	})
 }
 
 function broadcastRoomUpdate(room: Room) {
