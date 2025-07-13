@@ -23,485 +23,553 @@ export function renderChat() {
 const getTemplate = () => {
 	return `
 	<button class="home-button" id="homeBtn">
-		<i class="fas fa-home"></i>
-		Home
-	</button>
+        <i class="fas fa-home"></i>
+        Accueil
+    </button>
 
-	<div class="main-container">
-		<!-- Panel de gauche - Liste des conversations -->
-		<div class="conversations-panel">
-			<div class="conversations-header">
-				<h2>Messages</h2>
-				<input type="text" class="search-bar" placeholder="Rechercher..." id="searchInput">
-			</div>
-			<div class="conversations-list" id="conversationsList">
-				<!-- Les conversations seront ajoutées ici dynamiquement -->
-			</div>
-		</div>
+    <div class="flex-1 flex gap-6 p-6 pt-20">
+        <!-- Left Panel - Liste des amis -->
+        <div class="w-1/3 bg-white/10 backdrop-blur-lg rounded-xl p-6 border border-white/20 shadow-lg">
+            <h1 class="text-2xl font-bold text-white mb-6">
+                <i class="fas fa-users mr-2"></i>
+                Mes Amis
+            </h1>
 
-		<!-- Panel central - Conversation active -->
-		<div class="chat-panel">
-			<div class="chat-header" id="chatHeader" style="display: none;">
-				<div class="chat-header-avatar" id="chatAvatar">A</div>
-					<div class="chat-header-info">
-					<h3 id="chatName">Alice Martin</h3>
-					<div class="chat-header-status">
-						<span class="status-dot" id="statusDot"></span>
-						<span id="statusText">En ligne</span>
-					</div>
-				</div>
-			</div>
-			
-			<div class="chat-messages" id="chatMessages">
-				<div class="empty-chat" id="emptyChat">
-					<i class="fas fa-comments"></i>
-					<h3>Sélectionnez une conversation</h3>
-					<p>Choisissez une conversation pour commencer à discuter</p>
-				</div>
-			</div>
-			
-			<div class="message-input-container" id="messageInputContainer" style="display: none;">
-				<textarea class="message-input" id="messageInput" placeholder="Tapez votre message..." rows="1"></textarea>
-				<button class="send-btn" id="sendBtn">
-					<i class="fas fa-paper-plane"></i>
-				</button>
-			</div>
-		</div>
-	</div>
+            <!-- Barre de recherche -->
+            <div class="search-bar">
+                <i class="fas fa-search search-icon"></i>
+                <input type="text" class="search-input" id="searchInput" placeholder="Rechercher un ami...">
+            </div>
+
+            <!-- Onglets -->
+            <div class="tabs">
+                <div class="tab active" data-tab="friends">
+                    <i class="fas fa-user-friends mr-2"></i>
+                    Amis (<span id="friendsCount">5</span>)
+                </div>
+                <div class="tab" data-tab="requests">
+                    <i class="fas fa-user-plus mr-2"></i>
+                    Demandes (<span id="requestsCount">2</span>)
+                </div>
+                <div class="tab" data-tab="add">
+                    <i class="fas fa-plus mr-2"></i>
+                    Ajouter
+                </div>
+            </div>
+
+            <!-- Contenu des onglets -->
+            <div class="tab-content">
+                <!-- Liste des amis -->
+                <div id="friendsTab" class="tab-pane active">
+                    <div class="friends-list" id="friendsList">
+                        <!-- Les amis seront ajoutés ici dynamiquement -->
+                    </div>
+                </div>
+
+                <!-- Demandes d'amis -->
+                <div id="requestsTab" class="tab-pane hidden">
+                    <div class="friends-list" id="requestsList">
+                        <!-- Les demandes seront ajoutées ici dynamiquement -->
+                    </div>
+                </div>
+
+                <!-- Ajouter un ami -->
+                <div id="addTab" class="tab-pane hidden">
+                    <div class="add-friend-form">
+                        <h3 class="text-white mb-4">Ajouter un nouvel ami</h3>
+                        <input type="text" class="add-friend-input" id="friendUsernameInput" placeholder="Nom d'utilisateur">
+                        <button class="add-friend-btn" id="addFriendBtn">
+                            <i class="fas fa-plus mr-2"></i>
+                            Envoyer une demande
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Panel - Chat -->
+        <div class="w-2/3 bg-white/10 backdrop-blur-lg rounded-xl p-6 border border-white/20 shadow-lg flex flex-col">
+            <div id="noChatSelected" class="empty-state">
+                <i class="fas fa-comments"></i>
+                <h3>Sélectionnez un ami pour commencer à chatter</h3>
+            </div>
+
+            <div id="chatContainer" class="chat-container hidden">
+                <!-- En-tête du chat -->
+                <div class="chat-header" id="chatHeader">
+                    <!-- Sera rempli dynamiquement -->
+                </div>
+
+                <!-- Messages du chat -->
+                <div class="chat-messages flex-1" id="chatMessages">
+                    <!-- Les messages seront ajoutés ici dynamiquement -->
+                </div>
+
+                <!-- Zone de saisie -->
+                <div class="chat-input-container">
+                    <input type="text" class="chat-input" id="chatInput" placeholder="Tapez votre message..." maxlength="200">
+                    <button class="send-btn" id="sendBtn">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
 
 <style>
-	* {
-		margin: 0;
-		padding: 0;
-		box-sizing: border-box;
-        }
-
         body {
-		font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-		background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-		min-height: 100vh;
-		overflow: hidden;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
         }
 
         .home-button {
-		position: fixed;
-		top: 20px;
-		left: 20px;
-		padding: 10px 15px;
-		font-size: 1em;
-		border: none;
-		border-radius: 10px;
-		background: rgba(255, 255, 255, 0.1);
-		color: white;
-		display: flex;
-		align-items: center;
-		gap: 8px;
-		cursor: pointer;
-		transition: all 0.3s ease;
-		z-index: 100;
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            padding: 10px 15px;
+            font-size: 1em;
+            border: none;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 100;
         }
 
         .home-button:hover {
-		background: rgba(255, 255, 255, 0.2);
-		transform: translateY(-2px);
-        }
-
-        .main-container {
-		display: flex;
-		height: 100vh;
-		padding: 20px;
-		padding-top: 80px;
-		gap: 20px;
-        }
-
-        /* Panel de gauche - Liste des conversations */
-        .conversations-panel {
-		width: 300px;
-		background: rgba(255, 255, 255, 0.1);
-		backdrop-filter: blur(10px);
-		border-radius: 15px;
-		border: 1px solid rgba(255, 255, 255, 0.2);
-		box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-		display: flex;
-		flex-direction: column;
-		overflow: hidden;
-        }
-
-        .conversations-header {
-		padding: 20px;
-		border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .conversations-header h2 {
-		color: white;
-		font-size: 1.4em;
-		margin-bottom: 15px;
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
         }
 
         .search-bar {
-		width: 100%;
-		padding: 10px 15px;
-		border: 1px solid rgba(255, 255, 255, 0.2);
-		border-radius: 10px;
-		background: rgba(255, 255, 255, 0.1);
-		color: white;
-		font-size: 0.9em;
+            position: relative;
+            margin-bottom: 20px;
         }
 
-        .search-bar::placeholder {
-		color: rgba(255, 255, 255, 0.5);
+        .search-input {
+            width: 100%;
+            padding: 12px 15px 12px 45px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 0.9em;
+            backdrop-filter: blur(10px);
         }
 
-        .conversations-list {
-		flex: 1;
-		overflow-y: auto;
-		padding: 10px;
+        .search-input::placeholder {
+            color: rgba(255, 255, 255, 0.5);
         }
 
-        .conversation-item {
-		padding: 15px;
-		margin-bottom: 5px;
-		border-radius: 10px;
-		cursor: pointer;
-		transition: all 0.3s ease;
-		border: 1px solid transparent;
-		position: relative;
-		overflow: hidden;
+        .search-icon {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: rgba(255, 255, 255, 0.5);
         }
 
-        .conversation-item:hover {
-		background: rgba(255, 255, 255, 0.1);
-		transform: translateX(5px);
+        .friend-card {
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 15px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
         }
 
-        .conversation-item.active {
-		background: rgba(255, 255, 255, 0.2);
-		border-color: rgba(255, 255, 255, 0.3);
+        .friend-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.3);
         }
 
-        .conversation-item.unread::before {
-		content: '';
-		position: absolute;
-		left: 0;
-		top: 0;
-		bottom: 0;
-		width: 3px;
-		background: #10B981;
+        .friend-card.online {
+            border-color: #10B981;
+            background: rgba(16, 185, 129, 0.1);
         }
 
-        .conversation-avatar {
-		width: 40px;
-		height: 40px;
-		border-radius: 50%;
-		background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		color: white;
-		font-weight: bold;
-		margin-bottom: 8px;
+        .friend-card.away {
+            border-color: #F59E0B;
+            background: rgba(245, 158, 11, 0.1);
         }
 
-        .conversation-name {
-		color: white;
-		font-weight: bold;
-		margin-bottom: 3px;
+        .friend-card.offline {
+            border-color: #6B7280;
+            background: rgba(107, 114, 128, 0.1);
         }
 
-        .conversation-preview {
-		color: rgba(255, 255, 255, 0.7);
-		font-size: 0.85em;
-		margin-bottom: 3px;
-		white-space: nowrap;
-		overflow: hidden;
-		text-overflow: ellipsis;
+        .friend-card.selected {
+            border-color: #3B82F6;
+            background: rgba(59, 130, 246, 0.2);
         }
 
-        .conversation-time {
-		color: rgba(255, 255, 255, 0.5);
-		font-size: 0.75em;
-        }
-
-        .conversation-badge {
-		position: absolute;
-		top: 10px;
-		right: 10px;
-		background: #EF4444;
-		color: white;
-		border-radius: 50%;
-		width: 20px;
-		height: 20px;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		font-size: 0.7em;
-		font-weight: bold;
-        }
-
-        /* Panel central - Conversation active */
-        .chat-panel {
-		flex: 1;
-		background: rgba(255, 255, 255, 0.1);
-		backdrop-filter: blur(10px);
-		border-radius: 15px;
-		border: 1px solid rgba(255, 255, 255, 0.2);
-		box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-		display: flex;
-		flex-direction: column;
-		overflow: hidden;
-        }
-
-        .chat-header {
-		padding: 20px;
-		border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-		display: flex;
-		align-items: center;
-		gap: 15px;
-        }
-
-        .chat-header-avatar {
-		width: 50px;
-		height: 50px;
-		border-radius: 50%;
-		background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		color: white;
-		font-weight: bold;
-		font-size: 1.2em;
-        }
-
-        .chat-header-info h3 {
-		color: white;
-		margin-bottom: 3px;
-        }
-
-        .chat-header-status {
-		color: rgba(255, 255, 255, 0.7);
-		font-size: 0.9em;
-		display: flex;
-		align-items: center;
-		gap: 5px;
+        .friend-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2em;
+            color: white;
+            font-weight: bold;
+            position: relative;
         }
 
         .status-dot {
-		width: 8px;
-		height: 8px;
-		border-radius: 50%;
-		background: #10B981;
+            position: absolute;
+            bottom: 2px;
+            right: 2px;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            border: 2px solid white;
         }
 
-        .status-dot.offline {
-		background: #6B7280;
+        .status-dot.online { background: #10B981; }
+        .status-dot.away { background: #F59E0B; }
+        .status-dot.offline { background: #6B7280; }
+
+        .friend-info {
+            flex: 1;
+            margin-left: 15px;
+        }
+
+        .friend-name {
+            color: white;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .friend-status {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.9em;
+        }
+
+        .friend-actions {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .action-btn {
+            padding: 8px 12px;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.9em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .chat-btn {
+            background: linear-gradient(135deg, #3B82F6 0%, #1D4ED8 100%);
+            color: white;
+        }
+
+        .chat-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+        }
+
+        .remove-btn {
+            background: linear-gradient(135deg, #EF4444 0%, #DC2626 100%);
+            color: white;
+        }
+
+        .remove-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+        }
+
+        .accept-btn {
+            background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+            color: white;
+        }
+
+        .accept-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+        }
+
+        .decline-btn {
+            background: linear-gradient(135deg, #6B7280 0%, #4B5563 100%);
+            color: white;
+        }
+
+        .decline-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(107, 114, 128, 0.3);
+        }
+
+        .tabs {
+            display: flex;
+            margin-bottom: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 5px;
+        }
+
+        .tab {
+            flex: 1;
+            padding: 10px;
+            text-align: center;
+            color: rgba(255, 255, 255, 0.7);
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .tab.active {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+        }
+
+        .tab:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .add-friend-form {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            backdrop-filter: blur(10px);
+        }
+
+        .add-friend-input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            margin-bottom: 15px;
+        }
+
+        .add-friend-input::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .add-friend-btn {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .add-friend-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(16, 185, 129, 0.3);
         }
 
         .chat-messages {
-		flex: 1;
-		overflow-y: auto;
-		padding: 20px;
-		display: flex;
-		flex-direction: column;
-		gap: 15px;
+            max-height: 400px;
+            padding: 10px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            overflow-y: auto;
         }
 
-        .message {
-		max-width: 70%;
-		padding: 12px 16px;
-		border-radius: 15px;
-		position: relative;
-		animation: slideIn 0.3s ease;
+        .chat-messages::-webkit-scrollbar {
+            width: 8px;
         }
 
-        .message.sent {
-		align-self: flex-end;
-		background: linear-gradient(135deg, #10B981 0%, #059669 100%);
-		color: white;
+        .chat-messages::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
         }
 
-        .message.received {
-		align-self: flex-start;
-		background: rgba(255, 255, 255, 0.15);
-		color: white;
+        .chat-messages::-webkit-scrollbar-thumb {
+            background-color: rgba(255, 255, 255, 0.3);
+            border-radius: 8px;
+            border: 2px solid rgba(255, 255, 255, 0.1);
         }
 
-        .message-content {
-		margin-bottom: 5px;
-		line-height: 1.4;
+        .chat-messages::-webkit-scrollbar-thumb:hover {
+            background-color: rgba(255, 255, 255, 0.5);
         }
 
-        .message-time {
-		font-size: 0.75em;
-		opacity: 0.7;
+        .chat-message {
+            margin-bottom: 15px;
+            padding: 10px;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            animation: slideIn 0.3s ease;
         }
 
-        .message.sent .message-time {
-		text-align: right;
+        .chat-message.sent {
+            background: rgba(59, 130, 246, 0.2);
+            border-left: 3px solid #3B82F6;
+            margin-left: 20px;
         }
 
-        .empty-chat {
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-		justify-content: center;
-		height: 100%;
-		color: rgba(255, 255, 255, 0.5);
-		text-align: center;
+        .chat-message.received {
+            background: rgba(16, 185, 129, 0.2);
+            border-left: 3px solid #10B981;
+            margin-right: 20px;
         }
 
-        .empty-chat i {
-		font-size: 4em;
-		margin-bottom: 20px;
+        .chat-message-author {
+            font-weight: bold;
+            color: #60A5FA;
+            margin-bottom: 5px;
         }
 
-        .empty-chat h3 {
-		margin-bottom: 10px;
-		font-size: 1.5em;
+        .chat-message-content {
+            color: white;
         }
 
-        /* Input de message */
-        .message-input-container {
-		padding: 20px;
-		border-top: 1px solid rgba(255, 255, 255, 0.1);
-		display: flex;
-		gap: 15px;
-		align-items: center;
+        .chat-message-time {
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 0.8em;
+            margin-top: 5px;
         }
 
-        .message-input {
-		flex: 1;
-		padding: 12px 16px;
-		border: 1px solid rgba(255, 255, 255, 0.2);
-		border-radius: 20px;
-		background: rgba(255, 255, 255, 0.1);
-		color: white;
-		font-size: 0.9em;
-		resize: none;
-		max-height: 100px;
+        .chat-input-container {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
         }
 
-        .message-input::placeholder {
-		color: rgba(255, 255, 255, 0.5);
+        .chat-input {
+            flex: 1;
+            padding: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 0.9em;
+        }
+
+        .chat-input::placeholder {
+            color: rgba(255, 255, 255, 0.5);
         }
 
         .send-btn {
-		padding: 12px 16px;
-		border: none;
-		border-radius: 50%;
-		background: linear-gradient(135deg, #10B981 0%, #059669 100%);
-		color: white;
-		cursor: pointer;
-		transition: all 0.3s ease;
-		display: flex;
-		align-items: center;
-		justify-content: center;
+            padding: 12px 15px;
+            border: none;
+            border-radius: 10px;
+            background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
         }
 
         .send-btn:hover {
-		transform: scale(1.1);
-		box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(16, 185, 129, 0.3);
         }
 
-        .send-btn:disabled {
-		background: linear-gradient(135deg, #6B7280 0%, #4B5563 100%);
-		cursor: not-allowed;
-		opacity: 0.5;
+        .empty-state {
+            text-align: center;
+            color: rgba(255, 255, 255, 0.5);
+            padding: 40px;
         }
 
-        /* Scrollbar styling */
-        .conversations-list::-webkit-scrollbar,
-        .chat-messages::-webkit-scrollbar {
-		width: 8px;
-        }
-
-        .conversations-list::-webkit-scrollbar-track,
-        .chat-messages::-webkit-scrollbar-track {
-		background: rgba(255, 255, 255, 0.05);
-		border-radius: 8px;
-        }
-
-        .conversations-list::-webkit-scrollbar-thumb,
-        .chat-messages::-webkit-scrollbar-thumb {
-		background-color: rgba(255, 255, 255, 0.3);
-		border-radius: 8px;
-		border: 2px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .conversations-list::-webkit-scrollbar-thumb:hover,
-        .chat-messages::-webkit-scrollbar-thumb:hover {
-		background-color: rgba(255, 255, 255, 0.5);
+        .empty-state i {
+            font-size: 3em;
+            margin-bottom: 20px;
         }
 
         @keyframes slideIn {
-		from {
-			opacity: 0;
-			transform: translateY(10px);
-		}
-		to {
-			opacity: 1;
-			transform: translateY(0);
-		}
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         @keyframes fadeIn {
-		from { opacity: 0; }
-		to { opacity: 1; }
+            from { opacity: 0; }
+            to { opacity: 1; }
         }
 
-        .conversations-panel, .chat-panel {
-		animation: fadeIn 0.5s ease-out;
+        .friends-list, .chat-container {
+            animation: fadeIn 0.5s ease-out;
         }
 
-	.chat-options {
-		margin-left: auto;
-		position: relative;
-		cursor: pointer;
-		color: white;
-		font-size: 1.2em;
-	}
+        .notification-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: #EF4444;
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8em;
+            font-weight: bold;
+        }
 
-	.chat-options i:hover {
-		opacity: 0.8;
-	}
+        .chat-header {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
 
-	.friends-panel {
-		position: absolute;
-		top: 30px;
-		right: 0;
-		background: rgba(255, 255, 255, 0.1);
-		backdrop-filter: blur(10px);
-		border: 1px solid rgba(255, 255, 255, 0.2);
-		border-radius: 10px;
-		padding: 10px 15px;
-		min-width: 150px;
-		color: white;
-		box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-		z-index: 10;
-	}
+        .chat-header .friend-avatar {
+            width: 40px;
+            height: 40px;
+            margin-right: 15px;
+        }
 
-	.friends-panel h4 {
-		margin-bottom: 10px;
-		font-size: 1em;
-		border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-		padding-bottom: 5px;
-	}
+        .chat-header-info h3 {
+            color: white;
+            margin: 0;
+            font-size: 1.1em;
+        }
 
-	.friends-panel ul {
-		list-style: none;
-		padding: 0;
-		margin: 0;
-	}
+        .chat-header-info p {
+            color: rgba(255, 255, 255, 0.7);
+            margin: 0;
+            font-size: 0.9em;
+        }
 
-	.friends-panel li {
-		padding: 5px 0;
-		border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-	}
+        .close-chat-btn {
+            margin-left: auto;
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            color: white;
+            padding: 8px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
 
-	.friends-panel li:last-child {
-		border-bottom: none;
-	}
-
-	</style>
+        .close-chat-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+    </style>
 	`;
 };
 
