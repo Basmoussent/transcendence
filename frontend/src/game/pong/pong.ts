@@ -148,15 +148,6 @@ export class Pong {
 		this.ctx.fillStyle = 'white';
 		this.ctx.font = '48px sans-serif'; // changer police
 
-		for (let i = 0; i < 4; i++) {
-			const paddle = this.paddles[i];
-			if (paddle && paddle?.winsGame() === true) {
-			this.ctx.fillText(paddle.name, this.width / 2 - 70, this.height / 2);
-			break;
-			}
-		}
-		this.ctx.fillText("WINS", this.width / 2 - 70, this.height / 2 + 50);
-
 		this.ctx.globalAlpha = 1;
 	}
 
