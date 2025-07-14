@@ -43,4 +43,6 @@ purge: down
 	@docker image prune -af
 	@echo "✅ Docker purged."
 
+a: down all
+
 .PHONY: all build up down clean re status
