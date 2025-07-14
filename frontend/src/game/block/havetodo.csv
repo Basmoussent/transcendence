@@ -107,3 +107,30 @@ a chaque evenement:
 	dans websocket.ts je prend en compte le changement et modifie roomData en fonction
 	je broadcast à tout le monde qu'il faut update la room en leur tendant roomData
 	chaque client a sa fonction updateUI qui charge l'html 
+
+
+
+
+block --> max 2 players
+	pas d'ia
+
+
+pour pong ajouter card ia pour chaque ia presente
+
+
+Error: SQLITE_CONSTRAINT: UNIQUE constraint failed: users.email
+[ERROR] 20:34:13 Error: SQLITE_CONSTRAINT: UNIQUE constraint failed: users.email
+^C%
+
+
+trouver un moyen de passer les infos a la classe pong lors de la construction 
+	|
+	|__ un window.history.pushState({}, '', '/pong');
+
+		appele la route /pong qui appele renderPong qui cree le jeu
+			au moment du new pong() il faut lui passer les datas.
+
+
+
+
+faire le middle ware comme ca pas besoin de check le header de toutes les requetes

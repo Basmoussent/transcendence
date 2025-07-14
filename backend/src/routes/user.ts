@@ -20,7 +20,6 @@ interface UserData {
   email: string;
   avatar_url?: string;
   language: string;
-  stats: stats;
 }
 
 async function userRoutes(app: FastifyInstance) {
@@ -209,7 +208,68 @@ async function userRoutes(app: FastifyInstance) {
             }
             return reply.status(500).send({ error: 'Erreur lors de l\'upload de l\'avatar', details: err.message });
         }
+        
     });
+
+    app.get('/user:userid', async function (request: FastifyRequest, reply: FastifyReply) {
+
+        try {
+            const database = db.getDatabase();
+
+            const { userid } = request.query as { userid?: number };
+
+            if (!userid)
+                throw new Error ("missing userid in the request body");
+
+            const user = await new Promise<UserData | null>((resolve, reject) => {
+                database.get(
+                    'SELECT * FROM users WHERE id = ?',
+                    [ userid ],
+                    (err: any, row: UserData | undefined) => {
+                        err ? reject(err) : resolve(row || null); }
+                );
+            });
+            return reply.send({
+                message: `info du user ${userid}`,
+                data: user,
+            });
+        }
+        catch (err: any) {
+            return reply.status(500).send({
+                error: 'erreur GET /user:userId',
+                details: err.message });
+        }
+    })
+
+    app.get('/user/username:username', async function (request: FastifyRequest, reply: FastifyReply) {
+
+        try {
+            const database = db.getDatabase();
+
+            const { username } = request.query as { username?: string };
+
+            if (!username)
+                throw new Error ("missing username in the request body");
+
+            const user = await new Promise<UserData | null>((resolve, reject) => {
+                database.get(
+                    'SELECT * FROM users WHERE username = ?',
+                    [ username ],
+                    (err: any, row: UserData | undefined) => {
+                        err ? reject(err) : resolve(row || null); }
+                );
+            });
+            return reply.send({
+                message: `info du user ${username}`,
+                data: user,
+            });
+        }
+        catch (err: any) {
+            return reply.status(500).send({
+                error: 'erreur GET /user/username:username',
+                details: err.message });
+        }
+    })
 
     app.get('/user/:username', async (request: FastifyRequest, reply: FastifyReply) => {
         const data  = request.params as string;

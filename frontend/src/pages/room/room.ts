@@ -9,11 +9,12 @@ interface User {
 interface RoomData {
 	id: string;
 	name: string;
-	gameType: 'pong' | 'block';
+	gameType: 'Pong' | 'Block';
 	maxPlayers: number;
 	users: User[];
 	host: string;
 	isGameStarted: boolean;
+	ai: number;
 }
 
 export class Room {
@@ -28,14 +29,22 @@ export class Room {
 	private startBtn: HTMLButtonElement;
 	private leaveBtn: HTMLButtonElement;
 	private sendBtn: HTMLButtonElement;
+	private increaseAiBtn: HTMLButtonElement;
+	private decreaseAiBtn: HTMLButtonElement;
+
+
 	private chatInput: HTMLInputElement;
 	private playersContainer: HTMLElement;
 	private roomNameEl: HTMLElement;
 	private gameTypeEl: HTMLElement;
 	private playerCountEl: HTMLElement;
 	private gameStatusEl: HTMLElement;
-	private startGameBtn: HTMLButtonElement;
-
+	private roomSettings: HTMLElement;
+	private aiCountSpan: HTMLElement;
+	private maxPlayer: HTMLElement;
+	
+	private gameTypeSelect: HTMLElement;
+	
 
 	constructor(user: string, uuid: string) {
 		this.username = user;
@@ -48,13 +57,19 @@ export class Room {
 		this.startBtn = this.getElement('startGameBtn') as HTMLButtonElement;
 		this.leaveBtn = this.getElement('leaveBtn') as HTMLButtonElement;
 		this.sendBtn = this.getElement('sendBtn') as HTMLButtonElement;
-		this.startGameBtn = this.getElement('startGameBtn') as HTMLButtonElement;
+		this.increaseAiBtn = this.getElement('increaseAI') as HTMLButtonElement;
+		this.decreaseAiBtn = this.getElement('decreaseAI') as HTMLButtonElement;
 		this.chatInput = this.getElement('chatInput') as HTMLInputElement;
 		this.playersContainer = this.getElement('playersContainer');
+		this.roomSettings = this.getElement('roomSettings');
 		this.roomNameEl = this.getElement('roomName');
 		this.gameTypeEl = this.getElement('gameType');
 		this.playerCountEl = this.getElement('playerCount');
 		this.gameStatusEl = this.getElement('gameStatus');
+		this.gameTypeSelect = this.getElement("gameTypeSelect");
+		this.aiCountSpan = this.getElement('aiCount');
+		this.maxPlayer = this.getElement('max-player');
+		
 
 		this.chatInput.focus();
 		this.setupWsEvents();
@@ -97,11 +112,14 @@ export class Room {
 		this.readyBtn.addEventListener('click', () => this.toggleReadyState());
 		this.startBtn.addEventListener('click', () => this.startGame());
 		this.leaveBtn.addEventListener('click', () => this.leaveRoom());
-		this.homeBtn.addEventListener('click', () => this.leaveRoom());
+		this.homeBtn.addEventListener('click', () => this.goHome());
+		this.increaseAiBtn.addEventListener('click', () => this.increase());
+		this.decreaseAiBtn.addEventListener('click', () => this.decrease());
+		this.gameTypeSelect.addEventListener('change', () => this.gameTypeChanged());
 	}
 
 	private handleEvent(data: any) {
-		console.log(`dqouiwdouqbwdo \t`, data.type)
+		console.log(`room ws event : ${data.type}`)
 		switch (data.type) {
 
 			case 'room_update':
@@ -146,10 +164,22 @@ export class Room {
 	private toggleReadyState() {
 		this.ws.send(JSON.stringify({ type: 'toggle_ready' }));
 	}
+	
+	private increase() {
+		this.ws.send(JSON.stringify({ type: 'increase' }));
+	}
+
+	private decrease() {
+		this.ws.send(JSON.stringify({ type: 'decrease' }));
+	}
 
 	private startGame() {
 		this.ws.send(JSON.stringify({ type: 'start_game' }));
 	}
+
+	private gameTypeChanged() {
+		this.ws.send(JSON.stringify({ type: 'game_type' }))
+	}	
 
 	private leaveRoom() {
 		if (this.ws.readyState === WebSocket.OPEN) {
@@ -160,6 +190,15 @@ export class Room {
 		window.dispatchEvent(new Event('popstate'));
 	}
 
+	private goHome() {
+		if (this.ws.readyState === WebSocket.OPEN) {
+			this.ws.send(JSON.stringify({ type: 'leave_room' }));
+		}
+		this.ws.close();
+		window.history.pushState({}, '', '/main');
+		window.dispatchEvent(new Event('popstate'));
+	}
+
 	private updateUI() {
 
 		if (!this.roomData)
@@ -167,6 +206,7 @@ export class Room {
 
 		this.roomNameEl.textContent = this.roomData.name;
 		this.gameTypeEl.textContent = this.roomData.gameType;
+		this.aiCountSpan.textContent = String(this.roomData.ai);
 		this.playerCountEl.textContent = `${this.roomData.users.length}/${this.roomData.maxPlayers}`;
 
 		this.playersContainer.innerHTML = '';
@@ -174,7 +214,11 @@ export class Room {
 			this.playersContainer.innerHTML += this.playerCard(user);
 		});
 
-		for (let i = this.roomData.users.length; i < this.roomData.maxPlayers; i++)
+		for (let i = this.roomData.ai; i > 0; --i) {
+			this.playersContainer.innerHTML += this.aiCard(i);
+		}
+
+		for (let i = this.roomData.users.length + this.roomData.ai; i < this.roomData.maxPlayers; i++)
 			this.playersContainer.innerHTML += '<div class="empty-slot">Waiting for player...</div>';
 
 		const currentUser = this.roomData.users.find(u => u.username === this.username);
@@ -188,9 +232,33 @@ export class Room {
 			this.readyBtn.innerHTML = '<i class="fas fa-check"></i> Ready';
 		}
 
+		
 		const allReady = this.roomData.users.every(u => u.isReady);
-		const isHost = this.roomData.host === this.username;
-		this.startGameBtn.disabled = !isHost || !allReady;
+
+
+		if (this.roomData.host === this.username) {
+
+			if (this.roomData.users.length + this.roomData.ai >= 2)
+				this.startBtn.disabled = !allReady;
+
+			this.roomSettings.classList.remove('hidden')
+			this.getElement('gameActions').classList.remove('hidden');
+
+			if (this.roomData.gameType === 'Block')
+				this.getElement('ai-setting').style.display = 'none';
+			else {
+				this.getElement('ai-setting').style.display = 'block';
+				if (this.roomData.users.length + this.roomData.ai === this.roomData.maxPlayers)
+					this.increaseAiBtn.disabled = true;
+				else
+					this.increaseAiBtn.disabled = false;
+				if (this.roomData.ai === 0)
+					this.decreaseAiBtn.disabled = true;
+				else
+					this.decreaseAiBtn.disabled = false;
+			}
+			
+		}
 
 		if (allReady)
 			this.gameStatusEl.innerHTML = `<span class="status-dot ready"></span><span class="text-white/80">Ready to start!</span>`;
@@ -209,6 +277,25 @@ export class Room {
 				<div class="player-avatar">${avatarInitial}</div>
 				<div class="player-name">${sanitizeHtml(user.username)}</div>
 				<div class="player-status">${user.isReady ? 'Ready' : 'Not Ready'}</div>
+			</div>
+		`;
+	}
+
+	private aiCard(i: number): string {
+
+		let pp;
+		if (i === 1)
+			pp = "/api/uploads/frozen.png";
+		else if (i === 2)
+			pp = "/api/uploads/fetiche.png";
+		else
+			pp = "/api/uploads/droide.png";
+
+		return `
+			<div class="player-card ai">
+				<img class="player-avatar-img" src="${pp}" alt="Avatar">
+				<div class="player-name">IA</div>
+				<div class="player-status">Automatique</div>
 			</div>
 		`;
 	}
@@ -237,12 +324,15 @@ export class Room {
 		chatContainer.scrollTop = chatContainer.scrollHeight;
 	}
 
-	private launchGamePage(gameType: 'pong' | 'block') {
+	private launchGamePage(gameType: string) {
 
 		this.addSystemMessage(`The game is about to start ${gameType}...`);
 		setTimeout(() => {
 			// faire le new block ou pong avec info de la game dans le constructeur
-			window.history.pushState({}, '', `/${gameType}`);
+			if (gameType === 'Pong')
+				window.history.pushState({}, '', `/pong`);
+			else
+				window.history.pushState({}, '', `/block`);				
 			window.dispatchEvent(new Event('popstate'));
 		}, 2000);
 	}

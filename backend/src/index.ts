@@ -8,10 +8,13 @@ import websocket from '@fastify/websocket';
 import cookie from '@fastify/cookie';
 import multipart from '@fastify/multipart'
 import { db } from './database';
+import { UserService } from './services/userService';
+import { FriendService } from './services/friendService';
 import authRoutes from "./routes/authentication"
 import gameRoutes from './routes/game';
 import editRoutes from './routes/reset-pwd';
 import userRoutes from './routes/user';
+import friendRoutes from './routes/friend';
 import webSocketRoutes from './routes/web-socket';
 import { getSecretFromVault } from './utils/vault';
 import Fastify from 'fastify';
@@ -33,6 +36,14 @@ fastify.get('/redis-health', async (request, reply) => {
     reply.code(500).send({ status: 'error', message: 'Redis not reachable' });
   }
 });
+declare module 'fastify' {
+  interface FastifyInstance {
+    userService: UserService;
+    friendService: FriendService;
+  }
+}
+
+
 async function setup() {
 
 	console.log('🚀 Starting setup...');
@@ -41,6 +52,11 @@ async function setup() {
 	console.log('📦 Initializing database...');
 	await db.initialize();
 	console.log('✅ Database initialized');
+
+	console.log('🛠️  Decorating services...');
+	fastify.decorate('userService', new UserService(db.getDatabase()));
+	fastify.decorate('friendService', new FriendService(db.getDatabase()));
+	console.log('✅ Services decorated');
 
 	// Register CORS
 	console.log('🌐 Registering CORS...');
@@ -84,6 +100,10 @@ async function setup() {
 	await fastify.register(userRoutes);
 	console.log('✅ User routes registered');
 	await fastify.register(gameRoutes, { prefix: "/games" });
+	console.log('✅ Games routes registered');
+	await fastify.register(friendRoutes, { prefix: "/friend" });
+	console.log('✅ Friend routes registered');
+	
 
 	console.log('📡 Registering WebSocket routes...');
 	await fastify.register(require('@fastify/websocket'));
