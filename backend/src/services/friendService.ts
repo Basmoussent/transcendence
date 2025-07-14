@@ -18,10 +18,10 @@ export class FriendService {
 		try {
 			const relations = await new Promise<Relation[] | null>((resolve, reject) => {
 				this.db.all(
-					'SELECT * FROM friends WHERE user_1 = ? || user_2 = ?',
+					'SELECT * FROM friends WHERE user_1 = ? OR user_2 = ?',
 					[ userId, userId ],
-					(err: any, row: Relation[] | undefined) => {
-					err ? reject(err) : resolve(row || null); }
+					(err: any, rows: Relation[] | undefined) => {
+					err ? reject(err) : resolve(rows || null); }
 				);
 			});
 			return relations;

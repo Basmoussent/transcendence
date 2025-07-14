@@ -121,7 +121,7 @@ export class Chat {
 				this.addSystemMessage(data.content);
 				break;
 			default:
-				console.log(`Unknown event type: ${data.type}`);
+				console.log(`Unknown event type: ${data.type}   ${data.message}`);
 		}
 	}
 

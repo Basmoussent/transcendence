@@ -15,6 +15,14 @@ interface UserChat {
 	socket: WebSocket;
 }
 
+interface UserData {
+	id: number;
+	username: string;
+	email: string;
+	avatar_url?: string;
+	language: string;
+}
+
 interface Room {
 	id: string;
 	name: string;
@@ -225,15 +233,17 @@ async function webSocketRoutes(app: FastifyInstance) {
 		const decoded = app.jwt.verify(token) as { user: string };
 		const username = decoded.name;
 
-		// remplir avec les vraies infos /api/me
-		const user: UserChat = {
-			username: username,
-			userId: 0,
-			email: "talan",
-			avatar_url: "/api/uploads/fetiche.png",
-			socket: socket,	}
+		loadMe(app, username).then((tmp: UserData) => {
+			const user: UserChat = {
+				username: username,
+				userId: tmp.id,
+				email: tmp.email,
+				avatar_url: 'trouverunmoyen',
+				socket: socket,
+			};
+			live.set(user.username, user);
+		});
 
-		live.set(user.username, user);
 		// dire a tous ceux dont user.username est ami d'update leur UI
 
 		socket.on('message', (message: string) => {
@@ -248,7 +258,7 @@ async function webSocketRoutes(app: FastifyInstance) {
 						break;
 					
 					case 'friend_request':
-						addFriend(app, sender, data.friendName);
+						addFriend(app, sender, data.dest);
 						break;
 
 					default:
@@ -324,6 +334,10 @@ function broadcastSystemMessageChat(content: string) {
 	});
 }
 
+async function loadMe(app: FastifyInstance, username: string): Promise<UserData> {
+	return await app.userService.findByUsername(username);
+}
+
 async function addFriend(app: FastifyInstance, user: UserChat, friendName: string) {
 
 	// 1 - check que le user exist
@@ -339,15 +353,26 @@ async function addFriend(app: FastifyInstance, user: UserChat, friendName: strin
 		
 	// 2 - check si une relation n'existe pas déjà
 	const relations: Relation[] = await app.friendService.getRelations(user.userId);
+
+	relations.forEach((rel, index) => {
+			console.log(`Relation ${index + 1}:
+		- User 1: ${rel.user_1} (state: ${rel.user1_state})
+		- User 2: ${rel.user_2} (state: ${rel.user2_state})
+		`);
+	});
+
 	const relation = relations.find(rel => rel.user_1 === friend.id || rel.user_2 === friend.id);
 
 	if (relation) {
+		user.socket.send(JSON.stringify({
+			type: 'updateUI',
+			message: `tu l'as déjà en amis` }))
 		// 3 - check que l'un des deux n'a pas bloqué l'autre
 		// 4 - check que l'invitation n'a pas déjà été faites || l'autre l'a déjà ajouté au quel cas on normalise la relation
 		// identifie quel est l'état de la relation et envoyer un msg en fonction
 		return;
 	}
-	
+
 
 	// 5 - envoyer une demande + creer l'instance dans db friends avec userid des deux personnes
 	//	 |__ update l'état, qui a ajouté qui
