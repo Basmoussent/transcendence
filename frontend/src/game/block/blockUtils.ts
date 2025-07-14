@@ -1,43 +1,224 @@
+import { getAuthToken } from '../../utils/auth';
+import { sanitizeHtml } from '../../utils/sanitizer';
+
+export class Paddle {
+
+	public x: number;
+	public y: number;
+	public width: number;
+	public height: number;
+	public speed: number;
+
+	constructor(_x:number, _y:number, _speed:number) {
+		this.x = _x
+		this.y = _y
+		this.width = 10000
+		this.height = 20
+		this.speed = _speed
+	}
+
+	public move(direction:string, width:number) {
+		if (direction == "left") {
+			if (this.x - this.speed < 0)
+				this.x = 0;
+			else
+				this.x -= this.speed;
+		}
+		else if (direction == "right") {
+			if ((this.x + this.width + this.speed > width))
+				this.x = width - this.width;
+			else
+				this.x += this.speed;
+		}
+	}
+}
+
+export class Ball {
+
+	public x: number;
+	public y: number;
+	public radius: number;
+	public speedx: number;
+	public speedy: number;
+	
+	constructor(_x:number, _y:number,) {
+		this.x = _x
+		this.y = _y
+		this.radius = 10
+		this.speedx = 0
+		this.speedy = 0
+	}
+
+	public move() {
+		this.x += this.speedx;
+		this.y += this.speedy;
+	}
+
+	public reset(_x:number, _y:number, _speedx:number, _speedy:number) {
+		this.x = _x
+		this.y = _y
+		this.radius = 10
+		this.speedx = _speedx
+		this.speedy = _speedy
+	}
+
+	public moveTo(_x:number, _y:number) {
+		this.x = _x;
+		this.y = _y;
+	}
+
+	public collisionPadd1(paddle: Paddle) {
+
+		if (!(this.y + this.radius >= paddle.y && 
+			this.y - this.radius <= paddle.y + paddle.height))
+			return;
+			
+		if (this.x + this.radius >= paddle.x && 
+			this.x - this.radius <= paddle.x + paddle.width) {
+			
+			const relativeIntersectX = (this.x - paddle.x) / paddle.width;
+			
+			// Calculer l'angle de rebond basé sur la position d'impact
+			// Centre de la palette = angle droit (90°)
+			// Bords de la palette = angles plus aigus
+			const bounceAngle = (relativeIntersectX - 0.5) * Math.PI / 3; // Max 60° d'angle
+			
+			const speed = Math.sqrt(this.speedx * this.speedx + this.speedy * this.speedy);
+			
+			const leftEdge = paddle.x + paddle.width * 0.1;
+			const rightEdge = paddle.x + paddle.width * 0.9;
+			
+			if (this.x < leftEdge) {
+				this.speedx = -Math.abs(speed * Math.sin(bounceAngle));
+				this.speedy = -Math.abs(speed * Math.cos(bounceAngle));
+			}
+			else if (this.x > rightEdge) {
+				this.speedx = Math.abs(speed * Math.sin(bounceAngle));
+				this.speedy = -Math.abs(speed * Math.cos(bounceAngle));
+			}
+			else {
+				this.speedx = speed * Math.sin(bounceAngle);
+				this.speedy = -Math.abs(speed * Math.cos(bounceAngle));
+			}
+			
+			if (this.speedy > 0)
+				this.y = paddle.y - this.radius - 1;
+		}		
+	}
+
+	public collisionPadd2(paddle: Paddle) {
+
+		if (!(this.y - this.radius <= paddle.y + paddle.height && 
+			this.y + this.radius >= paddle.y))
+			return;
+			
+		if (this.x + this.radius >= paddle.x && 
+			this.x - this.radius <= paddle.x + paddle.width) {
+			
+			const relativeIntersectX = (this.x - paddle.x) / paddle.width;
+
+			// Calculer l'angle de rebond basé sur la position d'impact
+			const bounceAngle = (relativeIntersectX - 0.5) * Math.PI / 3; // Max 60°
+
+			const speed = Math.sqrt(this.speedx * this.speedx + this.speedy * this.speedy);
+
+			const leftEdge = paddle.x + paddle.width * 0.1;
+			const rightEdge = paddle.x + paddle.width * 0.9;
+
+			if (this.x < leftEdge) {
+				this.speedx = -Math.abs(speed * Math.sin(bounceAngle));
+				this.speedy = Math.abs(speed * Math.cos(bounceAngle));
+			}
+			else if (this.x > rightEdge) {
+				this.speedx = Math.abs(speed * Math.sin(bounceAngle));
+				this.speedy = Math.abs(speed * Math.cos(bounceAngle));
+			}
+			else {
+				this.speedx = speed * Math.sin(bounceAngle);
+				this.speedy = Math.abs(speed * Math.cos(bounceAngle));
+			}
+
+			if (this.speedy < 0)
+				this.y = paddle.y + paddle.height + this.radius + 1;
+		}	
+	}
+
+	public collisionWindow(width: number, flag:boolean) {
+
+		if (flag && this.y - this.radius <= 0) {
+			this.speedy = Math.abs(this.speedy);
+			this.y = this.radius;
+		}
+		else if (this.x - this.radius <= 0) {
+			this.speedx = Math.abs(this.speedx);
+			this.x = this.radius;
+		}
+		else if (this.x + this.radius >= width) {
+			this.speedx = -Math.abs(this.speedx);
+			this.x = width - this.radius;
+		}
+	}
+}
+
 export abstract class brick {
 
 	protected hp: number;
+	protected id: number;
 	protected type: string;
 	protected color: string;
+	protected x: number;
+	protected y: number;
 
-	constructor(_hp:number, _type:string, _color:string) {
+	constructor(_hp:number,_id:number, _type:string, _color:string, _x:number, _y:number) {
 		this.hp = _hp;
+		this.id = _id;
 		this.type = _type;
 		this.color = _color;
+		this.x = _x;
+		this.y = _y;
+
+	}
+
+	public beenHit(): void {
+		this.hp--;
 	}
 
 	public getHp(): number { return (this.hp); }
+	public getId(): number { return (this.id); }
 	public getType(): string { return (this.type); }
 	public getColor(): string { return (this.color); }
+	public getX(): number { return (this.x); }
+	public getY(): number { return (this.y); }
+	
 
 }
 
 class blue extends brick {
-	constructor() {
-		super(1, "blue", "#91B8D4"); }
+	constructor(_id:number, _x:number, _y:number) {
+		super(1, _id, "blue", "#95ADB6", _x, _y); }
 }
 
 class green extends brick {
-	constructor() {
-		super(2, "green", "#7CA982"); }
+	constructor(_id:number, _x:number, _y:number) {
+		super(2, _id, "green", "#8DA1B9", _x, _y); }
 }
 
 class red extends brick {
-	constructor() {
-		super(3, "red", "#A3333D"); }
+	constructor(_id:number, _x:number, _y:number) {
+		super(3, _id, "red", "#CBB3BF", _x, _y); }
 }
 
-export function	createRandomBrick(): brick {
+export function	createRandomBrick(it:number, _x:number, _y:number): brick {
 
 	const rand = Math.floor(Math.random() * 3);
 
 	if (rand === 0)
-		return (new red());
+		return (new red(it, _x, _y));
 	if (rand === 1)
-		return (new green());
-	return (new blue());
+		return (new green(it, _x, _y));
+	return (new blue(it, _x, _y));
 }
+
+
+
+// export async function updateStats(gameId:number)

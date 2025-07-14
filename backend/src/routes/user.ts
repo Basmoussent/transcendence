@@ -7,12 +7,20 @@ import util from 'util'
 import { pipeline } from 'stream'
 import path from 'path';
 
+interface stats {
+    wins: number,
+    pong_games: number,
+    block_games: number,
+    rating: number
+}
+
 interface UserData {
   id: number;
   username: string;
   email: string;
   avatar_url?: string;
   language: string;
+  stats: stats;
 }
 
 async function userRoutes(app: FastifyInstance) {
@@ -58,11 +66,12 @@ async function userRoutes(app: FastifyInstance) {
 
             // Récupération des statistiques (pour l'instant des valeurs par défaut)
             // TODO: Implémenter la vraie logique des statistiques
-            const stats = {
-                wins: 0,
-                games: 0,
-                rating: 0
-            };
+            // const stats = {
+            //     win: user.stats.wins,
+            //     pong_games: user.stats.pong_games,
+            //     block_games: user.stats.block_games,
+            //     rating: user.stats.rating
+            // };
 
             return reply.send({
                 user: {
@@ -72,7 +81,7 @@ async function userRoutes(app: FastifyInstance) {
                     avatar_url: user.avatar_url || 'avatar.png',
                     language: user.language
                 },
-                stats: stats
+                // stats: stats
             });
         } catch (err: any) {
             console.error('❌ Error in /me endpoint:', err);
@@ -103,6 +112,7 @@ async function userRoutes(app: FastifyInstance) {
         // Servir le fichier
         return reply.type(contentType).send(fs.createReadStream(filePath));
     });
+
 
     app.post('/upload/avatar', async function (request: FastifyRequest, reply: FastifyReply) {
         try {

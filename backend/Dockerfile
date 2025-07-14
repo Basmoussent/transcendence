@@ -14,7 +14,7 @@ COPY package*.json ./
 
 RUN npm install
 
-RUN npm install -g sqlite3
+RUN npm install -g sqlite3 && npm install uuid
 
 # Create symlink for environment file
 RUN ln -s /tmp/vault.env /app/.env
