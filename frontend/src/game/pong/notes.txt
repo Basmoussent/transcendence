@@ -11,7 +11,7 @@ https://dooglz.github.io/set09121/pong2.html
         // fleche du bas fais descendre la page pas que le paddle
 
     // ajouter les players id au constructeur de Pong + return les scores a la fin de la partie
-    
+
     // police avec l'API
         // ajuster texte au milieu pcq la c'est bancal
 
@@ -25,3 +25,10 @@ https://dooglz.github.io/set09121/pong2.html
     // pour les amis
         // y'a deja une page /friends
         // ajouter bouton home dessus
+
+    // pour la 2FA
+        // une fois activee le outon devient "desactiver 2FA" et met le bool a false?
+            // sinon juste le griser et pas pouvoir appuyer dessus
+
+    // pas oublier
+        // retirer /block des pages accessibles sans etre co
