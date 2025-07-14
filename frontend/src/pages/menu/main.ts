@@ -34,6 +34,11 @@ export function renderMain() {
             ${t('menu.friends')}
           </button>
 
+          <button class="menu-button chat-button" id="chatBtn">
+            <i class="fas fa-user-friends"></i>
+            Chat
+          </button>
+
           <button class="menu-button logout-button" id="logoutBtn">
             <i class="fas fa-sign-out-alt"></i>
             Logout
@@ -242,6 +247,7 @@ export function renderMain() {
 function initializeMainEvents() {
   // Gestion des boutons de navigation
   const profileBtn = document.getElementById('profileBtn');
+  const chatBtn = document.getElementById('chatBtn');
   const matchmakingBtn = document.getElementById('matchmakingBtn');
   const multiplayerBtn = document.getElementById('multiplayerBtn');
   const friendsBtn = document.getElementById('friendsBtn');
@@ -269,6 +275,13 @@ function initializeMainEvents() {
   if (tournamentBtn) {
     tournamentBtn.addEventListener('click', () => {
       window.history.pushState({}, '', '/tournament');
+      window.dispatchEvent(new PopStateEvent('popstate'));
+    });
+  }
+
+  if (chatBtn) {
+    chatBtn.addEventListener('click', () => {
+      window.history.pushState({}, '', '/chat');
       window.dispatchEvent(new PopStateEvent('popstate'));
     });
   }
