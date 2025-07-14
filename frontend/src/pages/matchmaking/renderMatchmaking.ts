@@ -403,8 +403,3 @@ async function gamesToDiv(games:Available[]): Promise<string> {
 	console.log("available games div: ", tmp);
 	return tmp;
 }
-<<<<<<< HEAD
-=======
-
-
->>>>>>> main

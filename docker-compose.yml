@@ -131,7 +131,7 @@ services:
     container_name: node-exporter
     image: prom/node-exporter:latest
     ports:
-      - "9100:9100"
+      - "9101:9101"
     volumes:
       - /proc:/host/proc:ro
       - /sys:/host/sys:ro
