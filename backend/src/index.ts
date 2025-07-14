@@ -17,7 +17,6 @@ import userRoutes from './routes/user';
 import friendRoutes from './routes/friend';
 import webSocketRoutes from './routes/web-socket';
 import { getSecretFromVault } from './utils/vault';
-import Fastify from 'fastify';
 import { createClient } from 'redis';
 
 
@@ -29,6 +28,13 @@ declare module 'fastify' {
     friendService: FriendService;
   }
 }
+
+// Initialisation du client Redis
+export const redis = createClient({
+  url: process.env.REDIS_URL || 'redis://redis:6378'
+});
+redis.on('error', (err) => console.error('Redis Client Error', err));
+redis.connect();
 
 
 async function setup() {

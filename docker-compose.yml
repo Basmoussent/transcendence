@@ -79,7 +79,7 @@ services:
     environment:
       - NODE_ENV=development
       - DATABASE_URL=sqlite:///./database.sqlite
-      - REDIS_URL=redis://redis:6379
+      - REDIS_URL=redis://redis:6378
     depends_on:
       - prometheus
       - grafana
@@ -140,7 +140,8 @@ services:
     image: redis:8.2-rc1-alpine
     container_name: redis
     ports:
-      - "6379:6379"
+      - "6378:6378"
+    command: redis-server --port 6378
     volumes:
       - redis-data:/data
     networks:

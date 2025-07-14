@@ -122,8 +122,8 @@
         
         try {
           const authToken = window.getAuthToken();
-          
-          const response = await fetch('/api/edit/change-language', {
+          if (authToken) {
+            const response = await fetch('/api/edit/change-language', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
@@ -136,6 +136,7 @@
             console.error('Erreur lors du changement de langue:', response.statusText);
             isChangingLanguage = false;
             return;
+          }
           }
           
           // Update the URL without full page reload using history API
@@ -183,14 +184,14 @@
       }
 
       async function ensureSubdomain() {
-        const lang = localStorage.getItem('lang');
-        if (!lang) {
-          localStorage.setItem('lang', 'en');
-          window.history.pushState({}, '', '/lang');
-          window.dispatchEvent(new CustomEvent('languageChanged', { detail: { language: 'en' } }));
-        }
-        else {
-          window.history.pushState({}, '', '/lang');
+        const lang = localStorage.getItem('lang') || 'en';
+        const hostname = window.location.hostname;
+        const currentLang = hostname.split('.')[0];
+        
+        // Ne rediriger que si on n'est pas déjà sur le bon sous-domaine
+        if (currentLang !== lang) {
+          const currentPath = window.location.pathname;
+          window.history.pushState({}, '', currentPath);
           window.dispatchEvent(new CustomEvent('languageChanged', { detail: { language: lang } }));
         }
       }
@@ -208,10 +209,9 @@
           }
         });
         
-        // Reset the flag after initial setup
-        setTimeout(() => {
-          isChangingLanguage = false;
-        }, 1000);
+        // Appel initial de initAlive si déjà loggé
+        window.initAlive && window.initAlive();
+          
       });
     </script>
   </body>

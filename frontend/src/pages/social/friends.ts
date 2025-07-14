@@ -2,7 +2,7 @@ import { getAuthToken } from '../../utils/auth';
 import { sanitizeHtml } from '../../utils/sanitizer';
 import { t } from '../../utils/translations';
 
-export async function renderFriends() {
+export async function renderFriends(uuid: string){
   // Données d'exemple pour un ami (à remplacer par un appel API réel)
   let friendData = {
     username: 'FriendUsername',
@@ -17,14 +17,6 @@ export async function renderFriends() {
   // const friendId = getFriendIdFromUrl();
   
   try {
-    const token = getAuthToken();
-    if (!token) {
-      alert('❌ Token d\'authentification manquant');
-      window.history.pushState({}, '', '/login');
-      window.dispatchEvent(new PopStateEvent('popstate'));
-      return '';
-    }
-
     // TODO: Remplacer par un vrai appel API pour récupérer les données de l'ami
     // const response = await fetch(`/api/friends/${friendId}`, {
     //   method: 'GET',
@@ -55,7 +47,7 @@ export async function renderFriends() {
   // Construire l'URL de l'avatar
   const avatarUrl = friendData.avatar.startsWith('http') || friendData.avatar.startsWith('/api/') 
     ? friendData.avatar 
-    : `/api/uploads/${friendData.avatar}`;
+    : `../uploads/${friendData.avatar}`;
 
   const htmlContent = `
     <div class="friend-profile-page">

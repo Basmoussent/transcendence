@@ -403,36 +403,5 @@ async function gamesToDiv(games:Available[]): Promise<string> {
 	console.log("available games div: ", tmp);
 	return tmp;
 }
-<<<<<<< HEAD
-
-export function renderMatchmaking() :string{
-
-	setTimeout(async () => {
-		console.log('Initializing matchmaking page');
-		try {
-			const gameList = await loadAvailableGames();
-
-			if (gameList !== -1) {
-				const inject = await gamesToDiv(gameList);
-			
-				const container = document.getElementById('available-games');
-
-				if (container && typeof inject === 'string')
-					container.innerHTML = inject;
-			}
-
-			const render = new matchmaking();
-		}
-		catch (err:any) {
-			console.log(err);
-		}
-	}, 0);
-
-	return getTemplate();
-
-}
 
 
-
-=======
->>>>>>> cookies

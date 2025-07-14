@@ -17,6 +17,8 @@ import { renderEditProfil, initializeEditProfileEvents } from '../pages/social/e
 import { getAuthToken } from './auth';
 import { clearTranslationCache } from './translations';
 import { renderPong } from '../pages/pong/pong';
+import { initAlive } from './auth';
+import { renderFriends } from '../pages/social/friends';
 
 export async function router() {
   // Clear translation cache to ensure fresh translations
@@ -30,11 +32,11 @@ export async function router() {
   const token = getAuthToken();
 
 
-  let uuid: string | null = null;
+  let uuid: string = '';
 
-  if (path.startsWith('/room/')) {
+  if (path.startsWith('/room/') || path.startsWith('/user/')) {
     uuid = path.substring(6);
-    path = '/room'
+    path = path.startsWith('/room/') ? '/room' : '/user';
 
   }
   
@@ -75,7 +77,7 @@ export async function router() {
   }
 
   let view = '';
-
+  console.log("path:", path);
   switch (path) {
     case '/':
     case '/lang':
@@ -99,6 +101,9 @@ export async function router() {
       break;
     case '/profil':
       view = await renderProfil();
+      break;
+    case '/user':
+      view = await renderFriends(uuid);
       break;
     case '/multiplayer':
       view = renderMultiplayer();
@@ -133,6 +138,27 @@ export async function router() {
       view = render404();
   }
   app.innerHTML = view;
+
+  const tokenAuth = getAuthToken();
+  if (tokenAuth) {
+    try {
+      const response = await fetch('/api/auth/verify', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-access-token': tokenAuth,
+        },
+      });
+      console.log("response:", response);
+      if (response.ok) {
+        initAlive();
+      }
+    } catch (e) {
+      console.error('Erreur lors de la vérification du token:', e);
+    }
+    console.log("initAlive");
+    console.log(tokenAuth);
+  }
 
   // Initialiser les événements après le rendu pour les pages qui en ont besoin
   setTimeout(() => {
