@@ -13,7 +13,7 @@ interface UserChat {
 	username: string;
 	userId: number;
 	email: string;
-	avatar_url: string;
+	avatar_url?: string;
 	socket: WebSocket;
 }
 
@@ -276,7 +276,7 @@ async function webSocketRoutes(app: FastifyInstance) {
 				username: username,
 				userId: tmp.id,
 				email: tmp.email,
-				avatar_url: 'trouverunmoyen',
+				avatar_url: tmp.avatar_url || "../uploads/avatar3.png",
 				socket: socket,
 			};
 			live.set(user.username, user);
