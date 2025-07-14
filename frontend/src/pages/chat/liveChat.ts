@@ -129,6 +129,7 @@ export class Chat {
 				break;
 			case 'system_message':
 				this.addSystemMessage(data.content);
+				this.updateFriendList();
 				break;
 			case 'notLog':
 				console.log('pas de token pour livechat')
@@ -229,11 +230,11 @@ export class Chat {
 
 		var	friends = 0;
 		var	request = 0;
-		// 1 get les relations normale du user
+
 		const relations: Relation[] | null = await fetchUserRelations(this.me.userId);
 
 		if (!relations) {
-			// t'as pas d'amis mgl
+			console.log("t'as pas d'amis mgl")
 			return;
 		}
 
@@ -244,11 +245,14 @@ export class Chat {
 
 			const friend: UserChat | void = await fetchUserInfo(friendId);
 
+
+
 			if (!friend)
 				continue;
 			
 			if (relation.user1_state === 'normal' && relation.user2_state === 'normal') {
 				friends++;
+
 				const conversationElement = document.createElement('div');
 					conversationElement.className = 'friend-card online flex items-center';
 					conversationElement.dataset.username = friend.username;
@@ -275,6 +279,27 @@ export class Chat {
 				(relation.user_2 === this.me.userId && relation.user2_state === 'waiting')) {
 				request++;
 
+				console.log(`afficher demande d'ami d'un des deux`)
+
+				const conversationElement = document.createElement('div');
+					conversationElement.className = 'friend-card online flex items-center';
+					conversationElement.dataset.username = friend.username;
+					conversationElement.innerHTML = `
+						<div class="friend-avatar">
+							${friend.username.charAt(0).toUpperCase()}
+							<div class="status-dot online"></div>
+						</div>
+						<div class="friend-info">
+							<div class="friend-name">${sanitizeHtml(friend.username)}</div>
+							<div class="friend-status">En ligne</div>
+						</div>
+						<div class="friend-actions">
+							<button class="action-btn chat-btn">
+								<i class="fas fa-comment-dots"></i>
+								</button>
+						</div>
+							`;
+
 				// afficher la carte de demande d'ami avec accepter ou refuser
 			}
 
@@ -284,6 +309,7 @@ export class Chat {
 	}
 
 	private updateUI() {
+		this.updateFriendList()
 
 	}
 
@@ -323,7 +349,7 @@ async function fetchUserRelations(userid: number): Promise<Relation[]|null> {
 	try {
 		if (!userid) throw new Error("userid is required");
 
-		const response = await fetch(`/relations${userid}`);
+		const response = await fetch(`/api/relations/${userid}`);
 		
 		if (!response.ok) {
 			const errorData = await response.json();
