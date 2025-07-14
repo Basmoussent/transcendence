@@ -77,6 +77,7 @@ function initializeLoginEvents() {
 		if (token) {
 			console.log('🎫 Token reçu dans le header');
 			setAuthToken(token);
+			console.log(`le token des familles `, token)
 		} else {
 			console.log('Token attendu dans les cookies');
 		}

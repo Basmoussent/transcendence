@@ -90,7 +90,6 @@ export function renderBlock() {
     }
     console.log('Canvas found, creating game instance...');
     const game = new Block(canvas);
-    game.init();
   }, 0);
 
   return html;

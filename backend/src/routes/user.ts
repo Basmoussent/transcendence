@@ -7,6 +7,13 @@ import util from 'util'
 import { pipeline } from 'stream'
 import path from 'path';
 
+interface stats {
+    wins: number,
+    pong_games: number,
+    block_games: number,
+    rating: number
+}
+
 interface UserData {
   id: number;
   username: string;
@@ -58,11 +65,12 @@ async function userRoutes(app: FastifyInstance) {
 
             // Récupération des statistiques (pour l'instant des valeurs par défaut)
             // TODO: Implémenter la vraie logique des statistiques
-            const stats = {
-                wins: 0,
-                games: 0,
-                rating: 0
-            };
+            // const stats = {
+            //     win: user.stats.wins,
+            //     pong_games: user.stats.pong_games,
+            //     block_games: user.stats.block_games,
+            //     rating: user.stats.rating
+            // };
 
             return reply.send({
                 user: {
@@ -72,7 +80,7 @@ async function userRoutes(app: FastifyInstance) {
                     avatar_url: user.avatar_url || 'avatar.png',
                     language: user.language
                 },
-                stats: stats
+                // stats: stats
             });
         } catch (err: any) {
             console.error('❌ Error in /me endpoint:', err);
@@ -103,6 +111,7 @@ async function userRoutes(app: FastifyInstance) {
         // Servir le fichier
         return reply.type(contentType).send(fs.createReadStream(filePath));
     });
+
 
     app.post('/upload/avatar', async function (request: FastifyRequest, reply: FastifyReply) {
         try {
@@ -199,7 +208,68 @@ async function userRoutes(app: FastifyInstance) {
             }
             return reply.status(500).send({ error: 'Erreur lors de l\'upload de l\'avatar', details: err.message });
         }
+        
     });
+
+    app.get('/user:userid', async function (request: FastifyRequest, reply: FastifyReply) {
+
+        try {
+            const database = db.getDatabase();
+
+            const { userid } = request.query as { userid?: number };
+
+            if (!userid)
+                throw new Error ("missing userid in the request body");
+
+            const user = await new Promise<UserData | null>((resolve, reject) => {
+                database.get(
+                    'SELECT * FROM users WHERE id = ?',
+                    [ userid ],
+                    (err: any, row: UserData | undefined) => {
+                        err ? reject(err) : resolve(row || null); }
+                );
+            });
+            return reply.send({
+                message: `info du user ${userid}`,
+                data: user,
+            });
+        }
+        catch (err: any) {
+            return reply.status(500).send({
+                error: 'erreur GET /user:userId',
+                details: err.message });
+        }
+    })
+
+    app.get('/user/username:username', async function (request: FastifyRequest, reply: FastifyReply) {
+
+        try {
+            const database = db.getDatabase();
+
+            const { username } = request.query as { username?: string };
+
+            if (!username)
+                throw new Error ("missing username in the request body");
+
+            const user = await new Promise<UserData | null>((resolve, reject) => {
+                database.get(
+                    'SELECT * FROM users WHERE username = ?',
+                    [ username ],
+                    (err: any, row: UserData | undefined) => {
+                        err ? reject(err) : resolve(row || null); }
+                );
+            });
+            return reply.send({
+                message: `info du user ${username}`,
+                data: user,
+            });
+        }
+        catch (err: any) {
+            return reply.status(500).send({
+                error: 'erreur GET /user/username:username',
+                details: err.message });
+        }
+    })
 
     app.get('/user/:username', async (request: FastifyRequest, reply: FastifyReply) => {
         const data  = request.params as string;

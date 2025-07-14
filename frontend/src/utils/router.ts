@@ -7,14 +7,20 @@ import { render404 } from '../components/404';
 import { renderSocial } from '../pages/social/social';
 import { renderProfil } from '../pages/social/profil';
 import { renderMultiplayer, initializeMultiplayerEvents } from '../pages/game/multiplayer';
-import { renderLocal, initializeLocalEvents } from '../pages/game/local';
+import { renderMatchmaking } from '../pages/matchmaking/renderMatchmaking';
 import { renderTournaments, initializeTournamentEvents } from '../pages/game/tournament';
 
 import { renderBlock } from '../pages/block/main';
+import { renderBlock1v1 } from '../pages/block/block1v1';
+import { renderRoom } from '../pages/room/renderRoom';
+import { renderChat } from '../pages/chat/renderChat';
 import { renderChangePassword, initializeChangePasswordEvents } from '../pages/auth/change-password';
 import { renderEditProfil, initializeEditProfileEvents } from '../pages/social/edit-profil';
 import { getAuthToken } from './auth';
 import { clearTranslationCache } from './translations';
+// import { renderPong } from '../pages/pong/main';
+import { getGame } from '@/game/gameUtils';
+import { initializeMatchmakingEvents } from '../pages/matchmaking/renderMatchmaking';
 import { renderPong } from '../pages/pong/pong';
 import { renderMultiPong } from '../pages/pong/multiplayer-pong';
 import { renderChooseGame } from '../pages/game/choose-game';
@@ -23,13 +29,22 @@ export async function router() {
   // Clear translation cache to ensure fresh translations
   clearTranslationCache();
   
-  const path = window.location.pathname;
+  let path = window.location.pathname;
   const app = document.getElementById('app');
   if (!app) return;
 
   const publicRoutes = ['/', '/login', '/create-account', '/forgot-password', '/block'];
   const token = getAuthToken();
 
+
+  let uuid: string | null = null;
+
+  if (path.startsWith('/room/')) {
+    uuid = path.substring(6);
+    path = '/room'
+
+  }
+  
   if (!publicRoutes.includes(path) && !token) {
     window.history.pushState({}, '', '/login');
     app.innerHTML = renderLogin();
@@ -93,8 +108,8 @@ export async function router() {
     case '/multiplayer':
       view = renderMultiplayer();
       break;
-    case '/local-game':
-      view = renderLocal();
+    case '/matchmaking':
+      view = renderMatchmaking();
       break;
     case '/tournament':
       view = renderTournaments();
@@ -102,8 +117,12 @@ export async function router() {
     case '/block':
       view = renderBlock();
       break;
+      break;
     case '/game':
       view = renderChooseGame();
+      break;
+    case '/block1v1':
+      view = renderBlock1v1();
       break;
     case '/change-password':
       view = renderChangePassword();
@@ -113,6 +132,11 @@ export async function router() {
       break;
     case '/pong':
       view = renderPong();
+      break;
+    case '/room':
+      if (!uuid)
+        return ;
+      view = renderRoom(uuid);
       break;
     case '/multi-pong':
       view = renderMultiPong();
@@ -143,9 +167,6 @@ export async function router() {
       case '/multiplayer':
         initializeMultiplayerEvents();
         break;
-      case '/local-game':
-        initializeLocalEvents();
-        break;
       case '/tournament':
         initializeTournamentEvents();
         break;
@@ -154,6 +175,9 @@ export async function router() {
         break;
       case '/edit-profil':
         initializeEditProfileEvents();
+        break;
+      case '/matchmaking':
+        initializeMatchmakingEvents();
         break;
     }
   }, 0);

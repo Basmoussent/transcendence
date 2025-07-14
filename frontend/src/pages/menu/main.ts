@@ -1,5 +1,6 @@
 import { t } from '../../utils/translations';
 import { removeAuthToken } from '../../utils/auth';
+import { loadAvailableGames } from '../matchmaking/matchmaking';
 
 export function renderMain() {
   return `
@@ -13,7 +14,7 @@ export function renderMain() {
             ${t('menu.profile')}
           </button>
           
-          <button class="menu-button local-game-button" id="localGameBtn">
+          <button class="menu-button matchmaking-button" id="matchmakingBtn">
             <i class="fas fa-gamepad"></i>
             ${t('menu.playLocal')}
           </button>
@@ -33,16 +34,6 @@ export function renderMain() {
             ${t('menu.friends')}
           </button>
 
-          <button class="menu-button pong-game-button" id="pongBtn">
-            <i class="fa-solid fa-trophy"></i>
-            Pong Game
-          </button>
-
-          <button class="menu-button block-game-button" id="blockBtn">
-            <i class="fas fa-cube"></i>
-            Block Game
-          </button>
-          
           <button class="menu-button logout-button" id="logoutBtn">
             <i class="fas fa-sign-out-alt"></i>
             Logout
@@ -123,7 +114,7 @@ export function renderMain() {
         background: linear-gradient(135deg, #4a90e2 0%, #357abd 100%);
       }
 
-      .local-game-button {
+      .matchmaking-button {
         background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
       }
 
@@ -251,7 +242,7 @@ export function renderMain() {
 function initializeMainEvents() {
   // Gestion des boutons de navigation
   const profileBtn = document.getElementById('profileBtn');
-  const localGameBtn = document.getElementById('localGameBtn');
+  const matchmakingBtn = document.getElementById('matchmakingBtn');
   const multiplayerBtn = document.getElementById('multiplayerBtn');
   const friendsBtn = document.getElementById('friendsBtn');
   const blockGameBtn = document.getElementById('blockBtn');
@@ -268,9 +259,9 @@ function initializeMainEvents() {
     });
   }
 
-  if (localGameBtn) {
-    localGameBtn.addEventListener('click', () => {
-      window.history.pushState({}, '', '/local-game');
+  if (matchmakingBtn) {
+    matchmakingBtn.addEventListener('click', () => {
+      window.history.pushState({}, '', '/matchmaking');
       window.dispatchEvent(new PopStateEvent('popstate'));
     });
   }
