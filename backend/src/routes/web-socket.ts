@@ -248,7 +248,7 @@ async function webSocketRoutes(app: FastifyInstance) {
 						break;
 					
 					case 'friend_request':
-						addFriend(sender, data);
+						addFriend(app, sender, data.friendName);
 						break;
 
 					default:
@@ -324,29 +324,26 @@ function broadcastSystemMessageChat(content: string) {
 	});
 }
 
-async function addFriend(user: UserChat, friend: string) {
-
-	const token = getTokenBack();
-	if (!token) {
-		// et renvoyer sur la page login
-		return;
-	}
+async function addFriend(app: FastifyInstance, user: UserChat, friendName: string) {
 
 	// 1 - check que le user exist
-	const friendId = await retrieveUserId(token, friend);
-	if (friendId === -1) {
+	const friend = await app.userService.findByUsername(friendName);
+	if (!friend) {
 		const message = JSON.stringify({
 			type: 'system_message',
 			content: 'user not found'
 		});
 		user.socket.send(message)
+		return;
 	}
 		
-	// 2 - check si le user n'est pas déjà amis
-	const relation  = await checkFriendshipState(token, user.userId, friendId);
-	if (relation !== null) {
+	// 2 - check si une relation n'existe pas déjà
+	const relations: Relation[] = await app.friendService.getRelations(user.userId);
+	const relation = relations.find(rel => rel.user_1 === friend.id || rel.user_2 === friend.id);
+
+	if (relation) {
 		// 3 - check que l'un des deux n'a pas bloqué l'autre
-		// 4 - check que l'invitation n'a pas déjà été faites et un des deux doit accepter
+		// 4 - check que l'invitation n'a pas déjà été faites || l'autre l'a déjà ajouté au quel cas on normalise la relation
 		// identifie quel est l'état de la relation et envoyer un msg en fonction
 		return;
 	}
@@ -354,98 +351,16 @@ async function addFriend(user: UserChat, friend: string) {
 
 	// 5 - envoyer une demande + creer l'instance dans db friends avec userid des deux personnes
 	//	 |__ update l'état, qui a ajouté qui
-	try {
-		const response = await fetch('/api/friend', {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json',
-				'x-access-token': token,
-			},
-			body: JSON.stringify({
-				user_1: user.userId,
-				user_2: friendId,
-				user1_state: 'waiting',
-				user2_state: 'requested'
-			})
-		});
+	await app.friendService.createRelation(user.userId, friend.id, 'waiting', 'requested');
 	
-		if (response.ok) {
-			console.log(`${user.username} requested ${friend} to be friends`)
-			// send au user le statut de la demande
-			user.socket.send(JSON.stringify({
-				type: 'updateUI',
-				message: 'new friend relation' }))
-			// send au friend l'invitation s'il est connecte
-			// dans update UI livechat -- onglet demandes
-			// on passe sur tous les friends du user et afficher seulement les instances ou le state de l'autre user est à `asking`
-		}
-		else 
-			console.error(`post addFriend failed`);
-	}
-	catch (error) {
-		console.error("", error); }
-}
-
-function getTokenBack() {
-	// const localToken = localStorage.getItem('x-access-token');
-	// if (localToken)
-	// 	return localToken;
-
-	const cookies = document.cookie.split(';');
-	for (const cookie of cookies) {
-		const [name, value] = cookie.trim().split('=');
-		if (name === 'x-access-token')
-			return value;
-	}
-	return null;
-}
-
-async function retrieveUserId(token: any, user: string): Promise<number> {
-
-	try {		
-		const response = await fetch(`/api/user/username?username=${user}`, {
-			method: 'GET',
-			headers: {
-				'Content-Type': 'application/json',
-				'x-access-token': token
-			}
-		});
-
-		if (response.ok) {
-			const result = await response.json();
-			return (result.data.id);
-		}
-		else
-			console.error('fetchuserinfo failed');
-	}
-	catch (error) {
-		console.error('fetchuserinfo failed: ', error);
-	}
-	return (-1);
-
-}
-
-async function checkFriendshipState(token: any, user: number, friend: number): Promise<Relation|null> {
-
-	const response = await fetch(`/api/friend/relations?userid=${user}`, {
-		method: 'GET',
-		headers: {
-			'Content-Type': 'application/json',
-			'x-access-token': token,
-		},
-	});
-
-	if (response.ok) {
-		const relations = await response.json();
-
-		for (const rel of relations) 
-			if (rel.user_1 === friend || rel.user_2 === friend)
-				return rel;
-		return null;
-	}
-	else 
-		console.error("Erreur pour start la game");
-	return null
+	console.log(`${user.username} requested ${friendName} to be friends`)
+	// send au user le statut de la demande
+	user.socket.send(JSON.stringify({
+		type: 'updateUI',
+		message: 'new friend relation' }))
+	// send au friend l'invitation s'il est connecte
+	// dans update UI livechat -- onglet demandes
+	// on passe sur tous les friends du user et afficher seulement les instances ou le state de l'autre user est à `asking`
 }
 
 export default webSocketRoutes;

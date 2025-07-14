@@ -62,7 +62,7 @@ async function friendRoutes(app: FastifyInstance) {
 				);
 			});
 			return reply.send({
-				message: `nouvelle amitie entre ${user_1} et ${user_2}`,
+				message: `nouvelle realtion entre ${user_1} et ${user_2}`,
 			});
 		}
 		catch (err: any) {
