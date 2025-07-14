@@ -79,3 +79,20 @@ export function removeAuthToken(): void {
 export function isAuthenticated(): boolean {
   return getAuthToken() !== null;
 }
+
+export  function initAlive()
+{
+  const socket = new WebSocket(`${window.location.protocol === "https:" ? "wss" : "ws"}://${window.location.host}/api/alive`);
+
+  socket.addEventListener('open', () => {
+    console.log('🔌 WebSocket connected');
+
+    setInterval(() => {
+      console.log('🔌 WebSocket readyState:', socket.readyState);
+      if (socket.readyState === WebSocket.OPEN) {
+        console.log('🔌 WebSocket ping sent');
+        socket.send('ping');
+      }
+    }, 10000);
+  });
+}

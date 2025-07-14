@@ -25,6 +25,7 @@ const fastify = Fastify({ logger: { level: 'debug' } });
 const redis = createClient({ url: 'redis://redis:6378' });
 redis.on('error', (err) => console.error('❌ Redis Error:', err)).connect();
 
+export { redis };
 
 // Healthcheck route for Redis
 fastify.get('/redis-health', async (request, reply) => {

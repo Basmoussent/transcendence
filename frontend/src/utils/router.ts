@@ -24,6 +24,7 @@ import { initializeMatchmakingEvents } from '../pages/matchmaking/renderMatchmak
 import { renderPong } from '../pages/pong/pong';
 import { renderMultiPong } from '../pages/pong/multiplayer-pong';
 import { renderChooseGame } from '../pages/game/choose-game';
+import { initAlive } from './auth';
 
 export async function router() {
   // Clear translation cache to ensure fresh translations
@@ -151,6 +152,8 @@ export async function router() {
 
   // Initialiser les événements après le rendu pour les pages qui en ont besoin
   setTimeout(() => {
+    if (!publicRoutes.includes(path))
+      initAlive();
     switch (path) {
       case '/':
         initializeHomeEvents();
