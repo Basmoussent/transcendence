@@ -10,8 +10,8 @@ interface Relation {
 }
 
 async function friendRoutes(app: FastifyInstance) {
-
-	app.get('/relation:userid', async function (request: FastifyRequest, reply: FastifyReply) {
+	
+	app.get('/relations:userid', async function (request: FastifyRequest, reply: FastifyReply) {
 
 		try {
 			const database = db.getDatabase();
@@ -21,9 +21,9 @@ async function friendRoutes(app: FastifyInstance) {
 			if (!userid)
 				throw new Error ("missing userid in the request body");
 
-			const relation = await new Promise<Relation[] | null>((resolve, reject) => {
+			const relations = await new Promise<Relation[] | null>((resolve, reject) => {
 
-				database.get(
+				database.all(
 					'SELECT * FROM friends WHERE user_1 = ? || user_2 = ?',
 					[ userid, userid ],
 					(err: any, row: Relation[] | undefined) => {
@@ -32,7 +32,7 @@ async function friendRoutes(app: FastifyInstance) {
 			});
 			return reply.send({
 				message: `friends du user ${userid}`,
-				relation: relation,
+				relations: relations,
 			});
 		}
 		catch (err: any) {
@@ -57,7 +57,7 @@ async function friendRoutes(app: FastifyInstance) {
 				database.run(
 					'INSERT INTO friends (user_1, user_2, user1_state, user2_state) VALUES (?, ?, ?, ?)',
 					[ user_1, user_2, user1_state, user2_state ],
-					(err: any, row: Relation[] | undefined) => {
+					(err: any) => {
 						err ? reject(err) : resolve(); }
 				);
 			});

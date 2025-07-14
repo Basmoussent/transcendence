@@ -26,6 +26,16 @@ interface Room {
 	ai: number;
 }
 
+// redeinition on peut import de web-socket.ts
+interface Relation {
+	user_1: number;
+	user_2: number;
+	user1_state: 'normal' | 'requested' | 'waiting' | 'blocked';
+	user2_state: 'normal' | 'requested' | 'waiting' | 'blocked';
+}
+
+
+
 const rooms = new Map<string, Room>();
 const live = new Map<string, UserChat>();
 
@@ -238,7 +248,7 @@ async function webSocketRoutes(app: FastifyInstance) {
 						break;
 					
 					case 'friend_request':
-						addFriend(username, data.dest);
+						addFriend(sender, data);
 						break;
 
 					default:
@@ -314,33 +324,85 @@ function broadcastSystemMessageChat(content: string) {
 	});
 }
 
-async function addFriend(user: string, friend: string) {
+async function addFriend(user: UserChat, friend: string) {
+
+	const token = getTokenBack();
+	if (!token) {
+		// et renvoyer sur la page login
+		return;
+	}
+
 	// 1 - check que le user exist
-	const friendId = await retrieveUserId(friend);
-	if (friendId === -1)
+	const friendId = await retrieveUserId(token, friend);
+	if (friendId === -1) {
+		const message = JSON.stringify({
+			type: 'system_message',
+			content: 'user not found'
+		});
+		user.socket.send(message)
+	}
 		
-
-
-
-
-	checkFriendshipState(user, friend);
 	// 2 - check si le user n'est pas déjà amis
-	// 3 - check que l'un des deux n'a pas bloqué l'autre
-	// 4 - check que l'invitation n'a pas déjà été faites et un des deux doit accepter
+	const relation  = await checkFriendshipState(token, user.userId, friendId);
+	if (relation !== null) {
+		// 3 - check que l'un des deux n'a pas bloqué l'autre
+		// 4 - check que l'invitation n'a pas déjà été faites et un des deux doit accepter
+		// identifie quel est l'état de la relation et envoyer un msg en fonction
+		return;
+	}
+	
+
 	// 5 - envoyer une demande + creer l'instance dans db friends avec userid des deux personnes
 	//	 |__ update l'état, qui a ajouté qui
-
-	// send au user le statut de la demande
-	// send au friend l'invitation 
-
-	// dans update UI livechat -- onglet demandes
-	// on passe sur tous les friends du user et afficher seulement les instances ou le state de l'autre user est à `asking`
-
+	try {
+		const response = await fetch('/api/friend', {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+				'x-access-token': token,
+			},
+			body: JSON.stringify({
+				user_1: user.userId,
+				user_2: friendId,
+				user1_state: 'waiting',
+				user2_state: 'requested'
+			})
+		});
+	
+		if (response.ok) {
+			console.log(`${user.username} requested ${friend} to be friends`)
+			// send au user le statut de la demande
+			user.socket.send(JSON.stringify({
+				type: 'updateUI',
+				message: 'new friend relation' }))
+			// send au friend l'invitation s'il est connecte
+			// dans update UI livechat -- onglet demandes
+			// on passe sur tous les friends du user et afficher seulement les instances ou le state de l'autre user est à `asking`
+		}
+		else 
+			console.error(`post addFriend failed`);
+	}
+	catch (error) {
+		console.error("", error); }
 }
 
-async function retrieveUserId(user: string): Promise<number> {
+function getTokenBack() {
+	// const localToken = localStorage.getItem('x-access-token');
+	// if (localToken)
+	// 	return localToken;
 
-	try {
+	const cookies = document.cookie.split(';');
+	for (const cookie of cookies) {
+		const [name, value] = cookie.trim().split('=');
+		if (name === 'x-access-token')
+			return value;
+	}
+	return null;
+}
+
+async function retrieveUserId(token: any, user: string): Promise<number> {
+
+	try {		
 		const response = await fetch(`/api/user/username?username=${user}`, {
 			method: 'GET',
 			headers: {
@@ -361,6 +423,29 @@ async function retrieveUserId(user: string): Promise<number> {
 	}
 	return (-1);
 
+}
+
+async function checkFriendshipState(token: any, user: number, friend: number): Promise<Relation|null> {
+
+	const response = await fetch(`/api/friend/relations?userid=${user}`, {
+		method: 'GET',
+		headers: {
+			'Content-Type': 'application/json',
+			'x-access-token': token,
+		},
+	});
+
+	if (response.ok) {
+		const relations = await response.json();
+
+		for (const rel of relations) 
+			if (rel.user_1 === friend || rel.user_2 === friend)
+				return rel;
+		return null;
+	}
+	else 
+		console.error("Erreur pour start la game");
+	return null
 }
 
 export default webSocketRoutes;

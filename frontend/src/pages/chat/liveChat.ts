@@ -12,7 +12,6 @@ export interface UserChat {
 
 export class Chat {
 
-	private username: string;
 	private ws: WebSocket;
 
 	// Left Panel
