@@ -134,3 +134,17 @@ trouver un moyen de passer les infos a la classe pong lors de la construction
 
 
 faire le middle ware comme ca pas besoin de check le header de toutes les requetes
+
+
+
+vu que chaque user a sa propre interface:
+
+	updateUI: refresh les elements --
+					|__ la liste d'amis
+					|__ les demandes d'amis
+
+
+
+
+
+a chaque fois que je send depuis ma classe chat j'envoie le token, automatiser la tache

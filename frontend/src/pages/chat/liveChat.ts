@@ -1,6 +1,6 @@
 import { escape } from 'querystring';
 import { sanitizeHtml } from '../../utils/sanitizer';
-import { fetchUserInfo, loadMe } from './utils';
+import { fetchMe, fetchUserInfo, loadMe } from './utils';
 
 export interface UserChat {
 	username: string;
@@ -8,6 +8,13 @@ export interface UserChat {
 	email: string;
 	avatar_url: string;
 	receiver?: string;
+}
+
+interface Relation {
+	user_1: number;
+	user_2: number;
+	user1_state: 'normal' | 'requested' | 'waiting' | 'blocked';
+	user2_state: 'normal' | 'requested' | 'waiting' | 'blocked';
 }
 
 export class Chat {
@@ -115,15 +122,13 @@ export class Chat {
 				this.addChatMessage(data.username, data.content);
 				break;
 			case 'friend_list_update':
-				this.updateFriendList(data.users);
+				this.updateFriendList();
+				break;
+			case 'updateUI':
+				this.updateUI();
 				break;
 			case 'system_message':
 				this.addSystemMessage(data.content);
-				break;
-			case 'notLog':
-				window.history.pushState({}, '', '/login');
-				window.dispatchEvent(new Event('popstate'));
-				this.ws.close();
 				break;
 			case 'notLog':
 				console.log('pas de token pour livechat')
@@ -159,11 +164,10 @@ export class Chat {
 
 				document.querySelectorAll('.tab-pane').forEach(pane => {
 					const htmlPane = pane as HTMLElement;
-					if (htmlPane.id === `${tabName}Tab`) {
+					if (htmlPane.id === `${tabName}Tab`)
 						htmlPane.classList.remove('hidden');
-					} else {
+					else
 						htmlPane.classList.add('hidden');
-					}
 				});
 			});
 		});
@@ -221,31 +225,66 @@ export class Chat {
 		this.chatMessages.scrollTop = this.chatMessages.scrollHeight;
 	}
 
-	private updateFriendList(users: UserChat[]) {
+	private async updateFriendList() {
+
+		var	friends = 0;
+		var	request = 0;
+		// 1 get les relations normale du user
+		const relations: Relation[] | null = await fetchUserRelations(this.me.userId);
+
+		if (!relations) {
+			// t'as pas d'amis mgl
+			return;
+		}
+
 		this.friendsList.innerHTML = '';
-		this.friendsCount.textContent = users.length.toString();
-		users.forEach(user => {
-			const conversationElement = document.createElement('div');
-			conversationElement.className = 'friend-card online flex items-center';
-			conversationElement.dataset.username = user.username;
-			conversationElement.innerHTML = `
-				<div class="friend-avatar">
-                    ${user.username.charAt(0).toUpperCase()}
-                    <div class="status-dot online"></div>
-                </div>
-                <div class="friend-info">
-                    <div class="friend-name">${sanitizeHtml(user.username)}</div>
-                    <div class="friend-status">En ligne</div>
-                </div>
-                <div class="friend-actions">
-                    <button class="action-btn chat-btn">
-                        <i class="fas fa-comment-dots"></i>
-                    </button>
-                </div>
-			`;
+		for (const relation of relations) {
+
+			const friendId = relation.user_2 === this.me.userId ? this.me.userId : relation.user_2;
+
+			const friend: UserChat | void = await fetchUserInfo(friendId);
+
+			if (!friend)
+				continue;
+			
+			if (relation.user1_state === 'normal' && relation.user2_state === 'normal') {
+				friends++;
+				const conversationElement = document.createElement('div');
+					conversationElement.className = 'friend-card online flex items-center';
+					conversationElement.dataset.username = friend.username;
+					conversationElement.innerHTML = `
+						<div class="friend-avatar">
+							${friend.username.charAt(0).toUpperCase()}
+							<div class="status-dot online"></div>
+						</div>
+						<div class="friend-info">
+							<div class="friend-name">${sanitizeHtml(friend.username)}</div>
+							<div class="friend-status">En ligne</div>
+						</div>
+						<div class="friend-actions">
+							<button class="action-btn chat-btn">
+								<i class="fas fa-comment-dots"></i>
+								</button>
+						</div>
+							`;
 			this.friendsList.appendChild(conversationElement);
-			conversationElement.addEventListener('click', () => this.startChatWith(user));
-		});
+			conversationElement.addEventListener('click', () => this.startChatWith(friend));
+				// afficher la carte de l'ami
+			}
+			else if ((relation.user_1 === this.me.userId && relation.user1_state === 'waiting') ||
+				(relation.user_2 === this.me.userId && relation.user2_state === 'waiting')) {
+				request++;
+
+				// afficher la carte de demande d'ami avec accepter ou refuser
+			}
+
+		}
+		this.friendsCount.textContent = friends.toString();
+		this.requestsCount.textContent = request.toString();
+	}
+
+	private updateUI() {
+
 	}
 
 	private startChatWith(user: UserChat) {
@@ -272,8 +311,42 @@ export class Chat {
 		this.chatMessages.innerHTML = '';
 
 		this.ws.send(JSON.stringify({
-		type: 'fetch_history',
-		with_user: user.username
+			type: 'fetch_history',
+			with_user: user.username
 		}));
 	}
+}
+
+
+async function fetchUserRelations(userid: number): Promise<Relation[]|null> {
+
+	try {
+		if (!userid) throw new Error("userid is required");
+
+		const response = await fetch(`/relations${userid}`);
+		
+		if (!response.ok) {
+			const errorData = await response.json();
+			throw new Error(errorData.details || "Erreur inconnue");
+		}
+
+		const result = await response.json();
+
+		if (response.ok) {
+			const relations: Relation[] = result.relation.map((relation:any) => ({
+				user_1: relation.user_1,
+				user_2: relation.user_2,
+				user1_state: relation.user_1_state,
+				user2_state: relation.user_2_state
+			}));
+			console.log("Relations:", relations);
+			return relations;
+		}
+		console.error("error retrieve relations of a user");
+		return null;
+	}
+	catch (error: any) {
+		console.error("error retrieve relations of a user", error.message);
+	}
+	return null;
 }

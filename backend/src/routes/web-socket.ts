@@ -42,8 +42,6 @@ interface Relation {
 	user2_state: 'normal' | 'requested' | 'waiting' | 'blocked';
 }
 
-
-
 const rooms = new Map<string, Room>();
 const live = new Map<string, UserChat>();
 
@@ -263,16 +261,18 @@ async function webSocketRoutes(app: FastifyInstance) {
 		const token = req.headers['x-access-token'] ? req.headers['x-access-token'] : req.cookies['x-access-token']; 
 
 		if (!token) {
-			socket.send(JSON.stringify({
-				type: 'notLog',
-				message: 'the user is not log' }))
-			return ;
+			// socket.send(JSON.stringify({
+			// 	type: 'notLog',
+			// 	message: 'the user is not log' }))
+			// return ;
 		}
 
 		const decoded = app.jwt.verify(token) as { user: string };
 		const username = decoded.name;
 
 		loadMe(app, username).then((tmp: UserData) => {
+
+			console.log('les infos valent', tmp);
 			const user: UserChat = {
 				username: username,
 				userId: tmp.id,
