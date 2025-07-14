@@ -33,7 +33,7 @@ export async function router() {
   const app = document.getElementById('app');
   if (!app) return;
 
-  const publicRoutes = ['/', '/login', '/create-account', '/forgot-password', '/block'];
+  const publicRoutes = ['/', '/login', '/create-account', '/forgot-password'];
   const token = getAuthToken();
 
 
@@ -132,6 +132,9 @@ export async function router() {
       break;
     case '/pong':
       view = renderPong();
+      break;
+    case '/chat':
+      view = renderChat();
       break;
     case '/room':
       if (!uuid)

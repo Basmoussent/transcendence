@@ -111,7 +111,10 @@ async function webSocketRoutes(app: FastifyInstance) {
 		const token = req.headers['x-access-token'] ? req.headers['x-access-token'] : req.cookies['x-access-token']; 
 		
 		if (!token) {
-			console.log('ya pas de token pour lassui')
+
+			console.log('⚠️  Aucun token fourni. Détails de la requête :');
+			console.log('Headers :', JSON.stringify(req.headers, null, 2));
+			console.log('Cookies :', JSON.stringify(req.cookies, null, 2));
 			socket.send(JSON.stringify({
 				type: 'notLog',
 				message: 'the user is not log' }))

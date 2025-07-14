@@ -120,6 +120,11 @@ export class Chat {
 			case 'system_message':
 				this.addSystemMessage(data.content);
 				break;
+			case 'notLog':
+				window.history.pushState({}, '', '/login');
+				window.dispatchEvent(new Event('popstate'));
+				this.ws.close();
+				break;
 			default:
 				console.log(`Unknown event type: ${data.type}   ${data.message}`);
 		}
