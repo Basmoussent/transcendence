@@ -16,7 +16,7 @@ import { renderChangePassword, initializeChangePasswordEvents } from '../pages/a
 import { renderEditProfil, initializeEditProfileEvents } from '../pages/social/edit-profil';
 import { getAuthToken } from './auth';
 import { clearTranslationCache } from './translations';
-import { renderPong } from '../pages/pong/main';
+import { renderPong } from '../pages/pong/pong';
 
 export async function router() {
   // Clear translation cache to ensure fresh translations

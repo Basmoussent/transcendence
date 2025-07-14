@@ -14,7 +14,7 @@ interface User {
 interface RoomData {
 	id: string;
 	name: string;
-	gameType: 'pong' | 'block';
+	gameType: 'Pong' | 'Block';
 	maxPlayers: number;
 	currentPlayers: number;
 	users: User[];
@@ -22,13 +22,27 @@ interface RoomData {
 	host: string;
 }
 
-	// <div class="bg-gradient-to-br from-[#AEB8FE] via-[#4b0082] to-[#000080]">
+export function renderRoom(uuid: string) {
+
+	setTimeout(async () => {
+		try {
+
+			const username = await fetchUsername();
+			if (username !== undefined) {
+				const render = new Room(username, uuid);
+			}
+		}
+		catch (err:any) {
+			console.log(err);
+		}
+	}, 0);
+	
+	return getTemplate();
+}
 
 
 const getTemplate = () => {
 	return `
-	<div class="flex flex-col h-screen bg-gradient-to-br from-[#C3423F] to-[#03254e]">
-
 		<button class="home-button" id="homeBtn">
 			<i class="fas fa-home"></i>
 			Home
@@ -62,10 +76,10 @@ const getTemplate = () => {
 					</button>
 				</div>
 			
-				<div class="room-settings" id="roomSettings">
+				<div class="room-settings hidden" id="roomSettings">
 					<h3 class="text-lg font-semibold text-white mb-3">Room Settings</h3>
 					<div class="settings-grid">
-						<div class="setting-item">
+						<div class="setting-item" id="max-player">
 							<label class="text-white/80">Max Players</label>
 							<select class="setting-select" id="maxPlayersSelect">
 								<option value="2">2</option>
@@ -79,6 +93,20 @@ const getTemplate = () => {
 								<option value="pong">Pong</option>
 								<option value="block">Block</option>
 							</select>
+						</div>
+						<div class="setting-item" id="ai-setting">
+							<label class="text-white/80 mb-2 block">AI</label>
+							<div class="flex items-center gap-3">
+								<button type="button" class="ai-button control-button" id="decreaseAI"
+									class="px-3 py-1 bg-white/10 border border-white/30 text-white rounded-lg hover:bg-white/20 transition">
+									-
+								</button>
+								<span id="aiCount" class="text-white text-lg font-semibold w-6 text-center">0</span>
+								<button type="button" class="ai-button control-button" id="increaseAI"
+									class="px-3 py-1 bg-white/10 border border-white/30 text-white rounded-lg hover:bg-white/20 transition">
+									+
+								</button>
+							</div>
 						</div>
 					</div>
 				</div>
@@ -98,8 +126,8 @@ const getTemplate = () => {
 					<!-- Players will be dynamically added here -->
 				</div>
 				
-				<div class="game-actions mt-6" id="gameActions">
-					<button class="action-btn start-btn" id="startGameBtn" disabled>
+				<div class="game-actions mt-6 hidden" id="gameActions">
+					<button class="action-btn start-btn " id="startGameBtn" disabled>
 						<i class="fas fa-play"></i>
 						Start Game
 					</button>
@@ -204,6 +232,22 @@ const getTemplate = () => {
 	.leave-btn:hover {
 		transform: translateY(-2px);
 		box-shadow: 0 8px 20px rgba(107, 114, 128, 0.3);
+	}
+
+	.ai-button {
+		padding: 0.25rem 0.75rem;
+		background-color: rgba(255, 255, 255, 0.1);
+		border: 1px solid rgba(255, 255, 255, 0.3);
+		color: white;
+		border-radius: 0.5rem;
+		transition: all 0.2s ease-in-out;
+	}
+
+	.ai-button:hover {
+		background-color: rgba(255, 255, 255, 0.2);
+		transform: scale(1.05);
+		box-shadow: 0 0 6px rgba(255, 255, 255, 0.2);
+		cursor: pointer
 	}
 
 	.settings-grid {
@@ -468,21 +512,3 @@ const getTemplate = () => {
 	</style>`;
 };
 
-export function renderRoom(uuid: string) {
-
-
-	setTimeout(async () => {
-		try {
-
-			const username = await fetchUsername();
-			if (username !== undefined) {
-				const render = new Room(username, uuid);
-			}
-		}
-		catch (err:any) {
-			console.log(err);
-		}
-	}, 0);
-	
-	return getTemplate();
-}
