@@ -92,6 +92,20 @@ export const translations = {
         newChat: "Nouvelle conversation",
         ago: "il y a"
       }
+    },
+    friends: {
+      backToSocial: "Retour",
+      online: "En ligne",
+      offline: "Hors ligne",
+      lastSeen: "Vu",
+      stats: {
+        wins: "Victoires",
+        games: "Parties",
+        rating: "Classement"
+      },
+      sendMessage: "Envoyer un message",
+      inviteToGame: "Inviter à jouer",
+      removeFriend: "Retirer des amis"
     }
   },
   en: {
@@ -187,6 +201,20 @@ export const translations = {
         newChat: "New Chat",
         ago: "ago"
       }
+    },
+    friends: {
+      backToSocial: "Back",
+      online: "Online",
+      offline: "Offline",
+      lastSeen: "Last seen",
+      stats: {
+        wins: "Wins",
+        games: "Games",
+        rating: "Rating"
+      },
+      sendMessage: "Send Message",
+      inviteToGame: "Invite to Game",
+      removeFriend: "Remove Friend"
     }
   },
   es: {
@@ -282,6 +310,20 @@ export const translations = {
         newChat: "Nuevo chat",
         ago: "hace"
       }
+    },
+    friends: {
+      backToSocial: "Volver",
+      online: "En línea",
+      offline: "Desconectado",
+      lastSeen: "Visto por última vez",
+      stats: {
+        wins: "Victorias",
+        games: "Partidas",
+        rating: "Clasificación"
+      },
+      sendMessage: "Enviar mensaje",
+      inviteToGame: "Invitar a jugar",
+      removeFriend: "Eliminar amigo"
     }
   }
 } as const;
@@ -352,7 +394,17 @@ type TranslationKeys =
   | 'social.friendRequests.decline'
   | 'social.chat.title'
   | 'social.chat.newChat'
-  | 'social.chat.ago';
+  | 'social.chat.ago'
+  | 'friends.backToSocial'
+  | 'friends.online'
+  | 'friends.offline'
+  | 'friends.lastSeen'
+  | 'friends.stats.wins'
+  | 'friends.stats.games'
+  | 'friends.stats.rating'
+  | 'friends.sendMessage'
+  | 'friends.inviteToGame'
+  | 'friends.removeFriend';
 
 export function getLanguage(): Language {
   const hostname = window.location.hostname;

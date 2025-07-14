@@ -17,4 +17,8 @@
 # ◦ Minor module: Support on all devices.
 
 ENLEVER LE RELOAD DANS LE CHANGEMENT DE LANGUE
+DOUBLON DE PSEUDO
+je crois y'as du tailwind dans index.html
+mettre tout els jwt.verify dasn des try and catch
+
 8M5m
