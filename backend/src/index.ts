@@ -22,7 +22,7 @@ import { createClient } from 'redis';
 
 
 const fastify = Fastify({ logger: { level: 'debug' } });
-const redis = createClient({ url: process.env.REDIS_URL || 'redis://localhost:6379' });
+const redis = createClient({ url: 'redis://redis:6378' });
 redis.on('error', (err) => console.error('❌ Redis Error:', err)).connect();
 
 

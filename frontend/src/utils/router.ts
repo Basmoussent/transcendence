@@ -24,7 +24,6 @@ import { initializeMatchmakingEvents } from '../pages/matchmaking/renderMatchmak
 import { renderPong } from '../pages/pong/pong';
 import { renderMultiPong } from '../pages/pong/multiplayer-pong';
 import { renderChooseGame } from '../pages/game/choose-game';
-import { renderPong } from '../pages/pong/main';
 
 export async function router() {
   // Clear translation cache to ensure fresh translations
