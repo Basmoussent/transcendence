@@ -156,8 +156,8 @@ export async function router() {
     } catch (e) {
       console.error('Erreur lors de la vérification du token:', e);
     }
-    console.log("initAlive");
-    console.log(tokenAuth);
+    // console.log("initAlive");
+    // console.log(tokenAuth);
   }
 
   // Initialiser les événements après le rendu pour les pages qui en ont besoin

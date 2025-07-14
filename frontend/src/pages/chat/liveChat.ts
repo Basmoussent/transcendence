@@ -233,7 +233,7 @@ export class Chat {
 
 		const relations: Relation[] | null = await fetchUserRelations(this.me.userId);
 
-		if (!relations) {
+		if (!relations || !relations.length) {
 			console.log("t'as pas d'amis mgl")
 			return;
 		}
@@ -347,9 +347,7 @@ export class Chat {
 async function fetchUserRelations(userid: number): Promise<Relation[]|null> {
 
 	try {
-		if (!userid) throw new Error("userid is required");
-
-		const response = await fetch(`/api/relations/${userid}`);
+		const response = await fetch(`/api/friend/relations?userid=${userid}`);
 		
 		if (!response.ok) {
 			const errorData = await response.json();
@@ -359,11 +357,11 @@ async function fetchUserRelations(userid: number): Promise<Relation[]|null> {
 		const result = await response.json();
 
 		if (response.ok) {
-			const relations: Relation[] = result.relation.map((relation:any) => ({
+			const relations: Relation[] = result.relations.map((relation:any) => ({
 				user_1: relation.user_1,
 				user_2: relation.user_2,
-				user1_state: relation.user_1_state,
-				user2_state: relation.user_2_state
+				user1_state: relation.user1_state,
+				user2_state: relation.user2_state
 			}));
 			console.log("Relations:", relations);
 			return relations;

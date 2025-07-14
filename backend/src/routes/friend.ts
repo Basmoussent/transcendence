@@ -11,7 +11,7 @@ interface Relation {
 
 async function friendRoutes(app: FastifyInstance) {
 	
-	app.get('/relations:userid', async function (request: FastifyRequest, reply: FastifyReply) {
+	app.get('/relations', async function (request: FastifyRequest, reply: FastifyReply) {
 
 		try {
 			const database = db.getDatabase();

@@ -43,11 +43,11 @@ const getTemplate = () => {
 		<div class="tabs">
 		<div class="tab active" data-tab="friends">
 			<i class="fas fa-user-friends mr-2"></i>
-			Amis (<span id="friendsCount">5</span>)
+			Amis (<span id="friendsCount">0</span>)
 		</div>
 		<div class="tab" data-tab="requests">
 			<i class="fas fa-user-plus mr-2"></i>
-			Demandes (<span id="requestsCount">2</span>)
+			Demandes (<span id="requestsCount">0</span>)
 		</div>
 		<div class="tab" data-tab="add">
 			<i class="fas fa-plus mr-2"></i>

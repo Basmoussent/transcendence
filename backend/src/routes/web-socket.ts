@@ -445,6 +445,15 @@ async function loadMe(app: FastifyInstance, username: string): Promise<UserData>
 
 async function addFriend(app: FastifyInstance, user: UserChat, friendName: string) {
 
+	if (friendName === user.username) {
+		const message = JSON.stringify({
+			type: 'system_message',
+			content: 'you cannot add yourself as a friend dumbass'
+		});
+		user.socket.send(message)
+		return;
+	}
+
 	// 1 - check que le user exist
 	const friend = await app.userService.findByUsername(friendName);
 	if (!friend) {
@@ -454,7 +463,7 @@ async function addFriend(app: FastifyInstance, user: UserChat, friendName: strin
 		});
 		user.socket.send(message)
 		return;
-	}
+	
 		
 	// 2 - check si une relation n'existe pas déjà
 	const relations: Relation[] = await app.friendService.getRelations(user.userId);
