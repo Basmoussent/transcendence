@@ -27,32 +27,99 @@ async function webSocketRoutes(app: FastifyInstance) {
 	dict.set("test", [])
 
 
-	app.get('/ws', { websocket: true }, (socket: any , req: FastifyRequest) => {
+	app.get('/ws', { websocket: true }, (socket: any, req: FastifyRequest) => {
+		let token = req.headers['x-access-token'] as string;
+		if (!token) {
+			token = req.cookies['x-access-token'];
+		}
+		
+		if (!token) {
+			console.log('❌ No token provided for WebSocket connection on /ws');
+			socket.send(JSON.stringify({
+				type: 'auth_error',
+				message: 'Authentication token required'
+			}));
+			socket.close();
+			return;
+		}
 
-		dict.get("test").push(socket)
+		try {
+			const decoded = app.jwt.verify(token) as { user: string; name: string };
+			console.log(`✅ WebSocket authenticated for user: ${decoded.name} on /ws`);
+		} catch (error: any) {
+			console.log('❌ Invalid token for WebSocket connection on /ws:', error.message);
+			socket.send(JSON.stringify({
+				type: 'auth_error',
+				message: 'Invalid or expired token'
+			}));
+			socket.close();
+			return;
+		}
+
+		dict.get("test").push(socket);
 		console.log("a user just connected on /ws");
 		socket.on('message', (message: any) => {
-			dict.get("test").forEach((client: any) => {
-				if (client !== socket)
-					client.send(message.toString())
-			})
-		})
+			try {
+				const data = JSON.parse(message.toString());
+				
+				dict.get("test").forEach((client: any) => {
+					if (client !== socket)
+						client.send(message.toString());
+				});
+			} catch (error) {
+				console.error('Invalid message format:', error);
+			}
+		});
 	});
 
-	app.get('/matchmaking', { websocket: true }, (socket: any , req: FastifyRequest) => {
+	app.get('/matchmaking', { websocket: true }, (socket: any, req: FastifyRequest) => {
+		// Vérification du token
+		let token = req.headers['x-access-token'] as string;
+		if (!token) {
+			token = req.cookies['x-access-token'];
+		}
+		
+		if (!token) {
+			console.log('❌ No token provided for WebSocket connection on /matchmaking');
+			socket.send(JSON.stringify({
+				type: 'auth_error',
+				message: 'Authentication token required'
+			}));
+			socket.close();
+			return;
+		}
+
+		try {
+			const decoded = app.jwt.verify(token) as { user: string; name: string };
+			console.log(`✅ WebSocket authenticated for user: ${decoded.name} on /matchmaking`);
+		} catch (error: any) {
+			console.log('❌ Invalid token for WebSocket connection on /matchmaking:', error.message);
+			socket.send(JSON.stringify({
+				type: 'auth_error',
+				message: 'Invalid or expired token'
+			}));
+			socket.close();
+			return;
+		}
 
 		dict.get("clients").push(socket);
 		console.log("a user just connected on /matchmaking");
 		socket.on('message', (message: any) => {
-			dict.get("clients").forEach((client: any) => {
-				if (client !== socket)
-					client.send(message.toString())
-			})
-		})
+			try {
+				const data = JSON.parse(message.toString());
+				
+				dict.get("clients").forEach((client: any) => {
+					if (client !== socket)
+						client.send(message.toString());
+				});
+			} catch (error) {
+				console.error('Invalid message format:', error);
+			}
+		});
 		socket.on('close', () => {
 			const index = dict.get("clients").indexOf(socket);
 			if (index !== -1) {
-				dict.get("clients").splice(index, 1); // Supprimer le client de la liste
+				dict.get("clients").splice(index, 1);
 				console.log("a user just disconnected from /matchmaking");
 			}
 		});
@@ -74,14 +141,22 @@ async function webSocketRoutes(app: FastifyInstance) {
 			return ;
 		}
 
-		const decoded = app.jwt.verify(token) as { user: string };
+		const decoded = app.jwt.verify(token) as { user: string; name: string };
 		const username = decoded.name;
 
-		const { uuid } = req.params as { uuid: string };
+		const { uuid } = req.params as { uuid?: string };
+		
+		if (!uuid) {
+			socket.send(JSON.stringify({
+				type: 'error',
+				message: 'UUID parameter is required'
+			}));
+			socket.close();
+			return;
+		}
 
-		// recup le bon usernam en faisant un appel /api/me ?
 
-		let room = rooms.get(uuid);
+		let room = rooms.get(uuid!);
 
 
 
@@ -96,7 +171,7 @@ async function webSocketRoutes(app: FastifyInstance) {
 				isGameStarted: false,
 			};
 
-			rooms.set(uuid, room);
+			rooms.set(uuid!, room);
 		}
 
 		if (room.users.size >= room.maxPlayers) {
@@ -117,14 +192,15 @@ async function webSocketRoutes(app: FastifyInstance) {
 
 		room.users.set(username, user);
 
-		console.log(`${username} connected to room ${uuid}`);
+		console.log(`${username} connected to room ${uuid!}`);
 		broadcastSystemMessage(room, `${username} has joined the room.`);
 		broadcastRoomUpdate(room);
 
 		socket.on('message', (message: string) => {
 			try {
 				const data = JSON.parse(message);
-				const currentRoom = rooms.get(uuid)!;
+				
+				const currentRoom = rooms.get(uuid!)!;
 				const currentUser = currentRoom.users.get(username)!;
 
 				switch (data.type) {
@@ -156,7 +232,7 @@ async function webSocketRoutes(app: FastifyInstance) {
 						if (!allReady)
 							return;
 
-						console.log(`Starting game for room ${uuid}`);
+						console.log(`Starting game for room ${uuid!}`);
 						currentRoom.isGameStarted = true;
 
 						const gameStartMessage = JSON.stringify({ 
@@ -164,7 +240,7 @@ async function webSocketRoutes(app: FastifyInstance) {
 							gameType: currentRoom.gameType });
 						
 						currentRoom.users.forEach(u => u.socket.send(gameStartMessage));
-						rooms.delete(uuid);
+						rooms.delete(uuid!);
 						break;
 				}
 			} catch (error) {
@@ -174,14 +250,14 @@ async function webSocketRoutes(app: FastifyInstance) {
 
 		socket.on('close', () => {
 
-			const roomToLeave = rooms.get(uuid);
+			const roomToLeave = rooms.get(uuid!);
 			if (roomToLeave) {
 				roomToLeave.users.delete(username);
-				console.log(`${username} disconnected from room ${uuid}`);
+				console.log(`${username} disconnected from room ${uuid!}`);
 
 				if (roomToLeave.users.size === 0) {
-					rooms.delete(uuid);
-					console.log(`Room ${uuid} deleted because em^ty`);
+					rooms.delete(uuid!);
+					console.log(`Room ${uuid!} deleted because em^ty`);
 				}
 				else { // delegate host
 					if (roomToLeave.host !== undefined && roomToLeave.host === username) {

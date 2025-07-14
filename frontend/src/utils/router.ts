@@ -12,7 +12,6 @@ import { renderTournaments, initializeTournamentEvents } from '../pages/game/tou
 
 import { renderBlock } from '../pages/block/main';
 import { renderBlock1v1 } from '../pages/block/block1v1';
-import { renderTest } from '../pages/test/renderTest';
 import { renderRoom } from '../pages/room/renderRoom';
 import { renderChangePassword, initializeChangePasswordEvents } from '../pages/auth/change-password';
 import { renderEditProfil, initializeEditProfileEvents } from '../pages/social/edit-profil';
@@ -20,6 +19,7 @@ import { getAuthToken } from './auth';
 import { clearTranslationCache } from './translations';
 // import { renderPong } from '../pages/pong/main';
 import { getGame } from '@/game/gameUtils';
+import { initializeMatchmakingEvents } from '../pages/matchmaking/renderMatchmaking';
 import { renderPong } from '../pages/pong/pong';
 import { renderMultiPong } from '../pages/pong/multiplayer-pong';
 import { renderChooseGame } from '../pages/game/choose-game';
@@ -176,6 +176,9 @@ export async function router() {
         break;
       case '/edit-profil':
         initializeEditProfileEvents();
+        break;
+      case '/matchmaking':
+        initializeMatchmakingEvents();
         break;
     }
   }, 0);

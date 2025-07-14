@@ -79,10 +79,12 @@ services:
     environment:
       - NODE_ENV=development
       - DATABASE_URL=sqlite:///./database.sqlite
+      - REDIS_URL=redis://redis:6379
     depends_on:
       - prometheus
       - grafana
       - vault
+      - redis
     networks:
       - app-network
 
@@ -134,6 +136,16 @@ services:
     networks:
       - app-network
 
+  redis:
+    image: redis:8.2-rc1-alpine
+    container_name: redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    networks:
+      - app-network
+
 networks:
   app-network:
     driver: bridge
@@ -146,3 +158,4 @@ volumes:
   vault_data:
   vault_env:
   modsecurity_logs:
+  redis-data:

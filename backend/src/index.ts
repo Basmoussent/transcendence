@@ -14,10 +14,25 @@ import editRoutes from './routes/reset-pwd';
 import userRoutes from './routes/user';
 import webSocketRoutes from './routes/web-socket';
 import { getSecretFromVault } from './utils/vault';
-import barRoutes from './routes/testrouter';
+import Fastify from 'fastify';
+import { createClient } from 'redis';
+
 
 const fastify = Fastify({ logger: { level: 'debug' } });
+const redis = createClient({ url: process.env.REDIS_URL || 'redis://localhost:6379' });
+redis.on('error', (err) => console.error('❌ Redis Error:', err)).connect();
 
+
+// Healthcheck route for Redis
+fastify.get('/redis-health', async (request, reply) => {
+  try {
+    const pong = await redis.ping();
+    return { status: 'ok', redis: pong };
+  } catch (err) {
+    console.error('Redis ping failed:', err);
+    reply.code(500).send({ status: 'error', message: 'Redis not reachable' });
+  }
+});
 async function setup() {
 
 	console.log('🚀 Starting setup...');

@@ -7,7 +7,7 @@ import { sanitizeHtml } from '../../utils/sanitizer';
 	// <div class="flex gap-12 h-screen justify-center items-center px-8" id=options-container>
 
 const getTemplate = () => {
-	return `
+	const html =  `
 	<div class="flex gap-12 h-screen justify-center items-center px-8" id="options-container">
 		<button class="home-button" id="homeBtn">
 			<i class="fas fa-home"></i>
@@ -132,7 +132,21 @@ const getTemplate = () => {
 	}
 	</style>
 	`;
+	return html;
 }
+
+function initializeMatchmakingEvents() {
+	const button = document.getElementById('homeBtn');
+	if (button) {
+		button.addEventListener('click', () => {
+		window.history.pushState({}, '', '/main');
+		window.dispatchEvent(new PopStateEvent('popstate'));
+		});
+	}
+	return;
+}
+
+export { initializeMatchmakingEvents };
 
 async function gamesToDiv(games:Available[]): Promise<string> {
 
@@ -147,7 +161,7 @@ async function gamesToDiv(games:Available[]): Promise<string> {
 	return tmp;
 }
 
-export function renderMatchmaking() {
+export function renderMatchmaking() :string{
 
 	setTimeout(async () => {
 		console.log('Initializing matchmaking page');
@@ -173,5 +187,6 @@ export function renderMatchmaking() {
 	return getTemplate();
 
 }
+
 
 
