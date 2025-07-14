@@ -33,7 +33,7 @@ export async function router() {
   const app = document.getElementById('app');
   if (!app) return;
 
-  const publicRoutes = ['/', '/login', '/create-account', '/forgot-password', '/block'];
+  const publicRoutes = ['/', '/login', '/create-account', '/forgot-password'];
   const token = getAuthToken();
 
 
@@ -117,6 +117,7 @@ export async function router() {
     case '/block':
       view = renderBlock();
       break;
+      break;
     case '/game':
       view = renderChooseGame();
       break;
@@ -132,6 +133,9 @@ export async function router() {
     case '/pong':
       view = renderPong();
       break;
+    case '/chat':
+      view = renderChat();
+      break;
     case '/room':
       if (!uuid)
         return ;
@@ -139,9 +143,6 @@ export async function router() {
       break;
     case '/multi-pong':
       view = renderMultiPong();
-      break;
-    case '/chat':
-      view = renderChat();
       break;
     default:
       view = render404();

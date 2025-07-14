@@ -1,4 +1,4 @@
-import { PADDLE_OFFSET, Player } from "./const";
+import { PADDLE_OFFSET } from "./const";
 import { PaddleAI } from "./paddle-ai";
 
 export class Paddle {

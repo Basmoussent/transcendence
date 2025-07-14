@@ -121,6 +121,11 @@ export class Chat {
 				this.addSystemMessage(data.content);
 				break;
 			case 'notLog':
+				window.history.pushState({}, '', '/login');
+				window.dispatchEvent(new Event('popstate'));
+				this.ws.close();
+				break;
+			case 'notLog':
 				console.log('pas de token pour livechat')
 				window.history.pushState({}, '', '/login');
 				window.dispatchEvent(new Event('popstate'));

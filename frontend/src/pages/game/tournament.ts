@@ -902,7 +902,7 @@ function generateQuarterFinals() {
           '<span class="player-score">0</span>' +
         '</div>' +
       '</div>' +
-      '<button class="play-match-btn" onclick="startGame()" disabled>' +
+      '<button class="play-match-btn" onclick="playMatch(\'' + matchPrefix + i + '\')" disabled>' +
         '<i class="fas fa-play"></i>' +
         'Play Match' +
       '</button>';
@@ -969,7 +969,6 @@ function updateTournamentDisplay() {
   const finalRound = document.getElementById('final-round');
   const championRound = document.getElementById('champion-round');
   
-  // Initially hide all higher levels - they will appear as matches are played
   if (sfRound) sfRound.style.display = 'none';
   if (finalRound) finalRound.style.display = 'none';
   if (championRound) championRound.style.display = 'none';
@@ -1003,16 +1002,10 @@ function updatePlayButtons() {
   });
 }
 
-(window as any).playMatch = function(matchId: any) {
-  console.log('Playing match:', matchId);
-  simulateMatch(matchId);
-};
-
 function simulateMatch(matchId: any) {
   const match = document.querySelector('[data-match="' + matchId + '"]');
   if (!match) return;
-  
-  const players = match.querySelectorAll('.player');
+    const players = match.querySelectorAll('.player');
   
   const winner = Math.random() < 0.5 ? 0 : 1;
   const winnerElement = players[winner] as HTMLElement;
@@ -1253,11 +1246,70 @@ document.addEventListener('input', function(event: Event) {
   }
 });
 
-(window as any).startGame = function() {
+(window as any).startGame = function(matchId: any) {
+  console.log('Initializing Pong game...', matchId);
   const canvas = document.getElementById('gameCanvas') as HTMLCanvasElement;
+  if (!canvas) {
+    console.error('Canvas not found!');
+    return;
+  }
+  console.log('Canvas found, creating game instance...');
+  const game = new Pong(canvas);
   if (canvas) {
     canvas.classList.add('active');
   }
+  const result = game.init();
+  
+  const checkGameEnd = () => {
+    if (game.end) {
+      const p1 = game.paddles[0];
+      const p2 = game.paddles[1];
+      const winner = p1.score > p2.score ? p1.name : p2.name;
+      // Trouver le bon élément gagnant
+      const match = document.querySelector('[data-match="' + matchId + '"]');
+      if (match) {
+        console.log("match found");
+        const players = match.querySelectorAll('.player');
+        const winnerIndex = p1.score > p2.score ? 0 : 1;
+        const winnerElement = players[winnerIndex] as HTMLElement;
+        
+        if (winnerElement) {
+          console.log("winnerElement found");
+          winnerElement.classList.add('winner');
+          const scoreElement = winnerElement.querySelector('.player-score');
+          if (scoreElement) {
+            console.log("scoreElement found", scoreElement.textContent, Math.max(p1.score, p2.score));
+            scoreElement.textContent = Math.max(p1.score, p2.score).toString();
+          }
+          
+          const winnerNameElement = winnerElement.querySelector('.player-name');
+          if (winnerNameElement && winner) {
+            advanceWinner(matchId, winner);
+          }
+        }
+        
+        const button = match.querySelector('.play-match-btn') as HTMLButtonElement;
+        if (button) button.disabled = true;
+      }
+      else {
+        console.log("match not found", matchId);
+      }
+      
+      (window as any).endGame();
+      return; 
+    }
+    
+    // Continuer à surveiller si le jeu n'est pas terminé
+    requestAnimationFrame(checkGameEnd);
+  };
+  
+  // Commencer la surveillance
+  checkGameEnd();
+};
+
+(window as any).playMatch = function(matchId: any) {
+  console.log('Playing match:', matchId);
+  (window as any).startGame(matchId);
 };
 
 (window as any).endGame = function() {
@@ -1265,8 +1317,6 @@ document.addEventListener('input', function(event: Event) {
   if (canvas) {
     canvas.classList.remove('active');
   }
-  const game = new Pong(canvas);
-  game.init();
 };
 
 export function initializeTournamentEvents() {
@@ -1275,3 +1325,4 @@ export function initializeTournamentEvents() {
   updateLobbyDisplay();
 
 }
+

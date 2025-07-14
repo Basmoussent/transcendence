@@ -29,7 +29,7 @@ export async function renderProfil() {
         'x-access-token': token
       }
     });
-    
+
     if (response.ok) {
       const result = await response.json();
       userData = {
@@ -50,20 +50,24 @@ export async function renderProfil() {
   }
 
   // Construire l'URL de l'avatar
-  const avatarUrl = userData.avatar.startsWith('http') || userData.avatar.startsWith('/api/') 
-    ? userData.avatar 
+  const avatarUrl = userData.avatar.startsWith('http') || userData.avatar.startsWith('/api/')
+    ? userData.avatar
     : `/api/uploads/${userData.avatar}`;
 
   const htmlContent = `
     <div class="profile-page">
       <div class="background-circles">
-        <div class="circle circle-1"></div>
-        <div class="circle circle-2"></div>
-        <div class="circle circle-3"></div>
-        <div class="circle circle-4"></div>
+      <div class="circle circle-1"></div>
+      <div class="circle circle-2"></div>
+      <div class="circle circle-3"></div>
+      <div class="circle circle-4"></div>
       </div>
       <div class="profile-container">
         <div class="profile-header">
+          <button class="home-button" id="homeBtn">
+              <i class="fas fa-home"></i>
+              Home
+          </button>
           <div class="profile-avatar">
             <img src="${avatarUrl}" alt="Profile Avatar" class="avatar-image" onerror="this.src='../../public/avatar.png'">
             <button class="change-avatar-btn" id="changeAvatarBtn">
@@ -78,6 +82,10 @@ export async function renderProfil() {
               <i class="fas fa-circle"></i> Online
             </div>
           </div>
+          <button class="action-button logout">
+            <i class="fas fa-sign-out-alt"></i>
+            ${t('profile.logout')}
+          </button>
         </div>
 
         <div class="profile-stats">
@@ -113,9 +121,9 @@ export async function renderProfil() {
             <i class="fas fa-key"></i>
             ${t('profile.changePassword')}
           </button>
-          <button class="action-button logout">
-            <i class="fas fa-sign-out-alt"></i>
-            ${t('profile.logout')}
+          <button class="action-button TFA-button" id="TFABtn">
+            <i class="fa-solid fa-shield"></i>
+            Two Factor Authentification
           </button>
         </div>
       </div>
@@ -202,6 +210,24 @@ export async function renderProfil() {
         align-items: center;
         gap: 30px;
         margin-bottom: 40px;
+      }
+
+      .home-button {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 10px;
+        background: rgba(255, 255, 255, 0.1);
+        color: white;
+        cursor: pointer;
+        transition: all 0.3s ease;
+      }
+
+      .home-button:hover {
+        background: rgba(255, 255, 255, 0.2);
+        transform: translateY(-2px);
       }
 
       .profile-avatar {
@@ -330,6 +356,10 @@ export async function renderProfil() {
         background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
       }
 
+      .TFA-button {
+        background: linear-gradient(135deg, #f39c12 0%, #d68910 100%);
+      }
+
       .logout {
         background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
       }
@@ -359,6 +389,11 @@ export async function renderProfil() {
           flex-direction: column;
           text-align: center;
           gap: 20px;
+        }
+
+        .home-button {
+          width: 100%;
+          justify-content: center;
         }
 
         .profile-stats {
@@ -407,7 +442,15 @@ export async function renderProfil() {
     const changePasswordButton = document.querySelector('.action-button.change-password');
     const changeAvatarBtn = document.getElementById('changeAvatarBtn');
     const avatarInput = document.getElementById('avatarInput') as HTMLInputElement;
-
+    const homeBtn = document.getElementById('homeBtn');
+    // const TFABtn = document.getElementById('TFABtn');
+  
+    if (homeBtn) {
+      homeBtn.addEventListener('click', () => {
+        window.history.pushState({}, '', '/main');
+        window.dispatchEvent(new PopStateEvent('popstate'));
+      });
+    }
     if (logoutButton) {
       logoutButton.addEventListener('click', () => {
         removeAuthToken();
@@ -427,6 +470,12 @@ export async function renderProfil() {
         window.dispatchEvent(new PopStateEvent('popstate'));
       });
     }
+    // if (TFABtn) {
+    //   TFABtn.addEventListener('click', () => {
+    //     window.history.pushState({}, '', '/TFA');
+    //     window.dispatchEvent(new PopStateEvent('popstate'));
+    //   });
+    // }
 
     // Gestion de l'upload d'avatar
     if (changeAvatarBtn && avatarInput) {
@@ -471,7 +520,7 @@ export async function renderProfil() {
           });
 
           const result = await response.json();
-          
+
           if (response.ok) {
             alert('✅ Avatar mis à jour avec succès');
             // Recharger la page pour afficher le nouvel avatar
