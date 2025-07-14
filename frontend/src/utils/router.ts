@@ -78,7 +78,9 @@ export async function router() {
 
   switch (path) {
     case '/':
+    case '/lang':
       view = renderHome();
+      window.history.pushState({}, '', '/');
       break;
     case '/login':
       view = renderLogin();
@@ -136,6 +138,9 @@ export async function router() {
   setTimeout(() => {
     switch (path) {
       case '/':
+        initializeHomeEvents();
+        break;
+      case '/lang':
         initializeHomeEvents();
         break;
       case '/login':

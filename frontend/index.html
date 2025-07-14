@@ -119,29 +119,7 @@
         
         isChangingLanguage = true;
         
-        const hostname = window.location.hostname;
-        const parts = hostname.split('.');
         
-        let baseDomain;
-        if (hostname.includes('localhost')) {
-          if (parts.length > 1) {
-            baseDomain = parts.slice(-1).join('.');
-          } else {
-            baseDomain = hostname;
-          }
-        } else {
-          baseDomain = parts.slice(-2).join('.');
-        }
-        
-        let newHostname;
-        if (hostname.includes('localhost') && parts.length === 1) {
-          newHostname = `${lang}.${baseDomain}`;
-        } else {
-          newHostname = `${lang}.${baseDomain}`;
-        }
-        
-        const newUrl = `${window.location.protocol}//${newHostname}${window.location.pathname}${window.location.search}${window.location.hash}`;
-
         try {
           const authToken = window.getAuthToken();
           
@@ -161,7 +139,8 @@
           }
           
           // Update the URL without full page reload using history API
-          window.history.pushState({}, '', newUrl);
+          localStorage.setItem('lang', lang);
+          window.history.pushState({}, '', '/lang');
           
           const buttons = document.querySelectorAll('.language-btn');
           buttons.forEach(btn => btn.classList.remove('active'));
@@ -169,7 +148,12 @@
           if (activeBtn) activeBtn.classList.add('active');
           
           // Trigger a custom event to notify the SPA router
-          window.dispatchEvent(new CustomEvent('languageChanged', { detail: { language: lang } }));
+          window.dispatchEvent(new PopStateEvent('popstate'));
+          
+          // Reset the flag after a short delay to allow the router to complete
+          setTimeout(() => {
+            isChangingLanguage = false;
+          }, 100);
           
         } catch (error) {
           console.error('Erreur lors du changement de langue:', error);
@@ -199,43 +183,15 @@
       }
 
       async function ensureSubdomain() {
-        if (isChangingLanguage) return; // Prevent execution during language change
-        
-        if (window.getAuthToken().length > 0) {
-          const preferredLanguage = await getPreferedLanguage();
-          const currentLang = window.location.hostname.split('.')[0];
-          
-          if (preferredLanguage !== currentLang) {
-            console.log(`🔄 Redirection vers la langue préférée: ${preferredLanguage}`);
-            changeLanguage(preferredLanguage);
-            return;
-          }
-          return;
-        }
-        
-        const hostname = window.location.hostname;
-        const parts = hostname.split('.');
-        
-        const hasLanguageSubdomain = parts.length > 1 && ['en', 'fr', 'es'].includes(parts[0]);
-        
-        if (!hasLanguageSubdomain) {
-          let baseDomain;
-          if (hostname.includes('localhost')) {
-            if (parts.length > 1) {
-              baseDomain = parts.slice(-1).join('.');
-            } else {
-              baseDomain = hostname;
-            }
-          } else {
-            baseDomain = parts.slice(-2).join('.');
-          }
-          const newHost = `en.${baseDomain}`;
-          const newUrl = window.location.protocol + '//' + newHost + window.location.pathname + window.location.search + window.location.hash;
-          console.log(`🔄 Redirection vers sous-domaine par défaut: ${hostname} -> ${newHost}`);
-          
-          // Use SPA navigation instead of full page redirect
-          window.history.pushState({}, '', newUrl);
+        const lang = localStorage.getItem('lang');
+        if (!lang) {
+          localStorage.setItem('lang', 'en');
+          window.history.pushState({}, '', '/lang');
           window.dispatchEvent(new CustomEvent('languageChanged', { detail: { language: 'en' } }));
+        }
+        else {
+          window.history.pushState({}, '', '/lang');
+          window.dispatchEvent(new CustomEvent('languageChanged', { detail: { language: lang } }));
         }
       }
 
