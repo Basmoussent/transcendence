@@ -79,3 +79,36 @@ export function removeAuthToken(): void {
 export function isAuthenticated(): boolean {
   return getAuthToken() !== null;
 }
+
+export  function initAlive()
+{
+  console.log("initAlive started");
+  const authToken = getAuthToken();
+  if (!authToken) {
+    console.log("No auth token, skipping initAlive");
+    return;
+  }
+
+  const socket = new WebSocket(`${window.location.protocol === "https:" ? "wss" : "ws"}://${window.location.host}/api/alive`);
+
+  socket.addEventListener('open', () => {
+    console.log('🔌 WebSocket /alive connected');
+    socket.send(JSON.stringify({ type: 'ping', token: authToken }));
+    const interval = setInterval(() => {
+      if (socket.readyState === WebSocket.OPEN) {
+        socket.send(JSON.stringify({ type: 'ping', token: authToken }));
+      } else {
+        clearInterval(interval);
+      }
+    }, 5000);
+
+    socket.addEventListener('close', () => {
+      clearInterval(interval);
+      console.log('🔌 WebSocket /alive disconnected');
+    });
+  });
+
+  socket.addEventListener('error', (error) => {
+    console.error('🔌 WebSocket /alive error:', error);
+  });
+}

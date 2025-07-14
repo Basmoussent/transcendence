@@ -1,5 +1,6 @@
 services:
   nginx:
+    container_name: nginx
     build:
       context: ./docker/nginx
       dockerfile: Dockerfile
@@ -35,6 +36,7 @@ services:
     user: root
 
   vault:
+    container_name: vault
     build:
       context: ./docker/vault
       dockerfile: Dockerfile
@@ -52,6 +54,7 @@ services:
       - app-network
 
   frontend:
+    container_name: frontend
     build:
       context: ./frontend
       dockerfile: Dockerfile
@@ -69,6 +72,7 @@ services:
       - app-network
 
   backend:
+    container_name: backend
     build:
       context: ./backend
       dockerfile: Dockerfile
@@ -89,6 +93,7 @@ services:
       - app-network
 
   prometheus:
+    container_name: prometheus
     image: prom/prometheus:latest
     ports:
       - "9090:9090"
@@ -104,6 +109,7 @@ services:
       - app-network
 
   grafana:
+    container_name: grafana
     image: grafana/grafana:latest
     ports:
       - "3001:3000"
@@ -122,9 +128,10 @@ services:
       - app-network
 
   node-exporter:
+    container_name: node-exporter
     image: prom/node-exporter:latest
     ports:
-      - "9101:9101"
+      - "9100:9100"
     volumes:
       - /proc:/host/proc:ro
       - /sys:/host/sys:ro
@@ -137,8 +144,8 @@ services:
       - app-network
 
   redis:
-    image: redis:8.2-rc1-alpine
     container_name: redis
+    image: redis:8.2-rc1-alpine
     ports:
       - "6378:6378"
     command: redis-server --port 6378
