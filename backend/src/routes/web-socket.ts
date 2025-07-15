@@ -46,63 +46,47 @@ interface Relation {
 
 const rooms = new Map<string, Room>();
 const live = new Map<string, UserChat>();
+const matchmaking = new Array<WebSocket>();
 
 async function webSocketRoutes(app: FastifyInstance) {
 
-	const dict = new Map();
-
-	dict.set("clients", [])
-
 	app.get('/matchmaking', { websocket: true }, (socket: any, req: FastifyRequest) => {
 		// Vérification du token
-		let token = req.headers['x-access-token'] as string;
-		if (!token) {
-			token = req.cookies['x-access-token'];
-		}
+		const token = req.headers['x-access-token'] ? req.headers['x-access-token'] : req.cookies['x-access-token']; 
 		
 		if (!token) {
-			console.log('❌ No token provided for WebSocket connection on /matchmaking');
+			console.log('⚠️  Aucun token fourni. Détails de la requête :');
+			console.log('Headers :', JSON.stringify(req.headers, null, 2));
+			console.log('Cookies :', JSON.stringify(req.cookies, null, 2));
 			socket.send(JSON.stringify({
-				type: 'auth_error',
-				message: 'Authentication token required'
-			}));
-			socket.close();
-			return;
+				type: 'notLog',
+				message: 'the user is not log' }))
+			return ;
 		}
 
-		try {
-			const decoded = app.jwt.verify(token) as { user: string; name: string };
-			console.log(`✅ WebSocket authenticated for user: ${decoded.name} on /matchmaking`);
-		} catch (error: any) {
-			console.log('❌ Invalid token for WebSocket connection on /matchmaking:', error.message);
-			socket.send(JSON.stringify({
-				type: 'auth_error',
-				message: 'Invalid or expired token'
-			}));
-			socket.close();
-			return;
-		}
-
-		dict.get("clients").push(socket);
+		matchmaking.push(socket);
 		console.log("a user just connected on /matchmaking");
 		socket.on('message', (message: any) => {
 			try {
 				const data = JSON.parse(message.toString());
 				
-				dict.get("clients").forEach((client: any) => {
-					if (client !== socket)
-						client.send(message.toString());
-				});
-			} catch (error) {
+				switch (data.type) {
+					case 'updateUI':
+						broadcastMatchmaking(data);
+						break;
+					default:
+						console.log(`l'event existe pas`)
+				}
+			}
+			catch (error) {
 				console.error('Invalid message format:', error);
 			}
 		});
 		socket.on('close', () => {
-			const index = dict.get("clients").indexOf(socket);
-			if (index !== -1) {
-				dict.get("clients").splice(index, 1);
-				console.log("a user just disconnected from /matchmaking");
-			}
+			const id = matchmaking.findIndex(user => user === socket);
+			matchmaking.splice(id, 1);
+
+			console.log(`user left matchmaking`)
 		});
 	});
 
@@ -520,6 +504,16 @@ async function acceptFriend(app: FastifyInstance, user: UserChat, friendName: st
 	
 
 	
+}
+
+function broadcastMatchmaking(data: any) {
+
+	for (const user of matchmaking) {
+		if (user.readyState === WebSocket.OPEN) {
+			console.log(`je send a tous le monde`)
+			user.send(JSON.stringify(data))
+		}
+	}
 }
 
 export default webSocketRoutes;
