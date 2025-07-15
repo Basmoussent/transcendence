@@ -26,7 +26,7 @@ export function renderMain() {
 
           <button class="menu-button tournament-button" id="tournamentBtn">
             <i class="fa-solid fa-medal"></i>
-            tournament
+            Tournament
           </button>
           
           <button class="menu-button friends-button" id="friendsBtn">
@@ -126,16 +126,8 @@ export function renderMain() {
         background: linear-gradient(135deg, #9b59b6 0%, #8e44ad 100%);
       }
 
-      .block-game-button {
+      .tournament-button {
         background: linear-gradient(135deg, #f1c40f 0%, #f39c12 100%);
-      }
-
-      .pong-game-button {
-        background: linear-gradient(135deg, #ff8000 0%, #f39c12 100%);
-      }
-
-      .multi-pong-game-button {
-        background: linear-gradient(135deg, #ff8000 0%, #f39c12 100%);
       }
 
       .logout-button {

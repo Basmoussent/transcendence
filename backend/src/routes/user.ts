@@ -20,6 +20,8 @@ interface UserData {
   email: string;
   avatar_url?: string;
   language: string;
+  two_fact_auth: boolean;
+  secret_key: string;
 }
 
 async function userRoutes(app: FastifyInstance) {
@@ -78,7 +80,9 @@ async function userRoutes(app: FastifyInstance) {
                     username: user.username,
                     email: user.email,
                     avatar_url: user.avatar_url || 'avatar.png',
-                    language: user.language
+                    language: user.language,
+                    two_fact_auth: user.two_fact_auth,
+                    secret_key: user.secret_key
                 },
                 // stats: stats
             });

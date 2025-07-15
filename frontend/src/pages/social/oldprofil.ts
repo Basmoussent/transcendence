@@ -10,8 +10,7 @@ export async function renderProfil() {
     wins: 0,
     games: 0,
     rating: 0,
-    preferred_language: 'en',
-    twoFactorEnabled: false // Ajout du champ 2FA
+    preferred_language: 'en'
   };
 
   try {
@@ -40,8 +39,7 @@ export async function renderProfil() {
         wins: (result.stats?.wins) || 0,
         games: (result.stats?.games) || 0,
         rating: (result.stats?.rating) || 0,
-        preferred_language: sanitizeHtml(result.user?.language) || 'en',
-        twoFactorEnabled: result.user?.twoFA || false // Récupération du statut 2FA
+        preferred_language: sanitizeHtml(result.user?.language) || 'en'
       };
     } else {
       console.error('Erreur lors de la récupération des données utilisateur');
@@ -54,10 +52,6 @@ export async function renderProfil() {
   const avatarUrl = userData.avatar.startsWith('http') || userData.avatar.startsWith('/api/')
     ? userData.avatar
     : `/api/uploads/${userData.avatar}`;
-
-  // Déterminer le texte et l'icône du bouton 2FA
-  const tfaButtonText = userData.twoFactorEnabled ? 'Deactivate 2FA' : 'Two Factor Authentification';
-  const tfaButtonIcon = userData.twoFactorEnabled ? 'fa-shield-slash' : 'fa-shield';
 
   const htmlContent = `
     <div class="profile-page">
@@ -126,9 +120,9 @@ export async function renderProfil() {
             <i class="fas fa-key"></i>
             ${t('profile.changePassword')}
           </button>
-          <button class="action-button TFA-button" id="TFABtn" data-enabled="${userData.twoFactorEnabled}">
-            <i class="fa-solid ${tfaButtonIcon}"></i>
-            ${tfaButtonText}
+          <button class="action-button TFA-button" id="TFABtn">
+            <i class="fa-solid fa-shield"></i>
+            Two Factor Authentification
           </button>
         </div>
       </div>
@@ -365,10 +359,6 @@ export async function renderProfil() {
         background: linear-gradient(135deg, #f39c12 0%, #d68910 100%);
       }
 
-      .TFA-button[data-enabled="true"] {
-        background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
-      }
-
       .logout {
         background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
       }
@@ -452,7 +442,7 @@ export async function renderProfil() {
     const changeAvatarBtn = document.getElementById('changeAvatarBtn');
     const avatarInput = document.getElementById('avatarInput') as HTMLInputElement;
     const homeBtn = document.getElementById('homeBtn');
-    const TFABtn = document.getElementById('TFABtn');
+    // const TFABtn = document.getElementById('TFABtn');
   
     if (homeBtn) {
       homeBtn.addEventListener('click', () => {
@@ -460,7 +450,6 @@ export async function renderProfil() {
         window.dispatchEvent(new PopStateEvent('popstate'));
       });
     }
-
     if (logoutButton) {
       logoutButton.addEventListener('click', () => {
         removeAuthToken();
@@ -468,128 +457,24 @@ export async function renderProfil() {
         window.dispatchEvent(new PopStateEvent('popstate'));
       });
     }
-
     if (editProfileButton) {
       editProfileButton.addEventListener('click', () => {
         window.history.pushState({}, '', '/edit-profil');
         window.dispatchEvent(new PopStateEvent('popstate'));
       });
     }
-
     if (changePasswordButton) {
       changePasswordButton.addEventListener('click', () => {
         window.history.pushState({}, '', '/change-password');
         window.dispatchEvent(new PopStateEvent('popstate'));
       });
     }
-
-    async function check2FAStatus() {
-      const token = getAuthToken();
-      if (!token)
-        return false;
-
-      try {
-        const response = await fetch('/api/me', {
-          method: 'GET',
-          headers: {
-            'x-access-token': token
-          }
-        });
-
-        if (!response.ok)
-          throw new Error();
-
-        const data = await response.json();
-        return data.twoFactorEnabled === 1 || data.twoFactorEnabled === true;
-      } catch {
-        return false; // en cas d'erreur, suppose désactivé
-      }
-    }
-
-    async function reverse2FAState() {
-      const token = getAuthToken();
-      if (!token)
-        return false;
-
-      try {
-        const response = await fetch('/api/user-settings', {
-          method: 'GET',
-          headers: {
-            'x-access-token': token
-          }
-        });
-
-        if (!response.ok)
-          throw new Error();
-
-        const data = await response.json();
-        data.twoFactorEnabled = !data.twoFactorEnabled;
-      } catch {
-      }
-    }
-
-
-    // Gestionnaire pour le bouton 2FA
-    if (TFABtn) {
-      TFABtn.addEventListener('click', async () => {
-        const isEnabled = await check2FAStatus();
-        
-        if (isEnabled) {
-          // Désactiver 2FA
-          const confirmation = confirm('Êtes-vous sûr de vouloir désactiver l\'authentification à deux facteurs ?');
-          
-          if (confirmation) {
-            try {
-              const token = getAuthToken();
-              if (!token) {
-                alert('Token d\'authentification manquant');
-                window.history.pushState({}, '', '/login');
-                window.dispatchEvent(new PopStateEvent('popstate'));
-                return;
-              }
-
-              // Désactiver le bouton pendant la requête
-              TFABtn.disabled = true;
-              TFABtn.innerHTML = '<i class="fa-solid fa-shield-halved"></i> Deactivate 2FA';
-
-              const response = await fetch('/api/disable-2fa', {
-                method: 'POST',
-                headers: {
-                  'Content-Type': 'application/json',
-                  'x-access-token': token
-                }
-              });
-
-              const result = await response.json();
-
-              if (response.ok) {
-                alert('Authentification à deux facteurs désactivée.');
-                // redirection vers page de profil
-                window.history.pushState({}, '', '/profil');
-                window.dispatchEvent(new PopStateEvent('popstate'));
-              } else {
-                alert(`Erreur: ${result.error || 'Erreur inconnue'}`);
-                // Réactiver le bouton en cas d'erreur
-                TFABtn.disabled = false;
-                TFABtn.innerHTML = '<i class="fa-solid fa-shield-slash"></i> Deactivate 2FA';
-              }
-            } catch (error) {
-              console.error('Erreur lors de la désactivation 2FA:', error);
-              alert('Erreur lors de la désactivation de l\'authentification à deux facteurs');
-              // Réactiver le bouton en cas d'erreur
-              TFABtn.disabled = false;
-              TFABtn.innerHTML = '<i class="fa-solid fa-shield-slash"></i> Deactivate 2FA';
-            }
-          }
-        }
-        else {
-          // Rediriger vers la page de configuration 2FA
-          window.history.pushState({}, '', '/tfa');
-          window.dispatchEvent(new PopStateEvent('popstate'));
-          TFABtn.innerHTML = '<i class="fa-solid fa-shield"></i> Activate 2FA';
-        }
-      });
-    }
+    // if (TFABtn) {
+    //   TFABtn.addEventListener('click', () => {
+    //     window.history.pushState({}, '', '/TFA');
+    //     window.dispatchEvent(new PopStateEvent('popstate'));
+    //   });
+    // }
 
     // Gestion de l'upload d'avatar
     if (changeAvatarBtn && avatarInput) {

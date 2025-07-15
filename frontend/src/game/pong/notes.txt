@@ -74,3 +74,13 @@ https://jwt.io/introduction
             // Payload: contient les claims
                 // infos sur l'utilisateur
             // Signature
+
+
+
+
+
+on peut aller sur la page /tfa pour deux raison:
+    - activer la 2fa
+        // on entre le code, two_fact_auth devient true t c'est tt
+    - se co a son compte
+        // on entre le code, on obtient son JWT definitif

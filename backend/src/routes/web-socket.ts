@@ -261,31 +261,31 @@ async function webSocketRoutes(app: FastifyInstance) {
 	});
 
 	
-	app.get('/alive', { websocket: true }, async (connection: any, req: FastifyRequest) => {
-		const token = validateToken(req, app);
-		if (!token) {
-			console.log('❌ No token provided for WebSocket connection on /alive');
-			connection.close();
-			return;
-		}
-		try {
-			const decoded = app.jwt.verify(token) as { user: string; name: string };
-			const userId = decoded.name;
-			await redis.set(`online:${userId}`, '1', { EX: 15 });
-			connection.on('message', async (msg: string) => {
-				if (msg === 'ping') {
-					await redis.set(`online:${userId}`, '1', { EX: 60 });
-				}
-			});
-		}
-		catch (error) {
-			console.log('❌ Invalid token for WebSocket connection on /alive');
-			connection.close();
-			return;
-		}
+	// app.get('/alive', { websocket: true }, async (connection: any, req: FastifyRequest) => {
+	// 	const token = validateToken(req, app);
+	// 	if (!token) {
+	// 		console.log('❌ No token provided for WebSocket connection on /alive');
+	// 		connection.close();
+	// 		return;
+	// 	}
+	// 	try {
+	// 		const decoded = app.jwt.verify(token) as { user: string; name: string };
+	// 		const userId = decoded.name;
+	// 		await redis.set(`online:${userId}`, '1', { EX: 15 });
+	// 		connection.on('message', async (msg: string) => {
+	// 			if (msg === 'ping') {
+	// 				await redis.set(`online:${userId}`, '1', { EX: 60 });
+	// 			}
+	// 		});
+	// 	}
+	// 	catch (error) {
+	// 		console.log('❌ Invalid token for WebSocket connection on /alive');
+	// 		connection.close();
+	// 		return;
+	// 	}
 
 		
-	});
+	// });
 
 	app.get('/alive/:userId', async (req: FastifyRequest, res: FastifyReply) => {
 		const token = validateToken(req, app);
