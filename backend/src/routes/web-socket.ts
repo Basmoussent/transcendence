@@ -463,6 +463,7 @@ async function addFriend(app: FastifyInstance, user: UserChat, friendName: strin
 		});
 		user.socket.send(message)
 		return;
+	}
 	
 		
 	// 2 - check si une relation n'existe pas déjà
