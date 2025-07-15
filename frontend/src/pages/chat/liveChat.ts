@@ -31,6 +31,8 @@ export class Chat {
 	private friendsCount: HTMLElement;
 	private requestsCount: HTMLElement;
 	private tabs: NodeListOf<HTMLElement>;
+	private isUpdatingFriendList = false;
+
 
 	// Right Panel
 	private noChatSelected: HTMLElement;
@@ -48,10 +50,11 @@ export class Chat {
 		};
 
 	private receiver?: string;
-
+ 
 	constructor() {
 
 		this.loadMe();
+
 
 		this.ws = new WebSocket(`${window.location.protocol === "https:" ? "wss" : "ws"}://${window.location.host}/api/chat`);
 
@@ -76,7 +79,21 @@ export class Chat {
 
 		this.chatInput.focus();
 		this.setupWsEvents();
+		this.startAutoUpdateFriendList(); // ← actualise toutes les 2 sec
 		this.setupClickEvents();
+	}
+
+
+	private startAutoUpdateFriendList() {
+		setInterval(async () => {
+			console.log("je passe")
+			if (this.isUpdatingFriendList) return;
+			this.isUpdatingFriendList = true;
+
+			await this.updateFriendList();
+
+			this.isUpdatingFriendList = false;
+		}, 2000);
 	}
 
 	private async loadMe() {
@@ -242,13 +259,14 @@ export class Chat {
 		}
 
 		this.friendsList.innerHTML = '';
+		this.requestsList.innerHTML = '';
+
 		for (const relation of relations) {
 
-			const friendId = relation.user_2 === this.me.userId ? this.me.userId : relation.user_2;
+			const friendId = relation.user_1 === this.me.userId ? relation.user_2 : relation.user_1;
+
 
 			const friend: UserChat | void = await fetchUserInfo(friendId);
-
-
 
 			if (!friend)
 				continue;
@@ -260,7 +278,7 @@ export class Chat {
 					conversationElement.className = 'friend-card online flex items-center';
 					conversationElement.dataset.username = friend.username;
 					conversationElement.innerHTML = `
-						<div class="friend-avatar">
+	w					<div class="friend-avatar">
 							${friend.username.charAt(0).toUpperCase()}
 							<div class="status-dot online"></div>
 						</div>
@@ -274,36 +292,46 @@ export class Chat {
 								</button>
 						</div>
 							`;
-			this.friendsList.appendChild(conversationElement);
-			conversationElement.addEventListener('click', () => this.startChatWith(friend));
-				// afficher la carte de l'ami
+				this.friendsList.appendChild(conversationElement);
+				conversationElement.addEventListener('click', () => this.startChatWith(friend));
 			}
 			else if ((relation.user_1 === this.me.userId && relation.user1_state === 'waiting') ||
 				(relation.user_2 === this.me.userId && relation.user2_state === 'waiting')) {
 				request++;
 
-				console.log(`afficher demande d'ami d'un des deux`)
 
-				const conversationElement = document.createElement('div');
-					conversationElement.className = 'friend-card online flex items-center';
-					conversationElement.dataset.username = friend.username;
-					conversationElement.innerHTML = `
+				console.log(`t'as une amis en attente zig`)
+
+				const requestElement = document.createElement('div');
+				requestElement.className = 'friend-card online flex items-center';
+				requestElement.dataset.username = friend.username;
+				requestElement.innerHTML = `
 						<div class="friend-avatar">
 							${friend.username.charAt(0).toUpperCase()}
 							<div class="status-dot online"></div>
 						</div>
 						<div class="friend-info">
 							<div class="friend-name">${sanitizeHtml(friend.username)}</div>
-							<div class="friend-status">En ligne</div>
+							<div class="friend-status">Demande d'ami</div>
 						</div>
 						<div class="friend-actions">
-							<button class="action-btn chat-btn">
-								<i class="fas fa-comment-dots"></i>
-								</button>
+							<button class="action-btn accept-btn">
+							<i class="fas fa-check"></i>
+							</button>
+							<button class="action-btn decline-btn">
+							<i class="fas fa-times"></i>
+							</button>
 						</div>
-							`;
+						`;
+				this.requestsList.appendChild(requestElement);
 
-				// afficher la carte de demande d'ami avec accepter ou refuser
+				requestElement.querySelector('.accept-btn')?.addEventListener('click', () => {
+					this.ws.send(JSON.stringify({ type: 'accept_friend_request', dest: friend.username }));
+				});
+
+				requestElement.querySelector('.decline-btn')?.addEventListener('click', () => {
+					this.ws.send(JSON.stringify({ type: 'decline_friend_request', dest: friend.username }));
+				});
 			}
 
 		}

@@ -54,15 +54,12 @@ export async function fetchUserInfo(userid: number): Promise<UserChat | void> {
 			return;
 		}
 
-		const response = await fetch('/user:userid', {
+		const response = await fetch(`/api/user/?userid=${userid}`, {
 			method: 'GET',
 			headers: {
 				'Content-Type': 'application/json',
 				'x-access-token': token
 			},
-			query: {
-				userid: userid,
-			}
 		});
 
 		if (response.ok) {

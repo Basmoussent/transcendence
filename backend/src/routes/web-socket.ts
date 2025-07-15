@@ -301,7 +301,12 @@ async function webSocketRoutes(app: FastifyInstance) {
 					case 'friend_request':
 						addFriend(app, sender, data.dest);
 						break;
-
+					case 'accept_friend_request':
+						// fonction pour handle
+						break;
+					case 'decline_friend_request':
+						// fonction pour handle
+						break;
 					default:
 						console.warn(`recoit un event inconnu`)
 				}
