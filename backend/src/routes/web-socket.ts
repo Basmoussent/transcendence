@@ -293,6 +293,8 @@ async function webSocketRoutes(app: FastifyInstance) {
 
 				const sender = live.get(username)!;
 
+				// attention envoyer l'id plutot psque si la personne change de username on trouve plus ?
+
 				switch (data.type) {
 					case 'chat_message':
 						sendChatMessage(username, data)
@@ -302,9 +304,13 @@ async function webSocketRoutes(app: FastifyInstance) {
 						addFriend(app, sender, data.dest);
 						break;
 					case 'accept_friend_request':
+						console.log("dans le bueno accept_friend_request")
+						acceptFriend(app, sender, data.dest)
+						
 						// fonction pour handle
 						break;
 					case 'decline_friend_request':
+						console.log("dans le bueno decline_friend_request")
 						// fonction pour handle
 						break;
 					default:
@@ -497,6 +503,7 @@ async function addFriend(app: FastifyInstance, user: UserChat, friendName: strin
 	// 5 - envoyer une demande + creer l'instance dans db friends avec userid des deux personnes
 	//	 |__ update l'état, qui a ajouté qui
 	await app.friendService.createRelation(user.userId, friend.id, 'waiting', 'requested');
+
 	
 	console.log(`${user.username} requested ${friendName} to be friends`)
 	// send au user le statut de la demande
@@ -508,4 +515,12 @@ async function addFriend(app: FastifyInstance, user: UserChat, friendName: strin
 	// on passe sur tous les friends du user et afficher seulement les instances ou le state de l'autre user est à `asking`
 }
 
+async function acceptFriend(app: FastifyInstance, user: UserChat, friendName: string) {
+
+	
+
+	
+}
+
 export default webSocketRoutes;
+

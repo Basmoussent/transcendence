@@ -31,7 +31,6 @@ export class Chat {
 	private friendsCount: HTMLElement;
 	private requestsCount: HTMLElement;
 	private tabs: NodeListOf<HTMLElement>;
-	private isUpdatingFriendList = false;
 
 
 	// Right Panel
@@ -79,21 +78,7 @@ export class Chat {
 
 		this.chatInput.focus();
 		this.setupWsEvents();
-		this.startAutoUpdateFriendList(); // ← actualise toutes les 2 sec
 		this.setupClickEvents();
-	}
-
-
-	private startAutoUpdateFriendList() {
-		setInterval(async () => {
-			console.log("je passe")
-			if (this.isUpdatingFriendList) return;
-			this.isUpdatingFriendList = true;
-
-			await this.updateFriendList();
-
-			this.isUpdatingFriendList = false;
-		}, 2000);
 	}
 
 	private async loadMe() {
@@ -111,6 +96,7 @@ export class Chat {
 
 		this.ws.onopen = () => {
 			console.log(`${this.me.username} est connecte au live chat`)
+			this.updateUI();
 		};
 
 		this.ws.onerror = (error) => {
@@ -341,7 +327,6 @@ export class Chat {
 
 	private updateUI() {
 		this.updateFriendList()
-
 	}
 
 	private startChatWith(user: UserChat) {
