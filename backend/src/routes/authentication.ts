@@ -43,18 +43,58 @@ async function authRoutes(app: FastifyInstance) {
     // Extraction des données du corps de la requête
     const { username, email, password, confirmPassword } = request.body;
     
-    // Vérification de la présence de tous les champs requis
+    // Validation des champs requis
     if (!username || !email || !password || !confirmPassword) {
-      return reply.status(400).send({ error: 'Missing required fields' });
+      return reply.status(400).send({ error: 'Tous les champs sont obligatoires' });
+    }
+
+    // Validation de la longueur du nom d'utilisateur
+    if (username.length < 3) {
+      return reply.status(400).send({ error: 'Le nom d\'utilisateur doit contenir au moins 3 caractères' });
+    }
+
+    // Validation de la longueur du mot de passe
+    if (password.length < 6) {
+      return reply.status(400).send({ error: 'Le mot de passe doit contenir au moins 6 caractères' });
+    }
+
+    // Validation du format email
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      return reply.status(400).send({ error: 'Format d\'email invalide' });
     }
 
     // Vérification que les mots de passe correspondent
     if (password !== confirmPassword) {
-      return reply.status(400).send({ error: 'Passwords do not match' });
+      return reply.status(400).send({ error: 'Les mots de passe ne correspondent pas' });
     }
 
     // Récupération de la connexion à la base de données
     const datab = db.getDatabase();
+    
+    // Vérification si l'utilisateur existe déjà
+    const existingUser = await new Promise<User | null>((resolve, reject) => {
+      datab.get(
+        'SELECT username, email FROM users WHERE username = ? OR email = ?',
+        [username, email],
+        (err: any, user: User | undefined) => {
+          if (err) {
+            reject(err);
+          } else {
+            resolve(user || null);
+          }
+        }
+      );
+    });
+
+    if (existingUser) {
+      if (existingUser.username === username) {
+        return reply.status(409).send({ error: 'Ce nom d\'utilisateur est déjà utilisé' });
+      } else if (existingUser.email === email) {
+        return reply.status(409).send({ error: 'Cette adresse email est déjà utilisée' });
+      }
+    }
+
     // Hashage du mot de passe avec bcrypt (10 tours de hachage)
     const password_hash = await bcrypt.hash(password, 10);
 
@@ -72,17 +112,11 @@ async function authRoutes(app: FastifyInstance) {
       // INSERT INTO statistics (l'id du user qui vient d'être créé)
       
       // Retourne un succès si l'insertion a réussi
-      return reply.status(201).send({ message: 'User registered successfully' });
+      return reply.status(201).send({ message: 'Compte créé avec succès' });
     } catch (err: any) {
-      // Gestion des erreurs spécifiques
-      if (err.message.includes('UNIQUE constraint')) {
-        // Erreur si le username ou l'email existe déjà
-        return reply.status(409).send({ error: 'Username or email already exists' });
-      } else {
-        // Erreur serveur pour les autres cas
-        console.error('❌ Error inserting user:', err);
-        return reply.status(500).send({ error: 'Internal server error' });
-      }
+      // Erreur serveur pour les cas inattendus
+      console.error('❌ Error inserting user:', err);
+      return reply.status(500).send({ error: 'Erreur interne du serveur' });
     }
     
   });

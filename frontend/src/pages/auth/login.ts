@@ -7,6 +7,12 @@ export function renderLogin(): string {
 		<main class="login-content">
 			<div class="login-form-container">
 				<h2>${t('auth.login.title')}</h2>
+				
+				<!-- Message de succès/erreur -->
+				<div id="messageContainer" class="message-container" style="display: none;">
+					<div id="messageContent" class="message-content"></div>
+				</div>
+				
 				<form id="loginForm" class="login-form">
 					<div class="form-group">
 						<input type="text" id="username" name="username" placeholder="${t('auth.login.username')}" required>
@@ -25,6 +31,39 @@ export function renderLogin(): string {
 	</div>
 
 	<style>
+		.message-container {
+			margin-bottom: 20px;
+			padding: 12px 16px;
+			border-radius: 8px;
+			font-size: 14px;
+			font-weight: 500;
+			text-align: center;
+			animation: slideDown 0.3s ease-out;
+		}
+
+		.message-container.success {
+			background-color: #d4edda;
+			border: 1px solid #c3e6cb;
+			color: #155724;
+		}
+
+		.message-container.error {
+			background-color: #f8d7da;
+			border: 1px solid #f5c6cb;
+			color: #721c24;
+		}
+
+		@keyframes slideDown {
+			from {
+				opacity: 0;
+				transform: translateY(-10px);
+			}
+			to {
+				opacity: 1;
+				transform: translateY(0);
+			}
+		}
+
 		.link-button {
 			background: none;
 			border: none;
@@ -45,6 +84,26 @@ export function renderLogin(): string {
 
 function initializeLoginEvents() {
 	const loginForm = document.getElementById('loginForm');
+	
+	// Fonction pour afficher les messages
+	function showMessage(message: string, type: 'success' | 'error') {
+		const messageContainer = document.getElementById('messageContainer');
+		const messageContent = document.getElementById('messageContent');
+		
+		if (messageContainer && messageContent) {
+			messageContent.textContent = message;
+			messageContainer.className = `message-container ${type}`;
+			messageContainer.style.display = 'block';
+			
+			// Auto-hide pour les messages de succès après 3 secondes
+			if (type === 'success') {
+				setTimeout(() => {
+					messageContainer.style.display = 'none';
+				}, 3000);
+			}
+		}
+	}
+	
 	loginForm?.addEventListener('submit', async (e) => {
 	e.preventDefault();
 
@@ -65,7 +124,7 @@ function initializeLoginEvents() {
 		const result = await response.json();
 
 		if (!response.ok) {
-			alert(`❌ Error: ${result.error || 'Invalid credentials'}`);
+			showMessage(`❌ Erreur: ${result.error || 'Identifiants invalides'}`, 'error');
 			return;
 		}
 
@@ -92,7 +151,7 @@ function initializeLoginEvents() {
 		
 	} catch (err) {
 		console.error('❌ Network or server error', err);
-		alert('❌ Error during login');
+		showMessage('❌ Erreur lors de la connexion', 'error');
 	}
 	});
 

@@ -17,32 +17,24 @@ import userRoutes from './routes/user';
 import friendRoutes from './routes/friend';
 import webSocketRoutes from './routes/web-socket';
 import { getSecretFromVault } from './utils/vault';
-import Fastify from 'fastify';
 import { createClient } from 'redis';
 
 
 const fastify = Fastify({ logger: { level: 'debug' } });
-const redis = createClient({ url: 'redis://redis:6378' });
-redis.on('error', (err) => console.error('❌ Redis Error:', err)).connect();
 
-export { redis };
-
-// Healthcheck route for Redis
-fastify.get('/redis-health', async (request, reply) => {
-  try {
-    const pong = await redis.ping();
-    return { status: 'ok', redis: pong };
-  } catch (err) {
-    console.error('Redis ping failed:', err);
-    reply.code(500).send({ status: 'error', message: 'Redis not reachable' });
-  }
-});
 declare module 'fastify' {
   interface FastifyInstance {
     userService: UserService;
     friendService: FriendService;
   }
 }
+
+// Initialisation du client Redis
+export const redis = createClient({
+  url: process.env.REDIS_URL || 'redis://redis:6378'
+});
+redis.on('error', (err) => console.error('Redis Client Error', err));
+redis.connect();
 
 
 async function setup() {
