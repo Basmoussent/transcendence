@@ -131,6 +131,9 @@ export class Chat {
 				this.addSystemMessage(data.content);
 				this.updateFriendList();
 				break;
+			case 'debug':
+				console.log(`DEBUG --> ${data.content}`)
+				break;
 			case 'notLog':
 				console.log('pas de token pour livechat')
 				window.history.pushState({}, '', '/login');

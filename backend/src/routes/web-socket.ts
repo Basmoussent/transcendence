@@ -447,7 +447,7 @@ async function addFriend(app: FastifyInstance, user: UserChat, friendName: strin
 
 	if (friendName === user.username) {
 		const message = JSON.stringify({
-			type: 'system_message',
+			type: 'debug',
 			content: 'you cannot add yourself as a friend dumbass'
 		});
 		user.socket.send(message)
@@ -458,7 +458,7 @@ async function addFriend(app: FastifyInstance, user: UserChat, friendName: strin
 	const friend = await app.userService.findByUsername(friendName);
 	if (!friend) {
 		const message = JSON.stringify({
-			type: 'system_message',
+			type: 'debug',
 			content: 'user not found'
 		});
 		user.socket.send(message)
