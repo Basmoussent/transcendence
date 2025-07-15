@@ -123,6 +123,7 @@ export class Chat {
 		console.log(`live chat ws event : ${data.type}`)
 		switch (data.type) {
 			case 'chat_message':
+				console.log(`les message ${data.content}`)
 				this.addChatMessage(data.username, data.content);
 				break;
 			case 'friend_list_update':
@@ -197,11 +198,14 @@ export class Chat {
 
 	private sendChatMessage() {
 		const message = this.chatInput.value.trim();
+
+
+		console.log("le message", message)
 		if (message && this.ws.readyState === WebSocket.OPEN) {
 			this.ws.send(JSON.stringify({
 				type: 'chat_message',
 				dest: this.receiver,
-				content: message
+				content: message,
 			}));
 			this.chatInput.value = '';
 		}
@@ -330,12 +334,13 @@ export class Chat {
 		this.updateFriendAndRequest()
 	}
 
-	private startChatWith(user: UserChat) {
+	private startChatWith(relationId: number, user: UserChat) {
 		
 		this.receiver = user.username;
 		this.noChatSelected.style.display = 'none';
 		this.chatContainer.style.display = 'flex';
 		this.chatContainer.classList.remove('hidden');
+		this.receiver = user.username
 
 		this.chatHeader.innerHTML = `
 		<div class="friend-avatar">
@@ -351,11 +356,17 @@ export class Chat {
 		</button>
 		`;
 
-		this.chatMessages.innerHTML = loadChatHistory();
-		this.ws.send(JSON.stringify({
-			type: 'fetch_history',
-			with_user: user.username
-		}));
+		this.chatMessages.innerHTML = this.loadChatHistory(relationId, user); // à compléter
+
+	}
+
+	private loadChatHistory(relationId: number, user:UserChat): string {
+
+		const conversation = ''
+		// recuperer tous les messages de cette relation
+		// boucler dessus et append dans la conversation tous les messages en fonction de qui a envoyé
+
+		return conversation;
 	}
 }
 

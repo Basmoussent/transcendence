@@ -3,7 +3,7 @@ import { WebSocket } from 'ws';
 import { validateToken } from '../utils/validation';
 import { redis } from '../index';
 
-import { ws_matchmaking } from './web_socket/ws_matchmaking'
+// import { ws_matchmaking } from './web_socket/ws_matchmaking'
 // import { ws_room } from './web_socket/ws_room'
 // import { ws_chat } from './web_socket/ws_chat'
 
@@ -423,7 +423,7 @@ function sendChatMessage(username: string, data: any) {
 	const message = JSON.stringify({
 		type: 'chat_message',
 		username: username,
-		message: data.message,
+		content: data.content,
 	});
 	// envoie au destinataire
 	live.get(data.dest)?.socket.send(message);
@@ -517,6 +517,13 @@ async function acceptFriend(app: FastifyInstance, user: UserChat, friendName: st
 		return;
 	}
 	app.friendService.acceptRelation(relation.id)
+	const message = JSON.stringify({
+		type: 'updateUI'
+	});
+
+	// faire update l'interface aux deux users
+	user.socket.send(message)
+	live.get(friend)?.socket.send(message);
 }
 
 function broadcastMatchmaking(data: any) {
