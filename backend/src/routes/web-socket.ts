@@ -3,6 +3,10 @@ import { WebSocket } from 'ws';
 import { validateToken } from '../utils/validation';
 import { redis } from '../index';
 
+import { ws_matchmaking } from './web_socket/ws_matchmaking'
+// import { ws_room } from './web_socket/ws_room'
+// import { ws_chat } from './web_socket/ws_chat'
+
 interface User {
 	username: string;
 	isReady: boolean;
@@ -38,15 +42,18 @@ interface Room {
 
 // redeinition on peut import de web-socket.ts
 interface Relation {
+	id: number | -1;
 	user_1: number;
 	user_2: number;
 	user1_state: 'normal' | 'requested' | 'waiting' | 'blocked';
 	user2_state: 'normal' | 'requested' | 'waiting' | 'blocked';
 }
 
+
 const rooms = new Map<string, Room>();
 const live = new Map<string, UserChat>();
 const matchmaking = new Array<WebSocket>();
+
 
 async function webSocketRoutes(app: FastifyInstance) {
 
@@ -501,9 +508,15 @@ async function addFriend(app: FastifyInstance, user: UserChat, friendName: strin
 
 async function acceptFriend(app: FastifyInstance, user: UserChat, friendName: string) {
 
-	
+	const friend = await app.userService.findByUsername(friendName);
+	const relations: Relation[] = await app.friendService.getRelations(user.userId);
+	const relation = relations.find(rel => rel.user_1 === friend.id || rel.user_2 === friend.id);
 
-	
+	if (!relation || relation.id === -1) {
+		console.error(`couldnt find the relation to accept friendship`);
+		return;
+	}
+	app.friendService.acceptRelation(relation.id)
 }
 
 function broadcastMatchmaking(data: any) {
@@ -515,6 +528,8 @@ function broadcastMatchmaking(data: any) {
 		}
 	}
 }
+
+
 
 export default webSocketRoutes;
 

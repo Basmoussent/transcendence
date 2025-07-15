@@ -11,6 +11,7 @@ export interface UserChat {
 }
 
 interface Relation {
+	id: number;
 	user_1: number;
 	user_2: number;
 	user1_state: 'normal' | 'requested' | 'waiting' | 'blocked';
@@ -125,14 +126,14 @@ export class Chat {
 				this.addChatMessage(data.username, data.content);
 				break;
 			case 'friend_list_update':
-				this.updateFriendList();
+				this.updateFriendAndRequest();
 				break;
 			case 'updateUI':
 				this.updateUI();
 				break;
 			case 'system_message':
 				this.addSystemMessage(data.content);
-				this.updateFriendList();
+				this.updateFriendAndRequest();
 				break;
 			case 'debug':
 				console.log(`DEBUG --> ${data.content}`)
@@ -232,7 +233,7 @@ export class Chat {
 		this.chatMessages.scrollTop = this.chatMessages.scrollHeight;
 	}
 
-	private async updateFriendList() {
+	private async updateFriendAndRequest() {
 
 		var	friends = 0;
 		var	request = 0;
@@ -264,7 +265,7 @@ export class Chat {
 					conversationElement.className = 'friend-card online flex items-center';
 					conversationElement.dataset.username = friend.username;
 					conversationElement.innerHTML = `
-	w					<div class="friend-avatar">
+						<div class="friend-avatar">
 							${friend.username.charAt(0).toUpperCase()}
 							<div class="status-dot online"></div>
 						</div>
@@ -279,10 +280,10 @@ export class Chat {
 						</div>
 							`;
 				this.friendsList.appendChild(conversationElement);
-				conversationElement.addEventListener('click', () => this.startChatWith(friend));
+				conversationElement.addEventListener('click', () => this.startChatWith(relation.id, friend));
 			}
-			else if ((relation.user_1 === this.me.userId && relation.user1_state === 'waiting') ||
-				(relation.user_2 === this.me.userId && relation.user2_state === 'waiting')) {
+			else if ((relation.user_1 === this.me.userId && relation.user2_state === 'waiting') ||
+				(relation.user_2 === this.me.userId && relation.user1_state === 'waiting')) {
 				request++;
 
 
@@ -326,7 +327,7 @@ export class Chat {
 	}
 
 	private updateUI() {
-		this.updateFriendList()
+		this.updateFriendAndRequest()
 	}
 
 	private startChatWith(user: UserChat) {
@@ -350,8 +351,7 @@ export class Chat {
 		</button>
 		`;
 
-		this.chatMessages.innerHTML = '';
-
+		this.chatMessages.innerHTML = loadChatHistory();
 		this.ws.send(JSON.stringify({
 			type: 'fetch_history',
 			with_user: user.username
@@ -374,6 +374,7 @@ async function fetchUserRelations(userid: number): Promise<Relation[]|null> {
 
 		if (response.ok) {
 			const relations: Relation[] = result.relations.map((relation:any) => ({
+				id: relation.id,
 				user_1: relation.user_1,
 				user_2: relation.user_2,
 				user1_state: relation.user1_state,
