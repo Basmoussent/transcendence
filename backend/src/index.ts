@@ -33,7 +33,7 @@ declare module 'fastify' {
 export const redis = createClient({
   url: process.env.REDIS_URL || 'redis://redis:6378'
 });
-redis.on('error', (err) => console.error('Redis Client Error', err));
+redis.on('error', (err: any) => console.error('Redis Client Error', err));
 redis.connect();
 
 

@@ -144,7 +144,11 @@ export class Room {
 				window.dispatchEvent(new Event('popstate'));
 				this.ws.close();
 				break;
-			
+			case 'error':
+				window.history.pushState({}, '', '/login');
+				window.dispatchEvent(new Event('popstate'));
+				this.ws.close();
+				break;
 			default:
 				console.warn(`Unknown event type received: ${data.type}`);
 		}
@@ -294,7 +298,7 @@ export class Room {
 		return `
 			<div class="player-card ai">
 				<img class="player-avatar-img" src="${pp}" alt="Avatar">
-				<div class="player-name">IA</div>
+				<div class="player-name">AI</div>
 				<div class="player-status">Automatique</div>
 			</div>
 		`;
@@ -328,6 +332,10 @@ export class Room {
 
 		this.addSystemMessage(`The game is about to start ${gameType}...`);
 		setTimeout(() => {
+			this.ws.send(JSON.stringify({
+				type: 'disconnection',
+				message: 'je launch une game'
+			}));
 			// faire le new block ou pong avec info de la game dans le constructeur
 			if (gameType === 'Pong')
 				window.history.pushState({}, '', `/pong`);

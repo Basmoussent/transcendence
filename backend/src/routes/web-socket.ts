@@ -134,12 +134,11 @@ async function webSocketRoutes(app: FastifyInstance) {
 			rooms.set(uuid!, room);
 		}
 
-		if (room.users.size >= room.maxPlayers + room.ai) {
+		if (room.maxPlayers === room.users.size + room.ai) {
 			socket.send(JSON.stringify({
 				type: 'error',
 				message: 'Room is full' }));
 				console.log('je vais close le socket')
-			socket.close();
 			return;
 		}
 
@@ -303,6 +302,10 @@ async function webSocketRoutes(app: FastifyInstance) {
 					case 'decline_friend_request':
 						console.log("dans le bueno decline_friend_request")
 						// fonction pour handle
+						break;
+					case 'disconnection':
+						live.delete(sender.username);
+						console.log('je disconnect le user')
 						break;
 					default:
 						console.warn(`recoit un event inconnu`)

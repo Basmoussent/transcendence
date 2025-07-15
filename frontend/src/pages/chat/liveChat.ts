@@ -1,4 +1,3 @@
-import { escape } from 'querystring';
 import { sanitizeHtml } from '../../utils/sanitizer';
 import { fetchMe, fetchUserInfo, loadMe } from './utils';
 
@@ -256,7 +255,6 @@ export class Chat {
 
 			const friendId = relation.user_1 === this.me.userId ? relation.user_2 : relation.user_1;
 
-
 			const friend: UserChat | void = await fetchUserInfo(friendId);
 
 			if (!friend)
@@ -280,9 +278,9 @@ export class Chat {
 						<div class="friend-actions">
 							<button class="action-btn chat-btn">
 								<i class="fas fa-comment-dots"></i>
-								</button>
+							</button>
 						</div>
-							`;
+					`;
 				this.friendsList.appendChild(conversationElement);
 				conversationElement.addEventListener('click', () => this.startChatWith(relation.id, friend));
 			}
@@ -340,7 +338,6 @@ export class Chat {
 		this.noChatSelected.style.display = 'none';
 		this.chatContainer.style.display = 'flex';
 		this.chatContainer.classList.remove('hidden');
-		this.receiver = user.username
 
 		this.chatHeader.innerHTML = `
 		<div class="friend-avatar">
@@ -351,9 +348,6 @@ export class Chat {
 			<h3>${sanitizeHtml(user.username)}</h3>
 			<p>En ligne</p>
 		</div>
-		<button class="close-chat-btn ml-auto">
-			<i class="fas fa-times"></i>
-		</button>
 		`;
 
 		this.chatMessages.innerHTML = this.loadChatHistory(relationId, user); // à compléter
