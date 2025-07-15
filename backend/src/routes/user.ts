@@ -49,7 +49,7 @@ async function userRoutes(app: FastifyInstance) {
             // Récupération des données utilisateur
             const user = await new Promise<UserData | null>((resolve, reject) => {
                 database.get(
-                    'SELECT id, username, email, avatar_url, language FROM users WHERE email = ?',
+                    'SELECT * FROM users WHERE email = ?',
                     [email],
                     (err: any, row: UserData | undefined) => {
                         if (err) {
@@ -81,8 +81,8 @@ async function userRoutes(app: FastifyInstance) {
                     email: user.email,
                     avatar_url: user.avatar_url || 'avatar.png',
                     language: user.language,
-                    two_fact_auth: user.two_fact_auth,
-                    secret_key: user.secret_key
+                    two_fact_auth: user.two_fact_auth || 0,
+                    secret_key: user.secret_key || "rien"
                 },
                 // stats: stats
             });
@@ -272,6 +272,26 @@ async function userRoutes(app: FastifyInstance) {
             return reply.status(500).send({
                 error: 'erreur GET /user/username:username',
                 details: err.message });
+        }
+    })
+
+    app.put('/username/2fa', async function (request: FastifyRequest, reply: FastifyReply) {
+        try {
+            const database = db.getDatabase();
+            const {status, userId} = request.body;
+			// const sql = `UPDATE games SET ${setClause} WHERE id = ?`;
+
+            await new Promise<void>((resolve, reject) => {
+                database.run(
+                    'UPDATE users SET two_fact_auth = ? WHERE id = ?',
+                    [ status, userId ],
+                    (err: any) => {
+                        err ? reject(err) : resolve();
+            })})
+            
+        }
+        catch (err: any) {
+            console.error("pblm change le boolean du user pour la 2FA")
         }
     })
 
