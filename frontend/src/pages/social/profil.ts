@@ -40,7 +40,6 @@ export async function renderProfil() {
         games: (result.stats?.games) || 0,
         rating: (result.stats?.rating) || 0,
         preferred_language: sanitizeHtml(result.user?.language) || 'en'
-        
       };
     } else {
       console.error('Erreur lors de la récupération des données utilisateur');

@@ -3,6 +3,8 @@ CREATE TABLE IF NOT EXISTS users (
   username VARCHAR UNIQUE NOT NULL,
   email VARCHAR UNIQUE NOT NULL,
   password_hash TEXT NOT NULL,
+  two_fact_auth BOOLEAN DEFAULT false,
+  secret_key VARCHAR DEFAULT NULL,
   avatar_url TEXT,
   language VARCHAR DEFAULT 'fr',
   created_at DATETIME DEFAULT CURRENT_TIMESTAMP
