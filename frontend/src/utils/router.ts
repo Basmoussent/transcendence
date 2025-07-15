@@ -19,10 +19,8 @@ import { getAuthToken } from './auth';
 import { clearTranslationCache } from './translations';
 import { getGame } from '@/game/gameUtils';
 import { initializeMatchmakingEvents } from '../pages/matchmaking/renderMatchmaking';
-import { renderPong } from '../pages/pong/pong';
 import { renderMultiPong } from '../pages/pong/multiplayer-pong';
 import { renderChooseGame } from '../pages/game/choose-game';
-import { initAlive } from './auth';
 import { renderPong } from '../pages/pong/pong';
 import { initAlive } from './auth';
 import { renderFriends } from '../pages/social/friends';
@@ -166,8 +164,8 @@ export async function router() {
     } catch (e) {
       console.error('Erreur lors de la vérification du token:', e);
     }
-    console.log("initAlive");
-    console.log(tokenAuth);
+    // console.log("initAlive");
+    // console.log(tokenAuth);
   }
 
   // Initialiser les événements après le rendu pour les pages qui en ont besoin

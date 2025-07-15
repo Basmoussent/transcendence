@@ -13,99 +13,6 @@ export interface Available {
 	divConverion(): string;
 };
 
-export async function loadAvailableGames(): Promise<Available[] | -1> {
-	
-	try {
-		const token = getAuthToken();
-		if (!token) {
-			alert('❌ Token d\'authentification manquant');
-			window.history.pushState({}, '', '/login');
-			window.dispatchEvent(new PopStateEvent('popstate'));
-			return -1;
-		}
-
-		const response = await fetch('/api/games/available', {
-			method: 'GET',
-			headers: {
-				'Content-Type': 'application/json',
-				'x-access-token': token,
-			}
-		});
-		
-		if (response.ok) {
-			const result = await response.json();
-			const available: Available[] = result.games.map((game:any) => ({
-				gameId: sanitizeHtml(game.id),
-				game_name: sanitizeHtml(game.game_name),
-				player1: sanitizeHtml(game.player1),
-				player2: sanitizeHtml(game?.player2),
-				player3: sanitizeHtml(game?.player3),
-				player4: sanitizeHtml(game?.player4),
-				users_needed:(sanitizeHtml(game.users_needed)),
-				divConverion(): string {
-					// Calculer le nombre de joueurs actuels
-					const currentPlayers = [this.player1, this.player2, this.player3, this.player4]
-						.filter(player => player && player.trim() !== '').length;
-					
-					// Déterminer le statut
-					const totalSlots = parseInt(this.users_needed) || 2;
-					const isWaiting = currentPlayers < totalSlots;
-					const isFull = currentPlayers >= totalSlots;
-					
-					const statusClass = isFull ? 'status-full' : (currentPlayers > 1 ? 'status-playing' : 'status-waiting');
-					const statusText = isFull ? 'Full' : (currentPlayers > 1 ? 'Playing' : 'Waiting');
-					
-					// Générer la liste des joueurs
-					const playersList = [this.player1, this.player2, this.player3, this.player4]
-						.filter(player => player && player.trim() !== '')
-						.join(', ');
-					
-					return `
-						<div class="game-card" ${!isFull ? `onclick="joinGame('${this.gameId}')"` : ''}>
-							<div class="game-header">
-								<h3 class="game-title">${this.game_name}</h3>
-								<span class="game-status ${statusClass}">${statusText}</span>
-							</div>
-							<div class="game-info">
-								<div class="game-type">
-									<i class="fas ${this.game_name.toLowerCase() === 'pong' ? 'fa-table-tennis' : 'fa-cubes'}"></i>
-									<span>${this.game_name}</span>
-								</div>
-								<div class="player-count">
-									<i class="fas fa-users"></i>
-									<span>${currentPlayers}/${totalSlots}</span>
-								</div>
-							</div>
-							${playersList ? `
-								<div class="players-list">
-									<i class="fas fa-user"></i>
-									<span>${playersList}</span>
-								</div>
-							` : ''}
-							${!isFull ? `
-								<button class="join-button" id="join${this.gameId}Btn">
-									<i class="fas fa-sign-in-alt"></i>
-									Join Game
-								</button>
-							` : ''}
-						</div>
-					`;
-
-				}
-			}));
-			console.log("available games: ", );
-			return (available);
-		}
-		else 
-			console.error("retrieve available game failed");
-	}
-	catch (error) {
-		console.error("retrieve available game failed", error); }
-	return -1;
-}
-
-
-
 export class matchmaking {
 
 	private pong: boolean;
@@ -126,6 +33,7 @@ export class matchmaking {
 	private launchBtn: HTMLElement;
 	private resetBtn: HTMLElement;
 	private options: HTMLElement;
+	private availableGames: HTMLElement;
 	private username: string;
 
 	private joinBtn: Map<number,HTMLElement> = new Map();
@@ -147,6 +55,7 @@ export class matchmaking {
 		this.launchBtn = this.getElement('launchBtn');
 		this.resetBtn = this.getElement('resetBtn');
 		this.options = this.getElement("game-options");
+		this.availableGames = this.getElement('available-games');
 
 
 		this.setupMutationObserver();
@@ -179,6 +88,7 @@ export class matchmaking {
 
 		this.ws.onopen = () => {
 			console.log(`${this.username} est arrive sur matchmaking`)
+			this.updateUI();
 		}
 
 		this.ws.onerror = (error) => {
@@ -243,11 +153,7 @@ export class matchmaking {
 			});
 	}
 
-	// this.homeBtn.addEventListener('click', () => {
-	// 		window.history.pushState({}, '', '/main');
-	// 		window.dispatchEvent(new PopStateEvent('popstate'));
-	// 		this.currentOptions();
-		// });
+	
 
 	private gameOptions(): void {
 
@@ -413,8 +319,7 @@ export class matchmaking {
 			window.dispatchEvent(new PopStateEvent('popstate'));
 
 			this.ws.send(JSON.stringify({
-				type: 'new_game',
-				game: tmp
+				type: 'updateUI',
 			}));
 
 		});
@@ -436,27 +341,26 @@ export class matchmaking {
 	private setJoinBtns() {
 
 		for (let [id, btn] of this.joinBtn) {
-			
-			console.log('ca passe')
 			btn.addEventListener('click', () => {
-				console.log(`je passe pour le btn ${id}`)
 				this.joinRoom(Number(id));
 			});
-
 		}
 	}
 
 	private handleEvents(data: any) {
 
+		console.log(`event recu ${data.type}`)
+
+		
 		if (!this.ws || this.ws.readyState !== WebSocket.OPEN) {
 			console.log("le websocket n'est pas du tout ready l'ancien")
 			return;
 		}
 
+
 		switch (data.type) {
-			case 'new_game':
-				console.log(`il y a une nouvelle game, il faut update`);
-				console.log(`${data.game}`)
+			case 'updateUI':
+				this.updateUI();
 				break;
 			case 'notLog':
 				window.history.pushState({}, '', '/login');
@@ -466,6 +370,128 @@ export class matchmaking {
 
 		}
 
+	}
+
+	private async updateUI() {
+		this.updateAvailableGames();
+	}
+
+	private async updateAvailableGames() {
+
+		const gameList = await this.loadAvailableGames();
+		
+		if (gameList === -1) {
+			return ;
+		}
+		const inject = await this.gamesToDiv(gameList);
+		
+		const container = document.getElementById('available-games');
+
+		if (container && typeof inject === 'string') {
+			this.availableGames.innerHTML = inject;
+		}
+	}
+
+	private async gamesToDiv(games:Available[]): Promise<string> {
+
+		let tmp:string = '';
+		for (const game of games)
+			tmp += game.divConverion();
+
+		return tmp;
+	}
+
+
+
+	private async loadAvailableGames(): Promise<Available[] | -1> {
+	
+		try {
+			const token = getAuthToken();
+			if (!token) {
+				alert('❌ Token d\'authentification manquant');
+				window.history.pushState({}, '', '/login');
+				window.dispatchEvent(new PopStateEvent('popstate'));
+				return -1;
+			}
+
+			const response = await fetch('/api/games/available', {
+				method: 'GET',
+				headers: {
+					'Content-Type': 'application/json',
+					'x-access-token': token,
+				}
+			});
+			
+			if (response.ok) {
+				const result = await response.json();
+				const available: Available[] = result.games.map((game:any) => ({
+					gameId: sanitizeHtml(game.id),
+					game_name: sanitizeHtml(game.game_name),
+					player1: sanitizeHtml(game.player1),
+					player2: sanitizeHtml(game?.player2),
+					player3: sanitizeHtml(game?.player3),
+					player4: sanitizeHtml(game?.player4),
+					users_needed:(sanitizeHtml(game.users_needed)),
+					divConverion(): string {
+						// Calculer le nombre de joueurs actuels
+						const currentPlayers = [this.player1, this.player2, this.player3, this.player4]
+							.filter(player => player && player.trim() !== '').length;
+						
+						// Déterminer le statut
+						const totalSlots = parseInt(this.users_needed) || 2;
+						const isWaiting = currentPlayers < totalSlots;
+						const isFull = currentPlayers >= totalSlots;
+						
+						const statusClass = isFull ? 'status-full' : (currentPlayers > 1 ? 'status-playing' : 'status-waiting');
+						const statusText = isFull ? 'Full' : (currentPlayers > 1 ? 'Playing' : 'Waiting');
+						
+						// Générer la liste des joueurs
+						const playersList = [this.player1, this.player2, this.player3, this.player4]
+							.filter(player => player && player.trim() !== '')
+							.join(', ');
+						
+						return `
+							<div class="game-card" ${!isFull ? `onclick="joinGame('${this.gameId}')"` : ''}>
+								<div class="game-header">
+									<h3 class="game-title">${this.game_name}</h3>
+									<span class="game-status ${statusClass}">${statusText}</span>
+								</div>
+								<div class="game-info">
+									<div class="game-type">
+										<i class="fas ${this.game_name.toLowerCase() === 'pong' ? 'fa-table-tennis' : 'fa-cubes'}"></i>
+										<span>${this.game_name}</span>
+									</div>
+									<div class="player-count">
+										<i class="fas fa-users"></i>
+										<span>${currentPlayers}/${totalSlots}</span>
+									</div>
+								</div>
+								${playersList ? `
+									<div class="players-list">
+										<i class="fas fa-user"></i>
+										<span>${playersList}</span>
+									</div>
+								` : ''}
+								${!isFull ? `
+									<button class="join-button" id="join${this.gameId}Btn">
+										<i class="fas fa-sign-in-alt"></i>
+										Join Game
+									</button>
+								` : ''}
+							</div>
+						`;
+
+					}
+				}));
+				console.log("available games: ", );
+				return (available);
+			}
+			else 
+				console.error("retrieve available game failed");
+		}
+		catch (error) {
+			console.error("retrieve available game failed", error); }
+		return -1;
 	}
 
 

@@ -44,67 +44,49 @@ interface Relation {
 	user2_state: 'normal' | 'requested' | 'waiting' | 'blocked';
 }
 
-
-
 const rooms = new Map<string, Room>();
 const live = new Map<string, UserChat>();
+const matchmaking = new Array<WebSocket>();
 
 async function webSocketRoutes(app: FastifyInstance) {
 
-	const dict = new Map();
-
-	dict.set("clients", [])
-
 	app.get('/matchmaking', { websocket: true }, (socket: any, req: FastifyRequest) => {
 		// Vérification du token
-		let token = req.headers['x-access-token'] as string;
-		if (!token) {
-			token = req.cookies['x-access-token'];
-		}
+		const token = req.headers['x-access-token'] ? req.headers['x-access-token'] : req.cookies['x-access-token']; 
 		
 		if (!token) {
-			console.log('❌ No token provided for WebSocket connection on /matchmaking');
+			console.log('⚠️  Aucun token fourni. Détails de la requête :');
+			console.log('Headers :', JSON.stringify(req.headers, null, 2));
+			console.log('Cookies :', JSON.stringify(req.cookies, null, 2));
 			socket.send(JSON.stringify({
-				type: 'auth_error',
-				message: 'Authentication token required'
-			}));
-			socket.close();
-			return;
+				type: 'notLog',
+				message: 'the user is not log' }))
+			return ;
 		}
 
-		try {
-			const decoded = app.jwt.verify(token) as { user: string; name: string };
-			console.log(`✅ WebSocket authenticated for user: ${decoded.name} on /matchmaking`);
-		} catch (error: any) {
-			console.log('❌ Invalid token for WebSocket connection on /matchmaking:', error.message);
-			socket.send(JSON.stringify({
-				type: 'auth_error',
-				message: 'Invalid or expired token'
-			}));
-			socket.close();
-			return;
-		}
-
-		dict.get("clients").push(socket);
+		matchmaking.push(socket);
 		console.log("a user just connected on /matchmaking");
 		socket.on('message', (message: any) => {
 			try {
 				const data = JSON.parse(message.toString());
 				
-				dict.get("clients").forEach((client: any) => {
-					if (client !== socket)
-						client.send(message.toString());
-				});
-			} catch (error) {
+				switch (data.type) {
+					case 'updateUI':
+						broadcastMatchmaking(data);
+						break;
+					default:
+						console.log(`l'event existe pas`)
+				}
+			}
+			catch (error) {
 				console.error('Invalid message format:', error);
 			}
 		});
 		socket.on('close', () => {
-			const index = dict.get("clients").indexOf(socket);
-			if (index !== -1) {
-				dict.get("clients").splice(index, 1);
-				console.log("a user just disconnected from /matchmaking");
-			}
+			const id = matchmaking.findIndex(user => user === socket);
+			matchmaking.splice(id, 1);
+
+			console.log(`user left matchmaking`)
 		});
 	});
 
@@ -287,46 +269,48 @@ async function webSocketRoutes(app: FastifyInstance) {
 		
 	// });
 
-	app.get('/alive/:userId', async (req: FastifyRequest, res: FastifyReply) => {
-		const token = validateToken(req, app);
-		if (!token) {
-			console.log('❌ No token provided for WebSocket connection on /alive');
-			res.status(401).send('Unauthorized');
-			return;
-		}
-		try {
-			const decoded = app.jwt.verify(token) as { user: string; name: string };
-			const userId = req.params.userId;
+	// app.get('/alive/:userId', async (req: FastifyRequest, res: FastifyReply) => {
+	// 	const token = validateToken(req, app);
+	// 	if (!token) {
+	// 		console.log('❌ No token provided for WebSocket connection on /alive');
+	// 		res.status(401).send('Unauthorized');
+	// 		return;
+	// 	}
+	// 	try {
+	// 		const decoded = app.jwt.verify(token) as { user: string; name: string };
+	// 		const userId = req.params.userId;
 
-			const isMember = await redis.sIsMember(`online`, userId);
-			if (isMember) {
-				res.status(200).send('alive');
-			  } else {
-				res.status(200).send('dead');
-			  }
-		}
-		catch (error) {
-			console.log('❌ Invalid token for WebSocket connection on /alive');
-			res.status(401).send('Unauthorized');
-			return;
-		}
-	});
+	// 		const isMember = await redis.sIsMember(`online`, userId);
+	// 		if (isMember) {
+	// 			res.status(200).send('alive');
+	// 		  } else {
+	// 			res.status(200).send('dead');
+	// 		  }
+	// 	}
+	// 	catch (error) {
+	// 		console.log('❌ Invalid token for WebSocket connection on /alive');
+	// 		res.status(401).send('Unauthorized');
+	// 		return;
+	// 	}
+	// });
 
 	app.get('/chat', { websocket: true }, (socket: WebSocket, req: FastifyRequest) => {
 
 		const token = req.headers['x-access-token'] ? req.headers['x-access-token'] : req.cookies['x-access-token']; 
 
 		if (!token) {
-			socket.send(JSON.stringify({
-				type: 'notLog',
-				message: 'the user is not log' }))
-			return ;
+			// socket.send(JSON.stringify({
+			// 	type: 'notLog',
+			// 	message: 'the user is not log' }))
+			// return ;
 		}
 
 		const decoded = app.jwt.verify(token) as { user: string };
 		const username = decoded.name;
 
 		loadMe(app, username).then((tmp: UserData) => {
+
+			console.log('les infos valent', tmp);
 			const user: UserChat = {
 				username: username,
 				userId: tmp.id,
@@ -345,6 +329,8 @@ async function webSocketRoutes(app: FastifyInstance) {
 
 				const sender = live.get(username)!;
 
+				// attention envoyer l'id plutot psque si la personne change de username on trouve plus ?
+
 				switch (data.type) {
 					case 'chat_message':
 						sendChatMessage(username, data)
@@ -353,7 +339,16 @@ async function webSocketRoutes(app: FastifyInstance) {
 					case 'friend_request':
 						addFriend(app, sender, data.dest);
 						break;
-
+					case 'accept_friend_request':
+						console.log("dans le bueno accept_friend_request")
+						acceptFriend(app, sender, data.dest)
+						
+						// fonction pour handle
+						break;
+					case 'decline_friend_request':
+						console.log("dans le bueno decline_friend_request")
+						// fonction pour handle
+						break;
 					default:
 						console.warn(`recoit un event inconnu`)
 				}
@@ -497,16 +492,26 @@ async function loadMe(app: FastifyInstance, username: string): Promise<UserData>
 
 async function addFriend(app: FastifyInstance, user: UserChat, friendName: string) {
 
+	if (friendName === user.username) {
+		const message = JSON.stringify({
+			type: 'debug',
+			content: 'you cannot add yourself as a friend dumbass'
+		});
+		user.socket.send(message)
+		return;
+	}
+
 	// 1 - check que le user exist
 	const friend = await app.userService.findByUsername(friendName);
 	if (!friend) {
 		const message = JSON.stringify({
-			type: 'system_message',
+			type: 'debug',
 			content: 'user not found'
 		});
 		user.socket.send(message)
 		return;
 	}
+	
 		
 	// 2 - check si une relation n'existe pas déjà
 	const relations: Relation[] = await app.friendService.getRelations(user.userId);
@@ -534,6 +539,7 @@ async function addFriend(app: FastifyInstance, user: UserChat, friendName: strin
 	// 5 - envoyer une demande + creer l'instance dans db friends avec userid des deux personnes
 	//	 |__ update l'état, qui a ajouté qui
 	await app.friendService.createRelation(user.userId, friend.id, 'waiting', 'requested');
+
 	
 	console.log(`${user.username} requested ${friendName} to be friends`)
 	// send au user le statut de la demande
@@ -545,4 +551,22 @@ async function addFriend(app: FastifyInstance, user: UserChat, friendName: strin
 	// on passe sur tous les friends du user et afficher seulement les instances ou le state de l'autre user est à `asking`
 }
 
+async function acceptFriend(app: FastifyInstance, user: UserChat, friendName: string) {
+
+	
+
+	
+}
+
+function broadcastMatchmaking(data: any) {
+
+	for (const user of matchmaking) {
+		if (user.readyState === WebSocket.OPEN) {
+			console.log(`je send a tous le monde`)
+			user.send(JSON.stringify(data))
+		}
+	}
+}
+
 export default webSocketRoutes;
+

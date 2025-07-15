@@ -140,27 +140,27 @@ function initializeCreateAccountEvents() {
 			return;
 		}
 
-		if (username.length < 3) {
-			showMessage('❌ Le nom d\'utilisateur doit contenir au moins 3 caractères', 'error');
-			return;
-		}
+		// if (username.length < 3) {
+		// 	showMessage('❌ Le nom d\'utilisateur doit contenir au moins 3 caractères', 'error');
+		// 	return;
+		// }
 
-		if (password.length < 6) {
-			showMessage('❌ Le mot de passe doit contenir au moins 6 caractères', 'error');
-			return;
-		}
+		// if (password.length < 6) {
+		// 	showMessage('❌ Le mot de passe doit contenir au moins 6 caractères', 'error');
+		// 	return;
+		// }
 
-		if (password !== confirmPassword) {
-			showMessage('❌ Les mots de passe ne correspondent pas', 'error');
-			return;
-		}
+		// if (password !== confirmPassword) {
+		// 	showMessage('❌ Les mots de passe ne correspondent pas', 'error');
+		// 	return;
+		// }
 
-		// Validation email basique
-		const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-		if (!emailRegex.test(email)) {
-			showMessage('❌ Format d\'email invalide', 'error');
-			return;
-		}
+		// // Validation email basique
+		// const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+		// if (!emailRegex.test(email)) {
+		// 	showMessage('❌ Format d\'email invalide', 'error');
+		// 	return;
+		// }
 
 		try {
 			const response = await fetch('/api/auth/register', {

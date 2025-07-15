@@ -140,9 +140,6 @@ async function setup() {
 	console.log('🌍 Starting server...');
 	await fastify.listen({ port: 8000, host: '0.0.0.0' });
 	console.log('🚀 Server running on http://localhost:8000');
-
-	console.log("etat de mon websocket", fastify.websocketServer);
-
 }
 
 process.on('SIGTERM', () => {

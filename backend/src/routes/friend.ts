@@ -11,7 +11,7 @@ interface Relation {
 
 async function friendRoutes(app: FastifyInstance) {
 	
-	app.get('/relations:userid', async function (request: FastifyRequest, reply: FastifyReply) {
+	app.get('/relations', async function (request: FastifyRequest, reply: FastifyReply) {
 
 		try {
 			const database = db.getDatabase();
@@ -24,7 +24,7 @@ async function friendRoutes(app: FastifyInstance) {
 			const relations = await new Promise<Relation[] | null>((resolve, reject) => {
 
 				database.all(
-					'SELECT * FROM friends WHERE user_1 = ? || user_2 = ?',
+					'SELECT * FROM friends WHERE user_1 = ? OR user_2 = ?',
 					[ userid, userid ],
 					(err: any, row: Relation[] | undefined) => {
 						err ? reject(err) : resolve(row || null); }

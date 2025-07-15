@@ -1,7 +1,7 @@
 CREATE TABLE IF NOT EXISTS users (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
-  username VARCHAR UNIQUE NOT NULL,
-  email VARCHAR UNIQUE NOT NULL,
+  username TEXT NOT NULL,
+  email TEXT NOT NULL,
   password_hash TEXT NOT NULL,
   two_fact_auth BOOLEAN DEFAULT false,
   secret_key VARCHAR DEFAULT NULL,

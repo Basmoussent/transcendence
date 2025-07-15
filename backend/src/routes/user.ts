@@ -215,7 +215,7 @@ async function userRoutes(app: FastifyInstance) {
         
     });
 
-    app.get('/user:userid', async function (request: FastifyRequest, reply: FastifyReply) {
+    app.get('/user/:userid', async function (request: FastifyRequest, reply: FastifyReply) {
 
         try {
             const database = db.getDatabase();
@@ -245,7 +245,7 @@ async function userRoutes(app: FastifyInstance) {
         }
     })
 
-    app.get('/user/username:username', async function (request: FastifyRequest, reply: FastifyReply) {
+    app.get('/user/username/:username', async function (request: FastifyRequest, reply: FastifyReply) {
 
         try {
             const database = db.getDatabase();

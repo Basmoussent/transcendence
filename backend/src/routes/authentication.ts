@@ -48,21 +48,21 @@ async function authRoutes(app: FastifyInstance) {
       return reply.status(400).send({ error: 'Tous les champs sont obligatoires' });
     }
 
-    // Validation de la longueur du nom d'utilisateur
-    if (username.length < 3) {
-      return reply.status(400).send({ error: 'Le nom d\'utilisateur doit contenir au moins 3 caractères' });
-    }
+    // // Validation de la longueur du nom d'utilisateur
+    // if (username.length < 3) {
+    //   return reply.status(400).send({ error: 'Le nom d\'utilisateur doit contenir au moins 3 caractères' });
+    // }
 
-    // Validation de la longueur du mot de passe
-    if (password.length < 6) {
-      return reply.status(400).send({ error: 'Le mot de passe doit contenir au moins 6 caractères' });
-    }
+    // // Validation de la longueur du mot de passe
+    // if (password.length < 6) {
+    //   return reply.status(400).send({ error: 'Le mot de passe doit contenir au moins 6 caractères' });
+    // }
 
-    // Validation du format email
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-      return reply.status(400).send({ error: 'Format d\'email invalide' });
-    }
+    // // Validation du format email
+    // const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    // if (!emailRegex.test(email)) {
+    //   return reply.status(400).send({ error: 'Format d\'email invalide' });
+    // }
 
     // Vérification que les mots de passe correspondent
     if (password !== confirmPassword) {
@@ -99,6 +99,8 @@ async function authRoutes(app: FastifyInstance) {
     const password_hash = await bcrypt.hash(password, 10);
 
     try {
+
+      console.log(`j'insert dans la db`)
       // Préparation et exécution de la requête SQL d'insertion
       const stmt = datab.prepare(
         `INSERT INTO users (username, email, password_hash)
