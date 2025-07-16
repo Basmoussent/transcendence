@@ -15,8 +15,6 @@ export class main {
 
 	constructor() {
 
-
-		console.log('je construis')
 		this.profileBtn = this.getElement('profileBtn');
 		this.chatBtn = this.getElement('chatBtn');
 		this.matchmakingBtn = this.getElement('matchmakingBtn');

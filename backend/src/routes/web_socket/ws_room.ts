@@ -103,7 +103,6 @@ export async function handleRoom(app: FastifyInstance, socket: WebSocket, req: F
 
 	room.users.set(username, user);
 
-
 	console.log(JSON.stringify(room, null, 4));
 
 	if (room.maxPlayers === room.users.size + room.ai) {
@@ -117,7 +116,6 @@ export async function handleRoom(app: FastifyInstance, socket: WebSocket, req: F
 
 	console.warn(`room.maxPlayers === room.users.size + room.ai --> ${room.maxPlayers} === ${room.users.size} + ${room.ai}`)
 
-	console.log(`${username} connected to room ${uuid!}`);
 	broadcastSystemMessage(room, `${username} has joined the room.`);
 	broadcastRoomUpdate(room);
 
@@ -138,7 +136,7 @@ export async function handleRoom(app: FastifyInstance, socket: WebSocket, req: F
 					break;
 
 				case 'game_type':
-					currentRoom.gameType === 'Pong' ? currentRoom.gameType = 'Block' : currentRoom.gameType = 'Pong';
+					currentRoom.gameType = data.name;
 					currentRoom.ai = 0;
 					broadcastRoomUpdate(currentRoom);
 					break;

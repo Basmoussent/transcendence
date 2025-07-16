@@ -42,8 +42,7 @@ export class Room {
 	private roomSettings: HTMLElement;
 	private aiCountSpan: HTMLElement;
 	private maxPlayersSelect: HTMLSelectElement;
-	
-	private gameTypeSelect: HTMLElement;
+	private gameTypeSelect: HTMLSelectElement;
 	
 
 	constructor(user: string, uuid: string) {
@@ -67,7 +66,7 @@ export class Room {
 		this.playerCountEl = this.getElement('playerCount');
 		this.gameStatusEl = this.getElement('gameStatus');
 		this.aiCountSpan = this.getElement('aiCount');
-		this.gameTypeSelect = this.getElement("gameTypeSelect");
+		this.gameTypeSelect = this.getElement("gameTypeSelect") as HTMLSelectElement;
 		this.maxPlayersSelect = this.getElement('maxPlayersSelect') as HTMLSelectElement;
 		
 
@@ -172,6 +171,10 @@ export class Room {
 	}
 	
 	private increase() {
+
+		// if (this.roomData?.maxPlayers === this.roomData?.users.size + this.roomData?.ai) {
+		// 	return;
+		// }
 		this.ws.send(JSON.stringify({ type: 'increase' }));
 	}
 
@@ -186,13 +189,17 @@ export class Room {
 		}));
 	}
 
+	private gameTypeChanged() {
+		this.ws.send(JSON.stringify({
+			type: 'game_type',
+			name: this.gameTypeSelect.value
+		}))
+	}
+
 	private startGame() {
 		this.ws.send(JSON.stringify({ type: 'start_game' }));
 	}
 
-	private gameTypeChanged() {
-		this.ws.send(JSON.stringify({ type: 'game_type' }))
-	}	
 
 	private leaveRoom() {
 		if (this.ws.readyState === WebSocket.OPEN) {
@@ -245,9 +252,7 @@ export class Room {
 			this.readyBtn.innerHTML = '<i class="fas fa-check"></i> Ready';
 		}
 
-		
 		const allReady = this.roomData.users.every(u => u.isReady);
-
 
 		if (this.roomData.host === this.username) {
 
