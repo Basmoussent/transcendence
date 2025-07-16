@@ -1,3 +1,4 @@
+import { getAuthToken } from '../../utils/auth';
 import { sanitizeHtml } from '../../utils/sanitizer';
 
 interface User {
@@ -43,6 +44,7 @@ export class Room {
 	private aiCountSpan: HTMLElement;
 	private maxPlayersSelect: HTMLSelectElement;
 	private gameTypeSelect: HTMLSelectElement;
+	private token: string | null;
 	
 
 	constructor(user: string, uuid: string) {
@@ -68,6 +70,8 @@ export class Room {
 		this.aiCountSpan = this.getElement('aiCount');
 		this.gameTypeSelect = this.getElement("gameTypeSelect") as HTMLSelectElement;
 		this.maxPlayersSelect = this.getElement('maxPlayersSelect') as HTMLSelectElement;
+
+		this.token = getAuthToken();
 		
 
 		this.chatInput.focus();
@@ -160,14 +164,18 @@ export class Room {
 		if (message && this.ws.readyState === WebSocket.OPEN) {
 			this.ws.send(JSON.stringify({
 				type: 'chat_message',
-				content: message
+				content: message,
+				token: this.token
 			}));
 			this.chatInput.value = '';
 		}
 	}
 
 	private toggleReadyState() {
-		this.ws.send(JSON.stringify({ type: 'toggle_ready' }));
+		this.ws.send(JSON.stringify({
+			type: 'toggle_ready',
+			token: this.token,
+		 }));
 	}
 	
 	private increase() {
@@ -175,35 +183,49 @@ export class Room {
 		// if (this.roomData?.maxPlayers === this.roomData?.users.size + this.roomData?.ai) {
 		// 	return;
 		// }
-		this.ws.send(JSON.stringify({ type: 'increase' }));
+		this.ws.send(JSON.stringify({
+			type: 'increase',
+			token: this.token,
+		 }));
 	}
 
 	private decrease() {
-		this.ws.send(JSON.stringify({ type: 'decrease' }));
+		this.ws.send(JSON.stringify({
+			type: 'decrease',
+			token: this.token,
+		 }));
 	}
 
 	private maxPlayersChanged() {
 		this.ws.send(JSON.stringify({
 			type: 'maxPlayer',
-			players: this.maxPlayersSelect.value
+			players: this.maxPlayersSelect.value,
+			token: this.token
 		}));
 	}
 
 	private gameTypeChanged() {
 		this.ws.send(JSON.stringify({
 			type: 'game_type',
-			name: this.gameTypeSelect.value
+			name: this.gameTypeSelect.value,
+			token: this.token,
 		}))
 	}
 
 	private startGame() {
-		this.ws.send(JSON.stringify({ type: 'start_game' }));
+		this.ws.send(JSON.stringify({
+			type: 'start_game',
+			token: this.token,
+		 }));
 	}
 
 
 	private leaveRoom() {
 		if (this.ws.readyState === WebSocket.OPEN) {
-			this.ws.send(JSON.stringify({ type: 'leave_room' }));
+			this.ws.send(JSON.stringify({
+				type: 'leave_room',
+				token: this.token,
+			 }));
 		}
 		this.ws.close();
 		window.history.pushState({}, '', '/matchmaking');
@@ -212,7 +234,10 @@ export class Room {
 
 	private goHome() {
 		if (this.ws.readyState === WebSocket.OPEN) {
-			this.ws.send(JSON.stringify({ type: 'leave_room' }));
+			this.ws.send(JSON.stringify({
+				type: 'leave_room',
+				token: this.token,
+			 }));
 		}
 		this.ws.close();
 		window.history.pushState({}, '', '/main');
@@ -350,7 +375,8 @@ export class Room {
 		setTimeout(() => {
 			this.ws.send(JSON.stringify({
 				type: 'disconnection',
-				message: 'je launch une game'
+				message: 'je launch une game',
+				token: this.token
 			}));
 			// faire le new block ou pong avec info de la game dans le constructeur
 			if (gameType === 'Pong')

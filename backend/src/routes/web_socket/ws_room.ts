@@ -122,6 +122,8 @@ export async function handleRoom(app: FastifyInstance, socket: WebSocket, req: F
 	socket.on('message', (message: string) => {
 		try {
 			const data = JSON.parse(message);
+
+			app.jwt.verify(data.token);
 			
 			const currentRoom = rooms.get(uuid!)!;
 			const currentUser = currentRoom.users.get(username)!;
