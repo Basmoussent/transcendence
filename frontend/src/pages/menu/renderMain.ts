@@ -2,7 +2,7 @@ import { t } from '../../utils/translations';
 import { removeAuthToken } from '../../utils/auth';
 import { main } from './main'
 
-export function renderMain() {
+export function renderMain(): string {
 
 	setTimeout(async () => {
 		console.log('Initializing main page');
@@ -15,8 +15,6 @@ export function renderMain() {
 	}, 0);
 	return getTemplate();
 }
-
-
 
 function getTemplate() {
 	return `
@@ -258,100 +256,3 @@ function getTemplate() {
 		</style>
 	`;
 }
-
-function initializeMainEvents() {
-	// Gestion des boutons de navigation
-	const profileBtn = document.getElementById('profileBtn');
-	const chatBtn = document.getElementById('chatBtn');
-	const matchmakingBtn = document.getElementById('matchmakingBtn');
-	const multiplayerBtn = document.getElementById('multiplayerBtn');
-	const friendsBtn = document.getElementById('friendsBtn');
-	const blockGameBtn = document.getElementById('blockBtn');
-	const pongGameBtn = document.getElementById('pongBtn');
-	const multiPongGameBtn = document.getElementById('multiPongBtn');
-	const logoutBtn = document.getElementById('logoutBtn');
-	const tournamentBtn = document.getElementById('tournamentBtn');
-
-
-	if (profileBtn) {
-		profileBtn.addEventListener('click', () => {
-			window.history.pushState({}, '', '/profil');
-			window.dispatchEvent(new PopStateEvent('popstate'));
-		});
-	}
-
-	if (matchmakingBtn) {
-		matchmakingBtn.addEventListener('click', () => {
-			window.history.pushState({}, '', '/matchmaking');
-			window.dispatchEvent(new PopStateEvent('popstate'));
-		});
-	}
-
-	if (tournamentBtn) {
-		tournamentBtn.addEventListener('click', () => {
-			window.history.pushState({}, '', '/tournament');
-			window.dispatchEvent(new PopStateEvent('popstate'));
-		});
-	}
-
-	if (chatBtn) {
-		chatBtn.addEventListener('click', () => {
-			window.history.pushState({}, '', '/chat');
-			window.dispatchEvent(new PopStateEvent('popstate'));
-		});
-	}
-
-	if (multiplayerBtn) {
-		multiplayerBtn.addEventListener('click', () => {
-			window.history.pushState({}, '', '/multiplayer');
-			window.dispatchEvent(new PopStateEvent('popstate'));
-		});
-	}
-
-	if (friendsBtn) {
-		friendsBtn.addEventListener('click', () => {
-			window.history.pushState({}, '', '/friends');
-			window.dispatchEvent(new PopStateEvent('popstate'));
-		});
-	}
-
-	if (blockGameBtn) {
-		blockGameBtn.addEventListener('click', () => {
-			window.history.pushState({}, '', '/block');
-			window.dispatchEvent(new PopStateEvent('popstate'));
-		});
-	}
-
-	if (pongGameBtn) {
-		pongGameBtn.addEventListener('click', () => {
-			window.history.pushState({}, '', '/pong');
-			window.dispatchEvent(new PopStateEvent('popstate'));
-		});
-	}
-
-	if (multiPongGameBtn) {
-		multiPongGameBtn.addEventListener('click', () => {
-			window.history.pushState({}, '', '/pong');
-			window.dispatchEvent(new PopStateEvent('popstate'));
-		});
-	}
-
-	if (logoutBtn) {
-		logoutBtn.addEventListener('click', async () => {
-			try {
-				console.log('🚪 Tentative de logout...');
-				removeAuthToken();
-				console.log('✅ Logout réussi');
-				window.history.pushState({}, '', '/login');
-				window.dispatchEvent(new PopStateEvent('popstate'));
-			} catch (error) {
-				console.error('❌ Erreur lors du logout:', error);
-				// Fallback: redirection directe
-				window.history.pushState({}, '', '/login');
-				window.dispatchEvent(new PopStateEvent('popstate'));
-			}
-		});
-	}
-}
-
-export { initializeMainEvents };

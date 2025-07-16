@@ -45,6 +45,7 @@ export class createAccount {
 
 	private async submit() {
 
+
 		const username = this.username.value;
 		const email = this.email.value;
 		const password = this.password.value;
@@ -80,6 +81,7 @@ export class createAccount {
 
 
 		try {
+
 			const response = await fetch('/api/auth/register', {
 				method: 'POST',
 				headers: {

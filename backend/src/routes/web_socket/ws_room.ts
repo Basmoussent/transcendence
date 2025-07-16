@@ -188,7 +188,7 @@ export function handleRoom(app: FastifyInstance, socket: WebSocket, req: Fastify
 
 			if (roomToLeave.users.size === 0) {
 				rooms.delete(uuid!);
-				console.log(`Room ${uuid!} deleted because em^ty`);
+				console.log(`Room ${uuid!} deleted because empty`);
 			}
 			else { // delegate host
 				if (roomToLeave.host !== undefined && roomToLeave.host === username) {

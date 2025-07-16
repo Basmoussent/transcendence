@@ -2,7 +2,7 @@ import { renderHome, initializeHomeEvents } from '../pages/menu/main';
 import { renderLogin } from '../pages/auth/login';
 import { renderCreateAccount } from '../pages/auth/create-account';
 import { renderForgotPassword, initializeForgotPasswordEvents } from '../pages/auth/forgot-password';
-import { renderMain } from '../pages/menu/renderMain';
+import { renderMain, mainhtml } from '../pages/menu/renderMain';
 import { render404 } from '../components/404';
 import { renderSocial } from '../pages/social/social';
 import { renderProfil } from '../pages/social/profil';
@@ -28,9 +28,8 @@ export async function router() {
 	const app = document.getElementById('app');
 	if (!app) return;
 
-	const publicRoutes = ['/', '/login', '/create-account', '/forgot-password'];
+	const publicRoutes = ['/', '/lang','/login', '/create-account', '/forgot-password'];
 	const token = getAuthToken();
-
 
 	let uuid: string = '';
 
@@ -41,7 +40,7 @@ export async function router() {
 	
 	if (!publicRoutes.includes(path) && !token) {
 		window.history.pushState({}, '', '/login');
-		app.innerHTML = renderLogin();
+		app.innerHTML = renderLogin();https://chatgpt.com/c/6877c557-906c-8013-bd68-e9fef37f7f71
 		return;
 	}
 	if (!publicRoutes.includes(path) && token) {
@@ -84,6 +83,7 @@ export async function router() {
 			view = renderForgotPassword();
 			break;
 		case '/main':
+			console.log('je passe ici')
 			view = renderMain();
 			break;
 		case '/friends':
