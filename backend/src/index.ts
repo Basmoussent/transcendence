@@ -100,7 +100,7 @@ async function setup() {
 	console.log('✅ Games routes registered');
 	await fastify.register(friendRoutes, { prefix: "/friend" });
 	console.log('✅ Friend routes registered');
-	
+
 
 	console.log('📡 Registering WebSocket routes...');
 	await fastify.register(require('@fastify/websocket'));
