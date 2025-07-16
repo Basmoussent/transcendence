@@ -5,7 +5,7 @@ import { sanitizeHtml } from '../utils/sanitizer';
 export interface Game {
 	id?: number,
 	uuid?: string,
-	game_name: string,
+	game_type: string,
 	player1: string,
 	player2?: string,
 	player3?: string,
@@ -34,7 +34,7 @@ export async function postGame(input:Game): Promise<number> {
 				'x-access-token': token,
 			},
 			body: JSON.stringify({
-				game_name: input.game_name,
+				game_type: input.game_type,
 				player1: input.player1,
 				users_needed: input.users_needed,
 			})
@@ -200,7 +200,7 @@ export async function getGame(gameId: number): Promise<Game | null> {
 			const game: Game = {
 				id: Number(result.id),
 				uuid: sanitizeHtml(result.uuid),
-				game_name: sanitizeHtml(result.game_name),
+				game_type: sanitizeHtml(result.game_type),
 				player1: sanitizeHtml(result.player1),
 				player2: sanitizeHtml(result?.player2),
 				player3: sanitizeHtml(result?.player3),
@@ -259,7 +259,7 @@ export async function getUuid(gameId: number) {
 export async function getGameByUuid(uuid: string): Promise<number> {
 
 	try {
-		const response = await fetch(`api/games/room/${uuid}`, {
+		const response = await fetch(`api/games/room/?uuid=${uuid}`, {
 			method: 'GET',
 			headers: {
 				'Content-Type': 'application/json',

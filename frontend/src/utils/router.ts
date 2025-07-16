@@ -2,7 +2,7 @@ import { renderHome, initializeHomeEvents } from '../pages/menu/main';
 import { renderLogin } from '../pages/auth/login';
 import { renderCreateAccount } from '../pages/auth/create-account';
 import { renderForgotPassword, initializeForgotPasswordEvents } from '../pages/auth/forgot-password';
-import { renderMain, mainhtml } from '../pages/menu/renderMain';
+import { renderMain } from '../pages/menu/renderMain';
 import { render404 } from '../components/404';
 import { renderSocial } from '../pages/social/social';
 import { renderProfil } from '../pages/social/profil';

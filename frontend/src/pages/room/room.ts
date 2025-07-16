@@ -41,7 +41,7 @@ export class Room {
 	private gameStatusEl: HTMLElement;
 	private roomSettings: HTMLElement;
 	private aiCountSpan: HTMLElement;
-	private maxPlayer: HTMLElement;
+	private maxPlayersSelect: HTMLSelectElement;
 	
 	private gameTypeSelect: HTMLElement;
 	
@@ -66,9 +66,9 @@ export class Room {
 		this.gameTypeEl = this.getElement('gameType');
 		this.playerCountEl = this.getElement('playerCount');
 		this.gameStatusEl = this.getElement('gameStatus');
-		this.gameTypeSelect = this.getElement("gameTypeSelect");
 		this.aiCountSpan = this.getElement('aiCount');
-		this.maxPlayer = this.getElement('max-player');
+		this.gameTypeSelect = this.getElement("gameTypeSelect");
+		this.maxPlayersSelect = this.getElement('maxPlayersSelect') as HTMLSelectElement;
 		
 
 		this.chatInput.focus();
@@ -116,6 +116,8 @@ export class Room {
 		this.increaseAiBtn.addEventListener('click', () => this.increase());
 		this.decreaseAiBtn.addEventListener('click', () => this.decrease());
 		this.gameTypeSelect.addEventListener('change', () => this.gameTypeChanged());
+		this.maxPlayersSelect.addEventListener('change', () => this.maxPlayersChanged());
+    
 	}
 
 	private handleEvent(data: any) {
@@ -175,6 +177,13 @@ export class Room {
 
 	private decrease() {
 		this.ws.send(JSON.stringify({ type: 'decrease' }));
+	}
+
+	private maxPlayersChanged() {
+		this.ws.send(JSON.stringify({
+			type: 'maxPlayer',
+			players: this.maxPlayersSelect.value
+		}));
 	}
 
 	private startGame() {
@@ -264,6 +273,8 @@ export class Room {
 			
 		}
 
+		// afficher dans le select seulement les options possibles
+
 		if (allReady)
 			this.gameStatusEl.innerHTML = `<span class="status-dot ready"></span><span class="text-white/80">Ready to start!</span>`;
 		else
@@ -342,6 +353,6 @@ export class Room {
 			else
 				window.history.pushState({}, '', `/block`);				
 			window.dispatchEvent(new Event('popstate'));
-		}, 2000);
+		}, 2500);
 	}
 }

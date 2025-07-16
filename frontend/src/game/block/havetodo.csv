@@ -158,4 +158,7 @@ lancer le jeu depuis sa page
 
 
 
-faire 
+
+
+
+si un user se connecte alors qu'il est deja connecte on deco l'ancienne instance

@@ -10,7 +10,7 @@ interface User {
 interface Room {
 	id: string;
 	name: string;
-	gameType: 'Pong' | 'Block';
+	gameType: string;
 	maxPlayers: number;
 	users: Map<string, User>;
 	host: string;
@@ -52,7 +52,7 @@ function broadcastSystemMessage(room: Room, content: string) {
 			user.socket.send(message); });
 }
 
-export function handleRoom(app: FastifyInstance, socket: WebSocket, req: FastifyRequest) {
+export async function handleRoom(app: FastifyInstance, socket: WebSocket, req: FastifyRequest) {
 	const token = req.headers['x-access-token'] ? req.headers['x-access-token'] : req.cookies['x-access-token']; 
 		
 	if (!token) {
@@ -72,22 +72,40 @@ export function handleRoom(app: FastifyInstance, socket: WebSocket, req: Fastify
 
 	let room = rooms.get(uuid);
 
+	
+
+	const game = await app.gameService.getGame(uuid);
+
+	if (!game)
+		return;
+
+	console.log(game.id);
+
+	const user: User = {
+		username: username,
+		isReady: false, 
+		socket: socket };
+
+
 	if (!room) {
 		room = {
 			id: uuid,
 			name: `Room ${uuid.substring(0, 5)}`,
-			gameType: 'Pong',
-			maxPlayers: 4,
+			gameType: game.game_type,
+			maxPlayers: game.users_needed,
 			users: new Map(),
 			host: username,
 			isGameStarted: false,
 			ai: 0,
 		};
-
+		room.users.set(username, user);
 		rooms.set(uuid!, room);
 	}
 
+	console.log(JSON.stringify(room, null, 4));
+
 	if (room.maxPlayers === room.users.size + room.ai) {
+		console.log("bah qiwudbqwiudbqiwu\n\n\n\ndbq")
 		socket.send(JSON.stringify({
 			type: 'error',
 			message: 'Room is full' }));
@@ -95,12 +113,7 @@ export function handleRoom(app: FastifyInstance, socket: WebSocket, req: Fastify
 		return;
 	}
 
-	const user: User = {
-		username: username,
-		isReady: false, 
-		socket: socket };
-
-	room.users.set(username, user);
+	console.warn(`room.maxPlayers === room.users.size + room.ai --> ${room.maxPlayers} === ${room.users.size} + ${room.ai}`)
 
 	console.log(`${username} connected to room ${uuid!}`);
 	broadcastSystemMessage(room, `${username} has joined the room.`);
@@ -133,13 +146,19 @@ export function handleRoom(app: FastifyInstance, socket: WebSocket, req: Fastify
 					console.log(currentRoom.ai)
 					broadcastRoomUpdate(currentRoom);
 					break;
-				
+
 				case 'decrease':
 					currentRoom.ai -= 1;
 					console.log(currentRoom.ai)
 					broadcastRoomUpdate(currentRoom);
 					break;
-
+					
+				case 'maxPlayer':
+					currentRoom.maxPlayers = data.players
+					console.log(currentRoom.maxPlayers)
+					broadcastRoomUpdate(currentRoom);
+					break;
+						
 				case 'chat_message':
 					const chatMessage = JSON.stringify({ 
 					type: 'chat_message', 

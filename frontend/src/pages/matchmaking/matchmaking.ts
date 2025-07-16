@@ -4,7 +4,7 @@ import { sanitizeHtml } from '../../utils/sanitizer';
 
 export interface Available {
 	gameId: number,
-	game_name: string,
+	game_type: string,
 	player1: string,
 	player2?: string,
 	player3?: string,
@@ -291,6 +291,15 @@ export class matchmaking {
 
 		});
 
+		this.homeBtn.addEventListener('click', () => {
+			window.history.pushState({}, '', `/main`);
+			window.dispatchEvent(new PopStateEvent('popstate'));
+			this.ws.send(JSON.stringify({
+				type: 'leave'
+			}));
+			this.ws.close();
+		})
+
 		// this.joinBtn.addEventListener('click', () => {
 
 		// boucler sur les join %d buttons de toutes les available games generees
@@ -304,7 +313,7 @@ export class matchmaking {
 		this.launchBtn.addEventListener('click', async () => {
 
 			let tmp = {
-				game_name: this.pong ? "pong" : "block",
+				game_type: this.pong ? "pong" : "block",
 				player1: this.username,
 				users_needed: this._1player ? 1 : this._2player ? 2 : this._3player ? 3 : 4
 			}
@@ -312,8 +321,6 @@ export class matchmaking {
 			var uuid = await postGame(tmp);
 
 			this.options.style.display = "none"
-
-			console.log("dans le bon uuid", uuid)
 
 			window.history.pushState({}, '', `/room/${uuid}`);
 			window.dispatchEvent(new PopStateEvent('popstate'));
@@ -333,6 +340,7 @@ export class matchmaking {
 
 			window.history.pushState({}, '', `/room/${uuid}`);
 			window.dispatchEvent(new PopStateEvent('popstate'));
+
 		}
 		catch (err: any) {
 			console.error('❌ Error retrieve game uuid', err); }
@@ -349,14 +357,10 @@ export class matchmaking {
 
 	private handleEvents(data: any) {
 
-		console.log(`event recu ${data.type}`)
-
-		
 		if (!this.ws || this.ws.readyState !== WebSocket.OPEN) {
-			console.log("le websocket n'est pas du tout ready l'ancien")
+			console.warn('web socket pas ready')
 			return;
 		}
-
 
 		switch (data.type) {
 			case 'updateUI':
@@ -367,6 +371,9 @@ export class matchmaking {
 				window.dispatchEvent(new Event('popstate'));
 				this.ws.close();
 				break;
+			
+			default:
+				console.warn(`event pas encore handled ${data.type}`)
 
 		}
 
@@ -426,7 +433,7 @@ export class matchmaking {
 				const result = await response.json();
 				const available: Available[] = result.games.map((game:any) => ({
 					gameId: sanitizeHtml(game.id),
-					game_name: sanitizeHtml(game.game_name),
+					game_type: sanitizeHtml(game.game_type),
 					player1: sanitizeHtml(game.player1),
 					player2: sanitizeHtml(game?.player2),
 					player3: sanitizeHtml(game?.player3),
@@ -453,13 +460,13 @@ export class matchmaking {
 						return `
 							<div class="game-card" ${!isFull ? `onclick="joinGame('${this.gameId}')"` : ''}>
 								<div class="game-header">
-									<h3 class="game-title">${this.game_name}</h3>
+									<h3 class="game-title">${this.game_type}</h3>
 									<span class="game-status ${statusClass}">${statusText}</span>
 								</div>
 								<div class="game-info">
 									<div class="game-type">
-										<i class="fas ${this.game_name.toLowerCase() === 'pong' ? 'fa-table-tennis' : 'fa-cubes'}"></i>
-										<span>${this.game_name}</span>
+										<i class="fas ${this.game_type.toLowerCase() === 'pong' ? 'fa-table-tennis' : 'fa-cubes'}"></i>
+										<span>${this.game_type}</span>
 									</div>
 									<div class="player-count">
 										<i class="fas fa-users"></i>

@@ -34,10 +34,14 @@ export function handleMatchmaking(socket: WebSocket, req: FastifyRequest) {
 			
 			switch (data.type) {
 				case 'updateUI':
-				broadcastMatchmaking(data);
-				break;
+					broadcastMatchmaking(data);
+					break;
+				case 'leave':
+					const id = matchmaking.indexOf(socket);
+					if (id !== -1)
+						matchmaking.splice(id, 1);
 				default:
-				console.log(`l'event existe pas`)
+					console.log(`l'event existe pas`)
 			}
 		}
 		catch (error) {
