@@ -73,10 +73,13 @@ async function authRoutes(app: FastifyInstance) {
     const datab = db.getDatabase();
     
     // Vérification si l'utilisateur existe déjà
+    const cleanUsername = username.trim().toLowerCase();
+    const cleanEmail = email.trim().toLowerCase();
+
     const existingUser = await new Promise<User | null>((resolve, reject) => {
       datab.get(
-        'SELECT username, email FROM users WHERE username = ? OR email = ?',
-        [username, email],
+        'SELECT username, email FROM users WHERE LOWER(username) = ? OR LOWER(email) = ?',
+        [cleanUsername, cleanEmail],
         (err: any, user: User | undefined) => {
           if (err) {
             reject(err);
@@ -86,11 +89,12 @@ async function authRoutes(app: FastifyInstance) {
         }
       );
     });
+    console.log('existingUser', existingUser);
 
     if (existingUser) {
-      if (existingUser.username === username) {
+      if (existingUser.username.toLowerCase() === cleanUsername) {
         return reply.status(409).send({ error: 'Ce nom d\'utilisateur est déjà utilisé' });
-      } else if (existingUser.email === email) {
+      } else if (existingUser.email.toLowerCase() === cleanEmail) {
         return reply.status(409).send({ error: 'Cette adresse email est déjà utilisée' });
       }
     }
@@ -104,8 +108,10 @@ async function authRoutes(app: FastifyInstance) {
         `INSERT INTO users (username, email, password_hash)
          VALUES (?, ?, ?)`
       );
+      console.log(`INSERT INTO users (username, email, password_hash)
+         VALUES (?, ?, ?)`, cleanUsername, cleanEmail, password_hash);
 
-      stmt.run(username, email, password_hash);
+      stmt.run(cleanUsername, cleanEmail, password_hash);                                                                                                                                 
 
       // stmt.run(username, email, password_hash);
       // INSERT INTO statistics (l'id du user qui vient d'être créé)

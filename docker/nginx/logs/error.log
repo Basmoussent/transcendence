@@ -58,3 +58,29 @@
 2025/07/14 18:37:17 [notice] 1#1: libmodsecurity3 version 3.0.14
 2025/07/14 18:38:24 [error] 132#132: *13 connect() failed (111: Connection refused) while connecting to upstream, client: 172.18.0.1, server: fr.localhost, request: "POST /api/auth/register HTTP/1.1", upstream: "http://172.18.0.7:8000/auth/register", host: "entropy.local:2443", referrer: "https://entropy.local:2443/create-account"
 2025/07/14 18:38:24 [error] 128#128: *5 connect() failed (111: Connection refused) while connecting to upstream, client: 172.18.0.1, server: fr.localhost, request: "POST /api/auth/register HTTP/1.1", upstream: "http://172.18.0.7:8000/auth/register", host: "entropy.local:2443", referrer: "https://entropy.local:2443/create-account"
+2025/07/14 18:59:18 [warn] 127#127: *302 an upstream response is buffered to a temporary file /var/cache/nginx/proxy_temp/1/00/0000000001 while reading upstream, client: 172.18.0.1, server: fr.localhost, request: "GET /@vite/client HTTP/1.1", upstream: "http://172.18.0.8:5173/@vite/client", host: "entropy.local:2443", referrer: "https://entropy.local:2443/login"
+2025/07/14 21:11:17 [warn] 130#130: *2188 an upstream response is buffered to a temporary file /var/cache/nginx/proxy_temp/2/00/0000000002 while reading upstream, client: 172.18.0.1, server: fr.localhost, request: "GET /@vite/client HTTP/1.1", upstream: "http://172.18.0.8:5173/@vite/client", host: "entropy.local:2443", referrer: "https://entropy.local:2443/login"
+2025/07/16 13:11:13 [notice] 1#1: ModSecurity-nginx v1.0.4 (rules loaded inline/local/remote: 0/10/0)
+2025/07/16 13:11:13 [notice] 1#1: libmodsecurity3 version 3.0.14
+2025/07/16 13:11:24 [warn] 345#345: *3 an upstream response is buffered to a temporary file /var/cache/nginx/proxy_temp/1/00/0000000001 while reading upstream, client: 172.18.0.1, server: fr.localhost, request: "GET /@vite/client HTTP/1.1", upstream: "http://172.18.0.9:5173/@vite/client", host: "entropy.local:2443", referrer: "https://entropy.local:2443/"
+2025/07/16 13:14:57 [notice] 1#1: ModSecurity-nginx v1.0.4 (rules loaded inline/local/remote: 0/10/0)
+2025/07/16 13:14:57 [notice] 1#1: libmodsecurity3 version 3.0.14
+2025/07/16 13:15:59 [error] 344#344: *96 connect() failed (111: Connection refused) while connecting to upstream, client: 172.18.0.1, server: fr.localhost, request: "POST /api/auth/login HTTP/1.1", upstream: "http://172.18.0.7:8000/auth/login", host: "entropy.local:2443", referrer: "https://entropy.local:2443/login"
+2025/07/16 13:18:59 [notice] 1#1: ModSecurity-nginx v1.0.4 (rules loaded inline/local/remote: 0/10/0)
+2025/07/16 13:18:59 [notice] 1#1: libmodsecurity3 version 3.0.14
+2025/07/16 13:19:03 [warn] 345#345: *3 an upstream response is buffered to a temporary file /var/cache/nginx/proxy_temp/1/00/0000000001 while reading upstream, client: 172.18.0.1, server: fr.localhost, request: "GET /@vite/client HTTP/1.1", upstream: "http://172.18.0.8:5173/@vite/client", host: "entropy.local:2443", referrer: "https://entropy.local:2443/login"
+2025/07/16 13:30:49 [warn] 346#346: *216 an upstream response is buffered to a temporary file /var/cache/nginx/proxy_temp/2/00/0000000002 while reading upstream, client: 172.18.0.1, server: fr.localhost, request: "GET /@vite/client HTTP/1.1", upstream: "http://172.18.0.8:5173/@vite/client", host: "entropy.local:2443", referrer: "https://entropy.local:2443/main"
+2025/07/16 13:47:53 [notice] 1#1: ModSecurity-nginx v1.0.4 (rules loaded inline/local/remote: 0/10/0)
+2025/07/16 13:47:53 [notice] 1#1: libmodsecurity3 version 3.0.14
+2025/07/16 14:20:47 [notice] 1#1: ModSecurity-nginx v1.0.4 (rules loaded inline/local/remote: 0/10/0)
+2025/07/16 14:20:47 [notice] 1#1: libmodsecurity3 version 3.0.14
+2025/07/16 14:49:44 [notice] 1#1: ModSecurity-nginx v1.0.4 (rules loaded inline/local/remote: 0/10/0)
+2025/07/16 14:49:44 [notice] 1#1: libmodsecurity3 version 3.0.14
+2025/07/16 14:53:57 [warn] 344#344: *93 an upstream response is buffered to a temporary file /var/cache/nginx/proxy_temp/1/00/0000000001 while reading upstream, client: 172.18.0.1, server: fr.localhost, request: "GET /@vite/client HTTP/1.1", upstream: "http://172.18.0.8:5173/@vite/client", host: "entropy.local:2443", referrer: "https://entropy.local:2443/login"
+2025/07/16 14:56:10 [notice] 1#1: ModSecurity-nginx v1.0.4 (rules loaded inline/local/remote: 0/10/0)
+2025/07/16 14:56:10 [notice] 1#1: libmodsecurity3 version 3.0.14
+2025/07/16 15:12:35 [warn] 348#348: *294 an upstream response is buffered to a temporary file /var/cache/nginx/proxy_temp/1/00/0000000001 while reading upstream, client: 172.18.0.1, server: fr.localhost, request: "GET /@vite/client HTTP/1.1", upstream: "http://172.18.0.8:5173/@vite/client", host: "entropy.local:2443", referrer: "https://entropy.local:2443/login"
+2025/07/16 17:58:15 [notice] 1#1: ModSecurity-nginx v1.0.4 (rules loaded inline/local/remote: 0/10/0)
+2025/07/16 17:58:15 [notice] 1#1: libmodsecurity3 version 3.0.14
+2025/07/16 18:06:46 [error] 345#345: *239 connect() failed (111: Connection refused) while connecting to upstream, client: 172.18.0.1, server: fr.localhost, request: "GET /api/auth/verify HTTP/1.1", upstream: "http://172.18.0.7:8000/auth/verify", host: "entropy.local:2443", referrer: "https://entropy.local:2443/main"
+2025/07/16 18:06:46 [error] 345#345: *239 connect() failed (111: Connection refused) while connecting to upstream, client: 172.18.0.1, server: fr.localhost, request: "GET /api/auth/verify HTTP/1.1", upstream: "http://172.18.0.7:8000/auth/verify", host: "entropy.local:2443", referrer: "https://entropy.local:2443/main"

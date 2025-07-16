@@ -4,7 +4,6 @@ import { router } from './utils/router.ts';
 function init() {
   window.addEventListener('popstate', router);
   
-  // Listen for language changes to trigger router
   window.addEventListener('languageChanged', router);
   
   document.addEventListener('click', (e) => {
@@ -17,7 +16,6 @@ function init() {
     }
   });
 
-  router();
 }
 
 init();
