@@ -1,7 +1,7 @@
 import { getAuthToken, removeAuthToken } from '../../utils/auth';
 import { sanitizeHtml } from '../../utils/sanitizer';
 import { t } from '../../utils/translations';
-import { userInfo, reverse2FAState } from './utils';
+import { userInfo, update2FAState } from './utils';
 
 export async function renderProfil() {
 	let userData = {
@@ -42,7 +42,7 @@ export async function renderProfil() {
 				games: (result.stats?.games) || 0,
 				rating: (result.stats?.rating) || 0,
 				preferred_language: sanitizeHtml(result.user?.language) || 'en',
-				twoFactorEnabled: result.user?.twoFA || false // Récupération du statut 2FA
+				twoFactorEnabled: result.user?.two_fact_auth || false // Récupération du statut 2FA
 			};
 		} else {
 			console.error('Erreur lors de la récupération des données utilisateur');
@@ -57,8 +57,8 @@ export async function renderProfil() {
 		: `/api/uploads/${userData.avatar}`;
 
 	// Déterminer le texte et l'icône du bouton 2FA
-	const tfaButtonText = userData.twoFactorEnabled ? 'Deactivate 2FA' : 'Two Factor Authentification';
-	const tfaButtonIcon = userData.twoFactorEnabled ? 'fa-shield-slash' : 'fa-shield';
+	const tfaButtonText = userData.twoFactorEnabled ? 'Deactivate 2FA' : 'Activate 2FA';
+	const tfaButtonIcon = userData.twoFactorEnabled ? 'fa-solid fa-lock-open' : 'fa-solid fa-lock';
 
 	const htmlContent = `
 		<div class="profile-wrapper">
@@ -486,40 +486,30 @@ export async function renderProfil() {
 			});
 		}
 
-		// Gestionnaire pour le bouton 2FA
+		// Gestion bouton 2FA
 		if (TFABtn) {
 			TFABtn.addEventListener('click', async () => {
-			const user = await userInfo();
+			const info = await userInfo();
 
-			if (user.two_fact_auth) {
+			if (info.user.two_fact_auth) {
 				// desactiver 2FA
 				const confirmation = confirm('Êtes-vous sûr de vouloir désactiver l\'authentification à deux facteurs ?');
 				
 				if (confirmation) {
-					try {
-						const token = getAuthToken();
-						if (!token) {
-							alert('Token d\'authentification manquant');
-							window.history.pushState({}, '', '/login');
-							window.dispatchEvent(new PopStateEvent('popstate'));
-							return;
-						}
+					const success = await update2FAState(0, info.user.id);
 
-						// two_fact_auth du user passe a false et bouton du profil change
-						reverse2FAState(user.two_fact_auth, user.userId);
-						TFABtn.innerHTML = '<i class="fa-solid fa-shield-halved"></i> Activate 2FA';
+					if (success) {
+						TFABtn.innerHTML = '<i class="fa-solid fa-lock"></i> Activate 2FA';
+						alert('✅ 2FA désactivée avec succès');
 					}
-					catch (err: any){
-						console.error('Erreur lors de la desactivation 2FA:', err);
-						alert('Erreur lors de la desactivation 2FA');
-					}
+					else
+						alert('❌ Erreur lors de la désactivation 2FA');
 				}
 			}
 			else {
 				// activer 2FA
 				window.history.pushState({}, '', '/2fa');
 				window.dispatchEvent(new PopStateEvent('popstate'));
-				TFABtn.innerHTML = '<i class="fa-solid fa-shield"></i> Activate 2FA';
 			}});
 		}
 

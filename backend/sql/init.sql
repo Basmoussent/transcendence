@@ -3,7 +3,7 @@ CREATE TABLE IF NOT EXISTS users (
   username TEXT NOT NULL,
   email TEXT NOT NULL,
   password_hash TEXT NOT NULL,
-  two_fact_auth BOOLEAN DEFAULT false,
+  two_fact_auth BOOLEAN DEFAULT false/^\d{6}$/.test(code);,
   secret_key VARCHAR DEFAULT NULL,
   avatar_url TEXT,
   language VARCHAR DEFAULT 'fr',

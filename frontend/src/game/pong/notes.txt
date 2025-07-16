@@ -81,3 +81,6 @@ on peut aller sur la page /tfa pour deux raison:
         // on entre le code, two_fact_auth devient true et c'est tt
     - se co a son compte
         // on entre le code, on obtient son JWT definitif
+
+
+voir si otplib ou speakeasy

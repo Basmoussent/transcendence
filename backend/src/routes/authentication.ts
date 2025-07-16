@@ -3,6 +3,7 @@ import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import Fastify from 'fastify';
 import jwt from '@fastify/jwt';
 import bcrypt from 'bcrypt';
+import { generateBase32Key } from './utils';
 
 
 // Interfaces pour le typage TypeScript
@@ -97,17 +98,18 @@ async function authRoutes(app: FastifyInstance) {
 
     // Hashage du mot de passe avec bcrypt (10 tours de hachage)
     const password_hash = await bcrypt.hash(password, 10);
+    const secret_key = generateBase32Key();
 
     try {
 
       console.log(`j'insert dans la db`)
       // Préparation et exécution de la requête SQL d'insertion
       const stmt = datab.prepare(
-        `INSERT INTO users (username, email, password_hash)
-         VALUES (?, ?, ?)`
+        `INSERT INTO users (username, email, password_hash, secret_key)
+         VALUES (?, ?, ?, ?)`
       );
 
-      stmt.run(username, email, password_hash);
+      stmt.run(username, email, password_hash, secret_key);
 
 
       // stmt.run(username, email, password_hash);

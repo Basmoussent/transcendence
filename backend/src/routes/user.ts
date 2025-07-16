@@ -278,20 +278,29 @@ async function userRoutes(app: FastifyInstance) {
     app.put('/username/2fa', async function (request: FastifyRequest, reply: FastifyReply) {
         try {
             const database = db.getDatabase();
-            const {status, userId} = request.body;
-			// const sql = `UPDATE games SET ${setClause} WHERE id = ?`;
+            const {status, userId} = request.body as { status: boolean, userId: number };
+
+            console.log(`on change la 2fa du user ${userId} on change pour bool = ${status}`)
 
             await new Promise<void>((resolve, reject) => {
                 database.run(
                     'UPDATE users SET two_fact_auth = ? WHERE id = ?',
-                    [ status, userId ],
-                    (err: any) => {
+                    [ status ? 1 : 0, userId ],
+                    function(err: any) {
                         err ? reject(err) : resolve();
             })})
-            
+
+            reply.send({
+                success: true,
+                user: {
+                    userId,
+                    two_fact_auth: status
+                }
+            });
         }
         catch (err: any) {
-            console.error("pblm change le boolean du user pour la 2FA")
+            console.error("pblm change le boolean du user pour la 2FA");
+            reply.status(500).send({ success: false, error: 'Erreur lors de la mise à jour 2FA' });
         }
     })
 

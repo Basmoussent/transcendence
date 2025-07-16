@@ -51,8 +51,12 @@ export async function fetchMe(): Promise<UserData | void> {
 
 export async function userInfo() {
     const token = getAuthToken();
-    if (!token)
-        return false;
+    if (!token) {
+        alert('❌ Token d\'authentification manquant');
+        window.history.pushState({}, '', '/login');
+        window.dispatchEvent(new PopStateEvent('popstate'));
+        return;
+    }
 
     try {
         const response = await fetch('/api/me', {
@@ -68,15 +72,21 @@ export async function userInfo() {
 
         const data = await response.json();
         return data;
-    } catch {
+    } catch (error) {
+		console.error('userInfo failed: ', error);
         return false; // en cas d'erreur, suppose désactivé
     }
 }
 
-export async function reverse2FAState(status: boolean, userId: number) {
+export async function update2FAState(status: number, userId: number): Promise<boolean> {
     const token = getAuthToken();
-    if (!token)
+    if (!token) {
+        alert('❌ Token d\'authentification manquant');
+        window.history.pushState({}, '', '/login');
+        window.dispatchEvent(new PopStateEvent('popstate'));
         return false;
+    }
+
 
     try {
         const response = await fetch('/api/username/2fa', {
@@ -91,11 +101,18 @@ export async function reverse2FAState(status: boolean, userId: number) {
             })
         });
 
-        if (!response.ok)
-            throw new Error();
-
         const data = await response.json();
-        data.two_fact_auth = !data.two_fact_auth;
-    } catch {
+
+        if (!response.ok) {
+            throw new Error('Échec de la requête PUT /2fa');
+        }
+
+        if (data.success)
+            return true;
+        else
+            throw new Error(data.error || 'Echec de la mise a jour du 2FA status');
+    } catch (error) {
+		console.error('reverse2FAstatus failed: ', error);
+        return false;
     }
 }
