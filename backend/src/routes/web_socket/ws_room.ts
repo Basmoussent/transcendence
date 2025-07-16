@@ -98,9 +98,11 @@ export async function handleRoom(app: FastifyInstance, socket: WebSocket, req: F
 			isGameStarted: false,
 			ai: 0,
 		};
-		room.users.set(username, user);
 		rooms.set(uuid!, room);
 	}
+
+	room.users.set(username, user);
+
 
 	console.log(JSON.stringify(room, null, 4));
 
