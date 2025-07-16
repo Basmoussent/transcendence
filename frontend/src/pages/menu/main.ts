@@ -1,341 +1,374 @@
 import { t } from '../../utils/translations';
 import { removeAuthToken } from '../../utils/auth';
-import { loadAvailableGames } from '../matchmaking/matchmaking';
 
-export function renderMain() {
-  return `
-    <div class="main-menu">
-      <div class="menu-container">
-        <h1 class="menu-title">${t('menu.title')}</h1>
-        
-        <div class="menu-buttons">
-          <button class="menu-button profile-button" id="profileBtn">
-            <i class="fas fa-user"></i>
-            ${t('menu.profile')}
-          </button>
-          
-          <button class="menu-button matchmaking-button" id="matchmakingBtn">
-            <i class="fas fa-gamepad"></i>
-            ${t('menu.playLocal')}
-          </button>
-          
-          <button class="menu-button multiplayer-button" id="multiplayerBtn">
-            <i class="fas fa-users"></i>
-            ${t('menu.multiplayer')}
-          </button>
+export class main {
 
-          <button class="menu-button tournament-button" id="tournamentBtn">
-            <i class="fa-solid fa-medal"></i>
-            tournament
-          </button>
-          
-          <button class="menu-button friends-button" id="friendsBtn">
-            <i class="fas fa-user-friends"></i>
-            ${t('menu.friends')}
-          </button>
+	private profileBtn: HTMLElement;
+	private chatBtn: HTMLElement;
+	private matchmakingBtn: HTMLElement;
+	private multiplayerBtn: HTMLElement;
+	private friendsBtn: HTMLElement;
 
-          <button class="menu-button chat-button" id="chatBtn">
-            <i class="fas fa-user-friends"></i>
-            Chat
-          </button>
+	private logoutBtn: HTMLElement;
+	private tournamentBtn: HTMLElement;
 
-          <button class="menu-button logout-button" id="logoutBtn">
-            <i class="fas fa-sign-out-alt"></i>
-            Logout
-          </button>
-        </div>
-      </div>
-    </div>
 
-    <style>
-      .main-menu {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        min-height: 100vh;
-        padding: 20px;
-      }
+	constructor() {
 
-      .menu-container {
-        background: rgba(255, 255, 255, 0.1);
-        backdrop-filter: blur(10px);
-        border-radius: 20px;
-        padding: 30px;
-        box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
-        border: 1px solid rgba(255, 255, 255, 0.18);
-        width: 100%;
-        max-width: 500px;
-        animation: fadeIn 0.5s ease-out;
-      }
 
-      .menu-title {
-        color: #fff;
-        text-align: center;
-        font-size: 2.2em;
-        margin-bottom: 30px;
-        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-      }
+		console.log('je construis')
+		this.profileBtn = this.getElement('profileBtn');
+		this.chatBtn = this.getElement('chatBtn');
+		this.matchmakingBtn = this.getElement('matchmakingBtn');
+		this.multiplayerBtn = this.getElement('multiplayerBtn');
+		this.friendsBtn = this.getElement('friendsBtn');
+		this.logoutBtn = this.getElement('logoutBtn');
+		this.tournamentBtn = this.getElement('tournamentBtn');
 
-      .menu-buttons {
-        display: flex;
-        flex-direction: column;
-        gap: 15px;
-      }
+		this.setupEvents();
 
-      .menu-button {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 10px;
-        padding: 15px 20px;
-        border: none;
-        border-radius: 12px;
-        font-size: 1.1em;
-        font-weight: 600;
-        color: white;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        background: rgba(255, 255, 255, 0.1);
-        border: 1px solid rgba(255, 255, 255, 0.2);
-      }
+	}
 
-      .menu-button:hover {
-        transform: translateY(-2px);
-        background: rgba(255, 255, 255, 0.2);
-        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-      }
+	private getElement(id: string): HTMLElement {
+		const el = document.getElementById(id);
+		if (!el)
+			throw new Error(`Element "${id}" not found`);
+		return el;
+	}
 
-      .menu-button:active {
-        transform: translateY(0);
-      }
+	private setupEvents() {
+		this.profileBtn.addEventListener('click', () => {
+			window.history.pushState({}, '', '/profil');
+			window.dispatchEvent(new PopStateEvent('popstate'));
+		});
+		
+		this.matchmakingBtn.addEventListener('click', () => {
+			window.history.pushState({}, '', '/matchmaking');
+			window.dispatchEvent(new PopStateEvent('popstate'));
+		});
 
-      .menu-button i {
-        font-size: 1.2em;
-      }
+		this.tournamentBtn.addEventListener('click', () => {
+			window.history.pushState({}, '', '/tournament');
+			window.dispatchEvent(new PopStateEvent('popstate'));
+		});
 
-      /* Styles spécifiques pour chaque bouton */
-      .profile-button {
-        background: linear-gradient(135deg, #4a90e2 0%, #357abd 100%);
-      }
+		this.chatBtn.addEventListener('click', () => {
+			window.history.pushState({}, '', '/chat');
+			window.dispatchEvent(new PopStateEvent('popstate'));
+		});
 
-      .matchmaking-button {
-        background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
-      }
+		this.multiplayerBtn.addEventListener('click', () => {
+			window.history.pushState({}, '', '/multiplayer');
+			window.dispatchEvent(new PopStateEvent('popstate'));
+		});
 
-      .multiplayer-button {
-        background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
-      }
+		this.friendsBtn.addEventListener('click', () => {
+			window.history.pushState({}, '', '/friends');
+			window.dispatchEvent(new PopStateEvent('popstate'));
+		});
 
-      .friends-button {
-        background: linear-gradient(135deg, #9b59b6 0%, #8e44ad 100%);
-      }
-
-      .block-game-button {
-        background: linear-gradient(135deg, #f1c40f 0%, #f39c12 100%);
-      }
-
-      .pong-game-button {
-        background: linear-gradient(135deg, #ff8000 0%, #f39c12 100%);
-      }
-
-      .multi-pong-game-button {
-        background: linear-gradient(135deg, #ff8000 0%, #f39c12 100%);
-      }
-
-      .logout-button {
-        background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
-        margin-top: 10px;
-        border-top: 1px solid rgba(255, 255, 255, 0.2);
-        padding-top: 20px;
-      }
-
-      /* Animation d'entrée */
-      @keyframes fadeIn {
-        from {
-          opacity: 0;
-          transform: translateY(20px);
-        }
-        to {
-          opacity: 1;
-          transform: translateY(0);
-        }
-      }
-
-      /* Desktop Layout */
-      @media (min-width: 1024px) {
-        .menu-container {
-          padding: 40px;
-        }
-
-        .menu-title {
-          font-size: 2.5em;
-          margin-bottom: 40px;
-        }
-
-        .menu-button {
-          padding: 20px 25px;
-          font-size: 1.2em;
-        }
-      }
-
-      /* Tablet Layout */
-      @media (min-width: 768px) and (max-width: 1023px) {
-        .menu-container {
-          padding: 35px;
-        }
-
-        .menu-title {
-          font-size: 2.3em;
-        }
-
-        .menu-button {
-          padding: 18px 22px;
-          font-size: 1.15em;
-        }
-      }
-
-      /* Mobile Layout */
-      @media (max-width: 767px) {
-        .main-menu {
-          padding: 15px;
-        }
-
-        .menu-container {
-          padding: 25px;
-        }
-
-        .menu-title {
-          font-size: 2em;
-          margin-bottom: 25px;
-        }
-
-        .menu-button {
-          padding: 12px 18px;
-          font-size: 1em;
-        }
-      }
-
-      /* Small Mobile Layout */
-      @media (max-width: 480px) {
-        .main-menu {
-          padding: 10px;
-        }
-
-        .menu-container {
-          padding: 20px;
-        }
-
-        .menu-title {
-          font-size: 1.8em;
-          margin-bottom: 20px;
-        }
-
-        .menu-button {
-          padding: 10px 15px;
-          font-size: 0.95em;
-        }
-
-        .menu-button i {
-          font-size: 1.1em;
-        }
-      }
-    </style>
-  `;
+		
+		this.logoutBtn.addEventListener('click', async () => {
+			try {
+				console.log('🚪 Tentative de logout...');
+				removeAuthToken();
+				console.log('✅ Logout réussi');
+				window.history.pushState({}, '', '/login');
+				window.dispatchEvent(new PopStateEvent('popstate'));
+			}
+			catch (error) {
+				console.error('❌ Erreur lors du logout:', error);
+				// Fallback: redirection directe
+				window.history.pushState({}, '', '/login');
+				window.dispatchEvent(new PopStateEvent('popstate'));
+			}
+		});
+	}
 }
 
-function initializeMainEvents() {
-  // Gestion des boutons de navigation
-  const profileBtn = document.getElementById('profileBtn');
-  const chatBtn = document.getElementById('chatBtn');
-  const matchmakingBtn = document.getElementById('matchmakingBtn');
-  const multiplayerBtn = document.getElementById('multiplayerBtn');
-  const friendsBtn = document.getElementById('friendsBtn');
-  const blockGameBtn = document.getElementById('blockBtn');
-  const pongGameBtn = document.getElementById('pongBtn');
-  const multiPongGameBtn = document.getElementById('multiPongBtn');
-  const logoutBtn = document.getElementById('logoutBtn');
-  const tournamentBtn = document.getElementById('tournamentBtn');
+export function renderHome(): string {
+	return `
+		<div class="home">
+			<header class="top-header">
+				<h1 class="site-title">${t('home.title')}</h1>
+			</header>
+			
+			<main class="main-content">
+				<div class="preview-container">
+					<video class="preview-video" autoplay loop muted playsinline>
+						<source src="/preview-pong.mp4" type="video/mp4">
+						<div class="video-fallback">
+							<div class="pong-demo">
+								<div class="ball"></div>
+								<div class="paddle paddle-left"></div>
+								<div class="paddle paddle-right"></div>
+							</div>
+						</div>
+					</video>
+					<div class="preview-overlay">
+						<h2>${t('home.subtitle')}</h2>
+						<p>${t('home.description')}</p>
+					</div>
+				</div>
+			</main>
+		</div>
+		<div class="connexion">
+			<button id="loginBtn" class="login-btn">${t('home.login')}</button>
+		</div>
 
+		<style>
+			.home {
+				max-width: 1200px;
+				margin: 0 auto;
+				padding: 20px;
+				text-align: center;
+			}
 
-  if (profileBtn) {
-    profileBtn.addEventListener('click', () => {
-      window.history.pushState({}, '', '/profil');
-      window.dispatchEvent(new PopStateEvent('popstate'));
-    });
-  }
+			.top-header {
+				margin-bottom: 30px;
+			}
 
-  if (matchmakingBtn) {
-    matchmakingBtn.addEventListener('click', () => {
-      window.history.pushState({}, '', '/matchmaking');
-      window.dispatchEvent(new PopStateEvent('popstate'));
-    });
-  }
+			.site-title {
+				font-size: 2.5em;
+				background: linear-gradient(45deg, #a8aba7, #ef659f);
+				-webkit-background-clip: text;
+				-webkit-text-fill-color: transparent;
+				margin: 0;
+			}
 
-  if (tournamentBtn) {
-    tournamentBtn.addEventListener('click', () => {
-      window.history.pushState({}, '', '/tournament');
-      window.dispatchEvent(new PopStateEvent('popstate'));
-    });
-  }
+			.main-content {
+				margin-bottom: 40px;
+			}
 
-  if (chatBtn) {
-    chatBtn.addEventListener('click', () => {
-      window.history.pushState({}, '', '/chat');
-      window.dispatchEvent(new PopStateEvent('popstate'));
-    });
-  }
+			.preview-container {
+				position: relative;
+				width: 100%;
+				max-width: 800px;
+				margin: 0 auto;
+				border-radius: 20px;
+				overflow: hidden;
+				box-shadow: 0 8px 32px rgba(31, 38, 135, 0.37);
+			}
 
-  if (multiplayerBtn) {
-    multiplayerBtn.addEventListener('click', () => {
-      window.history.pushState({}, '', '/multiplayer');
-      window.dispatchEvent(new PopStateEvent('popstate'));
-    });
-  }
+			.preview-video {
+				width: 100%;
+				height: auto;
+				display: block;
+				border-radius: 20px;
+			}
 
-  if (friendsBtn) {
-    friendsBtn.addEventListener('click', () => {
-      window.history.pushState({}, '', '/friends');
-      window.dispatchEvent(new PopStateEvent('popstate'));
-    });
-  }
+			.video-fallback {
+				width: 100%;
+				height: 400px;
+				background: #000;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+			}
 
-  if (blockGameBtn) {
-    blockGameBtn.addEventListener('click', () => {
-      window.history.pushState({}, '', '/block');
-      window.dispatchEvent(new PopStateEvent('popstate'));
-    });
-  }
+			.pong-demo {
+				width: 100%;
+				height: 100%;
+				position: relative;
+				background: #1a1a2e;
+			}
 
-  if (pongGameBtn) {
-    pongGameBtn.addEventListener('click', () => {
-      window.history.pushState({}, '', '/pong');
-      window.dispatchEvent(new PopStateEvent('popstate'));
-    });
-  }
+			.ball {
+				width: 20px;
+				height: 20px;
+				background: #fff;
+				border-radius: 50%;
+				position: absolute;
+				top: 50%;
+				left: 50%;
+				transform: translate(-50%, -50%);
+				animation: moveBall 2s infinite linear;
+			}
 
-  if (multiPongGameBtn) {
-    multiPongGameBtn.addEventListener('click', () => {
-      window.history.pushState({}, '', '/pong');
-      window.dispatchEvent(new PopStateEvent('popstate'));
-    });
-  }
+			.paddle {
+				width: 20px;
+				height: 100px;
+				background: #fff;
+				position: absolute;
+				top: 50%;
+				transform: translateY(-50%);
+			}
 
-  if (logoutBtn) {
-    logoutBtn.addEventListener('click', async () => {
-      try {
-        console.log('🚪 Tentative de logout...');
-        removeAuthToken();
-        console.log('✅ Logout réussi');
-        window.history.pushState({}, '', '/login');
-        window.dispatchEvent(new PopStateEvent('popstate'));
-      } catch (error) {
-        console.error('❌ Erreur lors du logout:', error);
-        // Fallback: redirection directe
-        window.history.pushState({}, '', '/login');
-        window.dispatchEvent(new PopStateEvent('popstate'));
-      }
-    });
-  }
+			.paddle-left {
+				left: 50px;
+			}
+
+			.paddle-right {
+				right: 50px;
+			}
+
+			.preview-overlay {
+				position: absolute;
+				top: 0;
+				left: 0;
+				right: 0;
+				bottom: 0;
+				background: rgba(0, 0, 0, 0.5);
+				display: flex;
+				flex-direction: column;
+				justify-content: center;
+				align-items: center;
+				padding: 20px;
+				text-align: center;
+				color: white;
+			}
+
+			.preview-overlay h2 {
+				font-size: 2em;
+				margin-bottom: 15px;
+				text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+			}
+
+			.preview-overlay p {
+				font-size: 1.2em;
+				max-width: 600px;
+				margin: 0 auto;
+				text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+			}
+
+			.connexion {
+				display: flex;
+				justify-content: center;
+				align-items: center;
+				padding: 20px;
+			}
+
+			.login-btn {
+				font-size: 1.2em;
+				font-weight: bold;
+				padding: 15px 40px;
+				background: linear-gradient(45deg, #a8aba7, #ef659f);
+				color: white;
+				border: none;
+				border-radius: 50px;
+				cursor: pointer;
+				transition: all 0.3s ease;
+				box-shadow: 0 8px 25px rgba(255, 107, 107, 0.3);
+				text-transform: uppercase;
+				letter-spacing: 1px;
+			}
+
+			.login-btn:hover {
+				transform: translateY(-3px);
+				box-shadow: 0 12px 35px rgba(255, 107, 107, 0.4);
+			}
+
+			.login-btn:active {
+				transform: translateY(-1px);
+				box-shadow: 0 6px 20px rgba(255, 107, 107, 0.3);
+			}
+
+			@keyframes moveBall {
+				0% { transform: translate(-50%, -50%) translateX(-200px); }
+				50% { transform: translate(-50%, -50%) translateX(200px); }
+				100% { transform: translate(-50%, -50%) translateX(-200px); }
+			}
+
+			/* Desktop Layout */
+			@media (min-width: 1024px) {
+				.home {
+					padding: 40px;
+				}
+
+				.site-title {
+					font-size: 3em;
+				}
+
+				.preview-overlay h2 {
+					font-size: 2.5em;
+				}
+
+				.preview-overlay p {
+					font-size: 1.4em;
+				}
+
+				.login-btn {
+					font-size: 1.4em;
+					padding: 20px 60px;
+				}
+			}
+
+			/* Tablet Layout */
+			@media (min-width: 768px) and (max-width: 1023px) {
+				.home {
+					padding: 30px;
+				}
+
+				.site-title {
+					font-size: 2.8em;
+				}
+
+				.preview-overlay h2 {
+					font-size: 2.2em;
+				}
+
+				.preview-overlay p {
+					font-size: 1.3em;
+				}
+			}
+
+			/* Mobile Layout */
+			@media (max-width: 767px) {
+				.home {
+					padding: 15px;
+				}
+
+				.site-title {
+					font-size: 2em;
+				}
+
+				.preview-overlay h2 {
+					font-size: 1.8em;
+				}
+
+				.preview-overlay p {
+					font-size: 1.1em;
+				}
+
+				.login-btn {
+					font-size: 1.1em;
+					padding: 12px 30px;
+				}
+			}
+
+			/* Small Mobile Layout */
+			@media (max-width: 480px) {
+				.home {
+					padding: 10px;
+				}
+
+				.site-title {
+					font-size: 1.8em;
+				}
+
+				.preview-overlay h2 {
+					font-size: 1.5em;
+				}
+
+				.preview-overlay p {
+					font-size: 1em;
+				}
+
+				.login-btn {
+					font-size: 1em;
+					padding: 10px 25px;
+				}
+			}
+		</style>
+	`;
 }
 
-export { initializeMainEvents };
+function initializeHomeEvents() {
+	const loginBtn = document.getElementById('loginBtn');
+	loginBtn?.addEventListener('click', () => {
+		window.history.pushState({}, '', '/login');
+		window.dispatchEvent(new PopStateEvent('popstate'));
+	});
+}
+
+export { initializeHomeEvents };

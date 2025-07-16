@@ -1,6 +1,21 @@
 import { t } from '../../utils/translations';
+import { createAccount } from './class/createAccount'
 
-export function renderCreateAccount(): string {
+export function renderCreateAccount() {
+
+	setTimeout(async () => {
+		console.log('Initializing create-account page');
+		try {
+			new createAccount();
+		}
+		catch (err:any) {
+			console.log(err);
+		}
+	}, 0);
+	return getTemplate();
+}
+
+function getTemplate(): string {
 	return `
 	<div class="login-container">
 		<main class="login-content">
@@ -94,118 +109,3 @@ export function renderCreateAccount(): string {
 	</style>
 	`;
 }
-
-function initializeCreateAccountEvents() {
-	const createAccountForm = document.getElementById('createAccountForm');
-	const backToLoginBtn = document.getElementById('backToLoginBtn');
-	
-	// Fonction pour afficher les messages
-	function showMessage(message: string, type: 'success' | 'error') {
-		const messageContainer = document.getElementById('messageContainer');
-		const messageContent = document.getElementById('messageContent');
-		
-		if (messageContainer && messageContent) {
-			messageContent.textContent = message;
-			messageContainer.className = `message-container ${type}`;
-			messageContainer.style.display = 'block';
-			
-			// Auto-hide pour les messages de succès après 3 secondes
-			if (type === 'success') {
-				setTimeout(() => {
-					messageContainer.style.display = 'none';
-				}, 3000);
-			}
-		}
-	}
-	
-	// Gestion du bouton retour au login
-	if (backToLoginBtn) {
-		backToLoginBtn.addEventListener('click', () => {
-			window.history.pushState({}, '', '/login');
-			window.dispatchEvent(new PopStateEvent('popstate'));
-		});
-	}
-
-	createAccountForm?.addEventListener('submit', async (e) => {
-		e.preventDefault();
-
-		const username = (document.getElementById('username') as HTMLInputElement).value;
-		const email = (document.getElementById('email') as HTMLInputElement).value;
-		const password = (document.getElementById('password') as HTMLInputElement).value;
-		const confirmPassword = (document.getElementById('confirmPassword') as HTMLInputElement).value;
-		
-		// Validation côté client
-		if (!username || !email || !password || !confirmPassword) {
-			showMessage('❌ Tous les champs sont obligatoires', 'error');
-			return;
-		}
-
-		// if (username.length < 3) {
-		// 	showMessage('❌ Le nom d\'utilisateur doit contenir au moins 3 caractères', 'error');
-		// 	return;
-		// }
-
-		// if (password.length < 6) {
-		// 	showMessage('❌ Le mot de passe doit contenir au moins 6 caractères', 'error');
-		// 	return;
-		// }
-
-		// if (password !== confirmPassword) {
-		// 	showMessage('❌ Les mots de passe ne correspondent pas', 'error');
-		// 	return;
-		// }
-
-		// // Validation email basique
-		// const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-		// if (!emailRegex.test(email)) {
-		// 	showMessage('❌ Format d\'email invalide', 'error');
-		// 	return;
-		// }
-
-		try {
-			const response = await fetch('/api/auth/register', {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json'
-				},
-				body: JSON.stringify({
-					username,
-					email,
-					password,
-					confirmPassword
-				})
-			});
-
-			const result = await response.json();
-
-			if (!response.ok) {
-				// Gestion spécifique des erreurs selon le code de statut
-				switch (response.status) {
-					case 400:
-						showMessage(`❌ Erreur de validation: ${result.error || 'Données invalides'}`, 'error');
-						break;
-					case 409:
-						showMessage(`❌ Conflit: ${result.error || 'Nom d\'utilisateur ou email déjà utilisé'}`, 'error');
-						break;
-					case 500:
-						showMessage('❌ Erreur serveur. Veuillez réessayer plus tard.', 'error');
-						break;
-					default:
-						showMessage(`❌ Erreur: ${result.error || 'Erreur inconnue'}`, 'error');
-				}
-			} else {
-				showMessage('✅ Compte créé avec succès ! Vous pouvez maintenant vous connecter.', 'success');
-				// Redirection après un délai pour laisser le temps de voir le message
-				setTimeout(() => {
-					window.history.pushState({}, '', '/login');
-					window.dispatchEvent(new PopStateEvent('popstate'));
-				}, 2000);
-			}
-		} catch (err) {
-			console.error('Erreur réseau ou serveur', err);
-			showMessage('❌ Erreur lors de la création du compte', 'error');
-		}
-	});
-}
-
-export { initializeCreateAccountEvents };

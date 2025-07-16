@@ -42,6 +42,8 @@ async function authRoutes(app: FastifyInstance) {
   app.post<{ Body: RegisterBody }>('/register', async (request: FastifyRequest, reply: FastifyReply) => {
     // Extraction des données du corps de la requête
     const { username, email, password, confirmPassword } = request.body;
+
+    console.log('je vais post dans la db')
     
     // Validation des champs requis
     if (!username || !email || !password || !confirmPassword) {
@@ -100,7 +102,7 @@ async function authRoutes(app: FastifyInstance) {
 
     try {
 
-      console.log(`j'insert dans la db`)
+      console.log(`DQIiiWUIWQWIDBBIWQBIBI       j'insert dans la db`)
       // Préparation et exécution de la requête SQL d'insertion
       const stmt = datab.prepare(
         `INSERT INTO users (username, email, password_hash)

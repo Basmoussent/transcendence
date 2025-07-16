@@ -1,7 +1,22 @@
 import { t } from '../../utils/translations';
-import { setAuthToken } from '../../utils/auth';
+import { login } from './class/login'
 
-export function renderLogin(): string {
+
+export function renderLogin() {
+
+	setTimeout(async () => {
+		console.log('Initializing login page');
+		try {
+			new login();
+		}
+		catch (err:any) {
+			console.log(err);
+		}
+	}, 0);
+	return getTemplate();
+}
+
+function getTemplate(): string {
 	return `
 	<div class="login-container">
 		<main class="login-content">
@@ -81,92 +96,3 @@ export function renderLogin(): string {
 	</style>
 	`;
 }
-
-function initializeLoginEvents() {
-	const loginForm = document.getElementById('loginForm');
-	
-	// Fonction pour afficher les messages
-	function showMessage(message: string, type: 'success' | 'error') {
-		const messageContainer = document.getElementById('messageContainer');
-		const messageContent = document.getElementById('messageContent');
-		
-		if (messageContainer && messageContent) {
-			messageContent.textContent = message;
-			messageContainer.className = `message-container ${type}`;
-			messageContainer.style.display = 'block';
-			
-			// Auto-hide pour les messages de succès après 3 secondes
-			if (type === 'success') {
-				setTimeout(() => {
-					messageContainer.style.display = 'none';
-				}, 3000);
-			}
-		}
-	}
-	
-	loginForm?.addEventListener('submit', async (e) => {
-	e.preventDefault();
-
-	const username = (document.getElementById('username') as HTMLInputElement).value;
-	const password = (document.getElementById('password') as HTMLInputElement).value;
-
-	try {
-		console.log('🔐 Tentative de connexion pour:', username);
-		console.log('🌐 URL actuelle:', window.location.href);
-		
-		const response = await fetch('/api/auth/login', {
-		method: 'POST',
-		headers: { 'Content-Type': 'application/json' },
-		body: JSON.stringify({ username, password }),
-		credentials: 'include' // Important pour recevoir les cookies
-		});
-
-		const result = await response.json();
-
-		if (!response.ok) {
-			showMessage(`❌ Erreur: ${result.error || 'Identifiants invalides'}`, 'error');
-			return;
-		}
-
-		console.log('✅ Connexion réussie');
-		console.log('Headers de réponse:', response.headers);
-		
-		// Le token est maintenant dans un cookie, mais on peut aussi le récupérer du header pour la compatibilité
-		const token = response.headers.get('x-access-token');
-		if (token) {
-			console.log('🎫 Token reçu dans le header');
-			setAuthToken(token);
-			console.log(`le token des familles `, token)
-		} else {
-			console.log('Token attendu dans les cookies');
-		}
-		
-		
-		// Attendre un peu pour que les cookies soient bien définis
-		setTimeout(() => {
-			console.log('🔄 Redirection vers /main');
-			window.history.pushState({}, '', '/main');
-			window.dispatchEvent(new PopStateEvent('popstate'));
-		}, 100);
-		
-	} catch (err) {
-		console.error('❌ Network or server error', err);
-		showMessage('❌ Erreur lors de la connexion', 'error');
-	}
-	});
-
-	
-	const ForgotPassword = document.getElementById('forgot-password');
-	ForgotPassword?.addEventListener('click', () => {
-		window.history.pushState({}, '', '/forgot-password');
-		window.dispatchEvent(new PopStateEvent('popstate'));
-	});
-
-	const CreateAccount = document.getElementById('create-account');
-	CreateAccount?.addEventListener('click', () => {
-		window.history.pushState({}, '', '/create-account');
-		window.dispatchEvent(new PopStateEvent('popstate'));
-	});
-}
-
-export { initializeLoginEvents };
