@@ -384,11 +384,16 @@ export class Room {
 				token: this.token
 			}));
 			// faire le new block ou pong avec info de la game dans le constructeur
-			if (gameType === 'Pong')
-				window.history.pushState({}, '', `/pong`);
+			if (this.roomData?.host === this.username) {
+				if (gameType === 'Pong')
+					window.history.pushState({}, '', `/pong`);
+				else
+					window.history.pushState({}, '', `/block`);
+			}
 			else
-				window.history.pushState({}, '', `/block`);				
+				window.history.pushState({}, '', `/main`);
+
 			window.dispatchEvent(new Event('popstate'));
-		}, 2500);
+		}, 1800);
 	}
 }
