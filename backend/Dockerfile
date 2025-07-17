@@ -16,7 +16,7 @@ RUN npm install
 
 RUN npm install -g sqlite3 && npm install uuid
 
-RUN npm install otplib
+RUN npm install otplib && npm install qrcode
 
 # Create symlink for environment file
 RUN ln -s /tmp/vault.env /app/.env

@@ -1,5 +1,5 @@
 import { getAuthToken } from '../../utils/auth';
-import { update2FAState, userInfo } from '../social/utils';
+import { fetchMe, update2FAState, userInfo } from '../social/utils';
 
 // Exemple de page /tfa pour activer la 2FA
 export function render2FA() {
@@ -221,7 +221,30 @@ export function render2FA() {
         window.dispatchEvent(new PopStateEvent('popstate'));
       });
     }
+    const user = await fetchMe()
+   
+    const authToken = getAuthToken();
+    if (!authToken) {
+      alert('❌ Token d\'authentification manquant');
+      window.history.pushState({}, '', '/login');
+      window.dispatchEvent(new PopStateEvent('popstate'));
+      return;
+    }
 
+    const response = await fetch(`/api/me/${user.id}`, {
+
+      method: 'POST',
+      headers: {
+          'Content-Type': 'application/json',
+          'x-access-token': authToken
+        },
+      body: JSON.stringify({
+					user,
+				})
+    });
+
+    const data = await response.json(); 
+    qrSection.innerHTML = data.qrcode;
 
     // Gestion de l'activation 2FA
     if (activateBtn && verificationCode) {
