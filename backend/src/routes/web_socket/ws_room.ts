@@ -21,7 +21,7 @@ interface Room {
 
 export const rooms = new Map<string, Room>();
 
-function broadcastRoomUpdate(room: Room) {
+async function broadcastRoomUpdate(app: FastifyInstance, room: Room) {
 	const stateToSend = {
 		id: room.id,
 		name: room.name,
@@ -41,10 +41,14 @@ function broadcastRoomUpdate(room: Room) {
 		if (user.socket.readyState === WebSocket.OPEN)
 			user.socket.send(message); });
 
-	broadcastMatchmaking(JSON.stringify({
-		type: 'updateUI',
-	}));
-	
+	const tmp = JSON.stringify({
+		type: 'updateUI'
+	})
+
+	broadcastMatchmaking(JSON.parse(tmp.toString()));
+
+	await app.roomService.updateGame(room);
+
 }
 
 function broadcastSystemMessage(room: Room, content: string) {
@@ -121,10 +125,9 @@ export async function handleRoom(app: FastifyInstance, socket: WebSocket, req: F
 	console.warn(`room.maxPlayers === room.users.size + room.ai --> ${room.maxPlayers} === ${room.users.size} + ${room.ai}`)
 
 	broadcastSystemMessage(room, `${username} has joined the room.`);
-	broadcastRoomUpdate(room);
-	app.roomService.updateGame(room);
+	await broadcastRoomUpdate(app, room);
 
-	socket.on('message', (message: string) => {
+	socket.on('message', async (message: string) => {
 		try {
 			const data = JSON.parse(message);
 
@@ -139,61 +142,61 @@ export async function handleRoom(app: FastifyInstance, socket: WebSocket, req: F
 				case 'toggle_ready':
 					currentUser.isReady = !currentUser.isReady;
 					console.log(`${username} --> isready == ${currentUser.isReady}`);
-					broadcastRoomUpdate(currentRoom);
+					await broadcastRoomUpdate(app, currentRoom);
 					break;
 
 				case 'game_type':
 					currentRoom.gameType = data.name;
 					currentRoom.ai = 0;
-					broadcastRoomUpdate(currentRoom);
+					await broadcastRoomUpdate(app, currentRoom);
 					break;
 
 				case 'increase':
 					currentRoom.ai += 1;
 					console.log(currentRoom.ai)
-					broadcastRoomUpdate(currentRoom);
+					await broadcastRoomUpdate(app, currentRoom);
 					break;
 
 				case 'decrease':
 					currentRoom.ai -= 1;
 					console.log(currentRoom.ai)
-					broadcastRoomUpdate(currentRoom);
+					await broadcastRoomUpdate(app, currentRoom);
 					break;
 					
 				case 'maxPlayer':
 					currentRoom.maxPlayers = data.players
-					console.log(currentRoom.maxPlayers)
-					broadcastRoomUpdate(currentRoom);
+					await broadcastRoomUpdate(app, currentRoom);
 					break;
 						
 				case 'chat_message':
 					const chatMessage = JSON.stringify({ 
-					type: 'chat_message', 
-					username: username,
-					content: data.content });
+						type: 'chat_message', 
+						username: username,
+						content: data.content
+					});
 					
 					currentRoom.users.forEach(u => {
-					// check que le socket du joueur est bien ouvert
-					if (u.socket.readyState === WebSocket.OPEN)
-						u.socket.send(chatMessage);
+						if (u.socket.readyState === WebSocket.OPEN)
+							u.socket.send(chatMessage);
 					});
 					break;
 
 				case 'start_game':
 					if (currentRoom.host !== username || currentRoom.users.size < 2)
-					return;
+						return;
 
 					const allReady = Array.from(currentRoom.users.values()).every(u => u.isReady);
 
 					if (!allReady)
-					return;
+						return;
 
 					console.log(`Starting game for room ${uuid!}`);
 					currentRoom.isGameStarted = true;
 
 					const gameStartMessage = JSON.stringify({ 
-					type: 'game_starting',
-					gameType: currentRoom.gameType });
+						type: 'game_starting',
+						gameType: currentRoom.gameType
+					});
 					
 					currentRoom.users.forEach(u => u.socket.send(gameStartMessage));
 					rooms.delete(uuid!);
@@ -205,7 +208,7 @@ export async function handleRoom(app: FastifyInstance, socket: WebSocket, req: F
 		}
 	});
 
-	socket.on('close', () => {
+	socket.on('close', async () => {
 
 		const roomToLeave = rooms.get(uuid!);
 		if (roomToLeave) {
@@ -217,12 +220,12 @@ export async function handleRoom(app: FastifyInstance, socket: WebSocket, req: F
 				console.log(`Room ${uuid!} deleted because empty`);
 			}
 			else { // delegate host
-				if (roomToLeave.host !== undefined && roomToLeave.host === username) {
+				if (roomToLeave.host === username) {
 					roomToLeave.host = roomToLeave.users.keys().next().value;
 					console.log(`${roomToLeave.host} is the new host.`);
 				}
 				broadcastSystemMessage(roomToLeave, `${username} has left the room.`);
-				broadcastRoomUpdate(roomToLeave);
+				await broadcastRoomUpdate(app, roomToLeave);
 			}
 		}
 	});

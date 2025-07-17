@@ -180,9 +180,8 @@ export class Room {
 	
 	private increase() {
 
-		// if (this.roomData?.maxPlayers === this.roomData?.users.size + this.roomData?.ai) {
-		// 	return;
-		// }
+		if (this.roomData?.users?.length && (this.roomData?.maxPlayers === this.roomData?.users?.length + this.roomData?.ai))
+			return;
 		this.ws.send(JSON.stringify({
 			type: 'increase',
 			token: this.token,
@@ -190,6 +189,9 @@ export class Room {
 	}
 
 	private decrease() {
+
+		if (this.roomData?.users?.length && this.roomData?.users?.length === 0)
+			return;
 		this.ws.send(JSON.stringify({
 			type: 'decrease',
 			token: this.token,
@@ -286,8 +288,6 @@ export class Room {
 
 			this.roomSettings.classList.remove('hidden')
 			this.getElement('gameActions').classList.remove('hidden');
-
-			console.log(`youyouyouyoyuyouyou ${this.roomData.gameType}`)
 
 			if (this.roomData.gameType === 'block')
 				this.getElement('ai-setting').style.display = 'none';
