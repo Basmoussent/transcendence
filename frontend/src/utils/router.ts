@@ -24,7 +24,7 @@ import { renderChooseGame } from '../pages/game/choose-game';
 import { renderPong } from '../pages/pong/pong';
 import { initAlive } from './auth';
 import { renderFriends } from '../pages/social/friends';
-import { renderTFA } from '../pages/auth/activate-2fa';
+import { render2FA } from '../pages/auth/activate-2fa';
 
 export async function router() {
 	// Clear translation cache to ensure fresh translations
@@ -129,6 +129,9 @@ export async function router() {
 			break;
 		case '/chat':
 			view = renderChat();
+			break;
+		case '/2fa':
+			view = render2FA();
 			break;
 		default:
 			view = render404();

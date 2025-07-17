@@ -7,7 +7,6 @@ interface UserData {
 	email: string;
 	avatar_url?: string;
 	two_fact_auth: boolean;
-	secret_key: string;
 }
 
 export async function fetchMe(): Promise<UserData | void> {
@@ -37,7 +36,6 @@ export async function fetchMe(): Promise<UserData | void> {
 				avatar_url: sanitizeHtml(result.user?.avatar_url) || 'avatar.png',
 				id: Number(sanitizeHtml(result.user?.id)) || 0,
 				two_fact_auth: Boolean(sanitizeHtml(result.user?.two_fact_auth)) || false,
-				secret_key: sanitizeHtml(result.user?.secret_key)
 			};
 			return (tmp);
 		}

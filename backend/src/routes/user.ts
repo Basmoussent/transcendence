@@ -21,7 +21,6 @@ interface UserData {
   avatar_url?: string;
   language: string;
   two_fact_auth: boolean;
-  secret_key: string;
 }
 
 async function userRoutes(app: FastifyInstance) {
@@ -82,7 +81,6 @@ async function userRoutes(app: FastifyInstance) {
                     avatar_url: user.avatar_url || 'avatar.png',
                     language: user.language,
                     two_fact_auth: user.two_fact_auth || 0,
-                    secret_key: user.secret_key || "rien"
                 },
                 // stats: stats
             });
@@ -341,6 +339,42 @@ async function userRoutes(app: FastifyInstance) {
                 isOnline: isOnline
             }
         });
+    })
+
+
+
+    app.post('/me/:userid', async function (request: FastifyRequest, reply: FastifyReply) {
+
+        try {
+            const database = db.getDatabase();
+
+            const { user } = request.body as { user?: any };
+
+
+
+            // console.log(`niwdoqwndoqnwodiqnoinwd `, JSON.stringify(user, null, 8));
+
+
+
+            if (!user)
+                throw new Error ("missing user in the request body");
+
+            try {
+                const qrcode = await app.userService.generateQrcode(user);
+                return reply.send({
+                    message: `qr code du user ${user}`,
+                    qrcode: qrcode
+                });
+            }
+            catch (err: any) {
+                console.log(`pblm retrieve la secret key dans le back`)
+            }
+        }
+        catch (err: any) {
+            return reply.status(500).send({
+                error: 'erreur GET /user:userId',
+                details: err.message });
+        }
     })
 }
 
