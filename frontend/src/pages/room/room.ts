@@ -385,10 +385,14 @@ export class Room {
 			}));
 			// faire le new block ou pong avec info de la game dans le constructeur
 			if (this.roomData?.host === this.username) {
-				if (gameType === 'Pong')
-					window.history.pushState({}, '', `/pong`);
-				else
-					window.history.pushState({}, '', `/block`);
+				if (gameType === 'pong' && this.roomData.users.length > 2)
+					window.history.pushState({}, '', `/multipong/${this.uuid}`);
+				else if (gameType === 'pong')
+					window.history.pushState({}, '', `/pong/${this.uuid}`);
+				else if (gameType === 'block' && this.roomData.users.length === 1)
+					window.history.pushState({}, '', `/block/${this.uuid}`);
+				else if (gameType === 'block' && this.roomData.users.length == 2)
+					window.history.pushState({}, '', `/block1v1/${this.uuid}`);
 			}
 			else
 				window.history.pushState({}, '', `/main`);

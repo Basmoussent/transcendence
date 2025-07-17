@@ -5,7 +5,6 @@ import { sanitizeHtml } from '../../utils/sanitizer';
 export function renderMatchmaking() {
 
 	setTimeout(async () => {
-		console.log('Initializing matchmaking page');
 		try {
 			new matchmaking();
 		}

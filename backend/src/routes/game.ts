@@ -33,26 +33,34 @@ interface BodyType {
 
 async function gameRoutes(app: FastifyInstance) {
 
-	app.get('/', async function (request: FastifyRequest, reply: FastifyReply) {
+	app.get('/:uuid', async function (request: FastifyRequest, reply: FastifyReply) {
 
-		console.log("récupérer toute les games");
+		console.log("recuperer une game");
 
 		try {
 			const database = db.getDatabase();
 
-			const gameTable = await new Promise<Game[] | null>((resolve, reject) => {
+			const { uuid } = request.query as { uuid?: string };
 
-				database.all(
-					'SELECT * FROM games',
-					(err: any, row: Game[] | undefined) => {
+			console.log(`le uuid ${uuid}`)
+
+			if (!uuid)
+				throw new Error ("missing uuid in the request query");
+
+			const game = await new Promise<Game | null>((resolve, reject) => {
+
+				database.get(
+					'SELECT * FROM games WHERE uuid = ?',
+					[ uuid ],
+					(err: any, row: Game | undefined) => {
 						err ? reject(err) : resolve(row || null); }
 				);
 			});
-			console.log("gameTable", gameTable);
+			console.log("game", game);
 
 			return reply.send({
-				message: 'gameTable recu avec succès',
-				gameTable: gameTable,
+				message: 'game recu avec succès',
+				game: game,
 			});
 		}
 
@@ -146,8 +154,6 @@ async function gameRoutes(app: FastifyInstance) {
 
 	app.get('/available', async function (request: FastifyRequest, reply: FastifyReply) {
 
-		console.log("récupérer qui attendent de pouvoir se lancer");
-
 		try {
 			const database = db.getDatabase();
 
@@ -159,8 +165,6 @@ async function gameRoutes(app: FastifyInstance) {
 						err ? reject(err) : resolve(row || null); }
 				);
 			});
-			console.log("games", games);
-
 			return reply.send({
 				message: 'games recu avec succès',
 				games: games,
