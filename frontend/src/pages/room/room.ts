@@ -90,6 +90,9 @@ export class Room {
 
 		this.ws.onopen = () => {
 			console.log(`✅ WebSocket connection established for room ${this.uuid}`);
+			this.ws.send(JSON.stringify({
+				type: 'update_db',
+			}))
 		};
 
 		this.ws.onerror = (error) => console.error(`${this.username} onerror ${this.uuid}:`, error);

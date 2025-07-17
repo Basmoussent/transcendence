@@ -18,7 +18,7 @@ import { renderEditProfil, initializeEditProfileEvents } from '../pages/social/e
 import { getAuthToken } from './auth';
 import { clearTranslationCache } from './translations';
 import { getGame } from '@/game/gameUtils';
-import { initializeMatchmakingEvents } from '../pages/matchmaking/renderMatchmaking';
+
 import { renderMultiPong } from '../pages/pong/multiplayer-pong';
 import { renderChooseGame } from '../pages/game/choose-game';
 import { renderPong } from '../pages/pong/pong';

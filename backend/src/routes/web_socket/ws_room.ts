@@ -126,7 +126,7 @@ export async function handleRoom(app: FastifyInstance, socket: WebSocket, req: F
 
 	broadcastSystemMessage(room, `${username} has joined the room.`);
 	await broadcastRoomUpdate(app, room);
-
+	await app.roomService.updateGame(room)
 	socket.on('message', async (message: string) => {
 		try {
 			const data = JSON.parse(message);
@@ -180,7 +180,9 @@ export async function handleRoom(app: FastifyInstance, socket: WebSocket, req: F
 							u.socket.send(chatMessage);
 					});
 					break;
-
+				case 'update_db':
+					await app.roomService.updateGame(room);
+					break;
 				case 'start_game':
 					if (currentRoom.host !== username || currentRoom.users.size < 2)
 						return;
