@@ -1,5 +1,6 @@
 import { FastifyInstance, FastifyRequest } from 'fastify';
 import { WebSocket } from 'ws';
+import { matchmaking, broadcastMatchmaking } from './ws_matchmaking';
 
 interface User {
 	username: string;
@@ -18,7 +19,7 @@ interface Room {
 	ai: number;
 }
 
-const rooms = new Map<string, Room>();
+export const rooms = new Map<string, Room>();
 
 function broadcastRoomUpdate(room: Room) {
 	const stateToSend = {
@@ -39,6 +40,11 @@ function broadcastRoomUpdate(room: Room) {
 	room.users.forEach(user => {
 		if (user.socket.readyState === WebSocket.OPEN)
 			user.socket.send(message); });
+
+	broadcastMatchmaking(JSON.stringify({
+		type: 'updateUI',
+	}));
+	
 }
 
 function broadcastSystemMessage(room: Room, content: string) {
@@ -71,8 +77,6 @@ export async function handleRoom(app: FastifyInstance, socket: WebSocket, req: F
 	const { uuid } = req.params as { uuid: string };
 
 	let room = rooms.get(uuid);
-
-	
 
 	const game = await app.gameService.getGame(uuid);
 
@@ -118,6 +122,7 @@ export async function handleRoom(app: FastifyInstance, socket: WebSocket, req: F
 
 	broadcastSystemMessage(room, `${username} has joined the room.`);
 	broadcastRoomUpdate(room);
+	app.roomService.updateGame(room);
 
 	socket.on('message', (message: string) => {
 		try {

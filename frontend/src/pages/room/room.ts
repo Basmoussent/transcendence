@@ -10,7 +10,7 @@ interface User {
 interface RoomData {
 	id: string;
 	name: string;
-	gameType: 'Pong' | 'Block';
+	gameType: 'pong' | 'block';
 	maxPlayers: number;
 	users: User[];
 	host: string;
@@ -287,7 +287,9 @@ export class Room {
 			this.roomSettings.classList.remove('hidden')
 			this.getElement('gameActions').classList.remove('hidden');
 
-			if (this.roomData.gameType === 'Block')
+			console.log(`youyouyouyoyuyouyou ${this.roomData.gameType}`)
+
+			if (this.roomData.gameType === 'block')
 				this.getElement('ai-setting').style.display = 'none';
 			else {
 				this.getElement('ai-setting').style.display = 'block';
