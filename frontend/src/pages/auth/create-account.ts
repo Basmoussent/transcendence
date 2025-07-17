@@ -201,7 +201,8 @@ function initializeCreateAccountEvents() {
 					window.dispatchEvent(new PopStateEvent('popstate'));
 				}, 2000);
 			}
-		} catch (err) {
+		}
+		catch (err) {
 			console.error('Erreur réseau ou serveur', err);
 			showMessage('❌ Erreur lors de la création du compte', 'error');
 		}

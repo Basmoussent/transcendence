@@ -278,7 +278,9 @@ export function renderTFA() {
           alert('❌ Veuillez entrer un code à 6 chiffres');
           return;
         }
-        if (!/^\d{6}$/.test(code)) {
+        
+        const codeRegex = /^\d{6}$/;
+        if (!codeRegex.test(code)) {
           alert('❌ Veuillez entrer des chiffres uniquement');
           return;
         }
