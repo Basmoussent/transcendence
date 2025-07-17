@@ -1,5 +1,5 @@
 export function render404() {
-  return `
+  const htmlContent = `
     <div class="not-found">
       <div class="not-found-content">
         <div class="error-code">
@@ -11,7 +11,7 @@ export function render404() {
         <h1 class="error-title">Page Not Found</h1>
         <p class="error-message">Oops! The page you're looking for seems to have disappeared into the void.</p>
         
-        <button class="back-button" onclick="window.location.href='/'">
+        <button class="back-button" id="backBtn">
           <i class="fas fa-arrow-left"></i>
           Back to Home
         </button>
@@ -158,4 +158,17 @@ export function render404() {
       }
     </style>
   `;
+
+  setTimeout(() => {
+      const backBtn = document.getElementById('backBtn');
+    
+      if (backBtn) {
+        backBtn.addEventListener('click', () => {
+          window.history.pushState({}, '', '/main');
+          window.dispatchEvent(new PopStateEvent('popstate'));
+        });
+      }
+    }, 0);
+  
+    return htmlContent;
 }
