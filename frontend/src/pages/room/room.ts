@@ -1,3 +1,4 @@
+import { getAuthToken } from '../../utils/auth';
 import { sanitizeHtml } from '../../utils/sanitizer';
 
 interface User {
@@ -41,9 +42,9 @@ export class Room {
 	private gameStatusEl: HTMLElement;
 	private roomSettings: HTMLElement;
 	private aiCountSpan: HTMLElement;
-	private maxPlayer: HTMLElement;
-	
-	private gameTypeSelect: HTMLElement;
+	private maxPlayersSelect: HTMLSelectElement;
+	private gameTypeSelect: HTMLSelectElement;
+	private token: string | null;
 	
 
 	constructor(user: string, uuid: string) {
@@ -66,9 +67,11 @@ export class Room {
 		this.gameTypeEl = this.getElement('gameType');
 		this.playerCountEl = this.getElement('playerCount');
 		this.gameStatusEl = this.getElement('gameStatus');
-		this.gameTypeSelect = this.getElement("gameTypeSelect");
 		this.aiCountSpan = this.getElement('aiCount');
-		this.maxPlayer = this.getElement('max-player');
+		this.gameTypeSelect = this.getElement("gameTypeSelect") as HTMLSelectElement;
+		this.maxPlayersSelect = this.getElement('maxPlayersSelect') as HTMLSelectElement;
+
+		this.token = getAuthToken();
 		
 
 		this.chatInput.focus();
@@ -116,6 +119,8 @@ export class Room {
 		this.increaseAiBtn.addEventListener('click', () => this.increase());
 		this.decreaseAiBtn.addEventListener('click', () => this.decrease());
 		this.gameTypeSelect.addEventListener('change', () => this.gameTypeChanged());
+		this.maxPlayersSelect.addEventListener('change', () => this.maxPlayersChanged());
+    
 	}
 
 	private handleEvent(data: any) {
@@ -144,7 +149,11 @@ export class Room {
 				window.dispatchEvent(new Event('popstate'));
 				this.ws.close();
 				break;
-			
+			case 'error':
+				window.history.pushState({}, '', '/login');
+				window.dispatchEvent(new Event('popstate'));
+				this.ws.close();
+				break;
 			default:
 				console.warn(`Unknown event type received: ${data.type}`);
 		}
@@ -155,35 +164,68 @@ export class Room {
 		if (message && this.ws.readyState === WebSocket.OPEN) {
 			this.ws.send(JSON.stringify({
 				type: 'chat_message',
-				content: message
+				content: message,
+				token: this.token
 			}));
 			this.chatInput.value = '';
 		}
 	}
 
 	private toggleReadyState() {
-		this.ws.send(JSON.stringify({ type: 'toggle_ready' }));
+		this.ws.send(JSON.stringify({
+			type: 'toggle_ready',
+			token: this.token,
+		 }));
 	}
 	
 	private increase() {
-		this.ws.send(JSON.stringify({ type: 'increase' }));
+
+		// if (this.roomData?.maxPlayers === this.roomData?.users.size + this.roomData?.ai) {
+		// 	return;
+		// }
+		this.ws.send(JSON.stringify({
+			type: 'increase',
+			token: this.token,
+		 }));
 	}
 
 	private decrease() {
-		this.ws.send(JSON.stringify({ type: 'decrease' }));
+		this.ws.send(JSON.stringify({
+			type: 'decrease',
+			token: this.token,
+		 }));
 	}
 
-	private startGame() {
-		this.ws.send(JSON.stringify({ type: 'start_game' }));
+	private maxPlayersChanged() {
+		this.ws.send(JSON.stringify({
+			type: 'maxPlayer',
+			players: this.maxPlayersSelect.value,
+			token: this.token
+		}));
 	}
 
 	private gameTypeChanged() {
-		this.ws.send(JSON.stringify({ type: 'game_type' }))
-	}	
+		this.ws.send(JSON.stringify({
+			type: 'game_type',
+			name: this.gameTypeSelect.value,
+			token: this.token,
+		}))
+	}
+
+	private startGame() {
+		this.ws.send(JSON.stringify({
+			type: 'start_game',
+			token: this.token,
+		 }));
+	}
+
 
 	private leaveRoom() {
 		if (this.ws.readyState === WebSocket.OPEN) {
-			this.ws.send(JSON.stringify({ type: 'leave_room' }));
+			this.ws.send(JSON.stringify({
+				type: 'leave_room',
+				token: this.token,
+			 }));
 		}
 		this.ws.close();
 		window.history.pushState({}, '', '/matchmaking');
@@ -192,7 +234,10 @@ export class Room {
 
 	private goHome() {
 		if (this.ws.readyState === WebSocket.OPEN) {
-			this.ws.send(JSON.stringify({ type: 'leave_room' }));
+			this.ws.send(JSON.stringify({
+				type: 'leave_room',
+				token: this.token,
+			 }));
 		}
 		this.ws.close();
 		window.history.pushState({}, '', '/main');
@@ -232,9 +277,7 @@ export class Room {
 			this.readyBtn.innerHTML = '<i class="fas fa-check"></i> Ready';
 		}
 
-		
 		const allReady = this.roomData.users.every(u => u.isReady);
-
 
 		if (this.roomData.host === this.username) {
 
@@ -259,6 +302,8 @@ export class Room {
 			}
 			
 		}
+
+		// afficher dans le select seulement les options possibles
 
 		if (allReady)
 			this.gameStatusEl.innerHTML = `<span class="status-dot ready"></span><span class="text-white/80">Ready to start!</span>`;
@@ -294,7 +339,7 @@ export class Room {
 		return `
 			<div class="player-card ai">
 				<img class="player-avatar-img" src="${pp}" alt="Avatar">
-				<div class="player-name">IA</div>
+				<div class="player-name">AI</div>
 				<div class="player-status">Automatique</div>
 			</div>
 		`;
@@ -328,12 +373,17 @@ export class Room {
 
 		this.addSystemMessage(`The game is about to start ${gameType}...`);
 		setTimeout(() => {
+			this.ws.send(JSON.stringify({
+				type: 'disconnection',
+				message: 'je launch une game',
+				token: this.token
+			}));
 			// faire le new block ou pong avec info de la game dans le constructeur
 			if (gameType === 'Pong')
 				window.history.pushState({}, '', `/pong`);
 			else
 				window.history.pushState({}, '', `/block`);				
 			window.dispatchEvent(new Event('popstate'));
-		}, 2000);
+		}, 2500);
 	}
 }

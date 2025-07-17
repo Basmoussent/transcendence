@@ -116,7 +116,6 @@ async function userRoutes(app: FastifyInstance) {
         return reply.type(contentType).send(fs.createReadStream(filePath));
     });
 
-
     app.post('/upload/avatar', async function (request: FastifyRequest, reply: FastifyReply) {
         try {
             let token = request.headers['x-access-token'] as string;
@@ -304,6 +303,45 @@ async function userRoutes(app: FastifyInstance) {
         }
     })
 
+    app.get('/profile/:username', async function (request: FastifyRequest, reply: FastifyReply) {
+        const { username } = request.params as { username: string };
+        
+        const database = db.getDatabase();
+        if (!database) {
+            return reply.status(500).send({ error: 'Erreur de connexion à la base de données' });
+        }
+
+        const user = await new Promise<UserData | null>((resolve, reject) => {
+            database.get(
+                'SELECT id, username, email, avatar_url, language FROM users WHERE username = ?',
+                [username],
+                (err: any, row: UserData | undefined) => {
+                    if (err) {
+                        reject(err);
+                    } else {
+                        resolve(row || null);
+                    }
+                }
+            );
+        });
+
+        if (!user) {
+            return reply.status(404).send({ error: 'Utilisateur non trouvé' });
+        }
+
+        const isOnline = await app.userService.isOnline(user.id);
+
+        return reply.send({
+            user: {
+                id: user.id,
+                username: user.username,
+                email: user.email,
+                avatar_url: user.avatar_url || 'avatar.png',
+                language: user.language,
+                isOnline: isOnline
+            }
+        });
+    })
 }
 
 export default userRoutes;

@@ -12,7 +12,7 @@ import path from 'path';
 export interface Game {
 	id: number,
 	uuid: string,
-	game_name: string,
+	game_type: string,
 	player1: string,
 	player2: string,
 	player3: string,
@@ -24,7 +24,7 @@ export interface Game {
 }
 
 interface BodyType {
-	game_name:string,
+	game_type:string,
 	player1: string,
 	users_needed:string,
 }
@@ -73,15 +73,15 @@ async function gameRoutes(app: FastifyInstance) {
 			const database = db.getDatabase();
 
 			let uuid = uuidv4(); // id de la room
-			const { game_name, player1, users_needed } = request.body;
+			const { game_type, player1, users_needed } = request.body;
 
-			if (!uuidValidate(uuid) || !game_name || !player1 || !users_needed)
+			if (!uuidValidate(uuid) || !game_type || !player1 || !users_needed)
 				throw new Error("Mandatory info needed to prelog game");
 
 			await new Promise<void>((resolve, reject) => {
 				database.run(
-					'INSERT INTO games (uuid, game_name, player1, users_needed) VALUES (?, ?, ?, ?)',
-					[uuid, game_name, player1, users_needed],
+					'INSERT INTO games (uuid, game_type, player1, users_needed) VALUES (?, ?, ?, ?)',
+					[uuid, game_type, player1, users_needed],
 					(err: any) => {
 						err ? reject(err) : resolve(); },
 				);
@@ -219,11 +219,11 @@ async function gameRoutes(app: FastifyInstance) {
 
 		try {
 			const database = db.getDatabase();
-
-			const { uuid } = request.params as { uuid?: string };
+``
+			const { uuid } = request.query as { uuid?: string };
 
 			if (!uuid)
-				throw new Error ("missing uuid in the request body");
+				throw new Error ("missing uuid in the request query");
 
 			const game = await new Promise<Game | null>((resolve, reject) => {
 

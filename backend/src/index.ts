@@ -10,6 +10,7 @@ import multipart from '@fastify/multipart'
 import { db } from './database';
 import { UserService } from './services/userService';
 import { FriendService } from './services/friendService';
+import { GameService } from './services/gameService';
 import authRoutes from "./routes/authentication"
 import gameRoutes from './routes/game';
 import editRoutes from './routes/reset-pwd';
@@ -23,17 +24,19 @@ import { createClient } from 'redis';
 const fastify = Fastify({ logger: { level: 'debug' } });
 
 declare module 'fastify' {
-  interface FastifyInstance {
-    userService: UserService;
-    friendService: FriendService;
-  }
+
+	interface FastifyInstance {
+		userService: UserService;
+		friendService: FriendService;
+		gameService: GameService;
+	}
 }
 
 // Initialisation du client Redis
 export const redis = createClient({
-  url: process.env.REDIS_URL || 'redis://redis:6378'
+	url: process.env.REDIS_URL || 'redis://redis:6378'
 });
-redis.on('error', (err) => console.error('Redis Client Error', err));
+redis.on('error', (err: any) => console.error('Redis Client Error', err));
 redis.connect();
 
 
@@ -49,6 +52,7 @@ async function setup() {
 	console.log('🛠️  Decorating services...');
 	fastify.decorate('userService', new UserService(db.getDatabase()));
 	fastify.decorate('friendService', new FriendService(db.getDatabase()));
+	fastify.decorate('gameService', new GameService(db.getDatabase()));
 	console.log('✅ Services decorated');
 
 	// Register CORS
@@ -96,7 +100,7 @@ async function setup() {
 	console.log('✅ Games routes registered');
 	await fastify.register(friendRoutes, { prefix: "/friend" });
 	console.log('✅ Friend routes registered');
-	
+
 
 	console.log('📡 Registering WebSocket routes...');
 	await fastify.register(require('@fastify/websocket'));

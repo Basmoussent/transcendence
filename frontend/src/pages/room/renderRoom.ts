@@ -29,7 +29,7 @@ export function renderRoom(uuid: string) {
 
 			const username = await fetchUsername();
 			if (username !== undefined) {
-				const render = new Room(username, uuid);
+				new Room(username, uuid);
 			}
 		}
 		catch (err:any) {

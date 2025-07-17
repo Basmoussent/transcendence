@@ -1,6 +1,21 @@
 import { t } from '../../utils/translations';
+import { createAccount } from './class/createAccount'
 
-export function renderCreateAccount(): string {
+export function renderCreateAccount() {
+
+	setTimeout(async () => {
+		console.log('Initializing create-account page');
+		try {
+			new createAccount();
+		}
+		catch (err:any) {
+			console.log(err);
+		}
+	}, 0);
+	return getTemplate();
+}
+
+function getTemplate(): string {
 	return `
 	<div class="login-container">
 		<main class="login-content">

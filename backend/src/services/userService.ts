@@ -1,3 +1,5 @@
+import { redis } from '../index';
+
 interface UserData {
 	id: number;
 	username: string;
@@ -52,5 +54,13 @@ export class UserService {
 			console.log(`le user ${id} n'existe pas`)
 		}
 		return Promise.resolve(null);
+	}
+
+	async isOnline(id: number) {
+		const user = await this.findById(id);
+		if (user) {
+			return redis.get(`alive:${id}`);
+		}
+		return false;
 	}
 }

@@ -20,8 +20,7 @@ ENLEVER LE RELOAD DANS LE CHANGEMENT DE LANGUE
 DOUBLON DE PSEUDO
 je crois y'as du tailwind dans index.html
 mettre tout els jwt.verify dasn des try and catch
-
+mettre une verife de jwt dans le routeur
 la page 404 refresh quand elle redirige vers /main
-bouton home dans /matchmaking ne redirige pas
 
 8M5m

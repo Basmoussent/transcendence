@@ -1,4 +1,3 @@
-import { escape } from 'querystring';
 import { sanitizeHtml } from '../../utils/sanitizer';
 import { fetchMe, fetchUserInfo, loadMe } from './utils';
 
@@ -11,6 +10,7 @@ export interface UserChat {
 }
 
 interface Relation {
+	id: number;
 	user_1: number;
 	user_2: number;
 	user1_state: 'normal' | 'requested' | 'waiting' | 'blocked';
@@ -122,17 +122,18 @@ export class Chat {
 		console.log(`live chat ws event : ${data.type}`)
 		switch (data.type) {
 			case 'chat_message':
+				console.log(`les message ${data.content}`)
 				this.addChatMessage(data.username, data.content);
 				break;
 			case 'friend_list_update':
-				this.updateFriendList();
+				this.updateFriendAndRequest();
 				break;
 			case 'updateUI':
 				this.updateUI();
 				break;
 			case 'system_message':
 				this.addSystemMessage(data.content);
-				this.updateFriendList();
+				this.updateFriendAndRequest();
 				break;
 			case 'debug':
 				console.log(`DEBUG --> ${data.content}`)
@@ -196,11 +197,14 @@ export class Chat {
 
 	private sendChatMessage() {
 		const message = this.chatInput.value.trim();
+
+
+		console.log("le message", message)
 		if (message && this.ws.readyState === WebSocket.OPEN) {
 			this.ws.send(JSON.stringify({
 				type: 'chat_message',
 				dest: this.receiver,
-				content: message
+				content: message,
 			}));
 			this.chatInput.value = '';
 		}
@@ -232,7 +236,7 @@ export class Chat {
 		this.chatMessages.scrollTop = this.chatMessages.scrollHeight;
 	}
 
-	private async updateFriendList() {
+	private async updateFriendAndRequest() {
 
 		var	friends = 0;
 		var	request = 0;
@@ -251,7 +255,6 @@ export class Chat {
 
 			const friendId = relation.user_1 === this.me.userId ? relation.user_2 : relation.user_1;
 
-
 			const friend: UserChat | void = await fetchUserInfo(friendId);
 
 			if (!friend)
@@ -264,7 +267,7 @@ export class Chat {
 					conversationElement.className = 'friend-card online flex items-center';
 					conversationElement.dataset.username = friend.username;
 					conversationElement.innerHTML = `
-	w					<div class="friend-avatar">
+						<div class="friend-avatar">
 							${friend.username.charAt(0).toUpperCase()}
 							<div class="status-dot online"></div>
 						</div>
@@ -275,14 +278,14 @@ export class Chat {
 						<div class="friend-actions">
 							<button class="action-btn chat-btn">
 								<i class="fas fa-comment-dots"></i>
-								</button>
+							</button>
 						</div>
-							`;
+					`;
 				this.friendsList.appendChild(conversationElement);
-				conversationElement.addEventListener('click', () => this.startChatWith(friend));
+				conversationElement.addEventListener('click', () => this.startChatWith(relation.id, friend));
 			}
-			else if ((relation.user_1 === this.me.userId && relation.user1_state === 'waiting') ||
-				(relation.user_2 === this.me.userId && relation.user2_state === 'waiting')) {
+			else if ((relation.user_1 === this.me.userId && relation.user2_state === 'waiting') ||
+				(relation.user_2 === this.me.userId && relation.user1_state === 'waiting')) {
 				request++;
 
 
@@ -326,10 +329,10 @@ export class Chat {
 	}
 
 	private updateUI() {
-		this.updateFriendList()
+		this.updateFriendAndRequest()
 	}
 
-	private startChatWith(user: UserChat) {
+	private startChatWith(relationId: number, user: UserChat) {
 		
 		this.receiver = user.username;
 		this.noChatSelected.style.display = 'none';
@@ -345,17 +348,19 @@ export class Chat {
 			<h3>${sanitizeHtml(user.username)}</h3>
 			<p>En ligne</p>
 		</div>
-		<button class="close-chat-btn ml-auto">
-			<i class="fas fa-times"></i>
-		</button>
 		`;
 
-		this.chatMessages.innerHTML = '';
+		this.chatMessages.innerHTML = this.loadChatHistory(relationId, user); // à compléter
 
-		this.ws.send(JSON.stringify({
-			type: 'fetch_history',
-			with_user: user.username
-		}));
+	}
+
+	private loadChatHistory(relationId: number, user:UserChat): string {
+
+		const conversation = ''
+		// recuperer tous les messages de cette relation
+		// boucler dessus et append dans la conversation tous les messages en fonction de qui a envoyé
+
+		return conversation;
 	}
 }
 
@@ -374,6 +379,7 @@ async function fetchUserRelations(userid: number): Promise<Relation[]|null> {
 
 		if (response.ok) {
 			const relations: Relation[] = result.relations.map((relation:any) => ({
+				id: relation.id,
 				user_1: relation.user_1,
 				user_2: relation.user_2,
 				user1_state: relation.user1_state,

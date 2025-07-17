@@ -1,4 +1,5 @@
 interface Relation {
+	id: number;
 	user_1: number;
 	user_2: number;
 	user1_state: 'normal' | 'requested' | 'waiting' | 'blocked';
@@ -48,5 +49,21 @@ export class FriendService {
 		catch (err: any) {
 			console.log(`fail de creer une relation `)
 		}
+	}
+
+	async acceptRelation(relationId: number) {
+		try {
+			await new Promise<void>((resolve, reject) => {
+				this.db.run(
+					'UPDATE friends SET user1_state = ?, user2_state = ? WHERE id = ?',
+					[ 'normal', 'normal', relationId ],
+					(err: any) => {
+					err ? reject(err) : resolve();
+			})});
+		}
+		catch (err: any) {
+			console.log(`fail accepter l'amitié; friends(${relationId}) `)
+		}
+
 	}
 }

@@ -1,9 +1,9 @@
 CREATE TABLE IF NOT EXISTS users (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
-  username TEXT NOT NULL,
-  email TEXT NOT NULL,
+  username TEXT UNIQUE NOT NULL,
+  email TEXT UNIQUE NOT NULL,
   password_hash TEXT NOT NULL,
-  two_fact_auth BOOLEAN DEFAULT false/^\d{6}$/.test(code);,
+  two_fact_auth BOOLEAN DEFAULT false,
   secret_key VARCHAR DEFAULT NULL,
   avatar_url TEXT,
   language VARCHAR DEFAULT 'fr',
@@ -13,7 +13,7 @@ CREATE TABLE IF NOT EXISTS users (
 CREATE TABLE IF NOT EXISTS games (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   uuid TEXT UNIQUE NOT NULL,
-  game_name TEXT NOT NULL,
+  game_type TEXT NOT NULL,
   player1 TEXT NOT NULL,
   player2 TEXT,
   player3 TEXT,

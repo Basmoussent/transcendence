@@ -1,0 +1,200 @@
+import { FastifyInstance, FastifyRequest } from 'fastify';
+import { WebSocket } from 'ws';
+
+interface UserChat {
+	username: string;
+	userId: number;
+	email: string;
+	avatar_url?: string;
+	socket: WebSocket;
+}
+
+interface UserData {
+	id: number;
+	username: string;
+	email: string;
+	avatar_url?: string;
+	language: string;
+}
+
+interface Relation {
+	id: number | -1;
+	user_1: number;
+	user_2: number;
+	user1_state: 'normal' | 'requested' | 'waiting' | 'blocked';
+	user2_state: 'normal' | 'requested' | 'waiting' | 'blocked';
+}
+
+const live = new Map<string, UserChat>();
+
+export function handleChat(app: FastifyInstance, socket: WebSocket, req: FastifyRequest) {
+	const token = req.headers['x-access-token'] ? req.headers['x-access-token'] : req.cookies['x-access-token']; 
+
+	if (!token) {
+		// socket.send(JSON.stringify({
+		// 	type: 'notLog',
+		// 	message: 'the user is not log' }))
+		// return ;
+	}
+
+	const decoded = app.jwt.verify(token as string) as { user: string, name: string };
+	const username = decoded.name;
+
+	loadMe(app, username).then((tmp: UserData) => {
+
+		console.log('les infos valent', tmp);
+		const user: UserChat = {
+			username: username,
+			userId: tmp.id,
+			email: tmp.email,
+			avatar_url: tmp.avatar_url || "../uploads/avatar3.png",
+			socket: socket,
+		};
+		live.set(user.username, user);
+	});
+
+	// dire a tous ceux dont user.username est ami d'update leur UI
+
+	socket.on('message', (message: string) => {
+		try {
+			const data = JSON.parse(message);
+
+			const sender = live.get(username)!;
+
+			// attention envoyer l'id plutot psque si la personne change de username on trouve plus ?
+
+			switch (data.type) {
+				case 'chat_message':
+					sendChatMessage(username, data)
+					break;
+				
+				case 'friend_request':
+					addFriend(app, sender, data.dest);
+					break;
+				case 'accept_friend_request':
+					console.log("dans le bueno accept_friend_request")
+					acceptFriend(app, sender, data.dest)
+
+					// fonction pour handle
+					break;
+				case 'decline_friend_request':
+					console.log("dans le bueno decline_friend_request")
+					// fonction pour handle
+					break;
+				case 'disconnection':
+					live.delete(sender.username);
+					console.log('je disconnect le user')
+					break;
+				default:
+					console.warn(`recoit un event inconnu`)
+			}
+		}
+		catch (error) {
+			console.error('Invalid message format:', error);
+		}
+	});
+
+	socket.on('close', () => {
+		live.delete(username);
+	});
+}
+
+async function loadMe(app: FastifyInstance, username: string): Promise<UserData> {
+	return await app.userService.findByUsername(username);
+}
+
+function sendChatMessage(username: string, data: any) {
+
+	// check que le destinataire fait partie de sa liste d'amis 
+
+	const message = JSON.stringify({
+		type: 'chat_message',
+		username: username,
+		content: data.content,
+	});
+	// envoie au destinataire
+	live.get(data.dest)?.socket.send(message);
+}
+
+async function addFriend(app: FastifyInstance, user: UserChat, friendName: string) {
+
+	if (friendName === user.username) {
+		const message = JSON.stringify({
+			type: 'debug',
+			content: 'you cannot add yourself as a friend dumbass'
+		});
+		user.socket.send(message)
+		return;
+	}
+
+	// 1 - check que le user exist
+	const friend = await app.userService.findByUsername(friendName);
+	if (!friend) {
+		const message = JSON.stringify({
+			type: 'debug',
+			content: 'user not found'
+		});
+		user.socket.send(message)
+		return;
+	}
+	
+		
+	// 2 - check si une relation n'existe pas déjà
+	const relations: Relation[] = await app.friendService.getRelations(user.userId);
+
+	relations.forEach((rel, index) => {
+			console.log(`Relation ${index + 1}:
+		- User 1: ${rel.user_1} (state: ${rel.user1_state})
+		- User 2: ${rel.user_2} (state: ${rel.user2_state})
+		`);
+	});
+
+	const relation = relations.find(rel => rel.user_1 === friend.id || rel.user_2 === friend.id);
+
+	if (relation) {
+		user.socket.send(JSON.stringify({
+			type: 'updateUI',
+			message: `tu l'as déjà en amis` }))
+		// 3 - check que l'un des deux n'a pas bloqué l'autre
+		// 4 - check que l'invitation n'a pas déjà été faites || l'autre l'a déjà ajouté au quel cas on normalise la relation
+		// identifie quel est l'état de la relation et envoyer un msg en fonction
+		return;
+	}
+
+
+	// 5 - envoyer une demande + creer l'instance dans db friends avec userid des deux personnes
+	//	 |__ update l'état, qui a ajouté qui
+	await app.friendService.createRelation(user.userId, friend.id, 'waiting', 'requested');
+
+	
+	console.log(`${user.username} requested ${friendName} to be friends`)
+	// send au user le statut de la demande
+	user.socket.send(JSON.stringify({
+		type: 'updateUI',
+		message: 'new friend relation' }))
+	// send au friend l'invitation s'il est connecte
+	// dans update UI livechat -- onglet demandes
+	// on passe sur tous les friends du user et afficher seulement les instances ou le state de l'autre user est à `asking`
+}
+
+async function acceptFriend(app: FastifyInstance, user: UserChat, friendName: string) {
+
+	const friend = await app.userService.findByUsername(friendName);
+	const relations: Relation[] = await app.friendService.getRelations(user.userId);
+	const relation = relations.find(rel => rel.user_1 === friend.id || rel.user_2 === friend.id);
+
+	if (!relation || relation.id === -1) {
+		console.error(`couldnt find the relation to accept friendship`);
+		return;
+	}
+	app.friendService.acceptRelation(relation.id)
+	const message = JSON.stringify({
+		type: 'updateUI'
+	});
+
+	// faire update l'interface aux deux users
+	user.socket.send(message)
+	live.get(friend.username)?.socket.send(message);
+}
+
+

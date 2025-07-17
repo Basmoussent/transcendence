@@ -7,7 +7,7 @@ export function renderMatchmaking() {
 	setTimeout(async () => {
 		console.log('Initializing matchmaking page');
 		try {
-			const render = new matchmaking();
+			new matchmaking();
 		}
 		catch (err:any) {
 			console.log(err);

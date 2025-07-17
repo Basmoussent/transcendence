@@ -567,6 +567,14 @@ const getTemplate = () => {
         .close-chat-btn:hover {
             background: rgba(255, 255, 255, 0.2);
         }
+
+        .flex {
+            display: flex;
+        }
+
+        .items-center {
+            align-items: center;
+        }
     </style>
 	`;
 };
