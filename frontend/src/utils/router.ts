@@ -28,7 +28,7 @@ export async function router() {
 	const app = document.getElementById('app');
 	if (!app) return;
 
-	const publicRoutes = ['/', '/lang','/login', '/create-account', '/forgot-password'];
+	const publicRoutes = ['/', '/lang','/login', '/create-account', '/forgot-password', '/block', '/block1v1'];
 	const token = getAuthToken();
 
 	let uuid: string = '';
