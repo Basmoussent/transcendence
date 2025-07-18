@@ -47,7 +47,7 @@ export async function router() {
 		uuid = path.substring(it + 1);
 		path = path.substring(0, it);
 	}
-	
+
 	if (!publicRoutes.includes(path) && !token) {
 		window.history.pushState({}, '', '/login');
 		app.innerHTML = renderLogin();

@@ -2,494 +2,654 @@ import { getAuthToken } from '../../utils/auth';
 import { sanitizeHtml } from '../../utils/sanitizer';
 import { t } from '../../utils/translations';
 
-export async function renderFriends(uuid: string){
-  // Données d'exemple pour un ami (à remplacer par un appel API réel)
-  let friendData = {
-    username: 'FriendUsername',
-    avatar: 'avatar3.png',
-    wins: 15,
-    games: 25,
-    rating: 1250,
-    status: 'online'
-  };
+export async function renderFriends(uuid: string) {
 
-  // TODO: Récupérer l'ID de l'ami depuis l'URL ou les paramètres
-  // const friendId = getFriendIdFromUrl();
-  
-  try {
-    // TODO: Remplacer par un vrai appel API pour récupérer les données de l'ami
-    // const response = await fetch(`/api/friends/${friendId}`, {
-    //   method: 'GET',
-    //   headers: {
-    //     'Content-Type': 'application/json',
-    //     'x-access-token': token
-    //   }
-    // });
-    
-    // if (response.ok) {
-    //   const result = await response.json();
-    //   friendData = {
-    //     username: sanitizeHtml(result.username) || 'FriendUsername',
-    //     avatar: sanitizeHtml(result.avatar_url) || 'avatar.png',
-    //     wins: (result.stats?.wins) || 0,
-    //     games: (result.stats?.games) || 0,
-    //     rating: (result.stats?.rating) || 0,
-    //     status: result.status || 'offline',
-    //     lastSeen: result.last_seen || 'Unknown'
-    //   };
-    // } else {
-    //   console.error('Erreur lors de la récupération des données de l\'ami');
-    // }
-  } catch (error) {
-    console.error("Error rendering friend profile page:", error);
-  }
+	try {
+		const user = await loadUserInfo(uuid);
+		console.log(JSON.stringify(user, null, 8));
 
-  // Construire l'URL de l'avatar
-  const avatarUrl = friendData.avatar.startsWith('http') || friendData.avatar.startsWith('/api/') 
-    ? friendData.avatar 
-    : `../uploads/${friendData.avatar}`;
+	}
+	catch (error) {
+		console.error("Error rendering friend profile page:", error);
+	}
 
-  const htmlContent = `
-    <div class="friend-profile-page">
-      <div class="background-circles">
-        <div class="circle circle-1"></div>
-        <div class="circle circle-2"></div>
-        <div class="circle circle-3"></div>
-        <div class="circle circle-4"></div>
-      </div>
-      
-      <div class="friend-profile-container">
-        <div class="friend-profile-header">
-          <button class="back-button" id="backButton">
-            <i class="fas fa-arrow-left"></i>
-            ${t('friends.backToSocial') || 'Retour'}
-          </button>
-          
-          <div class="friend-profile-avatar">
-            <img src="${avatarUrl}" alt="Friend Avatar" class="avatar-image" onerror="this.src='../../public/avatar.png'">
-            <div class="status-indicator ${friendData.status}">
-              <i class="fas fa-circle"></i>
-            </div>
-          </div>
-          
-          <div class="friend-profile-info">
-            <h1 class="friend-username">${friendData.username}</h1>
-            <div class="friend-status ${friendData.status}">
-              <i class="fas fa-circle"></i>
-              ${friendData.status === 'online' ? (t('friends.online') || 'En ligne') : (t('friends.offline') || 'Hors ligne')}
-              ${friendData.status === 'offline' ? ` - ${t('friends.lastSeen') || 'Vu'} ${friendData.lastSeen}` : ''}
-            </div>
-          </div>
-        </div>
+	return (getTemplate())
+}
 
-        <div class="friend-profile-stats">
-          <div class="stat-card">
-            <i class="fas fa-trophy"></i>
-            <div class="stat-info">
-              <span class="stat-value">${friendData.wins}</span>
-              <span class="stat-label">${t('friends.stats.wins') || 'Victoires'}</span>
-            </div>
-          </div>
-          <div class="stat-card">
-            <i class="fas fa-gamepad"></i>
-            <div class="stat-info">
-              <span class="stat-value">${friendData.games}</span>
-              <span class="stat-label">${t('friends.stats.games') || 'Parties'}</span>
-            </div>
-          </div>
-          <div class="stat-card">
-            <i class="fas fa-star"></i>
-            <div class="stat-info">
-              <span class="stat-value">${friendData.rating}</span>
-              <span class="stat-label">${t('friends.stats.rating') || 'Classement'}</span>
-            </div>
-          </div>
-        </div>
 
-        <div class="friend-profile-actions">
-          <button class="action-button send-message" id="sendMessageBtn">
-            <i class="fas fa-comment"></i>
-            ${t('friends.sendMessage') || 'Envoyer un message'}
-          </button>
-          <button class="action-button invite-game" id="inviteGameBtn" ${friendData.status === 'offline' ? 'disabled' : ''}>
-            <i class="fas fa-gamepad"></i>
-            ${t('friends.inviteToGame') || 'Inviter à jouer'}
-          </button>
-          <button class="action-button remove-friend" id="removeFriendBtn">
-            <i class="fas fa-user-minus"></i>
-            ${t('friends.removeFriend') || 'Retirer des amis'}
-          </button>
-        </div>
-      </div>
-    </div>
 
-    <style>
-      .friend-profile-page {
-        min-height: 100vh;
-        background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-        padding: 20px;
-        position: relative;
-        overflow: auto;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-      }
+async function loadUserInfo(username: string) {
 
-      .background-circles {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        z-index: 1;
-        pointer-events: none;
-      }
+	try {
+		const token = getAuthToken();
+		if (!token) {
+			alert('❌ Token d\'authentification manquant');
+			window.history.pushState({}, '', '/login');
+			window.dispatchEvent(new PopStateEvent('popstate'));
+			return '';
+		}
 
-      .circle {
-        position: absolute;
-        border-radius: 50%;
-        background: rgba(255, 255, 255, 0.05);
-        backdrop-filter: blur(5px);
-      }
+		const response = await fetch(`/api/user/username/?username=${username}`, {
+			method: 'GET',
+			headers: {
+				'Content-Type': 'application/json',
+				'x-access-token': token }
+		});
+	
+		if (response.ok) {
+			const result = await response.json();
+			const userData = {
+				id: result.data?.id,
+				username: sanitizeHtml(result.data?.username),
+				email: sanitizeHtml(result.data?.email),
+				avatar: sanitizeHtml(result.data?.avatar_url) || 'avatar.png',
+			};
+			return (userData);
+		}
+		else 
+			console.error('Erreur lors de la récupération des données utilisateur');
 
-      .circle-1 {
-        width: 300px;
-        height: 300px;
-        top: -100px;
-        left: -100px;
-        background: linear-gradient(135deg, rgba(74, 144, 226, 0.1) 0%, rgba(53, 122, 189, 0.1) 100%);
-      }
 
-      .circle-2 {
-        width: 200px;
-        height: 200px;
-        top: 50%;
-        right: -50px;
-        background: linear-gradient(135deg, rgba(46, 204, 113, 0.1) 0%, rgba(39, 174, 96, 0.1) 100%);
-      }
+	}
+	catch (err) {
+		console.error(`error retreve info du user pour render son profil  ${err}`);
+	}
+}
 
-      .circle-3 {
-        width: 250px;
-        height: 250px;
-        bottom: -100px;
-        left: 20%;
-        background: linear-gradient(135deg, rgba(231, 76, 60, 0.1) 0%, rgba(192, 57, 43, 0.1) 100%);
-      }
+function getTemplate() {
+	return `
+		<button class="home-button" id="homeBtn">
+			<i class="fas fa-home"></i>
+			Home
+		</button>
+		
+		<button class="home-button" onclick="goHome()">
+        <i class="fas fa-home"></i>
+        Home
+		</button>
 
-      .circle-4 {
-        width: 150px;
-        height: 150px;
-        top: 20%;
-        left: 30%;
-        background: linear-gradient(135deg, rgba(155, 89, 182, 0.1) 0%, rgba(142, 68, 173, 0.1) 100%);
-      }
+		<div class="container">
+			<div class="profile-header">
+			<div class="profile-banner">
+				<div class="profile-avatar">
+				<i class="fas fa-user"></i>
+				</div>
+			</div>
+			<div class="profile-info">
+				<div class="profile-details">
+				<h1>Alexandre Durand</h1>
+				<div class="profile-status">
+					<div class="status-dot"></div>
+					<span>En ligne</span>
+				</div>
+				</div>
+				<div class="profile-actions">
+				<button class="action-btn btn-primary">
+					<i class="fas fa-user-plus"></i>
+					Ajouter ami
+				</button>
+				<button class="action-btn btn-secondary">
+					<i class="fas fa-envelope"></i>
+					Message
+				</button>
+				</div>
+			</div>
+			</div>
 
-      .friend-profile-container {
-        position: relative;
-        z-index: 2;
-        width: 90%;
-        max-width: 800px;
-        background: rgba(255, 255, 255, 0.1);
-        backdrop-filter: blur(10px);
-        border-radius: 20px;
-        padding: 30px;
-        box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
-        border: 1px solid rgba(255, 255, 255, 0.18);
-        animation: fadeIn 0.5s ease-out;
-        overflow: auto;
-      }
+			<div class="profile-content">
+			<div class="profile-section">
+				<div class="section-header">
+				<i class="fas fa-chart-bar"></i>
+				<h2>Statistiques</h2>
+				</div>
+				<div class="stats-grid">
+				<div class="stat-card">
+					<div class="stat-number">1,247</div>
+					<div class="stat-label">Parties jouées</div>
+				</div>
+				<div class="stat-card">
+					<div class="stat-number">68%</div>
+					<div class="stat-label">Taux de victoire</div>
+				</div>
+				<div class="stat-card">
+					<div class="stat-number">2,150</div>
+					<div class="stat-label">Score total</div>
+				</div>
+				<div class="stat-card">
+					<div class="stat-number">42</div>
+					<div class="stat-label">Rang mondial</div>
+				</div>
+				</div>
+			</div>
 
-      .back-button {
-        position: absolute;
-        top: 20px;
-        left: 20px;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        padding: 10px 15px;
-        border: none;
-        border-radius: 10px;
-        background: rgba(255, 255, 255, 0.1);
-        color: white;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        font-size: 0.9em;
-        text-decoration: none;
-      }
+			
 
-      .back-button:hover {
-        background: rgba(255, 255, 255, 0.2);
-        transform: translateX(-2px);
-      }
+			<div class="profile-section">
+				<div class="section-header">
+				<i class="fas fa-history"></i>
+				<h2>Activité récente</h2>
+				</div>
+				<div class="recent-activity">
+				<div class="activity-item">
+					<div class="activity-icon">
+					<i class="fas fa-gamepad"></i>
+					</div>
+					<div class="activity-content">
+					<h4>Partie de Pong remportée</h4>
+					<p>Victoire contre Marie_G dans une partie serrée</p>
+					</div>
+					<div class="activity-time">Il y a 2h</div>
+				</div>
+				<div class="activity-item">
+					<div class="activity-icon">
+					<i class="fas fa-trophy"></i>
+					</div>
+					<div class="activity-content">
+					<h4>Nouveau succès débloqué</h4>
+					<p>Succès "Série de feu" obtenu</p>
+					</div>
+					<div class="activity-time">Il y a 1 jour</div>
+				</div>
+				<div class="activity-item">
+					<div class="activity-icon">
+					<i class="fas fa-users"></i>
+					</div>
+					<div class="activity-content">
+					<h4>Nouvel ami ajouté</h4>
+					<p>Thomas_42 a accepté votre demande d'ami</p>
+					</div>
+					<div class="activity-time">Il y a 3 jours</div>
+				</div>
+				</div>
+			</div>
 
-      .friend-profile-header {
-        display: flex;
-        align-items: center;
-        gap: 30px;
-        margin-bottom: 40px;
-        margin-top: 20px;
-      }
-
-      .friend-profile-avatar {
-        position: relative;
-      }
-
-      .avatar-image {
-        width: 120px;
-        height: 120px;
-        border-radius: 50%;
-        border: 4px solid rgba(255, 255, 255, 0.2);
-        object-fit: cover;
-      }
-
-      .status-indicator {
-        position: absolute;
-        bottom: 5px;
-        right: 5px;
-        width: 25px;
-        height: 25px;
-        border-radius: 50%;
-        border: 3px solid rgba(255, 255, 255, 0.1);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-      }
-
-      .status-indicator.online {
-        background: #2ecc71;
-      }
-
-      .status-indicator.offline {
-        background: #95a5a6;
-      }
-
-      .status-indicator i {
-        color: white;
-        font-size: 0.8em;
-      }
-
-      .friend-profile-info {
-        color: white;
-        flex: 1;
-      }
-
-      .friend-username {
-        font-size: 2em;
-        margin: 0;
-        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-      }
-
-      .friend-status {
-        display: inline-flex;
-        align-items: center;
-        gap: 5px;
-        padding: 5px 10px;
-        border-radius: 15px;
-        font-size: 0.9em;
-        margin-top: 5px;
-      }
-
-      .friend-status.online {
-        background: rgba(46, 204, 113, 0.2);
-        color: #2ecc71;
-      }
-
-      .friend-status.offline {
-        background: rgba(149, 165, 166, 0.2);
-        color: #95a5a6;
-      }
-
-      .friend-profile-stats {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 15px;
-        margin-bottom: 30px;
-      }
-
-      .stat-card {
-        background: rgba(255, 255, 255, 0.05);
-        border-radius: 15px;
-        padding: 15px;
-        display: flex;
-        align-items: center;
-        gap: 15px;
-        color: white;
-      }
-
-      .stat-card i {
-        font-size: 1.5em;
-        color: #4a90e2;
-      }
-
-      .stat-info {
-        display: flex;
-        flex-direction: column;
-      }
-
-      .stat-value {
-        font-size: 1.3em;
-        font-weight: bold;
-      }
-
-      .stat-label {
-        color: #ccc;
-        font-size: 0.9em;
-      }
-
-      .friend-profile-actions {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 15px;
-        margin-bottom: 30px;
-      }
-
-      .action-button {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 8px;
-        padding: 12px;
-        border: none;
-        border-radius: 12px;
-        color: white;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        font-weight: 600;
-        font-size: 0.9em;
-      }
-
-      .action-button:disabled {
-        opacity: 0.5;
-        cursor: not-allowed;
-      }
-
-      .send-message {
-        background: linear-gradient(135deg, #4a90e2 0%, #357abd 100%);
-      }
-
-      .invite-game {
-        background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
-      }
-
-      .remove-friend {
-        background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
-      }
-
-      .action-button:hover:not(:disabled) {
-        transform: translateY(-2px);
-        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-      }
-
-      @keyframes fadeIn {
-        from {
-          opacity: 0;
-          transform: translateY(20px);
-        }
-        to {
-          opacity: 1;
-          transform: translateY(0);
-        }
-      }
-
-      @media (max-width: 768px) {
-        .friend-profile-container {
-          padding: 20px;
+			<div class="profile-section friends-section">
+				<div class="section-header">
+				<i class="fas fa-users"></i>
+				<h2>Amis</h2>
+				</div>
+				<div class="friends-grid">
+				<div class="friend-card">
+					<div class="friend-avatar">M</div>
+					<div class="friend-name">Marie_G</div>
+					<div class="friend-status">En partie</div>
+				</div>
+				<div class="friend-card">
+					<div class="friend-avatar">T</div>
+					<div class="friend-name">Thomas_42</div>
+					<div class="friend-status">En ligne</div>
+				</div>
+				<div class="friend-card">
+					<div class="friend-avatar">S</div>
+					<div class="friend-name">Sophie_K</div>
+					<div class="friend-status">En ligne</div>
+				</div>
+				<div class="friend-card">
+					<div class="friend-avatar">L</div>
+					<div class="friend-name">Lucas_Dev</div>
+					<div class="friend-status">Absent</div>
+				</div>
+				</div>
+			</div>
+			</div>
+		</div>
+			
+	<style>
+        * {
+		margin: 0;
+		padding: 0;
+		box-sizing: border-box;
         }
 
-        .friend-profile-header {
-          flex-direction: column;
-          text-align: center;
-          gap: 20px;
+        body {
+		font-family: 'Arial', sans-serif;
+		background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+		min-height: 100vh;
+		color: white;
+		position: relative;
+		overflow-x: hidden;
         }
 
-        .friend-profile-stats {
-          grid-template-columns: 1fr;
+        body::before {
+		content: '';
+		position: fixed;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 100%;
+		background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M 10 0 L 0 0 0 10" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="1"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
+		z-index: -1;
         }
 
-        .friend-profile-actions {
-          grid-template-columns: 1fr;
+        .home-button {
+		position: fixed;
+		top: 20px;
+		left: 20px;
+		padding: 10px 15px;
+		font-size: 1em;
+		border: none;
+		border-radius: 10px;
+		background: rgba(255, 255, 255, 0.1);
+		color: white;
+		display: flex;
+		align-items: center;
+		gap: 8px;
+		cursor: pointer;
+		transition: all 0.3s ease;
+		z-index: 100;
         }
 
-        .friend-username {
-          font-size: 1.8em;
+        .home-button:hover {
+		background: rgba(255, 255, 255, 0.2);
+		transform: translateY(-2px);
         }
 
-        .avatar-image {
-          width: 100px;
-          height: 100px;
+        .container {
+		max-width: 1200px;
+		margin: 0 auto;
+		padding: 20px;
+		padding-top: 80px;
         }
 
-        .back-button {
-          position: relative;
-          top: auto;
-          left: auto;
-          align-self: flex-start;
-          margin-bottom: 20px;
-        }
-      }
-
-      @media (max-width: 480px) {
-        .friend-profile-container {
-          padding: 15px;
+        .profile-header {
+		background: rgba(255, 255, 255, 0.1);
+		backdrop-filter: blur(20px);
+		border-radius: 20px;
+		padding: 30px;
+		margin-bottom: 30px;
+		border: 1px solid rgba(255, 255, 255, 0.2);
+		box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+		animation: slideDown 0.8s ease-out;
         }
 
-        .friend-username {
-          font-size: 1.5em;
+        .profile-banner {
+		position: relative;
+		height: 200px;
+		background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+		border-radius: 15px;
+		margin-bottom: 20px;
+		overflow: hidden;
         }
 
-        .avatar-image {
-          width: 80px;
-          height: 80px;
+        .profile-banner::before {
+		content: '';
+		position: absolute;
+		top: 0;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="20" cy="20" r="2" fill="rgba(255,255,255,0.1)"/><circle cx="80" cy="40" r="3" fill="rgba(255,255,255,0.1)"/><circle cx="40" cy="70" r="1.5" fill="rgba(255,255,255,0.1)"/><circle cx="70" cy="80" r="2.5" fill="rgba(255,255,255,0.1)"/></svg>');
+		animation: float 6s ease-in-out infinite;
         }
 
-        .status-indicator {
-          width: 20px;
-          height: 20px;
+        .profile-avatar {
+		position: absolute;
+		bottom: -30px;
+		left: 30px;
+		width: 120px;
+		height: 120px;
+		border-radius: 50%;
+		background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+		border: 5px solid rgba(255, 255, 255, 0.2);
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		font-size: 2.5em;
+		font-weight: bold;
+		box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+		transition: all 0.3s ease;
         }
-      }
-    </style>
-  `;
 
-  setTimeout(() => {
-    const backButton = document.getElementById('backButton');
-    const sendMessageBtn = document.getElementById('sendMessageBtn');
-    const inviteGameBtn = document.getElementById('inviteGameBtn');
-    const removeFriendBtn = document.getElementById('removeFriendBtn');
-
-    if (backButton) {
-      backButton.addEventListener('click', () => {
-        window.history.pushState({}, '', '/social');
-        window.dispatchEvent(new PopStateEvent('popstate'));
-      });
-    }
-
-    if (sendMessageBtn) {
-      sendMessageBtn.addEventListener('click', () => {
-        // TODO: Implémenter l'envoi de message
-        alert('Fonctionnalité de message à implémenter');
-      });
-    }
-
-    if (inviteGameBtn) {
-      inviteGameBtn.addEventListener('click', () => {
-        if (friendData.status === 'online') {
-          // TODO: Implémenter l'invitation à jouer
-          alert('Invitation à jouer envoyée !');
+        .profile-avatar:hover {
+		transform: scale(1.05);
+		box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
         }
-      });
-    }
 
-    if (removeFriendBtn) {
-      removeFriendBtn.addEventListener('click', () => {
-        if (confirm('Êtes-vous sûr de vouloir retirer cet ami de votre liste d\'amis ?')) {
-          // TODO: Implémenter la suppression d'ami
-          alert('Ami retiré de la liste');
-          window.history.pushState({}, '', '/social');
-          window.dispatchEvent(new PopStateEvent('popstate'));
+        .profile-info {
+		margin-top: 40px;
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
         }
-      });
-    }
-  }, 0);
 
-  return htmlContent;
+        .profile-details h1 {
+		font-size: 2.5em;
+		margin-bottom: 10px;
+		background: linear-gradient(135deg, #60A5FA 0%, #3B82F6 100%);
+		-webkit-background-clip: text;
+		-webkit-text-fill-color: transparent;
+		background-clip: text;
+        }
+
+        .profile-meta {
+		display: flex;
+		gap: 20px;
+		margin-bottom: 15px;
+        }
+
+        .meta-item {
+		display: flex;
+		align-items: center;
+		gap: 8px;
+		color: rgba(255, 255, 255, 0.8);
+        }
+
+        .profile-status {
+		display: flex;
+		align-items: center;
+		gap: 8px;
+		padding: 8px 15px;
+		background: rgba(16, 185, 129, 0.2);
+		border-radius: 20px;
+		border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+
+        .status-dot {
+		width: 12px;
+		height: 12px;
+		border-radius: 50%;
+		background: #10B981;
+		animation: pulse 2s infinite;
+        }
+
+        .profile-actions {
+		display: flex;
+		gap: 15px;
+        }
+
+        .action-btn {
+		padding: 12px 20px;
+		border: none;
+		border-radius: 10px;
+		font-size: 1em;
+		font-weight: bold;
+		color: white;
+		cursor: pointer;
+		transition: all 0.3s ease;
+		display: flex;
+		align-items: center;
+		gap: 8px;
+        }
+
+        .btn-primary {
+		background: linear-gradient(135deg, #3B82F6 0%, #1D4ED8 100%);
+        }
+
+        .btn-secondary {
+		background: rgba(255, 255, 255, 0.1);
+		border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .action-btn:hover {
+		transform: translateY(-2px);
+		box-shadow: 0 8px 20px rgba(59, 130, 246, 0.3);
+        }
+
+        .profile-content {
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		gap: 30px;
+        }
+
+        .profile-section {
+		background: rgba(255, 255, 255, 0.1);
+		backdrop-filter: blur(20px);
+		border-radius: 15px;
+		padding: 25px;
+		border: 1px solid rgba(255, 255, 255, 0.2);
+		box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+		animation: slideUp 0.8s ease-out;
+        }
+
+        .section-header {
+		display: flex;
+		align-items: center;
+		gap: 10px;
+		margin-bottom: 20px;
+        }
+
+        .section-header h2 {
+		font-size: 1.5em;
+		color: white;
+        }
+
+        .section-header i {
+		color: #60A5FA;
+		font-size: 1.2em;
+        }
+
+        .stats-grid {
+		display: grid;
+		grid-template-columns: repeat(2, 1fr);
+		gap: 15px;
+        }
+
+        .stat-card {
+		background: rgba(255, 255, 255, 0.1);
+		border-radius: 10px;
+		padding: 20px;
+		text-align: center;
+		transition: all 0.3s ease;
+		border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .stat-card:hover {
+		transform: translateY(-5px);
+		box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+		background: rgba(255, 255, 255, 0.15);
+        }
+
+        .stat-number {
+		font-size: 2em;
+		font-weight: bold;
+		color: #60A5FA;
+		margin-bottom: 5px;
+        }
+
+        .stat-label {
+		color: rgba(255, 255, 255, 0.8);
+		font-size: 0.9em;
+        }
+
+        .achievement-list {
+		display: flex;
+		flex-direction: column;
+		gap: 15px;
+        }
+
+        .achievement-item {
+		display: flex;
+		align-items: center;
+		gap: 15px;
+		padding: 15px;
+		background: rgba(255, 255, 255, 0.1);
+		border-radius: 10px;
+		transition: all 0.3s ease;
+		border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .achievement-item:hover {
+		transform: translateX(5px);
+		background: rgba(255, 255, 255, 0.15);
+        }
+
+        .achievement-icon {
+		width: 50px;
+		height: 50px;
+		border-radius: 50%;
+		background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%);
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		font-size: 1.2em;
+		color: white;
+        }
+
+        .achievement-info h3 {
+		color: white;
+		margin-bottom: 5px;
+        }
+
+        .achievement-info p {
+		color: rgba(255, 255, 255, 0.7);
+		font-size: 0.9em;
+        }
+
+        .recent-activity {
+		display: flex;
+		flex-direction: column;
+		gap: 15px;
+        }
+
+        .activity-item {
+		display: flex;
+		align-items: center;
+		gap: 15px;
+		padding: 15px;
+		background: rgba(255, 255, 255, 0.1);
+		border-radius: 10px;
+		border-left: 4px solid #3B82F6;
+		transition: all 0.3s ease;
+        }
+
+        .activity-item:hover {
+		transform: translateX(5px);
+		background: rgba(255, 255, 255, 0.15);
+        }
+
+        .activity-icon {
+		width: 40px;
+		height: 40px;
+		border-radius: 50%;
+		background: rgba(59, 130, 246, 0.2);
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		color: #60A5FA;
+        }
+
+        .activity-content {
+		flex: 1;
+        }
+
+        .activity-content h4 {
+		color: white;
+		margin-bottom: 5px;
+        }
+
+        .activity-content p {
+		color: rgba(255, 255, 255, 0.7);
+		font-size: 0.9em;
+        }
+
+        .activity-time {
+		color: rgba(255, 255, 255, 0.5);
+		font-size: 0.8em;
+        }
+
+        .friends-section {
+		grid-column: 1 / -1;
+        }
+
+        .friends-grid {
+		display: grid;
+		grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+		gap: 20px;
+        }
+
+        .friend-card {
+		background: rgba(255, 255, 255, 0.1);
+		border-radius: 15px;
+		padding: 20px;
+		text-align: center;
+		transition: all 0.3s ease;
+		border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .friend-card:hover {
+		transform: translateY(-5px);
+		box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+		background: rgba(255, 255, 255, 0.15);
+        }
+
+        .friend-avatar {
+		width: 60px;
+		height: 60px;
+		border-radius: 50%;
+		background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%);
+		margin: 0 auto 10px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		font-size: 1.5em;
+		color: white;
+		font-weight: bold;
+        }
+
+        .friend-name {
+		color: white;
+		font-weight: bold;
+		margin-bottom: 5px;
+        }
+
+        .friend-status {
+		color: rgba(255, 255, 255, 0.7);
+		font-size: 0.9em;
+        }
+
+        @keyframes slideDown {
+		from {
+			opacity: 0;
+			transform: translateY(-30px);
+		}
+		to {
+			opacity: 1;
+			transform: translateY(0);
+		}
+        }
+
+        @keyframes slideUp {
+		from {
+			opacity: 0;
+			transform: translateY(30px);
+		}
+		to {
+			opacity: 1;
+			transform: translateY(0);
+		}
+        }
+
+        @keyframes pulse {
+		0%, 100% { opacity: 1; }
+		50% { opacity: 0.5; }
+        }
+
+        @keyframes float {
+		0%, 100% { transform: translateY(0px); }
+		50% { transform: translateY(-10px); }
+        }
+
+        @media (max-width: 768px) {
+		.profile-content {
+			grid-template-columns: 1fr;
+		}
+
+		.profile-info {
+			flex-direction: column;
+			align-items: flex-start;
+			gap: 20px;
+		}
+
+		.profile-actions {
+			width: 100%;
+			justify-content: center;
+		}
+
+		.friends-grid {
+			grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            }
+        }
+
+
+    	</style>`;
 }

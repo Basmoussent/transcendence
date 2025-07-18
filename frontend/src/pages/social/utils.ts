@@ -31,10 +31,10 @@ export async function fetchMe(): Promise<UserData | void> {
 		if (response.ok) {
 			const result = await response.json();
 			const tmp: UserData = {
-				username: sanitizeHtml(result.user?.username) || 'Username',
-				email: sanitizeHtml(result.user?.email) || 'email@example.com',
+				username: sanitizeHtml(result.user?.username),
+				email: sanitizeHtml(result.user?.email),
 				avatar_url: sanitizeHtml(result.user?.avatar_url) || 'avatar.png',
-				id: Number(sanitizeHtml(result.user?.id)) || 0,
+				id: Number(sanitizeHtml(result.user?.id)),
 				two_fact_auth: Boolean(sanitizeHtml(result.user?.two_fact_auth)) || false,
 			};
 			return (tmp);

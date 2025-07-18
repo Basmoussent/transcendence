@@ -24,10 +24,10 @@ export async function fetchMe(): Promise<UserChat | void> {
 		if (response.ok) {
 			const result = await response.json();
 			const tmp: UserChat = {
-				username: sanitizeHtml(result.user?.username) || 'Username',
-				email: sanitizeHtml(result.user?.email) || 'email@example.com',
+				username: sanitizeHtml(result.user?.username),
+				email: sanitizeHtml(result.user?.email),
 				avatar_url: sanitizeHtml(result.user?.avatar_url) || 'avatar.png',
-				userId: Number(sanitizeHtml(result.user?.id)) || 0,
+				userId: Number(sanitizeHtml(result.user?.id)),
 				receiver: 'null'
 			};
 			// console.log(`dans le bueno for real voici mes infos ${tmp.userId}, ${tmp.username}`)
