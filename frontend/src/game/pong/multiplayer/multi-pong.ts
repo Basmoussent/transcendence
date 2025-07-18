@@ -1,10 +1,24 @@
 import { Ball } from "./multi-ball";
 import { Paddle } from "./multi-paddle";
 import { PaddleAI } from "./multi-paddle-ai";
+import { getAuthToken } from '../../../utils/auth';
 import { PADDLE_OFFSET, Player, PADDLE1_COLOR, PADDLE2_COLOR, PADDLE3_COLOR, PADDLE4_COLOR } from "../const";
+
+export interface Game {
+	id: number,
+	uuid: string,
+	game_type: string,
+	player1: string,
+	player2: string,
+	player3: string,
+	player4: string,
+	ai: number,
+	users_needed: number,
+}
 
 export class MultiPong {
     private canvas: HTMLCanvasElement;
+
     private ctx: CanvasRenderingContext2D;
     private width: number;
     private height: number;
@@ -15,12 +29,16 @@ export class MultiPong {
     private ball: Ball;
     private keys: { [key: string]: boolean };
 
-    constructor(canvas: HTMLCanvasElement) {
+	private data: any;
+
+    constructor(canvas: HTMLCanvasElement, uuid: string) {
         this.canvas = canvas;
         const context = canvas.getContext('2d');
         if (!context) {
             throw new Error('Could not get 2D context');
         }
+
+		this.retrieveGameInfo(uuid);
 
         this.ctx = context;
         this.height = canvas.height;
@@ -40,6 +58,49 @@ export class MultiPong {
         this.ball = new Ball(this.height, this.width);
         this.keys = {};
     }
+
+	private async retrieveGameInfo(uuid: string) {
+
+		const authToken = getAuthToken()
+		if (!authToken) {
+			alert('❌ Token d\'authentification manquant');
+			window.history.pushState({}, '', '/login');
+			window.dispatchEvent(new PopStateEvent('popstate'));
+			return;
+		}
+
+		const response = await fetch(`/api/games/?uuid=${uuid}`, {
+			method: 'GET',
+			headers: {
+				'Content-Type': 'application/json',
+				'x-access-token': authToken
+				},
+		});
+
+		if (!response.ok) {
+			const errorData = await response.json();
+			throw new Error(errorData.details || "pblm recuperer les infos de la game le multipong");
+		}
+
+		const result = await response.json();
+
+        console.log("Résultat brut de l'API :", result);
+
+
+		this.data = {
+			id: result.game.id,
+			uuid: result.game.uuid,
+			game_type: result.game.game_type,
+			player1: result.game.player1,
+			player2: result.game.player2,
+			player3: result.game.player3,
+			player4: result.game.player4,
+			users_needed: result.game.users_needed,
+			ai: result.game.ai,
+		}
+
+        console.log(`les infos de la game => ${JSON.stringify(this.data, null, 12)}`)
+	}
 
     public init(): void {
         console.log('Initializing paddle game...');

@@ -14,7 +14,7 @@ interface User {
 interface RoomData {
 	id: string;
 	name: string;
-	gameType: 'Pong' | 'Block';
+	gameType: 'pong' | 'block';
 	maxPlayers: number;
 	currentPlayers: number;
 	users: User[];
@@ -82,6 +82,7 @@ const getTemplate = () => {
 						<div class="setting-item" id="max-player">
 							<label class="text-white/80">Max Players</label>
 							<select class="setting-select" id="maxPlayersSelect">
+								<option value="1">1</option>
 								<option value="2">2</option>
 								<option value="3">3</option>
 								<option value="4">4</option>

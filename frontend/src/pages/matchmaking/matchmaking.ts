@@ -408,8 +408,6 @@ export class matchmaking {
 		return tmp;
 	}
 
-
-
 	private async loadAvailableGames(): Promise<Available[] | -1> {
 	
 		try {

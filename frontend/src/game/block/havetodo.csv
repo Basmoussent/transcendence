@@ -162,3 +162,11 @@ lancer le jeu depuis sa page
 
 
 si un user se connecte alors qu'il est deja connecte on deco l'ancienne instance
+
+
+
+
+
+
+creer une game avec 3 joueurs --> des le debut la limite est a 2 a cause du selector de nb player pour le host je crois
+donc si une 3 eme personne essaie de rejoindre ca le fait quitter direct.

@@ -10,7 +10,7 @@ interface User {
 interface RoomData {
 	id: string;
 	name: string;
-	gameType: 'Pong' | 'Block';
+	gameType: 'pong' | 'block';
 	maxPlayers: number;
 	users: User[];
 	host: string;
@@ -90,6 +90,9 @@ export class Room {
 
 		this.ws.onopen = () => {
 			console.log(`✅ WebSocket connection established for room ${this.uuid}`);
+			this.ws.send(JSON.stringify({
+				type: 'update_db',
+			}))
 		};
 
 		this.ws.onerror = (error) => console.error(`${this.username} onerror ${this.uuid}:`, error);
@@ -180,9 +183,8 @@ export class Room {
 	
 	private increase() {
 
-		// if (this.roomData?.maxPlayers === this.roomData?.users.size + this.roomData?.ai) {
-		// 	return;
-		// }
+		if (this.roomData?.users?.length && (this.roomData?.maxPlayers === this.roomData?.users?.length + this.roomData?.ai))
+			return;
 		this.ws.send(JSON.stringify({
 			type: 'increase',
 			token: this.token,
@@ -190,6 +192,9 @@ export class Room {
 	}
 
 	private decrease() {
+
+		if (this.roomData?.users?.length && this.roomData?.users?.length === 0)
+			return;
 		this.ws.send(JSON.stringify({
 			type: 'decrease',
 			token: this.token,
@@ -281,16 +286,22 @@ export class Room {
 
 		if (this.roomData.host === this.username) {
 
-			if (this.roomData.users.length + this.roomData.ai >= 2)
-				this.startBtn.disabled = !allReady;
+			this.startBtn.disabled = !allReady;
 
 			this.roomSettings.classList.remove('hidden')
 			this.getElement('gameActions').classList.remove('hidden');
 
-			if (this.roomData.gameType === 'Block')
+			if (this.roomData.gameType === 'block') {
 				this.getElement('ai-setting').style.display = 'none';
+				this.maxPlayersSelect.innerHTML = `<label class="text-white/80">Max Players</label>
+									<select class="setting-select" id="maxPlayersSelect">
+										<option value="1">1</option>
+										<option value="2">2</option>
+									</select>`;
+				this.maxPlayersSelect.value = String(this.roomData.maxPlayers);
+			}
 			else {
-				this.getElement('ai-setting').style.display = 'block';
+				this.getElement('ai-setting').style.display = 'pong';
 				if (this.roomData.users.length + this.roomData.ai === this.roomData.maxPlayers)
 					this.increaseAiBtn.disabled = true;
 				else
@@ -299,6 +310,15 @@ export class Room {
 					this.decreaseAiBtn.disabled = true;
 				else
 					this.decreaseAiBtn.disabled = false;
+
+				this.maxPlayersSelect.innerHTML = `<label class="text-white/80">Max Players</label>
+									<select class="setting-select" id="maxPlayersSelect">
+										<option value="1">1</option>
+										<option value="2">2</option>
+										<option value="3">3</option>
+										<option value="4">4</option>
+									</select>`;
+				this.maxPlayersSelect.value = String(this.roomData.maxPlayers);
 			}
 			
 		}
@@ -379,11 +399,20 @@ export class Room {
 				token: this.token
 			}));
 			// faire le new block ou pong avec info de la game dans le constructeur
-			if (gameType === 'Pong')
-				window.history.pushState({}, '', `/pong`);
+			if (this.roomData?.host === this.username) {
+				if (gameType === 'pong' && this.roomData.users.length > 2)
+					window.history.pushState({}, '', `/multipong/${this.uuid}`);
+				else if (gameType === 'pong')
+					window.history.pushState({}, '', `/pong/${this.uuid}`);
+				else if (gameType === 'block' && this.roomData.users.length === 1)
+					window.history.pushState({}, '', `/block/${this.uuid}`);
+				else if (gameType === 'block' && this.roomData.users.length == 2)
+					window.history.pushState({}, '', `/block1v1/${this.uuid}`);
+			}
 			else
-				window.history.pushState({}, '', `/block`);				
+				window.history.pushState({}, '', `/main`);
+
 			window.dispatchEvent(new Event('popstate'));
-		}, 2500);
+		}, 1800);
 	}
 }

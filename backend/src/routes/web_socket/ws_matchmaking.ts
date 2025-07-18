@@ -1,16 +1,13 @@
 import { FastifyRequest } from 'fastify';
 import { WebSocket } from 'ws';
 
-const matchmaking = new Array<WebSocket>();
+export const matchmaking = new Array<WebSocket>();
 
-function broadcastMatchmaking(data: any) {
+export function broadcastMatchmaking(data: any) {
 
-	for (const user of matchmaking) {
-		if (user.readyState === WebSocket.OPEN) {
-			console.log(`je send a tous le monde`)
+	for (const user of matchmaking)
+		if (user.readyState === WebSocket.OPEN)
 			user.send(JSON.stringify(data))
-		}
-	}
 }
 
 export function handleMatchmaking(socket: WebSocket, req: FastifyRequest) {
@@ -50,9 +47,8 @@ export function handleMatchmaking(socket: WebSocket, req: FastifyRequest) {
 	});
 	socket.on('close', () => {
 		const id = matchmaking.findIndex(user => user === socket);
-		if (id !== -1) {
+		if (id !== -1)
 			matchmaking.splice(id, 1);
-		}
 		console.log(`user left matchmaking`)
 	});
 }

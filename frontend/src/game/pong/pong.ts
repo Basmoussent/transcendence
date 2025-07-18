@@ -2,7 +2,19 @@ import { Ball } from "./ball";
 import { Paddle } from "./paddle";
 import { PaddleAI } from "./paddle-ai";
 import { PADDLE_OFFSET, PADDLE1_COLOR, PADDLE2_COLOR } from "./const";
+import { getAuthToken } from '../../utils/auth';
 
+export interface Game {
+	id: number,
+	uuid: string,
+	game_type: string,
+	player1: string,
+	player2: string,
+	player3: string,
+	player4: string,
+	ai: number,
+	users_needed: number,
+}
 
 interface player1{
 	name : string;
@@ -21,8 +33,10 @@ export class Pong {
 	private ball: Ball;
 	private keys: { [key: string]: boolean };
 
+	private data: any;
+
 	// constructor(canvas: HTMLCanvasElement, player1ID: number, player2ID: number) {
-	constructor(canvas: HTMLCanvasElement) {
+	constructor(canvas: HTMLCanvasElement, uuid: string) {
 		this.canvas = canvas;
 		const context = canvas.getContext('2d');
 		if (!context) {
@@ -44,6 +58,8 @@ export class Pong {
 
 		this.ball = new Ball(this.height, this.width);
 		this.keys = {};
+
+		this.retrieveGameInfo(uuid);
 	}
 
 	public init(): { player1: player1, player2: player1 } {
@@ -61,6 +77,47 @@ export class Pong {
 		const player2 = {name: this.paddles[1].name, score: this.paddles[1].score} as player1;
 		return {player1, player2};
 	};
+
+	private async retrieveGameInfo(uuid: string) {
+		
+		const authToken = getAuthToken()
+		if (!authToken) {
+			alert('❌ Token d\'authentification manquant');
+			window.history.pushState({}, '', '/login');
+			window.dispatchEvent(new PopStateEvent('popstate'));
+			return;
+		}
+
+		const response = await fetch(`/api/games/?uuid=${uuid}`, {
+			method: 'GET',
+			headers: {
+				'Content-Type': 'application/json',
+				'x-access-token': authToken
+				},
+		});
+
+		if (!response.ok) {
+			const errorData = await response.json();
+			throw new Error(errorData.details || "pblm recuperer les infos de la game le multipong");
+		}
+
+		const result = await response.json();
+
+		this.data = {
+			id: result.game.id,
+			uuid: result.game.uuid,
+			game_type: result.game.game_type,
+			player1: result.game.player1,
+			player2: result.game.player2,
+			player3: result.game.player3,
+			player4: result.game.player4,
+			users_needed: result.game.users_needed,
+			ai: result.game.ai,
+		}
+
+		console.log(`les infos de la game => ${JSON.stringify(this.data, null, 12)}`)
+	}
+
 	// positions et tailles de base en fonction de la taille du canvas
 	private setupPaddles(): void {
 		console.log('Setting up paddles...');

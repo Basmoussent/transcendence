@@ -1,28 +1,28 @@
 CREATE TABLE IF NOT EXISTS users (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
-  username TEXT UNIQUE NOT NULL,
-  email TEXT UNIQUE NOT NULL,
-  password_hash TEXT NOT NULL,
+  username VARCHAR UNIQUE NOT NULL,
+  email VARCHAR UNIQUE NOT NULL,
+  password_hash VARCHAR NOT NULL,
   two_fact_auth BOOLEAN DEFAULT false,
   secret_key VARCHAR DEFAULT NULL,
-  avatar_url TEXT,
+  avatar_url VARCHAR,
   language VARCHAR DEFAULT 'fr',
   created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE IF NOT EXISTS games (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
-  uuid TEXT UNIQUE NOT NULL,
-  game_type TEXT NOT NULL,
-  player1 TEXT NOT NULL,
-  player2 TEXT,
-  player3 TEXT,
-  player4 TEXT,
+  uuid VARCHAR UNIQUE NOT NULL,
+  game_type VARCHAR NOT NULL,
+  player1 VARCHAR NOT NULL,
+  player2 VARCHAR,
+  player3 VARCHAR,
+  player4 VARCHAR,
   users_needed INTEGER,
   ai INTEGER DEFAULT 0,
-  start_time TEXT,
-  end_time TEXT,
-  winner TEXT
+  start_time VARCHAR,
+  end_time VARCHAR,
+  winner VARCHAR
 );
 
 CREATE TABLE IF NOT EXISTS chats (
@@ -60,6 +60,6 @@ CREATE TABLE IF NOT EXISTS statistics (
 
 -- CREATE TABLE IF NOT EXISTS tournaments (
 --   tournaments_id INTEGER PRIMARY KEY AUTOINCREMENT,
---   player_ids TEXT NOT NULL,
+--   player_ids VARCHAR NOT NULL,
 --   state INTEGER DEFAULT 0
 -- )

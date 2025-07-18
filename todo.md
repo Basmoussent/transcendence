@@ -18,6 +18,6 @@
 
 mettre tout els jwt.verify dasn des try and catch
 mettre une verife de jwt dans le routeur
-la page 404 refresh quand elle redirige vers /main
+clean la page /main
 
 8M5m

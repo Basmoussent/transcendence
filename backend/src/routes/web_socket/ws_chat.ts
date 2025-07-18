@@ -71,16 +71,15 @@ export function handleChat(app: FastifyInstance, socket: WebSocket, req: Fastify
 				case 'friend_request':
 					addFriend(app, sender, data.dest);
 					break;
+				
 				case 'accept_friend_request':
-					console.log("dans le bueno accept_friend_request")
 					acceptFriend(app, sender, data.dest)
+					break;
 
-					// fonction pour handle
+				case 'deny_friend_request':
+					denyFriend(app, sender, data.dest)
 					break;
-				case 'decline_friend_request':
-					console.log("dans le bueno decline_friend_request")
-					// fonction pour handle
-					break;
+
 				case 'disconnection':
 					live.delete(sender.username);
 					console.log('je disconnect le user')
@@ -188,6 +187,27 @@ async function acceptFriend(app: FastifyInstance, user: UserChat, friendName: st
 		return;
 	}
 	app.friendService.acceptRelation(relation.id)
+	const message = JSON.stringify({
+		type: 'updateUI'
+	});
+
+	// faire update l'interface aux deux users
+	user.socket.send(message)
+	live.get(friend.username)?.socket.send(message);
+}
+
+async function denyFriend(app: FastifyInstance, user: UserChat, friendName: string) {
+
+	const friend = await app.userService.findByUsername(friendName);
+	const relations: Relation[] = await app.friendService.getRelations(user.userId);
+	const relation = relations.find(rel => rel.user_1 === friend.id || rel.user_2 === friend.id);
+
+	if (!relation || relation.id === -1) {
+		console.error(`couldnt find the relation to refuse friendship`);
+		return;
+	}
+
+	app.friendService.denyRelation(relation.id)
 	const message = JSON.stringify({
 		type: 'updateUI'
 	});

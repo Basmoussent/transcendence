@@ -11,6 +11,7 @@ import { db } from './database';
 import { UserService } from './services/userService';
 import { FriendService } from './services/friendService';
 import { GameService } from './services/gameService';
+import { RoomService } from './services/roomService';
 import authRoutes from "./routes/authentication"
 import gameRoutes from './routes/game';
 import editRoutes from './routes/reset-pwd';
@@ -29,6 +30,7 @@ declare module 'fastify' {
 		userService: UserService;
 		friendService: FriendService;
 		gameService: GameService;
+		roomService: RoomService;
 	}
 }
 
@@ -53,6 +55,7 @@ async function setup() {
 	fastify.decorate('userService', new UserService(db.getDatabase()));
 	fastify.decorate('friendService', new FriendService(db.getDatabase()));
 	fastify.decorate('gameService', new GameService(db.getDatabase()));
+	fastify.decorate('roomService', new RoomService(db.getDatabase()));
 	console.log('✅ Services decorated');
 
 	// Register CORS

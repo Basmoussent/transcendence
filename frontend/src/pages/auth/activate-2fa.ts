@@ -1,10 +1,8 @@
 import { getAuthToken } from '../../utils/auth';
-import { update2FAState, userInfo } from '../social/utils';
-import { generateOtpAuthUrl } from './utils';
-import QRCode from 'qrcode';
+import { fetchMe, update2FAState, userInfo } from '../social/utils';
 
 // Exemple de page /tfa pour activer la 2FA
-export function renderTFA() {
+export function render2FA() {
   const htmlContent = `
     <div class="tfa-wrapper">
       <div class="tfa-container">
@@ -223,51 +221,30 @@ export function renderTFA() {
         window.dispatchEvent(new PopStateEvent('popstate'));
       });
     }
-
-    try {
-      // Récupération des informations utilisateur
-      const info = await userInfo();
-      const userEmail = info.user.email;
-      const secret = info.user.secret_key;
-
-      // generer l'url otp qui sera utilisee pour le qrcode
-      const otpUrl = generateOtpAuthUrl(secret, userEmail, 'Transcendence');
-
-      // generer et afficher le qrcode
-      try {
-        const qrCodeDataUrl = await QRCode.toDataURL(otpUrl, {
-          width: 200,
-          margin: 2,
-          color: {
-            dark: '#000000',
-            light: '#FFFFFF'
-          }
-        });
-
-        qrSection.innerHTML = `
-          <div class="qr-code-container">
-            <img src="${qrCodeDataUrl}" alt="2FA QRCode" style="border-radius: 10px;" />
-          </div>
-        `;
-      } catch (qrError) {
-        console.error('Erreur lors de la génération du QR code:', qrError);
-        qrSection.innerHTML = `
-          <div class="qr-placeholder">
-            <i class="fas fa-exclamation-triangle"></i>
-            <p>Erreur lors de la génération du QR code</p>
-          </div>
-        `;
-      }
-
-    } catch (error) {
-      console.error('Erreur lors du chargement des informations utilisateur:', error);
-      qrSection.innerHTML = `
-        <div class="qr-placeholder">
-          <i class="fas fa-exclamation-triangle"></i>
-          <p>Erreur lors du chargement</p>
-        </div>
-      `;
+    const user = await fetchMe()
+   
+    const authToken = getAuthToken();
+    if (!authToken) {
+      alert('❌ Token d\'authentification manquant');
+      window.history.pushState({}, '', '/login');
+      window.dispatchEvent(new PopStateEvent('popstate'));
+      return;
     }
+
+    const response = await fetch(`/api/me/${user.id}`, {
+
+      method: 'POST',
+      headers: {
+          'Content-Type': 'application/json',
+          'x-access-token': authToken
+        },
+      body: JSON.stringify({
+					user,
+				})
+    });
+
+    const data = await response.json(); 
+    qrSection.innerHTML = data.qrcode;
 
     // Gestion de l'activation 2FA
     if (activateBtn && verificationCode) {

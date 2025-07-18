@@ -40,7 +40,7 @@ function getTemplate() {
 
 					<button class="menu-button tournament-button" id="tournamentBtn">
 						<i class="fa-solid fa-medal"></i>
-						tournament
+						Tournament
 					</button>
 					
 					<button class="menu-button friends-button" id="friendsBtn">
@@ -144,7 +144,7 @@ function getTemplate() {
 				background: linear-gradient(135deg, #9b59b6 0%, #8e44ad 100%);
 			}
 
-			.block-game-button {
+			.tournament-button {
 				background: linear-gradient(135deg, #f1c40f 0%, #f39c12 100%);
 			}
 

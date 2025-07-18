@@ -18,13 +18,12 @@ import { renderEditProfil, initializeEditProfileEvents } from '../pages/social/e
 import { getAuthToken } from './auth';
 import { clearTranslationCache } from './translations';
 import { getGame } from '@/game/gameUtils';
-import { initializeMatchmakingEvents } from '../pages/matchmaking/renderMatchmaking';
+
 import { renderMultiPong } from '../pages/pong/multiplayer-pong';
-import { renderChooseGame } from '../pages/game/choose-game';
 import { renderPong } from '../pages/pong/pong';
 import { initAlive } from './auth';
 import { renderFriends } from '../pages/social/friends';
-import { renderTFA } from '../pages/auth/activate-2fa';
+import { render2FA } from '../pages/auth/activate-2fa';
 
 export async function router() {
 	// Clear translation cache to ensure fresh translations
@@ -39,14 +38,19 @@ export async function router() {
 
 	let uuid: string = '';
 
-	if (path.startsWith('/room/') || path.startsWith('/user/')) {
-		uuid = path.substring(6);
-		path = path.startsWith('/room/') ? '/room' : '/user';
+	
+	if (path.startsWith('/multipong/') || path.startsWith('/pong/') || path.startsWith('/block/') || path.startsWith('/block1v1/') ||
+			path.startsWith('/room/') || path.startsWith('/user/')) {
+
+		const it = path.indexOf('/', 1);
+
+		uuid = path.substring(it + 1);
+		path = path.substring(0, it);
 	}
 	
 	if (!publicRoutes.includes(path) && !token) {
 		window.history.pushState({}, '', '/login');
-		app.innerHTML = renderLogin();https://chatgpt.com/c/6877c557-906c-8013-bd68-e9fef37f7f71
+		app.innerHTML = renderLogin();
 		return;
 	}
 	if (!publicRoutes.includes(path) && token) {
@@ -120,21 +124,14 @@ export async function router() {
 		case '/matchmaking':
 			view = renderMatchmaking();
 			break;
-		case '/block':
-			view = renderBlock();
-			break;
-		case '/block1v1':
-			view = renderBlock1v1();
-			break;
+		
 		case '/change-password':
 			view = renderChangePassword();
 			break;
 		case '/edit-profil':
 			view = renderEditProfil();
 			break;
-		case '/pong':
-			view = renderPong();
-			break;
+		
 		case '/room':
 			if (!uuid)
 				return ;
@@ -142,6 +139,21 @@ export async function router() {
 			break;
 		case '/chat':
 			view = renderChat();
+			break;
+		case '/2fa':
+			view = render2FA();
+			break;
+		case '/block':
+			view = renderBlock(uuid);
+			break;
+		case '/block1v1':
+			view = renderBlock1v1(uuid);
+			break;
+		case '/pong':
+			view = renderPong(uuid);
+			break;
+		case '/multipong':
+			view = renderMultiPong(uuid);
 			break;
 		default:
 			view = render404();
