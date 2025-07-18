@@ -111,21 +111,14 @@ export async function router() {
 		case '/matchmaking':
 			view = renderMatchmaking();
 			break;
-		case '/block':
-			view = renderBlock();
-			break;
-		case '/block1v1':
-			view = renderBlock1v1();
-			break;
+		
 		case '/change-password':
 			view = renderChangePassword();
 			break;
 		case '/edit-profil':
 			view = renderEditProfil();
 			break;
-		case '/pong':
-			view = renderPong();
-			break;
+		
 		case '/room':
 			if (!uuid)
 				return ;
@@ -137,9 +130,16 @@ export async function router() {
 		case '/2fa':
 			view = render2FA();
 			break;
+		case '/block':
+			view = renderBlock(uuid);
+			break;
+		case '/block1v1':
+			view = renderBlock1v1(uuid);
+			break;
+		case '/pong':
+			view = renderPong(uuid);
+			break;
 		case '/multipong':
-			if (!uuid)
-				return ;
 			view = renderMultiPong(uuid);
 			break;
 		default:

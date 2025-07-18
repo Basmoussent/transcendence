@@ -99,7 +99,7 @@ export class MultiPong {
 			ai: result.game.ai,
 		}
 
-        console.log(`les infos de la game lancée => ${JSON.stringify(this.data, null, 12)}`)
+        console.log(`les infos de la game => ${JSON.stringify(this.data, null, 12)}`)
 	}
 
     public init(): void {

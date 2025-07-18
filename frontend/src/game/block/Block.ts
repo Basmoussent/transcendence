@@ -1,5 +1,18 @@
 import { fetchUsername, logEndGame, postGame } from "../gameUtils.ts";
 import { Ball, Paddle, brick, createRandomBrick, PowerUp, PowerUpType, getPowerUpFromBrick } from "./blockUtils.ts";
+import { getAuthToken } from '../../utils/auth.ts'
+
+export interface Game {
+	id: number,
+	uuid: string,
+	game_type: string,
+	player1: string,
+	player2: string,
+	player3: string,
+	player4: string,
+	ai: number,
+	users_needed: number,
+}
 
 export class Block {
 	private canvas: HTMLCanvasElement;
@@ -27,8 +40,10 @@ export class Block {
 	private fastBallTimer: number = 0;
 	private slowBallActive: boolean = false;
 	private slowBallTimer: number = 0;
+
+	private data: any;
   
-	constructor(canvas: HTMLCanvasElement) {
+	constructor(canvas: HTMLCanvasElement, uuid: string) {
 		this.canvas = canvas;
 		const context = canvas.getContext('2d');
 
@@ -51,6 +66,8 @@ export class Block {
 		this.bricks = [];
 		this.brickWidth = 0;
 		this.brickHeight = 0;
+
+		this.retrieveGameInfo(uuid);
 
 		this.loadUsername();
 		this.setupCanvas();
@@ -78,6 +95,46 @@ export class Block {
 		window.addEventListener('keyup', (e) => {
 			this.keys[e.key.toLowerCase()] = false;
 		});
+	}
+
+	private async retrieveGameInfo(uuid: string) {
+
+		const authToken = getAuthToken()
+		if (!authToken) {
+			alert('❌ Token d\'authentification manquant');
+			window.history.pushState({}, '', '/login');
+			window.dispatchEvent(new PopStateEvent('popstate'));
+			return;
+		}
+
+		const response = await fetch(`/api/games/?uuid=${uuid}`, {
+			method: 'GET',
+			headers: {
+				'Content-Type': 'application/json',
+				'x-access-token': authToken
+				},
+		});
+
+		if (!response.ok) {
+			const errorData = await response.json();
+			throw new Error(errorData.details || "pblm recuperer les infos de la game le multipong");
+		}
+
+		const result = await response.json();
+
+		this.data = {
+			id: result.game.id,
+			uuid: result.game.uuid,
+			game_type: result.game.game_type,
+			player1: result.game.player1,
+			player2: result.game.player2,
+			player3: result.game.player3,
+			player4: result.game.player4,
+			users_needed: result.game.users_needed,
+			ai: result.game.ai,
+		}
+
+		console.log(`les infos de la game => ${JSON.stringify(this.data, null, 12)}`)
 	}
   
 	private setupCanvas(): void {
