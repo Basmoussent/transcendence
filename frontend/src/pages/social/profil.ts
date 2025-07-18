@@ -38,7 +38,7 @@ export async function renderProfil() {
 				username: sanitizeHtml(result.user?.username) || 'Username',
 				email: sanitizeHtml(result.user?.email) || 'email@example.com',
 				avatar: sanitizeHtml(result.user?.avatar_url) || 'avatar.png',
-				wins: (result.stats?.wins) || 0,
+				wins: (result.stats?.win) || 0,
 				games: (result.stats?.games) || 0,
 				rating: (result.stats?.rating) || 0,
 				preferred_language: sanitizeHtml(result.user?.language) || 'en',

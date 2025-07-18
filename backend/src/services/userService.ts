@@ -63,4 +63,22 @@ export class UserService {
 		}
 		return false;
 	}
+
+	async retrieveStats(id: number) {
+		try {
+			const user = await new Promise<UserData | null>((resolve, reject) => {
+				this.db.get(
+					'SELECT * FROM statistics WHERE user_id = ?',
+					[ id ],
+					(err: any, row: UserData | undefined) => {
+					err ? reject(err) : resolve(row || null); }
+				);
+			});
+			return user;
+		}
+		catch (err: any) {
+			console.log(`le user ${id} n'existe pas`)
+		}
+		return Promise.resolve(null); 
+	}
 }

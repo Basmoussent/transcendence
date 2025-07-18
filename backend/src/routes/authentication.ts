@@ -114,19 +114,20 @@ async function authRoutes(app: FastifyInstance) {
         `INSERT INTO users (username, email, password_hash, secret_key)
          VALUES (?, ?, ?, ?)`
       );
-      console.log(`INSERT INTO users (username, email, password_hash)
-         VALUES (?, ?, ?)`, cleanUsername, cleanEmail, password_hash);
 
-      stmt.run(username, email, password_hash, secret_key);
+      stmt.run(cleanUsername, cleanEmail, password_hash, secret_key);
 
+      const user = await app.userService.findByUsername(cleanUsername);
 
-      // stmt.run(username, email, password_hash);
-      // INSERT INTO statistics (l'id du user qui vient d'être créé)
+      const stmt2 = datab.prepare(
+        `INSERT INTO statistics (user_id)
+        VALUES (?)`
+      );
+
+      stmt2.run(user.id);
       
-      // Retourne un succès si l'insertion a réussi
       return reply.status(201).send({ message: 'Compte créé avec succès' });
     } catch (err: any) {
-      // Erreur serveur pour les cas inattendus
       console.error('❌ Error inserting user:', err);
       return reply.status(500).send({ error: 'Erreur interne du serveur' });
     }
