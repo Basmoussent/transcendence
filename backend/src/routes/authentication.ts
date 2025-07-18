@@ -120,11 +120,11 @@ async function authRoutes(app: FastifyInstance) {
       const user = await app.userService.findByUsername(cleanUsername);
 
       const stmt2 = datab.prepare(
-        `INSERT INTO statistics (user_id)
+        `INSERT INTO statistics (username)
         VALUES (?)`
       );
 
-      stmt2.run(user.id);
+      stmt2.run(user.username);
       
       return reply.status(201).send({ message: 'Compte créé avec succès' });
     } catch (err: any) {

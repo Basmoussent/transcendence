@@ -1,5 +1,6 @@
 import { sanitizeHtml } from '../../utils/sanitizer';
 import { fetchMe, fetchUserInfo, loadMe } from './utils';
+import { getAuthToken } from '../../utils/auth';
 
 export interface UserChat {
 	username: string;
@@ -11,50 +12,54 @@ export interface UserChat {
 
 interface Relation {
 	id: number;
-	user_1: number;
-	user_2: number;
+	user_1: string;
+	user_2: string;
 	user1_state: 'normal' | 'requested' | 'waiting' | 'blocked';
 	user2_state: 'normal' | 'requested' | 'waiting' | 'blocked';
 }
 
 export class Chat {
 
-	private ws: WebSocket;
+	private ws!: WebSocket;
 
 	// Left Panel
-	private homeBtn: HTMLButtonElement;
-	private searchInput: HTMLInputElement;
-	private friendsList: HTMLElement;
-	private requestsList: HTMLElement;
-	private addFriendBtn: HTMLButtonElement;
-	private friendUsernameInput: HTMLInputElement;
-	private friendsCount: HTMLElement;
-	private requestsCount: HTMLElement;
-	private tabs: NodeListOf<HTMLElement>;
+	private homeBtn!: HTMLButtonElement;
+	private searchInput!: HTMLInputElement;
+	private friendsList!: HTMLElement;
+	private requestsList!: HTMLElement;
+	private addFriendBtn!: HTMLButtonElement;
+	private friendUsernameInput!: HTMLInputElement;
+	private friendsCount!: HTMLElement;
+	private requestsCount!: HTMLElement;
+	private tabs!: NodeListOf<HTMLElement>;
 
 
 	// Right Panel
-	private noChatSelected: HTMLElement;
-	private chatContainer: HTMLElement;
-	private chatHeader: HTMLElement;
-	private chatMessages: HTMLElement;
-	private chatInput: HTMLInputElement;
-	private sendBtn: HTMLButtonElement;
+	private noChatSelected!: HTMLElement;
+	private chatContainer!: HTMLElement;
+	private chatHeader!: HTMLElement;
+	private chatMessages!: HTMLElement;
+	private chatInput!: HTMLInputElement;
+	private sendBtn!: HTMLButtonElement;
 
 	private me: UserChat = {
-			username: "tmp",
-			email: "mefaispaschier@gmail.com",
-			avatar_url: "pitie",
-			userId: 3
-		};
+		username: "",
+		email: "",
+		avatar_url: "",
+		userId: 0
+	};
 
 	private receiver?: string;
  
 	constructor() {
+		this.init();
+	}
 
-		this.loadMe();
+	private async init() {
+		// Charger les données utilisateur d'abord
+		await this.loadMe();
 
-
+		// Créer le WebSocket seulement après avoir chargé les données
 		this.ws = new WebSocket(`${window.location.protocol === "https:" ? "wss" : "ws"}://${window.location.host}/api/chat`);
 
 		// Left Panel Elements
@@ -206,6 +211,8 @@ export class Chat {
 				dest: this.receiver,
 				content: message,
 			}));
+			// Affichage immédiat du message sur l'écran de l'utilisateur (optimistic UI)
+			this.addChatMessage(this.me.username, message);
 			this.chatInput.value = '';
 		}
 	}
@@ -241,7 +248,7 @@ export class Chat {
 		var	friends = 0;
 		var	request = 0;
 
-		const relations: Relation[] | null = await fetchUserRelations(this.me.userId);
+		const relations: Relation[] | null = await fetchUserRelations(this.me.username);
 
 		if (!relations || !relations.length) {
 			console.log("t'as pas d'amis mgl")
@@ -252,10 +259,11 @@ export class Chat {
 		this.requestsList.innerHTML = '';
 
 		for (const relation of relations) {
+			console.log("relation", relation)
 
-			const friendId = relation.user_1 === this.me.userId ? relation.user_2 : relation.user_1;
+			const friendUsername = relation.user_1 === this.me.username ? relation.user_2 : relation.user_1;
 
-			const friend: UserChat | void = await fetchUserInfo(friendId);
+			const friend: UserChat | void = await fetchUserInfo(friendUsername);
 
 			if (!friend)
 				continue;
@@ -284,8 +292,8 @@ export class Chat {
 				this.friendsList.appendChild(conversationElement);
 				conversationElement.addEventListener('click', () => this.startChatWith(relation.id, friend));
 			}
-			else if ((relation.user_1 === this.me.userId && relation.user2_state === 'waiting') ||
-				(relation.user_2 === this.me.userId && relation.user1_state === 'waiting')) {
+			else if ((relation.user_1 === this.me.username && relation.user2_state === 'waiting') ||
+				(relation.user_2 === this.me.username && relation.user1_state === 'waiting')) {
 				request++;
 
 
@@ -350,25 +358,46 @@ export class Chat {
 		</div>
 		`;
 
-		this.chatMessages.innerHTML = this.loadChatHistory(relationId, user); // à compléter
-
+		// Charger l'historique du chat
+		this.loadChatHistoryFromAPI(user.username);
 	}
 
-	private loadChatHistory(relationId: number, user:UserChat): string {
+	private async loadChatHistoryFromAPI(friendUsername: string) {
+		try {
+			const response = await fetch(`/api/friend/history?user1=${this.me.username}&user2=${friendUsername}`, {
+				method: 'GET',
+				headers: {
+					'Content-Type': 'application/json',
+					'x-access-token': getAuthToken() || ''
+				}
+			});
 
-		const conversation = ''
-		// recuperer tous les messages de cette relation
-		// boucler dessus et append dans la conversation tous les messages en fonction de qui a envoyé
-
-		return conversation;
+			if (response.ok) {
+				const chatHistory = await response.json();
+				this.chatMessages.innerHTML = ''; // Vider les messages actuels
+				
+				// Vérifier que chatHistory est un tableau
+				if (Array.isArray(chatHistory)) {
+					// Afficher l'historique des messages
+					chatHistory.forEach((msg: any) => {
+						this.addChatMessage(msg.sender_username, msg.content);
+					});
+				} else {
+					console.error('L\'historique du chat n\'est pas un tableau:', chatHistory);
+				}
+			} else {
+				console.error('Erreur lors du chargement de l\'historique du chat');
+			}
+		} catch (error) {
+			console.error('Erreur lors du chargement de l\'historique du chat:', error);
+		}
 	}
 }
 
-
-async function fetchUserRelations(userid: number): Promise<Relation[]|null> {
+async function fetchUserRelations(username: string): Promise<Relation[]|null> {
 
 	try {
-		const response = await fetch(`/api/friend/relations?userid=${userid}`);
+		const response = await fetch(`/api/friend/relations?username=${username}`);
 		
 		if (!response.ok) {
 			const errorData = await response.json();

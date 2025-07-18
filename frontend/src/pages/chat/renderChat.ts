@@ -86,25 +86,25 @@ const getTemplate = () => {
 	</div>
 
 	<!-- Right Panel - Chat -->
-	<div class="w-2/3 bg-white/10 backdrop-blur-lg rounded-xl p-6 border border-white/20 shadow-lg flex flex-col">
+	<div class="w-2/3 bg-white/10 backdrop-blur-lg rounded-xl p-6 border border-white/20 shadow-lg flex flex-col h-[70vh] relative">
 		<div id="noChatSelected" class="empty-state">
 		<i class="fas fa-comments"></i>
 		<h3>Sélectionnez un ami pour commencer à chatter</h3>
 		</div>
 
-		<div id="chatContainer" class="chat-container hidden">
+		<div id="chatContainer" class="chat-container hidden flex flex-col h-full">
 		<!-- En-tête du chat -->
 		<div class="chat-header" id="chatHeader">
 			<!-- Sera rempli dynamiquement -->
 		</div>
 
 		<!-- Messages du chat -->
-		<div class="chat-messages flex-1" id="chatMessages">
+		<div class="chat-messages flex-1 overflow-y-auto" id="chatMessages">
 			<!-- Les messages seront ajoutés ici dynamiquement -->
 		</div>
 
 		<!-- Zone de saisie -->
-		<div class="chat-input-container">
+		<div class="chat-input-container sticky bottom-0 bg-transparent mt-2">
 			<input type="text" class="chat-input" id="chatInput" placeholder="Tapez votre message..." maxlength="200">
 			<button class="send-btn" id="sendBtn">
 			<i class="fas fa-paper-plane"></i>
@@ -418,13 +418,11 @@ const getTemplate = () => {
 
         .chat-message.sent {
             background: rgba(59, 130, 246, 0.2);
-            border-left: 3px solid #3B82F6;
             margin-left: 20px;
         }
 
         .chat-message.received {
             background: rgba(16, 185, 129, 0.2);
-            border-left: 3px solid #10B981;
             margin-right: 20px;
         }
 
@@ -574,6 +572,91 @@ const getTemplate = () => {
 
         .items-center {
             align-items: center;
+        }
+        .chat-container {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding-bottom: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .chat-message {
+            display: flex;
+            flex-direction: column;
+            max-width: 70%;
+            min-width: 60px;
+            word-break: break-word;
+            padding: 10px 14px;
+            border-radius: 18px;
+            margin-bottom: 2px;
+            background: rgba(255, 255, 255, 0.1);
+            animation: slideIn 0.3s ease;
+            align-self: flex-start;
+        }
+        .chat-message.sent {
+            background: #B5446E;
+            color: white;
+            align-self: flex-end;
+            border-bottom-right-radius: 6px;
+            border-bottom-left-radius: 18px;
+            border-top-left-radius: 18px;
+            border-top-right-radius: 18px;
+        }
+        .chat-message.received {
+            background: #9D44B5;
+            color: white;
+            align-self: flex-start;
+            border-bottom-left-radius: 6px;
+            border-bottom-right-radius: 18px;
+            border-top-left-radius: 18px;
+            border-top-right-radius: 18px;
+        }
+        .chat-message-content {
+            color: inherit;
+            font-size: 1em;
+        }
+        .chat-message-time {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.8em;
+            margin-top: 4px;
+            align-self: flex-end;
+        }
+        .chat-input-container {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+            position: sticky;
+            bottom: 0;
+            background: rgba(0,0,0,0.05);
+            padding: 10px 0 0 0;
+        }
+        .chat-input {
+            flex: 1;
+            padding: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 0.9em;
+        }
+        .send-btn {
+            padding: 12px 15px;
+            border: none;
+            border-radius: 10px;
+            background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .send-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(16, 185, 129, 0.3);
         }
     </style>
 	`;

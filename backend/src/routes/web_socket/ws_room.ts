@@ -63,6 +63,7 @@ function broadcastSystemMessage(room: Room, content: string) {
 }
 
 export async function handleRoom(app: FastifyInstance, socket: WebSocket, req: FastifyRequest) {
+	try {
 	const token = req.headers['x-access-token'] ? req.headers['x-access-token'] : req.cookies['x-access-token']; 
 		
 	if (!token) {
@@ -235,4 +236,8 @@ export async function handleRoom(app: FastifyInstance, socket: WebSocket, req: F
 			}
 		}
 	});
+	} catch (error) {
+		console.error('Error in handleRoom:', error);
+		socket.close();
+	}
 }

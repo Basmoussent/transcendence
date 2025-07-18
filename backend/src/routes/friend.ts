@@ -3,8 +3,8 @@ import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 
 
 interface Relation {
-	user_1: number;
-	user_2: number;
+	user_1: string;
+	user_2: string;
 	user1_state: 'normal' | 'requested' | 'waiting' | 'blocked';
 	user2_state: 'normal' | 'requested' | 'waiting' | 'blocked';
 }
@@ -16,28 +16,35 @@ async function friendRoutes(app: FastifyInstance) {
 		try {
 			const database = db.getDatabase();
 
-			const { userid } = request.query as { userid?: number };
+			const { username } = request.query as { username?: string };
 
-			if (!userid)
-				throw new Error ("missing userid in the request body");
+			console.log('🔍 Debug - Requested relations for username:', username);
+
+			if (!username)
+				throw new Error ("missing username in the request body");
 
 			const relations = await new Promise<Relation[] | null>((resolve, reject) => {
 
 				database.all(
 					'SELECT * FROM friends WHERE user_1 = ? OR user_2 = ?',
-					[ userid, userid ],
+					[ username, username ],
 					(err: any, row: Relation[] | undefined) => {
 						err ? reject(err) : resolve(row || null); }
 				);
 			});
+
+			console.log('🔍 Debug - Found relations:', relations);
+			console.log(`SELECT * FROM friends WHERE user_1 = '${username}' OR user_2 = '${username}'`);
+
 			return reply.send({
-				message: `friends du user ${userid}`,
+				message: `friends du user ${username}`,
 				relations: relations,
 			});
 		}
 		catch (err: any) {
+			console.error('❌ Error in /relations:', err);
 			return reply.status(500).send({
-				error: 'erreur GET /friend/userId',
+				error: 'erreur GET /friend/username',
 				details: err.message });
 		}
 	});
@@ -71,6 +78,15 @@ async function friendRoutes(app: FastifyInstance) {
 				details: err.message });
 		}
 	})
+
+	app.get('/history', async function (request: FastifyRequest, reply: FastifyReply) {
+		const { user1, user2 } = request.query as { user1?: string, user2?: string };
+		if (!user1 || !user2) {
+			return reply.status(400).send({ error: 'user1 and user2 are required' });
+		}
+		const history = await app.chatService.retrieveChatHistory(user1, user2);
+		return reply.send(history);
+	});
 }
 
 export default friendRoutes;

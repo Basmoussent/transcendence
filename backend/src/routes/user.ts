@@ -21,6 +21,7 @@ interface UserData {
   avatar_url?: string;
   language: string;
   two_fact_auth: boolean;
+  secret_key?: string;
 }
 
 async function userRoutes(app: FastifyInstance) {
@@ -66,7 +67,7 @@ async function userRoutes(app: FastifyInstance) {
                 console.log('user', user);
                 // Récupération des statistiques (pour l'instant des valeurs par défaut)
                 // TODO: Implémenter la vraie logique des statistiques
-                const userStats = await app.userService.retrieveStats(user.id);
+                const userStats = await app.userService.retrieveStats(user.username);
                 console.log('userStats', userStats);
                 const win = userStats.pong_wins + userStats.block_wins;
                 const games = userStats.pong_games + userStats.block_games;
