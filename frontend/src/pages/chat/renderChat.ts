@@ -304,12 +304,12 @@ const getTemplate = () => {
             box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
         }
 
-        .decline-btn {
+        .deny-btn {
             background: linear-gradient(135deg, #6B7280 0%, #4B5563 100%);
             color: white;
         }
 
-        .decline-btn:hover {
+        .deny-btn:hover {
             transform: translateY(-1px);
             box-shadow: 0 4px 12px rgba(107, 114, 128, 0.3);
         }

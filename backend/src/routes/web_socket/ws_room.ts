@@ -109,9 +109,6 @@ export async function handleRoom(app: FastifyInstance, socket: WebSocket, req: F
 		rooms.set(uuid!, room);
 	}
 
-	room.users.set(username, user);
-
-	console.log(JSON.stringify(room, null, 4));
 
 	if (room.maxPlayers === room.users.size + room.ai) {
 		console.log("bah qiwudbqwiudbqiwu\n\n\n\ndbq")
@@ -121,6 +118,10 @@ export async function handleRoom(app: FastifyInstance, socket: WebSocket, req: F
 			console.log('je vais close le socket')
 		return;
 	}
+
+	console.log(JSON.stringify(room, null, 4));
+
+	room.users.set(username, user);
 
 	console.warn(`room.maxPlayers === room.users.size + room.ai --> ${room.maxPlayers} === ${room.users.size} + ${room.ai}`)
 
@@ -147,6 +148,7 @@ export async function handleRoom(app: FastifyInstance, socket: WebSocket, req: F
 
 				case 'game_type':
 					currentRoom.gameType = data.name;
+					currentRoom.maxPlayers = data.name === 'pong' ? 4 : 2;
 					currentRoom.ai = 0;
 					await broadcastRoomUpdate(app, currentRoom);
 					break;
@@ -180,11 +182,13 @@ export async function handleRoom(app: FastifyInstance, socket: WebSocket, req: F
 							u.socket.send(chatMessage);
 					});
 					break;
+				
 				case 'update_db':
 					await app.roomService.updateGame(room);
 					break;
+				
 				case 'start_game':
-					if (currentRoom.host !== username || currentRoom.users.size < 2)
+					if (currentRoom.host !== username)
 						return;
 
 					const allReady = Array.from(currentRoom.users.values()).every(u => u.isReady);

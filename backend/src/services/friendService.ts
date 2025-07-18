@@ -66,4 +66,37 @@ export class FriendService {
 		}
 
 	}
+
+	async denyRelation(relationId: number) {
+
+		try {
+			await new Promise<void>((resolve, reject) => {
+				this.db.run(
+					'DELETE friends WHERE id = ?',
+					[ relationId ],
+					(err: any) => {
+					err ? reject(err) : resolve();
+			})});
+		}
+		catch (err: any) {
+			console.log(`on deny la relation; friends(${relationId}) `)
+		}
+	}
+
+	// blocked == 'user1_state' | 'user2_state'
+	async blockUser(blocked: string, relationId: number) {
+
+		try {
+			await new Promise<void>((resolve, reject) => {
+				this.db.run(
+					`UPDATE friends SET ${blocked} = blocked WHERE id = ?`,
+					[ relationId ],
+					(err: any) => {	err ? reject(err) : resolve();})
+			});
+		}
+		catch (err: any) {
+			console.log(`on deny la relation; friends(${relationId}) `)
+		}
+	}
+
 }

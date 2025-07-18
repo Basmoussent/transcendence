@@ -307,7 +307,7 @@ export class Chat {
 							<button class="action-btn accept-btn">
 							<i class="fas fa-check"></i>
 							</button>
-							<button class="action-btn decline-btn">
+							<button class="action-btn deny-btn">
 							<i class="fas fa-times"></i>
 							</button>
 						</div>
@@ -318,8 +318,8 @@ export class Chat {
 					this.ws.send(JSON.stringify({ type: 'accept_friend_request', dest: friend.username }));
 				});
 
-				requestElement.querySelector('.decline-btn')?.addEventListener('click', () => {
-					this.ws.send(JSON.stringify({ type: 'decline_friend_request', dest: friend.username }));
+				requestElement.querySelector('.deny-btn')?.addEventListener('click', () => {
+					this.ws.send(JSON.stringify({ type: 'deny_friend_request', dest: friend.username }));
 				});
 			}
 

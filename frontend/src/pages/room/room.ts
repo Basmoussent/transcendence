@@ -286,16 +286,22 @@ export class Room {
 
 		if (this.roomData.host === this.username) {
 
-			if (this.roomData.users.length + this.roomData.ai >= 2)
-				this.startBtn.disabled = !allReady;
+			this.startBtn.disabled = !allReady;
 
 			this.roomSettings.classList.remove('hidden')
 			this.getElement('gameActions').classList.remove('hidden');
 
-			if (this.roomData.gameType === 'block')
+			if (this.roomData.gameType === 'block') {
 				this.getElement('ai-setting').style.display = 'none';
+				this.maxPlayersSelect.innerHTML = `<label class="text-white/80">Max Players</label>
+									<select class="setting-select" id="maxPlayersSelect">
+										<option value="1">1</option>
+										<option value="2">2</option>
+									</select>`;
+				this.maxPlayersSelect.value = String(this.roomData.maxPlayers);
+			}
 			else {
-				this.getElement('ai-setting').style.display = 'block';
+				this.getElement('ai-setting').style.display = 'pong';
 				if (this.roomData.users.length + this.roomData.ai === this.roomData.maxPlayers)
 					this.increaseAiBtn.disabled = true;
 				else
@@ -304,6 +310,15 @@ export class Room {
 					this.decreaseAiBtn.disabled = true;
 				else
 					this.decreaseAiBtn.disabled = false;
+
+				this.maxPlayersSelect.innerHTML = `<label class="text-white/80">Max Players</label>
+									<select class="setting-select" id="maxPlayersSelect">
+										<option value="1">1</option>
+										<option value="2">2</option>
+										<option value="3">3</option>
+										<option value="4">4</option>
+									</select>`;
+				this.maxPlayersSelect.value = String(this.roomData.maxPlayers);
 			}
 			
 		}
