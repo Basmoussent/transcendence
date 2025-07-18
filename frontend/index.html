@@ -135,6 +135,7 @@
           
           // Update the URL without full page reload using history API
           localStorage.setItem('lang', lang);
+          localStorage.setItem('lastPath', window.location.pathname);
           window.history.pushState({}, '', '/lang');
           
           const buttons = document.querySelectorAll('.language-btn');

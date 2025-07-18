@@ -53,14 +53,11 @@ export class login {
 		const password = this.password.value;
 
 		try {
-			console.log('🔐 Tentative de connexion pour:', username);
-			console.log('🌐 URL actuelle:', window.location.href);
-			
 			const response = await fetch('/api/auth/login', {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({ username, password }),
-			credentials: 'include' // Important pour recevoir les cookies
+			credentials: 'include'
 			});
 
 			const result = await response.json();

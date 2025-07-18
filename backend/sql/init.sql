@@ -34,22 +34,29 @@ CREATE TABLE IF NOT EXISTS chats (
 
 CREATE TABLE IF NOT EXISTS friends (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
-  user_1 INTEGER REFERENCES users(id),
-  user_2 INTEGER REFERENCES users(id),
+  user_1 VARCHAR REFERENCES users(username),
+  user_2 VARCHAR REFERENCES users(username),
   user1_state VARCHAR(36) NOT NULL,
   user2_state VARCHAR(36) NOT NULL
 );
 
+CREATE TABLE IF NOT EXISTS chat_history (
+  chat_id INTEGER PRIMARY KEY,
+  user1 VARCHAR REFERENCES users(username),
+  user2 VARCHAR REFERENCES users(username),
+  FOREIGN KEY (chat_id) REFERENCES friends(id)
+);
+
 CREATE TABLE IF NOT EXISTS messages (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
-  chat_id INTEGER REFERENCES chats(id) ON DELETE CASCADE,
-  sender_id INTEGER REFERENCES users(id),
+  chat_id INTEGER REFERENCES chat_history(chat_id),
+  sender_username VARCHAR REFERENCES users(username),
   content TEXT NOT NULL,
-  sent_at DATETIME DEFAULT CURRENT_TIMESTAMP
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE IF NOT EXISTS statistics (
-  user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+  username VARCHAR REFERENCES users(username) ON DELETE CASCADE,
   mmr INTEGER DEFAULT 800,
   pong_games INTEGER DEFAULT 0,
   pong_wins INTEGER DEFAULT 0,

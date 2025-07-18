@@ -67,6 +67,35 @@ export class UserService {
 		return false;
 	}
 
+	async retrieveStats(username: string) {
+		try {
+			const user = await new Promise<any>((resolve, reject) => {
+				this.db.get(
+					'SELECT * FROM statistics WHERE username = ?',
+					[ username ],
+					(err: any, row: any | undefined) => {
+					err ? reject(err) : resolve(row || null); }
+				);
+			});
+			return user || {
+				pong_wins: 0,
+				block_wins: 0,
+				pong_games: 0,
+				block_games: 0,
+				rating: 800
+			};
+		}
+		catch (err: any) {
+			console.log(`le user ${username} n'a pas de stats`)
+			return {
+				pong_wins: 0,
+				block_wins: 0,
+				pong_games: 0,
+				block_games: 0,
+				rating: 800
+			};
+		}
+	}
 	async generateQrcode(user: any) {
 		try {
 		// recup mail et secret_key du user

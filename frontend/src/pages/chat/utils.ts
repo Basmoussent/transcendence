@@ -43,7 +43,7 @@ export async function fetchMe(): Promise<UserChat | void> {
 }
 
 
-export async function fetchUserInfo(userid: number): Promise<UserChat | void> {
+export async function fetchUserInfo(username: string): Promise<UserChat | void> {
 
 	try {
 		const token = getAuthToken();
@@ -54,7 +54,7 @@ export async function fetchUserInfo(userid: number): Promise<UserChat | void> {
 			return;
 		}
 
-		const response = await fetch(`/api/user/?userid=${userid}`, {
+		const response = await fetch(`/api/user/username/?username=${username}`, {
 			method: 'GET',
 			headers: {
 				'Content-Type': 'application/json',

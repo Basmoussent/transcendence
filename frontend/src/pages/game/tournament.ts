@@ -1,4 +1,5 @@
 import { Pong } from '../../game/pong/pong';
+import { sanitizeHtml } from '../../utils/sanitizer';
 
 export function renderTournaments() {
   const html =  `
@@ -759,7 +760,7 @@ let tournamentData = {
     if (response.ok) {
       const data = await response.json();
       if (data.username) {
-        tournamentData.players.push(playerName);
+        tournamentData.players.push(sanitizeHtml(playerName));
         updateLobbyDisplay();
         (window as any).closeModal();
         return 1; 
