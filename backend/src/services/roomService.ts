@@ -33,21 +33,13 @@ export class RoomService {
 			values.push(data.gameType);
 
 			// Players
-			if (data.users[0]) {
-				fieldsToUpdate.push("player1 = ?");
-				values.push(data.users[0].username);
-			}
-			if (data.users[1]) {
-				fieldsToUpdate.push("player2 = ?");
-				values.push(data.users[1].username);
-			}
-			if (data.users[2]) {
-				fieldsToUpdate.push("player3 = ?");
-				values.push(data.users[2].username);
-			}
-			if (data.users[3]) {
-				fieldsToUpdate.push("player4 = ?");
-				values.push(data.users[3].username);
+			const users = Array.from((data.users as any).values());
+   2 
+			for (let i = 0; i < Math.min(users.length, 4); i++) {
+				if (users[i]) {
+					fieldsToUpdate.push(`player${i + 1} = ?`);
+					values.push((users[i] as any).username);
+				}
 			}
 
 			// Users needed (from maxPlayers)
