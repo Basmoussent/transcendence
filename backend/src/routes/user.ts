@@ -217,6 +217,8 @@ async function userRoutes(app: FastifyInstance) {
         try {
             const database = db.getDatabase();
 
+            console.log('apodnaozindoainzdoianzodinazodinazoidn')
+
             const { userid } = request.query as { userid?: number };
 
             if (!userid)

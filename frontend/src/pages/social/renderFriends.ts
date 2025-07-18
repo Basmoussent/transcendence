@@ -1,22 +1,26 @@
 import { getAuthToken } from '../../utils/auth';
 import { sanitizeHtml } from '../../utils/sanitizer';
 import { t } from '../../utils/translations';
+import { friend } from './friend'
 
-export async function renderFriends(uuid: string) {
 
-	try {
-		const user = await loadUserInfo(uuid);
-		console.log(JSON.stringify(user, null, 8));
+export function renderFriends(uuid: string) {
 
-	}
-	catch (error) {
-		console.error("Error rendering friend profile page:", error);
-	}
+	setTimeout(async () => {
+		try {
+			const user = await loadUserInfo(uuid);
+			console.log(JSON.stringify(user, null, 8));
 
-	return (getTemplate())
+			const stats = "les stats stp"
+
+			new friend(user, stats);
+		}
+		catch (err:any) {
+			console.log(err);
+		}
+	}, 0);
+	return getTemplate();
 }
-
-
 
 async function loadUserInfo(username: string) {
 
@@ -48,8 +52,6 @@ async function loadUserInfo(username: string) {
 		}
 		else 
 			console.error('Erreur lors de la récupération des données utilisateur');
-
-
 	}
 	catch (err) {
 		console.error(`error retreve info du user pour render son profil  ${err}`);
@@ -77,21 +79,21 @@ function getTemplate() {
 			</div>
 			<div class="profile-info">
 				<div class="profile-details">
-				<h1>Alexandre Durand</h1>
+				<h1 id="username"> talan</h1>
 				<div class="profile-status">
 					<div class="status-dot"></div>
 					<span>En ligne</span>
 				</div>
 				</div>
 				<div class="profile-actions">
-				<button class="action-btn btn-primary">
-					<i class="fas fa-user-plus"></i>
-					Ajouter ami
-				</button>
-				<button class="action-btn btn-secondary">
-					<i class="fas fa-envelope"></i>
-					Message
-				</button>
+					<button id="addFriend" "class="action-btn btn-primary">
+						<i class="fas fa-user-plus"></i>
+						Ajouter ami
+					</button>
+					<button id="sendMsg" class="action-btn btn-secondary">
+						<i class="fas fa-envelope"></i>
+						Message
+					</button>
 				</div>
 			</div>
 			</div>
@@ -102,29 +104,29 @@ function getTemplate() {
 				<i class="fas fa-chart-bar"></i>
 				<h2>Statistiques</h2>
 				</div>
-				<div class="stats-grid">
-				<div class="stat-card">
-					<div class="stat-number">1,247</div>
-					<div class="stat-label">Parties jouées</div>
-				</div>
-				<div class="stat-card">
-					<div class="stat-number">68%</div>
-					<div class="stat-label">Taux de victoire</div>
-				</div>
-				<div class="stat-card">
-					<div class="stat-number">2,150</div>
-					<div class="stat-label">Score total</div>
-				</div>
-				<div class="stat-card">
-					<div class="stat-number">42</div>
-					<div class="stat-label">Rang mondial</div>
-				</div>
+					<div class="stats-grid">
+						<div class="stat-card">
+							<div id="gamePlayed" class="stat-number">1,247</div>
+							<div class="stat-label">Game played</div>
+						</div>
+						<div class="stat-card">
+							<div id="winrate" class="stat-number">68%</div>
+							<div class="stat-label">Winrate</div>
+						</div>
+						<div class="stat-card">
+							<div id="victory" class="stat-number">42</div>
+							<div class="stat-label">Victory</div>
+						</div>
+						<div class="stat-card">
+							<div id="rank" class="stat-number">42</div>
+							<div class="stat-label">Rank</div>
+					</div>
 				</div>
 			</div>
 
 			
 
-			<div class="profile-section">
+			<div id="gameHistory" class="profile-section">
 				<div class="section-header">
 				<i class="fas fa-history"></i>
 				<h2>Activité récente</h2>

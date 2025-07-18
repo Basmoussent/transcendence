@@ -22,7 +22,7 @@ import { getGame } from '@/game/gameUtils';
 import { renderMultiPong } from '../pages/pong/multiplayer-pong';
 import { renderPong } from '../pages/pong/pong';
 import { initAlive } from './auth';
-import { renderFriends } from '../pages/social/friends';
+import { renderFriends } from '../pages/social/renderFriends';
 import { render2FA } from '../pages/auth/activate-2fa';
 
 export async function router() {
@@ -93,7 +93,6 @@ export async function router() {
 			view = renderForgotPassword();
 			break;
 		case '/main':
-			console.log('je passe ici')
 			view = renderMain();
 			break;
 		case '/friends':
