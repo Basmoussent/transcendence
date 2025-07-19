@@ -8,15 +8,16 @@ export function renderProfil(uuid: string) {
 
 	setTimeout(async () => {
 		try {
-			const me = await loadMe();
-			const user = await loadUserInfo(uuid);
-			const stats = await loadUserStats(uuid);
 
-			console.log(JSON.stringify(me, null, 8));
-			console.log(JSON.stringify(user, null, 8));
-			console.log(JSON.stringify(stats, null, 8));
+			const data = {
+				me: await loadMe(),
+				user: await loadUserInfo(uuid),
+				stats: await loadUserStats(uuid),
+				friends: await loadUserFriends(uuid)
+			}
 
-			new profil(me, user, stats);
+			console.log(JSON.stringify(data.friends, null, 8))
+			new profil(data);
 		}
 		catch (err:any) {
 			console.log(err);
@@ -118,13 +119,13 @@ async function loadUserStats(username: string) {
 		if (response.ok) {
 			const result = await response.json();
 			const userStats = {
-				mmr: result.data?.mmr,
-				pong_games: result.data?.pong_games,
-				pong_wins: result.data?.pong_wins,
-				block_games: result.data?.block_games,
-				block_wins: result.data?.block_wins,
-				rating: result.data?.rating,
-				id: result.data?.id,
+				mmr: result.stats?.mmr,
+				pong_games: result.stats?.pong_games,
+				pong_wins: result.stats?.pong_wins,
+				block_games: result.stats?.block_games,
+				block_wins: result.stats?.block_wins,
+				rating: result.stats?.rating,
+				id: result.stats?.id,
 			};
 			return (userStats);
 		}
@@ -137,8 +138,33 @@ async function loadUserStats(username: string) {
 
 }
 
+async function loadUserFriends(username: string) {
+	try {
+		const token = getAuthToken();
+		if (!token) {
+			alert('❌ Token d\'authentification manquant');
+			window.history.pushState({}, '', '/login');
+			window.dispatchEvent(new PopStateEvent('popstate'));
+			return '';
+		}
 
+		const response = await fetch(`/api/friend/?username=${username}`, {
+			method: 'GET',
+			headers: {
+				'Content-Type': 'application/json',
+				'x-access-token': token }
+		});
+	
+		if (response.ok)
+			return await response.json();
+		else 
+			console.error('gros gros zig');
 
+	}
+	catch (err) {
+		console.error(`pas réussi a récup les amis de cette personnes zignew que tu es`)
+	}
+}
 
 function getTemplate() {
 	return `
@@ -196,8 +222,8 @@ function getTemplate() {
 							<div class="stat-label">Winrate</div>
 						</div>
 						<div class="stat-card">
-							<div id="victory" class="stat-number">42</div>
-							<div class="stat-label">Victory</div>
+							<div id="mmr" class="stat-number">42</div>
+							<div class="stat-label">MMR</div>
 						</div>
 						<div class="stat-card">
 							<div id="rank" class="stat-number">42</div>

@@ -131,12 +131,12 @@ export class UserService {
 		return authenticator.check(userInputCode, secret);
 	}
 
-	async retrieveStats(id: number) {
+	async retrieveStats(username: string) {
 		try {
 			const user = await new Promise<UserData | null>((resolve, reject) => {
 				this.db.get(
 					'SELECT * FROM statistics WHERE username = ?', // tu te basais sur le user_id mais le champs dans la db c'est username zignew
-					[ id ],
+					[ username ],
 					(err: any, row: UserData | undefined) => {
 					err ? reject(err) : resolve(row || null); }
 				);
@@ -144,7 +144,7 @@ export class UserService {
 			return user;
 		}
 		catch (err: any) {
-			console.log(`le user ${id} n'existe pas`)
+			console.log(`le user ${username} n'existe pas`)
 		}
 		return Promise.resolve(null); 
 	}

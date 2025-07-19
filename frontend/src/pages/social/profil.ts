@@ -5,6 +5,7 @@ export class profil {
 	private me: any;
 	private user: any;
 	private stats: any;
+	private friends: any;
 
 	private homeBtn: HTMLElement;
 	private username: HTMLElement;
@@ -12,15 +13,17 @@ export class profil {
 	private sendMsgBtn: HTMLElement;
 	private gamePlayed: HTMLElement;
 	private winrate: HTMLElement;
-	private victory: HTMLElement;
+	private mmr: HTMLElement;
 	private rank: HTMLElement;
 	private gameHistory: HTMLElement;
 
-	constructor (me: any, user: any, stats: any) {
+	constructor (data: any) {
 
-		this.me = me;
-		this.user = user;
-		this.stats = stats;
+		this.me = data.me;
+		this.user = data.user;
+		this.stats = data.stats;
+		this.friends = data.friends;
+
 
 		this.homeBtn = this.getElement('homeBtn');
 		this.username = this.getElement('username');
@@ -28,7 +31,7 @@ export class profil {
 		this.sendMsgBtn = this.getElement('sendMsg');
 		this.gamePlayed = this.getElement('gamePlayed');
 		this.winrate = this.getElement('winrate');
-		this.victory = this.getElement('victory');
+		this.mmr = this.getElement('mmr');
 		this.rank = this.getElement('rank');
 		this.gameHistory = this.getElement('gameHistory');
 
@@ -64,11 +67,13 @@ export class profil {
 
 	private updateInfo() {
 
-		this.username.innerHTML = this.user.username;
-		this.gamePlayed.innerHTML = this.stats.gamePlayed;
-		this.victory.innerHTML = this.stats.victory;
-		this.winrate.innerHTML = `${(this.stats.victory / this.stats.gamePlayed) * 100}%`;
-		this.rank.innerHTML = this.stats.rank;
+		this.username.textContent = this.user.username;
+		this.gamePlayed.textContent = this.stats.pong_games + this.stats.block_games;
+		this.mmr.textContent = this.stats.mmr;
+		this.winrate.textContent = this.stats.pong_games + this.stats.block_games ? `${(this.stats.pong_wins + this.stats.block_wins + this.stats.block_games) * 100}%` : 'N/A';
+		this.rank.textContent = "rank tt le monde via mmr";
+
+
 	}
 
 	// private async addFriend() {

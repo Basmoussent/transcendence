@@ -397,7 +397,7 @@ export class Chat {
 async function fetchUserRelations(username: string): Promise<Relation[]|null> {
 
 	try {
-		const response = await fetch(`/api/friend/relations?username=${username}`);
+		const response = await fetch(`/api/friend/relations/?username=${username}`);
 		
 		if (!response.ok) {
 			const errorData = await response.json();
