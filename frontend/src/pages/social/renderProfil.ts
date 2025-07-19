@@ -16,7 +16,6 @@ export function renderProfil(uuid: string) {
 				friends: await loadUserFriends(uuid)
 			}
 
-			console.log(JSON.stringify(data.friends, null, 8))
 			new profil(data);
 		}
 		catch (err:any) {
@@ -198,10 +197,6 @@ function getTemplate() {
 						<i class="fas fa-user-plus"></i>
 						Ajouter ami
 					</button>
-					<button id="sendMsg" class="action-btn btn-secondary">
-						<i class="fas fa-envelope"></i>
-						Message
-					</button>
 				</div>
 			</div>
 			</div>
@@ -270,6 +265,16 @@ function getTemplate() {
 					</div>
 					<div class="activity-time">Il y a 3 jours</div>
 				</div>
+				<div class="activity-item">
+					<div class="activity-icon">
+					<i class="fas fa-users"></i>
+					</div>
+					<div class="activity-content">
+					<h4>Nouvel ami ajouté</h4>
+					<p>Thomas_42 a accepté votre demande d'ami</p>
+					</div>
+					<div class="activity-time">Il y a 3 jours</div>
+				</div>
 				</div>
 			</div>
 
@@ -277,30 +282,10 @@ function getTemplate() {
 				<div class="section-header">
 				<i class="fas fa-users"></i>
 				<h2>Amis</h2>
+					</div>
+					<div id="friends" class="friends-grid">
+					</div>
 				</div>
-				<div class="friends-grid">
-				<div class="friend-card">
-					<div class="friend-avatar">M</div>
-					<div class="friend-name">Marie_G</div>
-					<div class="friend-status">En partie</div>
-				</div>
-				<div class="friend-card">
-					<div class="friend-avatar">T</div>
-					<div class="friend-name">Thomas_42</div>
-					<div class="friend-status">En ligne</div>
-				</div>
-				<div class="friend-card">
-					<div class="friend-avatar">S</div>
-					<div class="friend-name">Sophie_K</div>
-					<div class="friend-status">En ligne</div>
-				</div>
-				<div class="friend-card">
-					<div class="friend-avatar">L</div>
-					<div class="friend-name">Lucas_Dev</div>
-					<div class="friend-status">Absent</div>
-				</div>
-				</div>
-			</div>
 			</div>
 		</div>
 			
@@ -391,6 +376,13 @@ function getTemplate() {
 		background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="20" cy="20" r="2" fill="rgba(255,255,255,0.1)"/><circle cx="80" cy="40" r="3" fill="rgba(255,255,255,0.1)"/><circle cx="40" cy="70" r="1.5" fill="rgba(255,255,255,0.1)"/><circle cx="70" cy="80" r="2.5" fill="rgba(255,255,255,0.1)"/></svg>');
 		animation: float 6s ease-in-out infinite;
         }
+
+	#gameHistory {
+		max-height: 400px; /* Ou la hauteur fixe que tu souhaites */
+		overflow-y: auto;
+		padding-right: 10px; /* Pour éviter que la scrollbar ne cache du contenu */
+	}
+
 
         .profile-avatar {
 		position: absolute;

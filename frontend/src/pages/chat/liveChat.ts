@@ -250,6 +250,9 @@ export class Chat {
 
 		const relations: Relation[] | null = await fetchUserRelations(this.me.username);
 
+
+		console.log(JSON.stringify(relations, null, 8))
+
 		if (!relations || !relations.length) {
 			console.log("t'as pas d'amis mgl")
 			return;
@@ -406,17 +409,9 @@ async function fetchUserRelations(username: string): Promise<Relation[]|null> {
 
 		const result = await response.json();
 
-		if (response.ok) {
-			const relations: Relation[] = result.relations.map((relation:any) => ({
-				id: relation.id,
-				user_1: relation.user_1,
-				user_2: relation.user_2,
-				user1_state: relation.user1_state,
-				user2_state: relation.user2_state
-			}));
-			console.log("Relations:", relations);
-			return relations;
-		}
+		if (response.ok)
+			return result.relations;
+		
 		console.error("error retrieve relations of a user");
 		return null;
 	}

@@ -118,11 +118,6 @@ block --> max 2 players
 pour pong ajouter card ia pour chaque ia presente
 
 
-Error: SQLITE_CONSTRAINT: UNIQUE constraint failed: users.email
-[ERROR] 20:34:13 Error: SQLITE_CONSTRAINT: UNIQUE constraint failed: users.email
-^C%
-
-
 trouver un moyen de passer les infos a la classe pong lors de la construction 
 	|
 	|__ un window.history.pushState({}, '', '/pong');

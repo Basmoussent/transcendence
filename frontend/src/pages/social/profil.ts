@@ -10,12 +10,12 @@ export class profil {
 	private homeBtn: HTMLElement;
 	private username: HTMLElement;
 	private addFriendBtn: HTMLElement;
-	private sendMsgBtn: HTMLElement;
 	private gamePlayed: HTMLElement;
 	private winrate: HTMLElement;
 	private mmr: HTMLElement;
 	private rank: HTMLElement;
 	private gameHistory: HTMLElement;
+	private friendsGrid: HTMLElement;
 
 	constructor (data: any) {
 
@@ -28,12 +28,12 @@ export class profil {
 		this.homeBtn = this.getElement('homeBtn');
 		this.username = this.getElement('username');
 		this.addFriendBtn = this.getElement('addFriend');
-		this.sendMsgBtn = this.getElement('sendMsg');
 		this.gamePlayed = this.getElement('gamePlayed');
 		this.winrate = this.getElement('winrate');
 		this.mmr = this.getElement('mmr');
 		this.rank = this.getElement('rank');
 		this.gameHistory = this.getElement('gameHistory');
+		this.friendsGrid = this.getElement('friends');
 
 		this.setupEvents();
 
@@ -54,13 +54,12 @@ export class profil {
 			window.dispatchEvent(new Event('popstate'));
 		});
 
-		this.addFriendBtn.addEventListener('click', () => {
-			this.addFriend();
-		})
+		this.addFriendBtn.addEventListener('click', async () => {
+			await this.addFriend();
 
-		this.sendMsgBtn.addEventListener('click', () => {
-			console.warn(`pas encore implémenté`)
-		});
+			this.addFriendBtn.textContent = 'requested'
+
+		})
 
 
 	}
@@ -73,8 +72,82 @@ export class profil {
 		this.winrate.textContent = this.stats.pong_games + this.stats.block_games ? `${(this.stats.pong_wins + this.stats.block_wins + this.stats.block_games) * 100}%` : 'N/A';
 		this.rank.textContent = "rank tt le monde via mmr";
 
+		// this.friendsGrid.textContent = '';
+
+
+		for (const friend of this.friends) {
+			const tmp = {
+				username : friend.user_1 !== this.user.username ? friend.user_1: friend.user_2,
+				
+			}
+			console.log(JSON.stringify(friend, null, 8))
+			this.friendsGrid.innerHTML += this.friendCard(tmp);
+		}
+	}
+
+	private friendCard(friend: any) { // modifier status absent | en ligne avec redis
+		return `
+			<div class="friend-card">
+				<div class="friend-avatar">${friend.username.charAt(0).toUpperCase()}</div>
+				<div class="friend-name">${friend.username}</div>
+				<div class="friend-status">Absent</div>
+			</div>
+			`;
+        }
+
+	private async addFriend() {
+
+		try {
+			const token = getAuthToken();
+			if (!token) {
+				alert('❌ Token d\'authentification manquant');
+				window.history.pushState({}, '', '/login');
+				window.dispatchEvent(new PopStateEvent('popstate'));
+				return null;
+			}
+	
+			const response = await fetch(`/api/friend/${this.user.username}`, {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+					'x-access-token': token,
+				},
+			});
+		
+			if (response.ok) {
+				const result = await response.json();
+				console.log("on a bien recup la game", result);
+				const game: Game = {
+					id: Number(result.id),
+					uuid: sanitizeHtml(result.uuid),
+					game_type: sanitizeHtml(result.game_type),
+					player1: sanitizeHtml(result.player1),
+					player2: sanitizeHtml(result?.player2),
+					player3: sanitizeHtml(result?.player3),
+					player4: sanitizeHtml(result?.player4),
+					winner: sanitizeHtml(result?.winner),
+					users_needed:(Number(result.users_needed)),
+					start_time: sanitizeHtml(result?.start_time),
+					end_time: sanitizeHtml(result?.end_time),
+				};
+				return game;
+			}
+			else 
+				console.error("erreur specific getGame");
+
+		}
+		catch (err) {
+			console.error(`nn nn c'est pas bon mgl`)
+		}
 
 	}
+
+
+	// // Gérer le clic sur un ami
+        // private onFriendClick(friendName) {
+        //     alert(`Interaction avec ${friendName}`);
+        //     // Ici vous pouvez ajouter votre logique : ouvrir un chat, voir le profil, etc.
+        // }
 
 	// private async addFriend() {
 	// 	const token = getAuthToken();
