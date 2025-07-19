@@ -4,71 +4,75 @@ import path from 'path';
 import sqlite3 from 'sqlite3';
 
 export class DatabaseService {
-  private db: sqlite3.Database | null = null;
-  private password: string | null = null;
 
-  constructor(
-    private dbPath: string = path.resolve('./data/database.sqlite')
-  ) {}
+	private db: sqlite3.Database | null = null;
+	private dbPath: string;
 
-  async initialize(): Promise<void> {
-    try {
-      const dir = path.dirname(this.dbPath);
-      if (!fs.existsSync(dir)) {
-        fs.mkdirSync(dir, { recursive: true });
-      }
+	//TALAN
+	constructor() {
+		this.dbPath = path.resolve('./data/database.sqlite')
+	}
 
-      const isNewDb = !fs.existsSync(this.dbPath);
+	async initialize(): Promise<void> {
+		try {
+			const dir = path.dirname(this.dbPath);
 
-      // TODO:add database encryption using apasshohrase stored in vault
-      this.db = new sqlite3.Database(this.dbPath, sqlite3.OPEN_READWRITE | sqlite3.OPEN_CREATE, (err) => {
-        if (err) {
-          console.error('❌ Error opening database:', err.message);
-          throw err;
-        }
+			if (!fs.existsSync(dir))
+				fs.mkdirSync(dir, { recursive: true });
 
-        console.log('📦 Connected to SQLite database (unencrypted)');
-        this.initializeDatabase().catch(console.error);
-      });
-    } catch (error) {
-      console.error('❌ Error initializing database service:', error);
-      throw error;
-    }
-  }
+			const isNewDb = !fs.existsSync(this.dbPath);
 
-  private async initializeDatabase(): Promise<void> {
-    try {
-      const sqlPath = '/app/sql/init.sql';
-      const initSql = readFileSync(sqlPath, 'utf8');
+			// TODO:add database encryption using apasshohrase stored in vault
+			this.db = new sqlite3.Database(this.dbPath, sqlite3.OPEN_READWRITE | sqlite3.OPEN_CREATE, (err) => {
 
-      this.db!.exec(initSql, (err) => {
-        if (err) {
-          console.error('❌ Error executing init SQL:', err.message);
-          throw err;
-        }
-        console.log('✅ Database initialized and encrypted successfully');
-      });
-    } catch (error) {
-      console.error('❌ Error reading init SQL file:', error);
-      throw error;
-    }
-  }
+				if (err) {
+					console.error('❌ Error opening database:', err.message);
+					throw err;
+				}
 
-  public getDatabase(): sqlite3.Database {
-    if (!this.db) {
-      throw new Error('Database not initialized');
-    }
-    return this.db;
-  }
+				console.log('📦 Connected to SQLite database (unencrypted)');
+				this.initializeDatabase().catch(console.error);
+			});
+		}
+		catch (error) {
+			console.error('❌ Error initializing database service:', error);
+			throw error;
+		}
+	}
 
-  public close(): void {
-    if (this.db) {
-      this.db.close((err) => {
-        if (err) console.error('❌ Error closing database:', err.message);
-        else console.log('📦 Database connection closed');
-      });
-    }
-  }
+	private async initializeDatabase(): Promise<void> {
+		try {
+			const sqlPath = '/app/sql/init.sql';
+			const initSql = readFileSync(sqlPath, 'utf8');
+
+			this.db!.exec(initSql, (err) => {
+				if (err) {
+					console.error('❌ Error executing init SQL:', err.message);
+					throw err;
+				}
+				console.log('✅ Database initialized and encrypted successfully');
+			});
+		} catch (error) {
+			console.error('❌ Error reading init SQL file:', error);
+			throw error;
+		}
+	}
+
+	public getDatabase(): sqlite3.Database {
+
+		if (!this.db)
+			throw new Error('Database not initialized');
+		return this.db;
+	}
+
+	public close(): void {
+		if (this.db) {
+			this.db.close((err: any) => { //TALAN
+				if (err) console.error('❌ Error closing database:', err.message);
+				else console.log('📦 Database connection closed');
+			});
+		}
+	}
 }
 
 export const db = new DatabaseService();

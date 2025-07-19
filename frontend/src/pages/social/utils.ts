@@ -86,69 +86,69 @@ export async function fetchMe2fa(): Promise<UserData | void> {
 }
 
 export async function userInfo() {
-    const token = getAuthToken();
-    if (!token) {
-        alert('❌ Token d\'authentification manquant');
-        window.history.pushState({}, '', '/login');
-        window.dispatchEvent(new PopStateEvent('popstate'));
-        return;
-    }
+	const token = getAuthToken();
+	if (!token) {
+		alert('❌ Token d\'authentification manquant');
+		window.history.pushState({}, '', '/login');
+		window.dispatchEvent(new PopStateEvent('popstate'));
+		return;
+	}
 
-    try {
-        const response = await fetch('/api/me', {
-            method: 'GET',
-            headers: {
-                'x-access-token': token,
-                'Content-Type': 'application/json'
-            }
-        });
+	try {
+		const response = await fetch('/api/me', {
+			method: 'GET',
+			headers: {
+				'x-access-token': token,
+				'Content-Type': 'application/json'
+			}
+		});
 
-        if (!response.ok)
-            throw new Error();
+		if (!response.ok)
+			throw new Error();
 
-        const data = await response.json();
-        return data;
-    } catch (error) {
+		const data = await response.json();
+		return data;
+	}
+	catch (error) {
 		console.error('userInfo failed: ', error);
-        return false; // en cas d'erreur, suppose désactivé
-    }
+		return false; // en cas d'erreur, suppose désactivé
+	}
 }
 
 export async function update2FAState(status: number, userId: number): Promise<boolean> {
-    const token = getAuthToken();
-    if (!token) {
-        alert('❌ Token d\'authentification manquant');
-        window.history.pushState({}, '', '/login');
-        window.dispatchEvent(new PopStateEvent('popstate'));
-        return false;
-    }
+	const token = getAuthToken();
+	if (!token) {
+		alert('❌ Token d\'authentification manquant');
+		window.history.pushState({}, '', '/login');
+		window.dispatchEvent(new PopStateEvent('popstate'));
+		return false;
+	}
 
+	try {
+		const response = await fetch('/api/username/2fa', {
+			method: 'PUT',
+			headers: {
+				'x-access-token': token,
+				'Content-Type': 'application/json'
+			},
+			body: JSON.stringify({
+				status: status,
+				userId: userId
+			})
+		});
 
-    try {
-        const response = await fetch('/api/username/2fa', {
-            method: 'PUT',
-            headers: {
-                'x-access-token': token,
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                status: status,
-                userId: userId
-            })
-        });
+		const data = await response.json();
 
-        const data = await response.json();
+		if (!response.ok)
+			throw new Error('Échec de la requête PUT /2fa');
 
-        if (!response.ok) {
-            throw new Error('Échec de la requête PUT /2fa');
-        }
-
-        if (data.success)
-            return true;
-        else
-            throw new Error(data.error || 'Echec de la mise a jour du 2FA status');
-    } catch (error) {
+		if (data.success)
+			return true;
+		else
+			throw new Error(data.error || 'Echec de la mise a jour du 2FA status');
+	}
+	catch (error) {
 		console.error('reverse2FAstatus failed: ', error);
-        return false;
-    }
+		return false;
+	}
 }

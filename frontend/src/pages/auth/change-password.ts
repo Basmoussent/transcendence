@@ -92,9 +92,10 @@ function initializeChangePasswordEvents() {
 				body: JSON.stringify({ currentPassword, newPassword, confirmNewPassword })
 			});
 			const result = await response.json();
-			if (!response.ok) {
+			
+			if (!response.ok)
 				alert(`❌ Erreur: ${result.error || 'Erreur inconnue'}`);
-			} else {
+			else {
 				alert('✅ Mot de passe modifié avec succès');
 				window.history.pushState({}, '', '/profil');
 				window.dispatchEvent(new PopStateEvent('popstate'));
