@@ -294,7 +294,7 @@ export function render2FA() {
             if (success) {
               alert('✅ Authentification à deux facteurs activée avec succès');
               setTimeout(() => {
-                window.history.pushState({}, '', '/profil');
+                window.history.pushState({}, '', '/me');
                 window.dispatchEvent(new PopStateEvent('popstate'));
               }, 2000);
             }
