@@ -275,7 +275,7 @@ export function render2FA() {
               'x-access-token': authToken
             },
             body: JSON.stringify({
-              user,
+              user :user?.username,
               code
             })
           });

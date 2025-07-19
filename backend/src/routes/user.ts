@@ -78,7 +78,71 @@ async function userRoutes(app: FastifyInstance) {
 					avatar_url: user.avatar_url || 'avatar.png',
 					language: user.language,
 					two_fact_auth: user.two_fact_auth || 0,
-					secret_key: user.secret_key || "rien"
+				},
+				stats: stats
+			});
+		} catch (err: any) {
+			console.error('❌ Error in /me endpoint:', err);
+			if (err.name === 'JsonWebTokenError') {
+				return reply.status(401).send({ error: 'Token invalide ou expiré' });
+			}
+			return reply.status(500).send({ error: 'Erreur serveur interne' });
+		}
+	});
+
+	app.get('/me2fa', async (request: FastifyRequest, reply: FastifyReply) => {
+
+		const token = request.headers['x-access-token'] ? request.headers['x-access-token'] : request.cookies['x-access-token'];
+
+		if (!token)
+			return reply.status(401).send({ error: 'Token d\'authentification manquant' });
+
+		try {
+			const decoded = app.jwt2fa.verify(token) as { name: string };
+			const username = decoded.name;
+
+			const database = db.getDatabase();
+			if (!database) {
+				return reply.status(500).send({ error: 'Erreur de connexion à la base de données' });
+			}
+
+			// Récupération des données utilisateur
+			const user = await new Promise<UserData | null>((resolve, reject) => {
+				database.get(
+					'SELECT * FROM users WHERE username = ?',
+					[username],
+					(err: any, row: UserData | undefined) => {
+						err ? reject(err) : resolve(row || null);
+					}
+				);
+			});
+
+			if (!user)
+				return reply.status(404).send({ error: 'Utilisateur non trouvé' });
+
+			console.log('user', user);
+
+			// Récupération des statistiques (pour l'instant des valeurs par défaut)
+			// TODO: Implémenter la vraie logique des statistiques
+			const userStats = await app.userService.retrieveStats(user.username);
+			console.log('userStats', userStats);
+			const win = userStats.pong_wins + userStats.block_wins;
+			const games = userStats.pong_games + userStats.block_games;
+			const rating = userStats.rating;
+			const stats = {
+				win: win,
+				games: games,
+				rating: rating
+			};
+
+			return reply.send({
+				user: {
+					id: user.id,
+					username: user.username,
+					email: user.email,
+					avatar_url: user.avatar_url || 'avatar.png',
+					language: user.language,
+					two_fact_auth: user.two_fact_auth || 0,
 				},
 				stats: stats
 			});
@@ -368,10 +432,9 @@ async function userRoutes(app: FastifyInstance) {
 		try {
 			const { user, code } = request.body as { user?: any, code: any };
 
-			const database = db.getDatabase(); // pour recup le secret
-			if (!database) {
-				return reply.status(500).send({ error: 'Erreur de connexion à la base de données' });
-			}
+			const database = db.getDatabase();
+			console.log(`user = ${user} et code = ${code}`)
+			console.log(`request.body = ${JSON.stringify(request.body, null, 8)}`)
 
 			if (!user)
 				throw new Error("missing user in the request body");
@@ -379,20 +442,12 @@ async function userRoutes(app: FastifyInstance) {
 			if (!code)
 				throw new Error("missing code in the request body");
 
-			const secret = await new Promise<string>((resolve, reject) => {
-				database.get(
-					'SELECT secret_key FROM users WHERE id = ?',
-					[user.id],
-					(err: any, row: string) => {
-						err ? reject(err) : resolve(row);
-					}
-				);
-			});
+			const secret = await app.userService.findByUsername(user);
+			console.log(`secret = ${secret}`)
 
 			try {
-				const checkCode = await app.userService.verifiyCode(code, secret.secret_key);
-
-				if (checkCode.checkCode) {
+				let checkCode = await app.userService.verifiyCode(code, secret.secret_key);
+				if (checkCode) {
 					const origin = request.headers.origin || '';
 					const host = request.headers.host || '';
 					let cookieDomain;
@@ -410,8 +465,9 @@ async function userRoutes(app: FastifyInstance) {
 							cookieDomain = ".localhost"; // Pas de domaine pour localhost simple
 					}
 
-
-					const token = app.jwt.sign({ user: user.email, name: user.username });
+					console.log(`avant le sign`)
+					const token = app.jwt.sign({ user: secret.email, name: secret.username });
+					console.log(`après le sign`)
 					return reply.header(
 						'Set-Cookie',
 						`x-access-token=${token}; Path=/; Domain=${cookieDomain}; SameSite=Lax; Max-Age=${7 * 24 * 60 * 60}`).send({
@@ -419,13 +475,13 @@ async function userRoutes(app: FastifyInstance) {
 						})
 				}
 
-				console.log(JSON.stringify(checkCode, null, 8))
 				return reply.send({
 					checkCode: checkCode
 				});
+
 			}
 			catch (err: any) {
-				console.log(`pblm verify code`)
+				console.log(`pblm verify code`, err)
 			}
 		}
 		catch (err: any) {

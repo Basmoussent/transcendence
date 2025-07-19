@@ -62,13 +62,14 @@ export async function router() {
 				'x-access-token': token || '',
 			},
 		});
-		console.log("api check response:", response);
+		const data = await response.json();
+		console.log("api check response:", data);
 		if (response.status === 401) {
 			window.history.pushState({}, '', '/login');
 			app.innerHTML = renderLogin();
 			return;
 		}
-		else if (response.ok && response.temp) {
+		else if (response.ok && data.temp) {
 			console.log("jvais render2fa login")
 			app.innerHTML = render2FALogin();
 			return;
@@ -175,8 +176,9 @@ export async function router() {
 					'x-access-token': tokenAuth,
 				},
 			});
-			console.log("response:", response);
-			if (response.ok && response.temp) {
+			const data = await response.json();
+			console.log("response:", data);
+			if (response.ok && data.temp) {
 				initAlive();
 			}
 		} catch (e) {

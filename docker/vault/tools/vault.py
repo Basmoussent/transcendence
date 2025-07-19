@@ -173,6 +173,24 @@ class VaultManager:
         except:
             print("Erreur lors de la génération du secret aléatoire")
             sys.exit(1)
+
+    def generate_random_secret_2fa(self, length: int = 24) -> str:
+        """Generate a random secret string"""
+        import secrets
+        import string
+        import dotenv
+        try :
+            dotenv.load_dotenv("/tmp/vault.env")
+            KEY = os.getenv('KEY_SECRET')
+            if KEY:
+                print("Utilisation du secret KEY_SECRET existant :", KEY)
+                return KEY
+            else:
+                alphabet = string.ascii_letters + string.digits
+                return ''.join(secrets.choice(alphabet) for _ in range(length))
+        except:
+            print("Erreur lors de la génération du secret aléatoire")
+            sys.exit(1)
         
 
 def signal_handler(signum, frame):
@@ -224,11 +242,12 @@ def main():
             print("Échec du stockage du secret JWT")
             vault_manager.stop_vault_server()
             sys.exit(1)
-        key_secret = vault_manager.generate_random_secret()
+        key_secret = vault_manager.generate_random_secret_2fa()
         if not vault_manager.store_key_secret(vault_token, key_secret):
             print("Échec du stockage du secret JWT")
             vault_manager.stop_vault_server()
             sys.exit(1)
+
         env_content = f"""VAULT_KEY_1={vault_key}
 VAULT_TOKEN={vault_token}
 KEY_SECRET={key_secret}
@@ -269,7 +288,7 @@ VAULT_JWT_KEY={jwt_secret}"""
             vault_manager.stop_vault_server()
             sys.exit(1)
 
-        key_secret = vault_manager.generate_random_secret()
+        key_secret = vault_manager.generate_random_secret_2fa()
         if not vault_manager.store_key_secret(vault_token, key_secret):
             print("Échec du stockage du secret JWT")
             vault_manager.stop_vault_server()

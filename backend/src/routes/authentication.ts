@@ -225,10 +225,18 @@ async function authRoutes(app: FastifyInstance) {
 
             if (info.two_fact_auth) {
               console.warn(`bool 2fa quefgwjfge ${info.two_fact_auth}`)
-              console.log('app:', JSON.stringify(app, null, 8));
+              console.log('🔍 Debug JWT in auth route:');
               console.log('app.jwt:', typeof app?.jwt);
               console.log('app.jwt2fa:', typeof app?.jwt2fa);
               console.log('Available properties:', Object.keys(app || {}));
+              console.log('All JWT-related properties:', Object.keys(app || {}).filter(key => key.includes('jwt')));
+              
+              if (!app.jwt2fa) {
+                console.error('❌ jwt2fa decorator is not available!');
+                resolve(reply.status(500).send({ error: 'JWT 2FA not configured' }));
+                return;
+              }
+              
               const tfa_token = app.jwt2fa.sign({ name: user.username });
               response.header(
                 'Set-Cookie',
@@ -347,7 +355,7 @@ async function authRoutes(app: FastifyInstance) {
 
         return { valid: true, payload: tfa_decoded, temp: true };
       }
-      catch {
+      catch (err: any) {
         return reply.status(401).send({ error: 'Invalid token', detail: err.message });
       }
     }

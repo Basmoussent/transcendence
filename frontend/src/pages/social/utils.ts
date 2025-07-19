@@ -47,6 +47,44 @@ export async function fetchMe(): Promise<UserData | void> {
 	}
 }
 
+export async function fetchMe2fa(): Promise<UserData | void> {
+
+	try {
+		const token = getAuthToken();
+		if (!token) {
+			alert('❌ Token d\'authentification manquant');
+			window.history.pushState({}, '', '/login');
+			window.dispatchEvent(new PopStateEvent('popstate'));
+			return;
+		}
+
+		const response = await fetch('/api/me2fa', {
+			method: 'GET',
+			headers: {
+				'Content-Type': 'application/json',
+				'x-access-token': token
+			}
+		});
+
+		if (response.ok) {
+			const result = await response.json();
+			const tmp: UserData = {
+				username: sanitizeHtml(result.user?.username),
+				email: sanitizeHtml(result.user?.email),
+				avatar_url: sanitizeHtml(result.user?.avatar_url) || 'avatar.png',
+				id: Number(sanitizeHtml(result.user?.id)),
+				two_fact_auth: Boolean(sanitizeHtml(result.user?.two_fact_auth)) || false,
+			};
+			return (tmp);
+		}
+		else
+			console.error('fetchMe failed');
+	}
+	catch (error) {
+		console.error('fetchMe failed: ', error);
+	}
+}
+
 export async function userInfo() {
     const token = getAuthToken();
     if (!token) {

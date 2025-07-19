@@ -1,5 +1,5 @@
 import { getAuthToken } from '../../utils/auth';
-import { fetchMe, update2FAState, userInfo } from '../social/utils';
+import { fetchMe2fa } from '../social/utils';
 
 export function render2FALogin() {
   const htmlContent = `
@@ -187,7 +187,8 @@ export function render2FALogin() {
     const activateBtn = document.getElementById('activateBtn') as HTMLInputElement;
     const verificationCode = document.getElementById('verificationCode') as HTMLInputElement;
 
-    const user = await fetchMe()
+    const user = await fetchMe2fa()
+    console.log(`user = ${JSON.stringify(user, null, 8)}`)
   
     const authToken = getAuthToken();
     if (!authToken) {
@@ -229,12 +230,13 @@ export function render2FALogin() {
               'x-access-token': authToken
             },
             body: JSON.stringify({
-              user,
+              user :user?.username,
               code
             })
           });
 
           const checkCode = await responseCode.json();
+          console.log(`checkCode = ${checkCode.checkCode}`)
           if (!checkCode.checkCode)
             alert(`❌ Code incorrect`);
 
@@ -244,6 +246,8 @@ export function render2FALogin() {
           }
         }
         catch (error) {
+          console.log(`error = ${error}`)
+          console.error('Stack trace :', error.stack)
         }
       });
     }
