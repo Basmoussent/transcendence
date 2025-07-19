@@ -15,14 +15,6 @@ interface RoomData {
 	ai: number;
 }
 
-interface Relation {
-	id: number;
-	user_1: string;
-	user_2: string;
-	user1_state: 'normal' | 'requested' | 'waiting' | 'blocked';
-	user2_state: 'normal' | 'requested' | 'waiting' | 'blocked';
-}
-
 export class ChatService {
 
 	private db: any;
@@ -62,10 +54,11 @@ export class ChatService {
 					SELECT m.*, m.sender_username 
 					FROM messages m 
 					WHERE m.chat_id = ? 
-					ORDER BY m.created_at ASC
-				`, [chatId], (err: any, rows: any[]) => {
-					err ? reject(err) : resolve(rows || []);
-				});
+					ORDER BY m.created_at ASC`,
+					[chatId], (err: any, rows: any[]) => {
+						err ? reject(err) : resolve(rows || []);
+					}
+				);
 			});
 			return chatHistory;
 		} catch (error) {
@@ -77,9 +70,10 @@ export class ChatService {
 	async logChatMessage(user1: string, user2: string, message: string) {
 		try {
 			const chatId = await this.getChatId(user1, user2);
-			if (!chatId) {
+
+			if (!chatId)
 				throw new Error('Chat not found - users must be friends');
-			}
+
 			const result = await new Promise<any>((resolve, reject) => {
 				this.db.run(
 					'INSERT INTO messages (chat_id, sender_username, content) VALUES (?, ?, ?)',
