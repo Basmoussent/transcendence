@@ -65,219 +65,182 @@ function broadcastSystemMessage(room: Room, content: string) {
 
 export async function handleRoom(app: FastifyInstance, socket: WebSocket, req: FastifyRequest) {
 	try {
-	const token = req.headers['x-access-token'] ? req.headers['x-access-token'] : req.cookies['x-access-token']; 
-		
-	if (!token) {
-		console.log('⚠️  Aucun token fourni. Détails de la requête :');
-		console.log('Headers :', JSON.stringify(req.headers, null, 2));
-		console.log('Cookies :', JSON.stringify(req.cookies, null, 2));
-		socket.send(JSON.stringify({
-			type: 'notLog',
-			message: 'the user is not log' }));
-		return ;
-	}
-
-	const decoded = app.jwt.verify(token as string) as { user: string; name: string };
-	const username = decoded.name;
-
-	const { uuid } = req.params as { uuid: string };
-
-	let room = rooms.get(uuid);
-
-	const game = await app.gameService.getGame(uuid);
-
-	if (!game)
-		return;
-
-	console.log(game.id);
-
-	const user: User = {
-		username: username,
-		isReady: false, 
-		socket: socket };
-
-
-	if (!room) {
-		room = {
-			id: uuid,
-			name: `Room ${uuid.substring(0, 5)}`,
-			gameType: game.game_type,
-			maxPlayers: game.users_needed,
-			users: new Map(),
-			host: username,
-			isGameStarted: false,
-			ai: 0,
-		};
-		rooms.set(uuid!, room);
-	}
-
-
-	if (room.maxPlayers === room.users.size + room.ai) {
-		console.log("bah qiwudbqwiudbqiwu\n\n\n\ndbq")
-		socket.send(JSON.stringify({
-			type: 'error',
-			message: 'Room is full' }));
-			console.log('je vais close le socket')
-		return;
-	}
-
-	console.log(JSON.stringify(room, null, 4));
-
-	room.users.set(username, user);
-
-	console.warn(`room.maxPlayers === room.users.size + room.ai --> ${room.maxPlayers} === ${room.users.size} + ${room.ai}`)
-
-	broadcastSystemMessage(room, `${username} has joined the room.`);
-	await broadcastRoomUpdate(app, room);
-	await app.roomService.updateGame(room)
-	socket.on('message', async (message: string) => {
-		try {
-			const data = JSON.parse(message);
-
-			app.jwt.verify(data.token);
+		const token = req.headers['x-access-token'] ? req.headers['x-access-token'] : req.cookies['x-access-token']; 
 			
-			const currentRoom = rooms.get(uuid!)!;
-			const currentUser = currentRoom.users.get(username)!;
+		if (!token) {
+			console.log('⚠️  Aucun token fourni. Détails de la requête :');
+			socket.send(JSON.stringify({
+				type: 'notLog',
+				message: 'the user is not log' }));
+			return ;
+		}
 
-			console.log()
+		const decoded = app.jwt.verify(token as string) as { user: string; name: string };
+		const username = decoded.name;
 
-			switch (data.type) {
-				case 'toggle_ready':
-					currentUser.isReady = !currentUser.isReady;
-					console.log(`${username} --> isready == ${currentUser.isReady}`);
-					await broadcastRoomUpdate(app, currentRoom);
-					break;
+		const { uuid } = req.params as { uuid: string };
 
-				case 'game_type':
-					currentRoom.gameType = data.name;
-					currentRoom.maxPlayers = data.name === 'pong' ? 4 : 2;
-					currentRoom.ai = 0;
-					await broadcastRoomUpdate(app, currentRoom);
-					break;
+		let room = rooms.get(uuid);
 
-				case 'increase':
-					currentRoom.ai += 1;
-					console.log(currentRoom.ai)
-					await broadcastRoomUpdate(app, currentRoom);
-					break;
+		const game = await app.gameService.getGame(uuid);
 
-				case 'decrease':
-					currentRoom.ai -= 1;
-					console.log(currentRoom.ai)
-					await broadcastRoomUpdate(app, currentRoom);
-					break;
-					
-				case 'maxPlayer':
-					currentRoom.maxPlayers = data.players
-					await broadcastRoomUpdate(app, currentRoom);
-					break;
+		if (!game)
+			return;
+
+		const user: User = {
+			username: username,
+			isReady: false, 
+			socket: socket };
+
+		if (!room) {
+			room = {
+				id: uuid,
+				name: `Room ${uuid.substring(0, 5)}`,
+				gameType: game.game_type,
+				maxPlayers: game.users_needed,
+				users: new Map(),
+				host: username,
+				isGameStarted: false,
+				ai: 0,
+			};
+
+			rooms.set(uuid!, room);
+		}
+
+		if (room.maxPlayers === room.users.size + room.ai) {
+
+			console.log(JSON.stringify({
+				room_users_size : room.users.size,
+				room_ai : room.ai,
+				maxplayer: room.maxPlayers,
+				taille_actuelle: room.users.size + room.ai
+			}))
+			socket.send(JSON.stringify({
+				type: 'error',
+				message: 'Room is full' }));
+				console.log('je vais close le socket')
+			return;
+		}
+
+		room.users.set(username, user);
+
+		console.warn(`room.maxPlayers === room.users.size + room.ai --> ${room.maxPlayers} === ${room.users.size} + ${room.ai}`)
+
+		broadcastSystemMessage(room, `${username} has joined the room.`);
+		await broadcastRoomUpdate(app, room);
+		await app.roomService.updateGame(room)
+		socket.on('message', async (message: string) => {
+			try {
+				const data = JSON.parse(message);
+
+				app.jwt.verify(data.token);
+				
+				const currentRoom = rooms.get(uuid!)!;
+				const currentUser = currentRoom.users.get(username)!;
+
+				console.log()
+
+				switch (data.type) {
+					case 'toggle_ready':
+						currentUser.isReady = !currentUser.isReady;
+						console.log(`${username} --> isready == ${currentUser.isReady}`);
+						await broadcastRoomUpdate(app, currentRoom);
+						break;
+
+					case 'game_type':
+						currentRoom.gameType = data.name;
+						currentRoom.maxPlayers = data.name === 'pong' ? 4 : 2;
+						currentRoom.ai = 0;
+						await broadcastRoomUpdate(app, currentRoom);
+						await app.roomService.updateGame(room)
+						break;
+
+					case 'increase':
+						currentRoom.ai += 1;
+						console.log(currentRoom.ai)
+						await broadcastRoomUpdate(app, currentRoom);
+						break;
+
+					case 'decrease':
+						currentRoom.ai -= 1;
+						console.log(currentRoom.ai)
+						await broadcastRoomUpdate(app, currentRoom);
+						break;
 						
-				case 'chat_message':
-					const chatMessage = JSON.stringify({ 
-						type: 'chat_message', 
-						username: username,
-						content: data.content
-					});
+					case 'maxPlayer':
+						currentRoom.maxPlayers = data.players
+						await broadcastRoomUpdate(app, currentRoom);
+						await app.roomService.updateGame(room)
+						break;
+							
+					case 'chat_message':
+						const chatMessage = JSON.stringify({ 
+							type: 'chat_message', 
+							username: username,
+							content: data.content
+						});
+						
+						currentRoom.users.forEach(u => {
+							if (u.socket.readyState === WebSocket.OPEN)
+								u.socket.send(chatMessage);
+						});
+						break;
 					
-					currentRoom.users.forEach(u => {
-						if (u.socket.readyState === WebSocket.OPEN)
-							u.socket.send(chatMessage);
-					});
-					break;
-				
-				case 'update_db':
-					await app.roomService.updateGame(room);
-					break;
-				
-				case 'start_game':
-					if (currentRoom.host !== username)
-						return;
-
-					const allReady = Array.from(currentRoom.users.values()).every(u => u.isReady);
-
-					if (!allReady)
-						return;
-
-					console.log(`Starting game for room ${uuid!}`);
-					currentRoom.isGameStarted = true;
-
-					const gameStartMessage = JSON.stringify({ 
-						type: 'game_starting',
-						gameType: currentRoom.gameType
-					});
+					case 'update_db':
+						await app.roomService.updateGame(room);
+						break;
 					
-					currentRoom.users.forEach(u => u.socket.send(gameStartMessage));
+					case 'start_game':
+						if (currentRoom.host !== username)
+							return;
+
+						const allReady = Array.from(currentRoom.users.values()).every(u => u.isReady);
+
+						if (!allReady)
+							return;
+
+						console.log(`Starting game for room ${uuid!}`);
+						currentRoom.isGameStarted = true;
+
+						const gameStartMessage = JSON.stringify({ 
+							type: 'game_starting',
+							gameType: currentRoom.gameType
+						});
+						
+						currentRoom.users.forEach(u => u.socket.send(gameStartMessage));
+						rooms.delete(uuid!);
+						break;
+					
+				}
+			}
+			catch (error) {
+				console.error('Invalid message format:', error);
+			}
+		});
+
+		socket.on('close', async () => {
+
+			const roomToLeave = rooms.get(uuid!);
+			if (roomToLeave) {
+				roomToLeave.users.delete(username);
+				console.log(`${username} disconnected from room ${uuid!}`);
+
+				if (roomToLeave.users.size === 0) {
 					rooms.delete(uuid!);
-					break;
-				
-				case 'leave_room':
-					try {	
-						app.jwt.verify(data.token);
-						const decoded = app.jwt.verify(data.token as string) as { user: string; name: string };
-						const username = decoded.name;
-						currentRoom.users.delete(username);
-						console.log(`${username} has left the room.`);
-						if (currentRoom && currentRoom.users.size === 0)
-						{
-							rooms.delete(uuid!);
-							console.log(`Room ${uuid!} deleted because empty`);
-							const database = db.getDatabase();
-							const stmt = await database.prepare('DELETE FROM games WHERE uuid = ?');
-							stmt.run(uuid!);
-							console.log(`Game ${uuid!} deleted from database`);
-						}
-							else
-							{
-								await broadcastRoomUpdate(app, currentRoom);
-								currentRoom.users.forEach(async u => {
-									if (u.username === username)
-										currentRoom.users.delete(username);
-									await app.roomService.updateGame(currentRoom);
-								});
-							}
-						
+					console.log(`Room ${uuid!} deleted because empty`);
+					app.gameService.deleteGame(uuid);
+				}
+				else { // delegate host
+					if (roomToLeave.host === username) {
+						roomToLeave.host = roomToLeave.users.keys().next().value;
+						console.log(`${roomToLeave.host} is the new host.`);
 					}
-					catch (error) {
-						console.error('Invalid message format:', error);
-					}
-					break;
-			}
-		}
-		catch (error) {
-			console.error('Invalid message format:', error);
-		}
-	});
-
-	socket.on('close', async () => {
-
-		const roomToLeave = rooms.get(uuid!);
-		if (roomToLeave) {
-			roomToLeave.users.delete(username);
-			console.log(`${username} disconnected from room ${uuid!}`);
-
-			if (roomToLeave.users.size === 0) {
-				rooms.delete(uuid!);
-				console.log(`Room ${uuid!} deleted because empty`);
-				// Supprimer aussi de la base de données
-				if (uuid) {
-					const database = db.getDatabase();
-					const stmt = await database.prepare('DELETE FROM games WHERE uuid = ?');
-					stmt.run(uuid);
-					console.log(`Game ${uuid} deleted from database`);
+					broadcastSystemMessage(roomToLeave, `${username} has left the room.`);
+					await broadcastRoomUpdate(app, roomToLeave);
+					await app.roomService.updateGame(roomToLeave);
 				}
 			}
-			else { // delegate host
-				if (roomToLeave.host === username) {
-					roomToLeave.host = roomToLeave.users.keys().next().value;
-					console.log(`${roomToLeave.host} is the new host.`);
-				}
-				broadcastSystemMessage(roomToLeave, `${username} has left the room.`);
-				await broadcastRoomUpdate(app, roomToLeave);
-				// Mettre à jour la base de données
-				await app.roomService.updateGame(roomToLeave);
-			}
-		}
-	});
+		});
 	} catch (error) {
 		console.error('Error in handleRoom:', error);
 		socket.close();

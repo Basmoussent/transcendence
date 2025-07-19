@@ -35,10 +35,14 @@ export class RoomService {
 			// Players
 			const users = Array.from((data.users as any).values());
    2 
-			for (let i = 0; i < Math.min(users.length, 4); i++) {
+			for (let i = 0; i < 4; i++) {
 				if (users[i]) {
 					fieldsToUpdate.push(`player${i + 1} = ?`);
 					values.push((users[i] as any).username);
+				}
+				else {
+					fieldsToUpdate.push(`player${i + 1} = ?`);
+					values.push(null);
 				}
 			}
 
@@ -59,10 +63,8 @@ export class RoomService {
 					err ? reject(err) : resolve();
 				});
 			});
-
-			console.log(`j'ai bien update la game dans la db`)
-
-		} catch (err: any) {
+		}
+		catch (err: any) {
 			console.error("Erreur dans updateGame:", err);
 		}
 	}
