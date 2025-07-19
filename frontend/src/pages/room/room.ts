@@ -298,13 +298,10 @@ export class Room {
 				else
 					this.decreaseAiBtn.disabled = false;
 
-				this.maxPlayersSelect.innerHTML = `<label class="text-white/80">Max Players</label>
-									<select class="setting-select" id="maxPlayersSelect">
-										<option value="1">1</option>
-										<option value="2">2</option>
-										<option value="3">3</option>
-										<option value="4">4</option>
-									</select>`;
+				this.maxPlayersSelect.innerHTML = `<option value="1">1</option>
+									<option value="2">2</option>
+									<option value="3">3</option>
+									<option value="4">4</option>`;
 				this.maxPlayersSelect.value = String(this.roomData.maxPlayers);
 			}
 			

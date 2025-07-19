@@ -80,7 +80,6 @@ const getTemplate = () => {
 					<h3 class="text-lg font-semibold text-white mb-3">Room Settings</h3>
 					<div class="settings-grid">
 						<div class="setting-item" id="max-player">
-							<label class="text-white/80">Max Players</label>
 							<select class="setting-select" id="maxPlayersSelect">
 								<option value="1">1</option>
 								<option value="2">2</option>
