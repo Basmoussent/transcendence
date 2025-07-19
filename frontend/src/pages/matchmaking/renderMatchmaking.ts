@@ -250,12 +250,37 @@ const getTemplate = () => {
 		box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
 	}
 
-	.launch-button {
-		background: linear-gradient(135deg, #D5CAD6, #011C27);
+	#launchBtn {
+		font-size: clamp(1rem, 2.5vw, 1.4rem); /* taille adaptative */
+		padding: 14px 30px;
+		letter-spacing: 1px;
+		position: relative;
+		overflow: hidden;
+		transition: transform 0.3s ease, box-shadow 0.3s ease, filter 0.3s ease;
 	}
 
-	.launch-button:hover {
-		background: linear-gradient(135deg, #ED6A5A, #392B58);
+	#launchBtn::after {
+		content: '';
+		position: absolute;
+		bottom: 0;
+		left: 50%;
+		transform: translateX(-50%);
+		width: 0;
+		height: 4px;
+		background: #DFD9E2;
+		border-radius: 2px;
+		transition: width 0.4s ease;
+	}
+
+	#launchBtn:hover::after {
+		width: 80%;
+		opacity: 1
+	}
+
+	#launchBtn:hover {
+		transform: scale(1.12);
+		box-shadow: 0 15px 40px #C3ACCE;
+		filter: brightness(1.2);
 	}
 
 	.home-button {
