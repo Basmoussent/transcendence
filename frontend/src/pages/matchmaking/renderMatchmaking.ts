@@ -26,29 +26,48 @@ const getTemplate = () => {
 		<!-- Game Options Section -->
 		<div class="glass-panel w-4/6 flex flex-col gap-10 justify-center items-center px-20 py-16 h-10/12">
 			<div id="game-options" class="flex flex-col gap-8 justify-center items-center w-full">
-
-				<div class="option-group">
-					<button class="option-button pong-button" id="pongBtn">Pong</button>
-					<button class="option-button block-button" id="blockBtn">Block</button>
+				
+				<!-- Title -->
+				<div class="title-section">
+					<h1 class="main-title">Create a Game</h1>
+					<p class="subtitle">Choose your game type and launch a room</p>
 				</div>
 
-				<div class="option-group">
-					<button class="option-button player-button" id="1playerBtn">1 player</button>
-					<button class="option-button player-button" id="2playerBtn">2 player</button>
-					<button class="option-button player-button" id="3playerBtn">3 player</button>
-					<button class="option-button player-button" id="4playerBtn">4 player</button>
+				<!-- Game Type Selection -->
+				<div class="game-type-section">
+					<h2 class="section-title">Game Type</h2>
+					<div class="game-type-buttons">
+						<button class="game-type-button pong-button" id="pongBtn">
+							<i class="fas fa-table-tennis"></i>
+							<span>Pong</span>
+						</button>
+						<button class="game-type-button block-button" id="blockBtn">
+							<i class="fas fa-cubes"></i>
+							<span>Block</span>
+						</button>
+					</div>
 				</div>
 
-				<div class="option-group">
-					<button class="option-button launch-button" id="launchBtn">Launch</button>
-					<button class="option-button reset-button" id="resetBtn">Reset</button>
+				<!-- Action Buttons -->
+				<div class="action-buttons">
+					<button class="action-button launch-button" id="launchBtn">
+						<i class="fas fa-rocket"></i>
+						<span>Launch Room</span>
+					</button>
+					<button class="action-button reset-button" id="resetBtn">
+						<i class="fas fa-undo"></i>
+						<span>Reset</span>
+					</button>
 				</div>
 			</div>
 		</div>
 
 		<!-- Join Game Section -->
 		<div class="glass-panel w-2/6 flex flex-col gap-5 justify-start items-center py-8 px-6 h-10/12">
-			<h1 class="text-white text-2xl font-bold uppercase tracking-wider">Join a Game</h1>
+			<div class="join-header">
+				<h1 class="join-title">Join a Game</h1>
+				<p class="join-subtitle">Available rooms</p>
+			</div>
 
 			<div class="available-games-container" id="available-games">
 				<!-- Empty state -->
@@ -74,55 +93,148 @@ const getTemplate = () => {
 		animation: fadeIn 0.5s ease-out;
 	}
 
-	.option-group {
-		display: flex;
-		gap: 20px;
-		background: rgba(255, 255, 255, 0.05);
-		border-radius: 12px;
-		padding: 16px 24px;
-		box-shadow: inset 0 0 8px rgba(255, 255, 255, 0.1);
+	/* Title Section */
+	.title-section {
+		text-align: center;
+		margin-bottom: 20px;
 	}
 
-	.option-button {
-		padding: 12px 20px;
-		font-size: 1.2em;
-		border-radius: 12px;
+	.main-title {
+		color: white;
+		font-size: 2.5rem;
+		font-weight: 700;
+		margin-bottom: 8px;
+		text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+	}
+
+	.subtitle {
+		color: rgba(255, 255, 255, 0.7);
+		font-size: 1.1rem;
+		font-weight: 400;
+	}
+
+	/* Game Type Section */
+	.game-type-section {
+		width: 100%;
+		text-align: center;
+	}
+
+	.section-title {
+		color: white;
+		font-size: 1.3rem;
+		font-weight: 600;
+		margin-bottom: 20px;
+		text-transform: uppercase;
+		letter-spacing: 1px;
+	}
+
+	.game-type-buttons {
+		display: flex;
+		gap: 30px;
+		justify-content: center;
+	}
+
+	.game-type-button {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: 12px;
+		padding: 30px 40px;
+		font-size: 1.4em;
+		border-radius: 16px;
 		border: none;
 		color: white;
 		font-weight: 600;
 		cursor: pointer;
-		transition: transform 0.2s, box-shadow 0.2s;
-		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+		transition: all 0.3s ease;
+		box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+		min-width: 140px;
+		position: relative;
+		overflow: hidden;
 	}
 
-	.option-button:hover {
-		transform: translateY(-3px);
-		box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25);
+	.game-type-button::before {
+		content: '';
+		position: absolute;
+		top: 0;
+		left: -100%;
+		width: 100%;
+		height: 100%;
+		background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+		transition: left 0.5s;
+	}
+
+	.game-type-button:hover::before {
+		left: 100%;
+	}
+
+	.game-type-button:hover {
+		transform: translateY(-5px) scale(1.05);
+		box-shadow: 0 12px 30px rgba(0, 0, 0, 0.3);
+	}
+
+	.game-type-button i {
+		font-size: 2rem;
+		margin-bottom: 8px;
 	}
 
 	/* Button backgrounds */
 	.pong-button {
 		background: linear-gradient(135deg, #4a90e2, #8DA1B9);
 	}
+
 	.block-button {
 		background: linear-gradient(135deg, #474973, #03254E);
 	}
-	.player-button {
-		background: linear-gradient(135deg, #EF959C, #95ADB6);
+
+	.chosen-button {
+		background: linear-gradient(135deg, #474973, #7B0D1E);
+		transform: scale(1.05);
+		box-shadow: 0 8px 25px rgba(123, 13, 30, 0.4);
 	}
-	.player-button-grise {
-		background: linear-gradient(135deg, #E3E3E3, #5B5750);
-		pointer-events: none;
-		opacity: 0.32;
+
+	/* Action Buttons */
+	.action-buttons {
+		display: flex;
+		gap: 20px;
+		justify-content: center;
+		margin-top: 20px;
 	}
+
+	.action-button {
+		display: flex;
+		align-items: center;
+		gap: 10px;
+		padding: 16px 30px;
+		font-size: 1.2em;
+		border-radius: 12px;
+		border: none;
+		color: white;
+		font-weight: 600;
+		cursor: pointer;
+		transition: all 0.3s ease;
+		box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+	}
+
+	.action-button:hover {
+		transform: translateY(-3px);
+		box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+	}
+
 	.launch-button {
 		background: linear-gradient(135deg, #AFC97E, #5A8573);
 	}
+
+	.launch-button:hover {
+		background: linear-gradient(135deg, #5A8573, #AFC97E);
+	}
+
 	.reset-button {
 		background: linear-gradient(135deg, #89B0AE, #272635);
 	}
-	.chosen-button {
-		background: linear-gradient(135deg, #474973, #7B0D1E);
+
+	.reset-button:hover {
+		background: linear-gradient(135deg, #272635, #89B0AE);
 	}
 
 	.home-button {
@@ -146,6 +258,27 @@ const getTemplate = () => {
 	.home-button:hover {
 		background: rgba(255, 255, 255, 0.2);
 		transform: translateY(-2px);
+	}
+
+	/* Join Section */
+	.join-header {
+		text-align: center;
+		margin-bottom: 20px;
+	}
+
+	.join-title {
+		color: white;
+		font-size: 1.8rem;
+		font-weight: 700;
+		margin-bottom: 5px;
+		text-transform: uppercase;
+		letter-spacing: 1px;
+	}
+
+	.join-subtitle {
+		color: rgba(255, 255, 255, 0.6);
+		font-size: 0.9rem;
+		font-weight: 400;
 	}
 
 	/* Available Games Container */
@@ -359,6 +492,18 @@ const getTemplate = () => {
 
 	.available-games-container::-webkit-scrollbar-thumb:hover {
 		background: rgba(255, 255, 255, 0.3);
+	}
+
+	/* Animations */
+	@keyframes fadeIn {
+		from {
+			opacity: 0;
+			transform: translateY(20px);
+		}
+		to {
+			opacity: 1;
+			transform: translateY(0);
+		}
 	}
 	</style>
 	`;

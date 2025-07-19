@@ -124,7 +124,7 @@ async function authRoutes(app: FastifyInstance) {
         VALUES (?)`
       );
 
-      stmt2.run(user.username);
+      stmt2.run(cleanUsername);
       
       return reply.status(201).send({ message: 'Compte créé avec succès' });
     } catch (err: any) {
