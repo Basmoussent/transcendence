@@ -23,7 +23,6 @@ export class matchmaking {
 	private pongBtn: HTMLElement;
 	private blockBtn: HTMLElement;
 	private launchBtn: HTMLElement;
-	private resetBtn: HTMLElement;
 	private options: HTMLElement;
 	private availableGames: HTMLElement;
 	private username: string;
@@ -41,7 +40,6 @@ export class matchmaking {
 		this.pongBtn = this.getElement('pongBtn');
 		this.blockBtn = this.getElement('blockBtn');
 		this.launchBtn = this.getElement('launchBtn');
-		this.resetBtn = this.getElement('resetBtn');
 		this.options = this.getElement("game-options");
 		this.availableGames = this.getElement('available-games');
 
@@ -164,18 +162,6 @@ export class matchmaking {
 			this.blockBtn.classList.remove("block-button");
 			this.blockBtn.classList.add("chosen-button");
 			console.log("blockBtn classes:", this.blockBtn.classList);
-		});
-
-		this.resetBtn.addEventListener('click', () => {
-			this.pong = false;
-			this.brick = false;
-
-			this.pongBtn.classList.remove("chosen-button");
-			this.blockBtn.classList.remove("chosen-button");
-			this.pongBtn.classList.add("pong-button");
-			this.blockBtn.classList.add("block-button");
-
-			console.log("Reset completed");
 		});
 
 		this.homeBtn.addEventListener('click', () => {

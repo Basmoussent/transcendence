@@ -117,7 +117,7 @@ export async function router() {
 			view = await renderMe();
 			break;
 		case '/profil':
-			view = await renderProfil(uuid);
+			view = renderProfil(uuid);
 			break;
 		case '/matchmaking':
 			view = renderMatchmaking();

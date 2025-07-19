@@ -23,17 +23,14 @@ const getTemplate = () => {
 			Home
 		</button>
 
-		<!-- Game Options Section -->
 		<div class="glass-panel w-4/6 flex flex-col gap-10 justify-center items-center px-20 py-16 h-10/12">
 			<div id="game-options" class="flex flex-col gap-8 justify-center items-center w-full">
 				
-				<!-- Title -->
 				<div class="title-section">
-					<h1 class="main-title">Create a Game</h1>
+					<h1 id="oui" class="main-title">Create a Game</h1>
 					<p class="subtitle">Choose your game type and launch a room</p>
 				</div>
 
-				<!-- Game Type Selection -->
 				<div class="game-type-section">
 					<h2 class="section-title">Game Type</h2>
 					<div class="game-type-buttons">
@@ -48,21 +45,15 @@ const getTemplate = () => {
 					</div>
 				</div>
 
-				<!-- Action Buttons -->
 				<div class="action-buttons">
 					<button class="action-button launch-button" id="launchBtn">
 						<i class="fas fa-rocket"></i>
 						<span>Launch Room</span>
 					</button>
-					<button class="action-button reset-button" id="resetBtn">
-						<i class="fas fa-undo"></i>
-						<span>Reset</span>
-					</button>
 				</div>
 			</div>
 		</div>
 
-		<!-- Join Game Section -->
 		<div class="glass-panel w-2/6 flex flex-col gap-5 justify-start items-center py-8 px-6 h-10/12">
 			<div class="join-header">
 				<h1 class="join-title">Join a Game</h1>
@@ -112,6 +103,44 @@ const getTemplate = () => {
 		font-size: 1.1rem;
 		font-weight: 400;
 	}
+
+	#oui {
+		font-size: clamp(2rem, 5vw, 4rem);
+		font-weight: 800;
+		color: #B49CB6;
+		margin-bottom: 36px;
+		text-align: center;
+		text-transform: uppercase;
+		position: relative;
+		transition: all 0.3s ease;
+		letter-spacing: 2px;
+		text-shadow: 0 2px 6px #D5CAD6;
+		cursor: default;
+	}
+
+	#oui::after {
+		content: '';
+		position: absolute;
+		bottom: -10px;
+		left: 50%;
+		width: 190px;
+		height: 4px;
+		background: #D5CAD6;
+		border-radius: 2px;
+		transform: translateX(-50%);
+		transition: width 0.3s ease;
+	}
+
+	#oui:hover {
+		color: #B35857;
+		transform: scale(1.05);
+		text-shadow: 0 4px 12px #DC605E;
+	}
+
+	#oui:hover::after {
+		width: 100px;
+	}
+
 
 	/* Game Type Section */
 	.game-type-section {
@@ -222,19 +251,11 @@ const getTemplate = () => {
 	}
 
 	.launch-button {
-		background: linear-gradient(135deg, #AFC97E, #5A8573);
+		background: linear-gradient(135deg, #D5CAD6, #011C27);
 	}
 
 	.launch-button:hover {
-		background: linear-gradient(135deg, #5A8573, #AFC97E);
-	}
-
-	.reset-button {
-		background: linear-gradient(135deg, #89B0AE, #272635);
-	}
-
-	.reset-button:hover {
-		background: linear-gradient(135deg, #272635, #89B0AE);
+		background: linear-gradient(135deg, #ED6A5A, #392B58);
 	}
 
 	.home-button {
@@ -440,7 +461,7 @@ const getTemplate = () => {
 		width: 100%;
 		margin-top: 12px;
 		padding: 10px 16px;
-		background: linear-gradient(135deg, #AFC97E, #5A8573);
+		background: linear-gradient(135deg, #D5CAD6, #011C27);
 		border: none;
 		border-radius: 8px;
 		color: white;
@@ -455,7 +476,8 @@ const getTemplate = () => {
 	}
 
 	.join-button:hover {
-		background: linear-gradient(135deg, #5A8573, #AFC97E);
+
+		background: linear-gradient(135deg, #ED6A5A, #392B58);
 		transform: translateY(-2px);
 		box-shadow: 0 4px 12px rgba(175, 201, 126, 0.3);
 	}
