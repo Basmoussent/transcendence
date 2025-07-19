@@ -1,19 +1,20 @@
 import { getAuthToken } from '../../utils/auth';
 import { sanitizeHtml } from '../../utils/sanitizer';
 import { t } from '../../utils/translations';
-import { friend } from './friend'
+import {profil } from './profil'
 
 
-export function renderFriends(uuid: string) {
+export function renderProfil(uuid: string) {
 
 	setTimeout(async () => {
 		try {
+			const me = await loadMe();
 			const user = await loadUserInfo(uuid);
 			console.log(JSON.stringify(user, null, 8));
 
 			const stats = "les stats stp"
 
-			new friend(user, stats);
+			new friend(me, user, stats);
 		}
 		catch (err:any) {
 			console.log(err);
@@ -56,6 +57,42 @@ async function loadUserInfo(username: string) {
 	catch (err) {
 		console.error(`error retreve info du user pour render son profil  ${err}`);
 	}
+}
+
+async function loadMe() {
+
+	try {
+		const token = getAuthToken();
+		if (!token) {
+			alert('❌ Token d\'authentification manquant');
+			window.history.pushState({}, '', '/login');
+			window.dispatchEvent(new PopStateEvent('popstate'));
+			return '';
+		}
+
+		const response = await fetch('/api/me', {
+			method: 'GET',
+			headers: {
+				'Content-Type': 'application/json',
+				'x-access-token': token
+			}
+		});
+
+		if (response.ok) {
+			const result = await response.json();
+			const userData = {
+				username: sanitizeHtml(result.user?.username),
+				email: sanitizeHtml(result.user?.email),
+			};
+			return (userData);
+		} else {
+			console.error('Erreur lors de la récupération des données utilisateur');
+		}
+	}
+	catch (err) {
+		console.error(`fail de recup me dans loadme renderFriends`);
+	}
+
 }
 
 function getTemplate() {

@@ -5,7 +5,7 @@ import { renderForgotPassword, initializeForgotPasswordEvents } from '../pages/a
 import { renderMain } from '../pages/menu/renderMain';
 import { render404 } from '../components/404';
 import { renderSocial } from '../pages/social/social';
-import { renderProfil } from '../pages/social/profil';
+import { renderMe } from '../pages/social/me';
 import { renderMultiplayer, initializeMultiplayerEvents } from '../pages/game/multiplayer';
 import { renderMatchmaking } from '../pages/matchmaking/renderMatchmaking';
 import { renderTournaments, initializeTournamentEvents } from '../pages/game/tournament';
@@ -22,7 +22,7 @@ import { getGame } from '@/game/gameUtils';
 import { renderMultiPong } from '../pages/pong/multiplayer-pong';
 import { renderPong } from '../pages/pong/pong';
 import { initAlive } from './auth';
-import { renderFriends } from '../pages/social/renderFriends';
+import { renderProfil } from '../pages/social/renderProfil';
 import { render2FA } from '../pages/auth/activate-2fa';
 
 export async function router() {
@@ -40,7 +40,7 @@ export async function router() {
 
 	
 	if (path.startsWith('/multipong/') || path.startsWith('/pong/') || path.startsWith('/block/') || path.startsWith('/block1v1/') ||
-			path.startsWith('/room/') || path.startsWith('/user/')) {
+			path.startsWith('/room/') || path.startsWith('/profil/')) {
 
 		const it = path.indexOf('/', 1);
 
@@ -111,11 +111,11 @@ export async function router() {
 		case '/friends':
 			view = renderSocial();
 			break;
-		case '/profil':
-			view = await renderProfil();
+		case '/me':
+			view = await renderMe();
 			break;
-		case '/user':
-			view = await renderFriends(uuid);
+		case '/profil':
+			view = await renderProfil(uuid);
 			break;
 		case '/multiplayer':
 			view = renderMultiplayer();
