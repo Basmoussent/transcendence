@@ -5,7 +5,6 @@ import { renderForgotPassword, initializeForgotPasswordEvents } from '../pages/a
 import { renderMain } from '../pages/menu/renderMain';
 import { render404 } from '../components/404';
 import { renderMe } from '../pages/social/me';
-import { renderMultiplayer, initializeMultiplayerEvents } from '../pages/game/multiplayer';
 import { renderMatchmaking } from '../pages/matchmaking/renderMatchmaking';
 import { renderTournaments, initializeTournamentEvents } from '../pages/game/tournament';
 import { renderBlock } from '../pages/block/main';
@@ -151,6 +150,9 @@ export async function router() {
 			break;
 		case '/multipong':
 			view = renderMultiPong(uuid);
+			break;
+		case '/tournament':
+			view = renderTournaments();
 			break;
 		default:
 			view = render404();
