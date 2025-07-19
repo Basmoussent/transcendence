@@ -131,7 +131,7 @@ services:
     container_name: node-exporter
     image: prom/node-exporter:latest
     ports:
-      - "9100:9100"
+      - "9101:9101"
     volumes:
       - /proc:/host/proc:ro
       - /sys:/host/sys:ro
@@ -140,6 +140,7 @@ services:
       - '--path.procfs=/host/proc'
       - '--path.sysfs=/host/sys'
       - '--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)'
+      - '--web.listen-address=:9101'
     networks:
       - app-network
 

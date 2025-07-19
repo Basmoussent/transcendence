@@ -17,19 +17,11 @@ export class matchmaking {
 
 	private pong: boolean;
 	private brick: boolean;
-	private _1player: boolean;
-	private _2player: boolean;
-	private _3player: boolean;
-	private _4player: boolean;
 	private ws: WebSocket;
 
 	private homeBtn: HTMLElement;
 	private pongBtn: HTMLElement;
 	private blockBtn: HTMLElement;
-	private _1playerBtn: HTMLElement;
-	private _2playerBtn: HTMLElement;
-	private _3playerBtn: HTMLElement;
-	private _4playerBtn: HTMLElement;
 	private launchBtn: HTMLElement;
 	private resetBtn: HTMLElement;
 	private options: HTMLElement;
@@ -48,39 +40,25 @@ export class matchmaking {
 		this.homeBtn = this.getElement('homeBtn');
 		this.pongBtn = this.getElement('pongBtn');
 		this.blockBtn = this.getElement('blockBtn');
-		this._1playerBtn = this.getElement('1playerBtn');
-		this._2playerBtn = this.getElement('2playerBtn');
-		this._3playerBtn = this.getElement('3playerBtn');
-		this._4playerBtn = this.getElement('4playerBtn');
 		this.launchBtn = this.getElement('launchBtn');
 		this.resetBtn = this.getElement('resetBtn');
 		this.options = this.getElement("game-options");
 		this.availableGames = this.getElement('available-games');
 
-
 		this.setupMutationObserver();
 
-
-		// loadAvailableGames().then((available) => {
-		// 	if (available === -1)
-		// 		return;
-		// 	available.forEach((game) => {
-
-		// 		const btn = this.getElement(`join${game.gameId}Btn`);
-		// 		if (btn) {
-		// 			console.log(`game ${game.gameId}, btn : ${btn}`)
-		// 			this.joinBtn.set(game.gameId, btn);
-		// 		}
-		// 	})
-		// })
-
+		// Ajouter un listener pour nettoyer quand l'utilisateur quitte la page
+		window.addEventListener('beforeunload', () => {
+			this.stopPolling();
+			if (this.ws.readyState === WebSocket.OPEN) {
+				this.ws.send(JSON.stringify({
+					type: 'leave'
+				}));
+			}
+		});
 
 		this.pong = false;
 		this.brick = false;
-		this._1player = false;
-		this._2player = false;
-		this._3player = false;
-		this._4player = false;
 
 		this.gameOptions();
 		this.setJoinBtns();
@@ -89,17 +67,21 @@ export class matchmaking {
 		this.ws.onopen = () => {
 			console.log(`${this.username} est arrive sur matchmaking`)
 			this.updateUI();
+			this.startPolling();
 		}
 
 		this.ws.onerror = (error) => {
 			console.error(`❌ ${this.username} n'a pas pu creer de websocket:`, error)}
 
 		this.ws.onclose = (event) => {
-			console.log(`${this.username} part de la page matchmaking`)}
+			console.log(`${this.username} part de la page matchmaking`);
+			this.stopPolling();
+		}
 
 		this.ws.onmessage = (event) =>  {
 			const data = JSON.parse(event.data);
-			this.handleEvents(data);}
+			this.handleEvents(data);
+		}
 
 	}
 	
@@ -145,29 +127,17 @@ export class matchmaking {
 	private currentOptions(): void {
 		console.log('Game Mode States:', {
 			brick: this.brick,
-			pong: this.pong,
-			_1player: this._1player,
-			_2player: this._2player,
-			_3player: this._3player,
-			_4player: this._4player
+			pong: this.pong
 			});
 	}
 
-	
-
 	private gameOptions(): void {
 
-
 		this.pongBtn.addEventListener('click', () => {
-
 			if (this.pong)
 				return ;
 
 			this.pong = true;
-			this._1player = false;
-			this._1playerBtn.classList.add("player-button-grise");
-			this._3playerBtn.classList.remove("player-button-grise");
-			this._4playerBtn.classList.remove("player-button-grise");
 
 			if (this.brick) {
 				this.brick = false;
@@ -178,7 +148,6 @@ export class matchmaking {
 			this.pongBtn.classList.remove("pong-button");
 			this.pongBtn.classList.add("chosen-button");
 			console.log("pongBtn classes:", this.pongBtn.classList);
-
 		});
 
 		this.blockBtn.addEventListener('click', () => {
@@ -186,112 +155,32 @@ export class matchmaking {
 				return ;
 
 			this.brick = true;
-			this._3player = false;
-			this._4player = false;
-			this._1playerBtn.classList.remove("player-button-grise");
-			this._3playerBtn.classList.add("player-button-grise");
-			this._4playerBtn.classList.add("player-button-grise");
 
 			if (this.pong) {
 				this.pong = false;
 				this.pongBtn.classList.remove("chosen-button");
 				this.pongBtn.classList.add("pong-button");
-
 			}
 
 			this.blockBtn.classList.remove("block-button");
 			this.blockBtn.classList.add("chosen-button");
 			console.log("blockBtn classes:", this.blockBtn.classList);
-
-		});
-
-		this._1playerBtn.addEventListener('click', () => {
-			if (this._1player)
-				return ;
-			this._1player = !this._1player;
-			if (this._1player) {
-				this._2player = false;
-				this._3player = false;
-				this._4player = false;
-			}
-			this._1playerBtn.classList.add("chosen-button");
-		});
-
-		this._2playerBtn.addEventListener('click', () => {
-			if (this._2player)
-				return ;
-			this._2player = !this._2player;
-			if (this._2player) {
-				this._1player = false;
-				this._3player = false;
-				this._4player = false;
-			}
-			this._2playerBtn.classList.add("chosen-button");
-		});
-
-		this._3playerBtn.addEventListener('click', () => {
-
-			if (this._3player)
-				return ;
-
-			if (this.brick)
-				return ;
-
-			this._3player = !this._3player;
-			if (this._3player) {
-				this._1player = false;
-				this._2player = false;
-				this._4player = false;
-			}
-			this._3playerBtn.classList.add("chosen-button");
-
-		});
-
-		this._4playerBtn.addEventListener('click', () => {
-
-			if (this._4player)
-				return ;
-
-			if (this.brick)
-				return ;
-
-			this._4player = !this._4player;
-			if (this._4player) {
-				this._1player = false;
-				this._2player = false;
-				this._3player = false;
-			}
-			this._4playerBtn.classList.add("chosen-button");
-
 		});
 
 		this.resetBtn.addEventListener('click', () => {
-
 			this.pong = false;
-			
 			this.brick = false;
-			this._1player = false;
-			this._2player = false;
-			this._3player = false;
-			this._4player = false;
 
 			this.pongBtn.classList.remove("chosen-button");
 			this.blockBtn.classList.remove("chosen-button");
-			this._1playerBtn.classList.remove("chosen-button");
-			this._2playerBtn.classList.remove("chosen-button");
-			this._3playerBtn.classList.remove("chosen-button");
-			this._4playerBtn.classList.remove("chosen-button");
-			this._1playerBtn.classList.remove("player-button-grise");
-			this._2playerBtn.classList.remove("player-button-grise");
-			this._3playerBtn.classList.remove("player-button-grise");
-			this._4playerBtn.classList.remove("player-button-grise");
+			this.pongBtn.classList.add("pong-button");
+			this.blockBtn.classList.add("block-button");
 
-			console.log("pongBtn classes:", this.pongBtn.classList);
-			console.log("_1playerBtn classes:", this._1playerBtn.classList);
-
+			console.log("Reset completed");
 		});
 
 		this.homeBtn.addEventListener('click', () => {
+			this.stopPolling();
 			window.history.pushState({}, '', `/main`);
 			window.dispatchEvent(new PopStateEvent('popstate'));
 			this.ws.send(JSON.stringify({
@@ -299,23 +188,21 @@ export class matchmaking {
 			}));
 			this.ws.close();
 		})
-
-		// this.joinBtn.addEventListener('click', () => {
-
-		// boucler sur les join %d buttons de toutes les available games generees
-		// => requete PUT vers api/games
-		//	mettre le gameId dans le body
-		//	rajouter mon username en tant que player --> comment savoir quel player !!
 	}
 
 	private async launchRoom() {
 
 		this.launchBtn.addEventListener('click', async () => {
+			// Vérifier qu'un type de jeu est sélectionné
+			if (!this.pong && !this.brick) {
+				alert('Please select a game type first!');
+				return;
+			}
 
 			let tmp = {
 				game_type: this.pong ? "pong" : "block",
 				player1: this.username,
-				users_needed: this._1player ? 1 : this._2player ? 2 : this._3player ? 3 : 4
+				users_needed: 2 // Par défaut 2 joueurs, sera configuré dans la room
 			}
 
 			var uuid = await postGame(tmp);
@@ -328,9 +215,7 @@ export class matchmaking {
 			this.ws.send(JSON.stringify({
 				type: 'updateUI',
 			}));
-
 		});
-
 	}
 
 	private async joinRoom(gameId: number) {
@@ -364,9 +249,11 @@ export class matchmaking {
 
 		switch (data.type) {
 			case 'updateUI':
+				console.log('Received updateUI event, updating available games...');
 				this.updateUI();
 				break;
 			case 'notLog':
+				this.stopPolling();
 				window.history.pushState({}, '', '/login');
 				window.dispatchEvent(new Event('popstate'));
 				this.ws.close();
@@ -374,9 +261,7 @@ export class matchmaking {
 			
 			default:
 				console.warn(`event pas encore handled ${data.type}`)
-
 		}
-
 	}
 
 	private async updateUI() {
@@ -385,17 +270,31 @@ export class matchmaking {
 
 	private async updateAvailableGames() {
 
-		const gameList = await this.loadAvailableGames();
-		
-		if (gameList === -1) {
-			return ;
-		}
-		const inject = await this.gamesToDiv(gameList);
-		
-		const container = document.getElementById('available-games');
+		try {
+			// Ajouter un indicateur de chargement
+			const container = document.getElementById('available-games');
+			if (container) {
+				const loadingIndicator = document.createElement('div');
+				loadingIndicator.className = 'loading-indicator';
+				loadingIndicator.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Updating games...';
+				container.appendChild(loadingIndicator);
+			}
 
-		if (container && typeof inject === 'string') {
-			this.availableGames.innerHTML = inject;
+			const gameList = await this.loadAvailableGames();
+			
+			if (gameList === -1) {
+				console.log('No games available or error occurred');
+				return;
+			}
+			
+			const inject = await this.gamesToDiv(gameList);
+			
+			if (container && typeof inject === 'string') {
+				this.availableGames.innerHTML = inject;
+				console.log(`Updated available games: ${gameList.length} games found`);
+			}
+		} catch (error) {
+			console.error('Error updating available games:', error);
 		}
 	}
 
@@ -406,6 +305,27 @@ export class matchmaking {
 			tmp += game.divConverion();
 
 		return tmp;
+	}
+
+	private pollingInterval: number | null = null;
+
+	private startPolling() {
+		if (this.pollingInterval) {
+			clearInterval(this.pollingInterval);
+		}
+		
+		this.pollingInterval = setInterval(() => {
+			if (this.ws.readyState === WebSocket.OPEN) {
+				this.updateUI();
+			}
+		}, 3000);
+	}
+
+	private stopPolling() {
+		if (this.pollingInterval) {
+			clearInterval(this.pollingInterval);
+			this.pollingInterval = null;
+		}
 	}
 
 	private async loadAvailableGames(): Promise<Available[] | -1> {
@@ -485,7 +405,6 @@ export class matchmaking {
 								` : ''}
 							</div>
 						`;
-
 					}
 				}));
 				console.log("available games: ", );
@@ -498,6 +417,4 @@ export class matchmaking {
 			console.error("retrieve available game failed", error); }
 		return -1;
 	}
-
-
 }
