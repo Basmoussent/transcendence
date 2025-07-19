@@ -144,12 +144,12 @@ function getTemplate() {
 	return `
 		<button class="home-button" id="homeBtn">
 			<i class="fas fa-home"></i>
-			Home
+			${t('social.home')}
 		</button>
 		
 		<button class="home-button" onclick="goHome()">
         <i class="fas fa-home"></i>
-        Home
+        ${t('social.home')}
 		</button>
 
 		<div class="container">
@@ -164,17 +164,17 @@ function getTemplate() {
 				<h1 id="username"> talan</h1>
 				<div class="profile-status">
 					<div class="status-dot"></div>
-					<span>En ligne</span>
+					<span>${t('social.online')}</span>
 				</div>
 				</div>
 				<div class="profile-actions">
 					<button id="addFriend" "class="action-btn btn-primary">
 						<i class="fas fa-user-plus"></i>
-						Ajouter ami
+						${t('social.addFriend')}
 					</button>
 					<button id="sendMsg" class="action-btn btn-secondary">
 						<i class="fas fa-envelope"></i>
-						Message
+						${t('social.message')}
 					</button>
 				</div>
 			</div>
@@ -184,20 +184,20 @@ function getTemplate() {
 			<div class="profile-section">
 				<div class="section-header">
 				<i class="fas fa-chart-bar"></i>
-				<h2>Statistiques</h2>
+				<h2>${t('social.statistics')}</h2>
 				</div>
 					<div class="stats-grid">
 						<div class="stat-card">
 							<div id="gamePlayed" class="stat-number">1,247</div>
-							<div class="stat-label">Game played</div>
-						</div>
-						<div class="stat-card">
-							<div id="winrate" class="stat-number">68%</div>
-							<div class="stat-label">Winrate</div>
-						</div>
-						<div class="stat-card">
-							<div id="victory" class="stat-number">42</div>
-							<div class="stat-label">Victory</div>
+													<div class="stat-label">${t('social.gamePlayed')}</div>
+					</div>
+					<div class="stat-card">
+						<div id="winrate" class="stat-number">68%</div>
+						<div class="stat-label">${t('social.winrate')}</div>
+					</div>
+					<div class="stat-card">
+						<div id="victory" class="stat-number">42</div>
+						<div class="stat-label">${t('social.victory')}</div>
 						</div>
 						<div class="stat-card">
 							<div id="rank" class="stat-number">42</div>
@@ -232,12 +232,12 @@ function getTemplate() {
 				<div class="friend-card">
 					<div class="friend-avatar">T</div>
 					<div class="friend-name">Thomas_42</div>
-					<div class="friend-status">En ligne</div>
+					<div class="friend-status">${t('social.online')}</div>
 				</div>
 				<div class="friend-card">
 					<div class="friend-avatar">S</div>
 					<div class="friend-name">Sophie_K</div>
-					<div class="friend-status">En ligne</div>
+					<div class="friend-status">${t('social.online')}</div>
 				</div>
 				<div class="friend-card">
 					<div class="friend-avatar">L</div>

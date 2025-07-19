@@ -1,6 +1,7 @@
 import { Available, matchmaking,  } from "./matchmaking";
 import { getAuthToken } from '../../utils/auth';
 import { sanitizeHtml } from '../../utils/sanitizer';
+import { t } from '../../utils/translations';
 
 export function renderMatchmaking() {
 
@@ -20,7 +21,7 @@ const getTemplate = () => {
 	<div class="flex gap-12 h-screen justify-center items-center px-8 pb-40" id="options-container">
 		<button class="home-button" id="homeBtn">
 			<i class="fas fa-home"></i>
-			Home
+			${t('matchmaking.home')}
 		</button>
 
 		<!-- Game Options Section -->

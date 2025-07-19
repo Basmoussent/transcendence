@@ -10,12 +10,12 @@ export function renderChooseGame() {
 
           <button class="menu-button block-game-button" id="blockBtn">
             <i class="fas fa-cube"></i>
-            Block Game
+            ${t('game.blockGame')}
           </button>
 
           <button class="menu-button pong-game-button" id="pongBtn">
             <i class="fas fa-cube"></i>
-            Pong Game
+            ${t('game.pongGame')}
           </button>
           
           </button>

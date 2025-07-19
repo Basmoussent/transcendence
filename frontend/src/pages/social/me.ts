@@ -57,7 +57,7 @@ export async function renderMe() {
 		: `/api/uploads/${userData.avatar}`;
 
 	// Déterminer le texte et l'icône du bouton 2FA
-	const tfaButtonText = userData.twoFactorEnabled ? 'Deactivate 2FA' : 'Activate 2FA';
+	const tfaButtonText = userData.twoFactorEnabled ? t('social.deactivate2FA') : t('social.activate2FA');
 	const tfaButtonIcon = userData.twoFactorEnabled ? 'fa-solid fa-lock-open' : 'fa-solid fa-lock';
 
 	const htmlContent = `
@@ -66,7 +66,7 @@ export async function renderMe() {
 				<div class="profile-header">
 					<button class="home-button" id="homeBtn">
 							<i class="fas fa-home"></i>
-							Home
+							${t('social.home')}
 					</button>
 					<div class="profile-avatar">
 						<img src="${avatarUrl}" alt="Profile Avatar" class="avatar-image" onerror="this.src='../../public/avatar.png'">
@@ -79,7 +79,7 @@ export async function renderMe() {
 						<h1 class="username">${userData.username}</h1>
 						<p class="email">${userData.email}</p>
 						<div class="status online">
-							<i class="fas fa-circle"></i> Online
+							<i class="fas fa-circle"></i> ${t('social.online')}
 						</div>
 					</div>
 					<button class="action-button logout">
@@ -495,13 +495,13 @@ export async function renderMe() {
 
 			if (info.user.two_fact_auth) {
 				// desactiver 2FA
-				const confirmation = confirm('Êtes-vous sûr de vouloir désactiver l\'authentification à deux facteurs ?');
+				const confirmation = confirm(t('social.confirmDisable2FA'));
 				
 				if (confirmation) {
 					const success = await update2FAState(0, info.user.id);
 
 					if (success) {
-						TFABtn.innerHTML = '<i class="fa-solid fa-lock"></i> Activate 2FA';
+						TFABtn.innerHTML = '<i class="fa-solid fa-lock"></i> ' + t('social.activate2FA');
 						alert('✅ 2FA désactivée avec succès');
 					}
 					else
@@ -564,7 +564,7 @@ export async function renderMe() {
 						// Recharger la page pour afficher le nouvel avatar
 						window.location.reload();
 					} else {
-						alert(`❌ Erreur: ${result.error || 'Erreur inconnue'}`);
+						alert(`❌ Erreur: ${result.error || t('social.unknownError')}`);
 					}
 				} catch (err) {
 					console.error('Erreur lors de l\'upload:', err);

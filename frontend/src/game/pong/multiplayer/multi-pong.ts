@@ -3,6 +3,7 @@ import { Paddle } from "./multi-paddle";
 import { PaddleAI } from "./multi-paddle-ai";
 import { getAuthToken } from '../../../utils/auth';
 import { PADDLE_OFFSET, Player, PADDLE1_COLOR, PADDLE2_COLOR, PADDLE3_COLOR, PADDLE4_COLOR } from "../const";
+import { t } from '../../../utils/translations';
 
 export interface Game {
 	id: number,
@@ -183,8 +184,8 @@ export class MultiPong {
         this.ctx.globalAlpha = 0.2;
         this.ctx.fillStyle = 'white';
         this.ctx.font = '48px sans-serif'; // changer police
-        this.ctx.fillText('PRESS ENTER', this.width / 2 - 150, this.height / 2 - 30);
-        this.ctx.fillText('TO START', this.width / 2 - 100, this.height / 2 + 50);
+        this.ctx.fillText(t('pong.pressEnterToStart'), this.width / 2 - 150, this.height / 2 - 30);
+        this.ctx.fillText(t('pong.toStart'), this.width / 2 - 100, this.height / 2 + 50);
         this.ctx.globalAlpha = 1;
     }
 

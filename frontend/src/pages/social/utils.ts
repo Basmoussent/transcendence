@@ -1,5 +1,6 @@
 import { getAuthToken } from '../../utils/auth';
 import { sanitizeHtml } from '../../utils/sanitizer';
+import { t } from '../../utils/translations';
 
 interface UserData {
 	id: number;
@@ -146,7 +147,7 @@ export async function update2FAState(status: number, userId: number): Promise<bo
         if (data.success)
             return true;
         else
-            throw new Error(data.error || 'Echec de la mise a jour du 2FA status');
+            		throw new Error(data.error || t('social.twoFAUpdateFailed'));
     } catch (error) {
 		console.error('reverse2FAstatus failed: ', error);
         return false;

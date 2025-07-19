@@ -38,6 +38,18 @@ export const translations = {
         confirmNewPassword: "Confirmer le nouveau mot de passe",
         submit: "Modifier le mot de passe",
         backToProfile: "Retour au profil"
+      },
+      twoFactorAuth: {
+        title: "Authentification à deux facteurs",
+        backToProfile: "Retour au profil",
+        scanQR: "Scannez le QR code avec votre application d'authentification Google Authenticator",
+        generatingQR: "Génération du QR code...",
+        verificationCode: "Entrez le code de vérification :",
+        activate: "Activer 2FA",
+        verify: "Vérifier le code",
+        success: "2FA activée avec succès",
+        error: "Code de vérification incorrect",
+        missingToken: "Token d'authentification manquant"
       }
     },
     menu: {
@@ -45,7 +57,10 @@ export const translations = {
       profile: "Profil",
       playLocal: "Jouer en local",
       multiplayer: "Multijoueur",
-      friends: "Amis"
+      friends: "Amis",
+      tournament: "Tournoi",
+      chat: "Chat",
+      logout: "Déconnexion"
     },
     profile: {
       title: "Profil",
@@ -91,7 +106,31 @@ export const translations = {
         title: "Chat",
         newChat: "Nouvelle conversation",
         ago: "il y a"
-      }
+      },
+      home: "Accueil",
+      deactivate2FA: "Désactiver 2FA",
+      activate2FA: "Activer 2FA",
+      hoursAgo: "heures",
+      heyWantToPlay: "Salut, envie de jouer ?",
+      goodGame: "Bonne partie !",
+      upload: "Télécharger",
+      selectValidImage: "Veuillez sélectionner une image valide",
+      imageTooLarge: "L'image est trop volumineuse. Taille maximum: 5MB",
+      avatarUploadSuccess: "Avatar uploadé avec succès",
+      avatarUploadError: "Erreur lors de l'upload de l'avatar",
+      victory: "Victoire",
+      defeat: "Défaite",
+      draw: "Match nul",
+      justNow: "À l'instant",
+      yesterday: "Hier",
+      twoFAUpdateFailed: "Échec de la mise à jour du statut 2FA",
+      confirmDisable2FA: "Êtes-vous sûr de vouloir désactiver l'authentification à deux facteurs ?",
+      unknownError: "Erreur inconnue",
+      addFriend: "Ajouter ami",
+      message: "Message",
+      statistics: "Statistiques",
+      gamePlayed: "Parties jouées",
+      winrate: "Taux de victoire"
     },
     friends: {
       backToSocial: "Retour",
@@ -106,6 +145,105 @@ export const translations = {
       sendMessage: "Envoyer un message",
       inviteToGame: "Inviter à jouer",
       removeFriend: "Retirer des amis"
+    },
+    block: {
+      pressEnterToStart: "APPUYEZ SUR ENTRÉE POUR COMMENCER",
+      player1Controls: "JOUEUR 1: TOUCHES A/D",
+      player2Controls: "JOUEUR 2: TOUCHES FLÉCHÉES",
+      wins: "GAGNE !",
+      pressEnterToPlayAgain: "Appuyez sur ENTRÉE pour rejouer",
+      score: "Score :",
+      lives: "Vies :"
+    },
+    chat: {
+      home: "Accueil",
+      myFriends: "Mes Amis",
+      searchFriend: "Rechercher un ami...",
+      friends: "Amis",
+      requests: "Demandes",
+      add: "Ajouter",
+      addNewFriend: "Ajouter un nouvel ami",
+      username: "Nom d'utilisateur",
+      sendRequest: "Envoyer une demande",
+      selectFriendToChat: "Sélectionnez un ami pour commencer à chatter",
+      typeMessage: "Tapez votre message...",
+      online: "En ligne",
+      offline: "Hors ligne",
+      away: "Absent",
+      accept: "Accepter",
+      decline: "Refuser",
+      remove: "Retirer",
+      block: "Bloquer",
+      unblock: "Débloquer"
+    },
+    matchmaking: {
+      home: "Accueil",
+      createGame: "Créer une partie",
+      chooseGameType: "Choisissez votre type de jeu et lancez une salle",
+      gameType: "Type de jeu",
+      pong: "Pong",
+      block: "Block",
+      launchRoom: "Lancer la salle",
+      reset: "Réinitialiser",
+      joinGame: "Rejoindre une partie",
+      availableRooms: "Salles disponibles",
+      noActiveGames: "Aucune partie active",
+      createGameToStart: "Créez une partie pour commencer",
+      waitingForPlayers: "En attente de joueurs...",
+      playersConnected: "Joueurs connectés",
+      join: "Rejoindre",
+      cancel: "Annuler"
+    },
+    game: {
+      blockGame: "Block Game",
+      pongGame: "Pong Game",
+      tournament: "Tournoi",
+      createTournament: "Créer un tournoi",
+      joinTournament: "Rejoindre un tournoi",
+      tournamentName: "Nom du tournoi",
+      maxPlayers: "Joueurs maximum",
+      startTournament: "Démarrer le tournoi",
+      tournamentBracket: "Arbre du tournoi",
+      round: "Tour",
+      final: "Finale",
+      semiFinal: "Demi-finale",
+      quarterFinal: "Quart de finale",
+      winner: "Vainqueur",
+      vs: "contre",
+      waitingForMatch: "En attente du match...",
+      matchInProgress: "Match en cours...",
+      matchFinished: "Match terminé"
+    },
+    room: {
+      roomId: "ID de la salle",
+      copyRoomId: "Copier l'ID de la salle",
+      shareRoom: "Partager la salle",
+      players: "Joueurs",
+      spectators: "Spectateurs",
+      kickPlayer: "Expulser le joueur",
+      banPlayer: "Bannir le joueur",
+      startGame: "Démarrer la partie",
+      leaveRoom: "Quitter la salle",
+      roomSettings: "Paramètres de la salle",
+      maxSpectators: "Spectateurs maximum",
+      privateRoom: "Salle privée",
+      publicRoom: "Salle publique",
+      home: "Accueil",
+      roomName: "Nom de la salle",
+      ready: "Prêt",
+      maxPlayers: "Joueurs maximum",
+      gameType: "Type de jeu",
+      ai: "IA",
+      waitingForPlayers: "En attente de joueurs...",
+      chat: "Chat",
+      typeMessage: "Tapez un message...",
+      host: "HÔTE"
+    },
+    pong: {
+      pressEnterToStart: "APPUYEZ SUR ENTRÉE",
+      toStart: "POUR COMMENCER",
+      player: "Joueur",
+      aiPlayer: "IA"
     }
   },
   en: {
@@ -147,6 +285,18 @@ export const translations = {
         confirmNewPassword: "Confirm New Password",
         submit: "Change Password",
         backToProfile: "Back to Profile"
+      },
+      twoFactorAuth: {
+        title: "Two-Factor Authentication",
+        backToProfile: "Back to Profile",
+        scanQR: "Scan the QR code with your Google Authenticator app",
+        generatingQR: "Generating QR code...",
+        verificationCode: "Enter verification code:",
+        activate: "Activate 2FA",
+        verify: "Verify Code",
+        success: "2FA activated successfully",
+        error: "Incorrect verification code",
+        missingToken: "Authentication token missing"
       }
     },
     menu: {
@@ -154,7 +304,10 @@ export const translations = {
       profile: "Profile",
       playLocal: "Play Local",
       multiplayer: "Multiplayer",
-      friends: "Friends"
+      friends: "Friends",
+      tournament: "Tournament",
+      chat: "Chat",
+      logout: "Logout"
     },
     profile: {
       title: "Profile",
@@ -200,7 +353,31 @@ export const translations = {
         title: "Chat",
         newChat: "New Chat",
         ago: "ago"
-      }
+      },
+      home: "Home",
+      deactivate2FA: "Deactivate 2FA",
+      activate2FA: "Activate 2FA",
+      hoursAgo: "hours ago",
+      heyWantToPlay: "Hey, want to play a game?",
+      goodGame: "Good game!",
+      upload: "Upload",
+      selectValidImage: "Please select a valid image",
+      imageTooLarge: "Image is too large. Maximum size: 5MB",
+      avatarUploadSuccess: "Avatar uploaded successfully",
+      avatarUploadError: "Error uploading avatar",
+      victory: "Victory",
+      defeat: "Defeat",
+      draw: "Draw",
+      justNow: "Just now",
+      yesterday: "Yesterday",
+      twoFAUpdateFailed: "Failed to update 2FA status",
+      confirmDisable2FA: "Are you sure you want to disable two-factor authentication?",
+      unknownError: "Unknown error",
+      addFriend: "Add Friend",
+      message: "Message",
+      statistics: "Statistics",
+      gamePlayed: "Games played",
+      winrate: "Winrate"
     },
     friends: {
       backToSocial: "Back",
@@ -215,6 +392,105 @@ export const translations = {
       sendMessage: "Send Message",
       inviteToGame: "Invite to Game",
       removeFriend: "Remove Friend"
+    },
+    block: {
+      pressEnterToStart: "PRESS ENTER TO START",
+      player1Controls: "PLAYER 1: A/D KEYS",
+      player2Controls: "PLAYER 2: ARROW KEYS",
+      wins: "WINS!",
+      pressEnterToPlayAgain: "Press ENTER to play again",
+      score: "Score:",
+      lives: "Lives:"
+    },
+    chat: {
+      home: "Home",
+      myFriends: "My Friends",
+      searchFriend: "Search for a friend...",
+      friends: "Friends",
+      requests: "Requests",
+      add: "Add",
+      addNewFriend: "Add a new friend",
+      username: "Username",
+      sendRequest: "Send request",
+      selectFriendToChat: "Select a friend to start chatting",
+      typeMessage: "Type your message...",
+      online: "Online",
+      offline: "Offline",
+      away: "Away",
+      accept: "Accept",
+      decline: "Decline",
+      remove: "Remove",
+      block: "Block",
+      unblock: "Unblock"
+    },
+    matchmaking: {
+      home: "Home",
+      createGame: "Create a Game",
+      chooseGameType: "Choose your game type and launch a room",
+      gameType: "Game Type",
+      pong: "Pong",
+      block: "Block",
+      launchRoom: "Launch Room",
+      reset: "Reset",
+      joinGame: "Join a Game",
+      availableRooms: "Available rooms",
+      noActiveGames: "No active games",
+      createGameToStart: "Create a game to get started",
+      waitingForPlayers: "Waiting for players...",
+      playersConnected: "Players connected",
+      join: "Join",
+      cancel: "Cancel"
+    },
+    game: {
+      blockGame: "Block Game",
+      pongGame: "Pong Game",
+      tournament: "Tournament",
+      createTournament: "Create Tournament",
+      joinTournament: "Join Tournament",
+      tournamentName: "Tournament Name",
+      maxPlayers: "Max Players",
+      startTournament: "Start Tournament",
+      tournamentBracket: "Tournament Bracket",
+      round: "Round",
+      final: "Final",
+      semiFinal: "Semi-Final",
+      quarterFinal: "Quarter-Final",
+      winner: "Winner",
+      vs: "vs",
+      waitingForMatch: "Waiting for match...",
+      matchInProgress: "Match in progress...",
+      matchFinished: "Match finished"
+    },
+    room: {
+      roomId: "Room ID",
+      copyRoomId: "Copy Room ID",
+      shareRoom: "Share Room",
+      players: "Players",
+      spectators: "Spectators",
+      kickPlayer: "Kick Player",
+      banPlayer: "Ban Player",
+      startGame: "Start Game",
+      leaveRoom: "Leave Room",
+      roomSettings: "Room Settings",
+      maxSpectators: "Max Spectators",
+      privateRoom: "Private Room",
+      publicRoom: "Public Room",
+      home: "Home",
+      roomName: "Room Name",
+      ready: "Ready",
+      maxPlayers: "Max Players",
+      gameType: "Game Type",
+      ai: "AI",
+      waitingForPlayers: "Waiting for players...",
+      chat: "Chat",
+      typeMessage: "Type a message...",
+      host: "HOST"
+    },
+    pong: {
+      pressEnterToStart: "PRESS ENTER",
+      toStart: "TO START",
+      player: "Player",
+      aiPlayer: "AI"
     }
   },
   es: {
@@ -256,6 +532,18 @@ export const translations = {
         confirmNewPassword: "Confirmar nueva contraseña",
         submit: "Cambiar contraseña",
         backToProfile: "Volver al perfil"
+      },
+      twoFactorAuth: {
+        title: "Autenticación de dos factores",
+        backToProfile: "Volver al perfil",
+        scanQR: "Escanee el código QR con su aplicación Google Authenticator",
+        generatingQR: "Generando código QR...",
+        verificationCode: "Ingrese el código de verificación:",
+        activate: "Activar 2FA",
+        verify: "Verificar código",
+        success: "2FA activada exitosamente",
+        error: "Código de verificación incorrecto",
+        missingToken: "Token de autenticación faltante"
       }
     },
     menu: {
@@ -263,7 +551,10 @@ export const translations = {
       profile: "Perfil",
       playLocal: "Jugar local",
       multiplayer: "Multijugador",
-      friends: "Amigos"
+      friends: "Amigos",
+      tournament: "Torneo",
+      chat: "Chat",
+      logout: "Cerrar sesión"
     },
     profile: {
       title: "Perfil",
@@ -309,7 +600,31 @@ export const translations = {
         title: "Chat",
         newChat: "Nuevo chat",
         ago: "hace"
-      }
+      },
+      home: "Inicio",
+      deactivate2FA: "Desactivar 2FA",
+      activate2FA: "Activar 2FA",
+      hoursAgo: "horas",
+      heyWantToPlay: "¡Hola, ¿quieres jugar?",
+      goodGame: "¡Buena partida!",
+      upload: "Subir",
+      selectValidImage: "Por favor selecciona una imagen válida",
+      imageTooLarge: "La imagen es demasiado grande. Tamaño máximo: 5MB",
+      avatarUploadSuccess: "Avatar subido exitosamente",
+      avatarUploadError: "Error al subir el avatar",
+      victory: "Victoria",
+      defeat: "Derrota",
+      draw: "Empate",
+      justNow: "Ahora mismo",
+      yesterday: "Ayer",
+      twoFAUpdateFailed: "Error al actualizar el estado 2FA",
+      confirmDisable2FA: "¿Estás seguro de que quieres desactivar la autenticación de dos factores?",
+      unknownError: "Error desconocido",
+      addFriend: "Agregar Amigo",
+      message: "Mensaje",
+      statistics: "Estadísticas",
+      gamePlayed: "Partidas jugadas",
+      winrate: "Tasa de victoria"
     },
     friends: {
       backToSocial: "Volver",
@@ -324,87 +639,119 @@ export const translations = {
       sendMessage: "Enviar mensaje",
       inviteToGame: "Invitar a jugar",
       removeFriend: "Eliminar amigo"
+    },
+    block: {
+      pressEnterToStart: "PRESIONA ENTER PARA COMENZAR",
+      player1Controls: "JUGADOR 1: TECLAS A/D",
+      player2Controls: "JUGADOR 2: TECLAS DE FLECHA",
+      wins: "¡GANÓ!",
+      pressEnterToPlayAgain: "Presiona ENTER para jugar de nuevo",
+      score: "Puntuación:",
+      lives: "Vidas:"
+    },
+    chat: {
+      home: "Inicio",
+      myFriends: "Mis Amigos",
+      searchFriend: "Buscar un amigo...",
+      friends: "Amigos",
+      requests: "Solicitudes",
+      add: "Agregar",
+      addNewFriend: "Agregar un nuevo amigo",
+      username: "Nombre de usuario",
+      sendRequest: "Enviar solicitud",
+      selectFriendToChat: "Selecciona un amigo para comenzar a chatear",
+      typeMessage: "Escribe tu mensaje...",
+      online: "En línea",
+      offline: "Desconectado",
+      away: "Ausente",
+      accept: "Aceptar",
+      decline: "Rechazar",
+      remove: "Eliminar",
+      block: "Bloquear",
+      unblock: "Desbloquear"
+    },
+    matchmaking: {
+      home: "Inicio",
+      createGame: "Crear un Juego",
+      chooseGameType: "Elige tu tipo de juego y lanza una sala",
+      gameType: "Tipo de Juego",
+      pong: "Pong",
+      block: "Block",
+      launchRoom: "Lanzar Sala",
+      reset: "Reiniciar",
+      joinGame: "Unirse a un Juego",
+      availableRooms: "Salas disponibles",
+      noActiveGames: "No hay juegos activos",
+      createGameToStart: "Crea un juego para comenzar",
+      waitingForPlayers: "Esperando jugadores...",
+      playersConnected: "Jugadores conectados",
+      join: "Unirse",
+      cancel: "Cancelar"
+    },
+    game: {
+      blockGame: "Juego de Bloques",
+      pongGame: "Juego de Pong",
+      tournament: "Torneo",
+      createTournament: "Crear Torneo",
+      joinTournament: "Unirse al Torneo",
+      tournamentName: "Nombre del Torneo",
+      maxPlayers: "Jugadores Máximos",
+      startTournament: "Iniciar Torneo",
+      tournamentBracket: "Llave del Torneo",
+      round: "Ronda",
+      final: "Final",
+      semiFinal: "Semi-Final",
+      quarterFinal: "Cuartos de Final",
+      winner: "Ganador",
+      vs: "vs",
+      waitingForMatch: "Esperando partida...",
+      matchInProgress: "Partida en progreso...",
+      matchFinished: "Partida terminada"
+    },
+    room: {
+      roomId: "ID de la Sala",
+      copyRoomId: "Copiar ID de la Sala",
+      shareRoom: "Compartir Sala",
+      players: "Jugadores",
+      spectators: "Espectadores",
+      kickPlayer: "Expulsar Jugador",
+      banPlayer: "Banear Jugador",
+      startGame: "Iniciar Juego",
+      leaveRoom: "Salir de la Sala",
+      roomSettings: "Configuración de la Sala",
+      maxSpectators: "Espectadores Máximos",
+      privateRoom: "Sala Privada",
+      publicRoom: "Sala Pública",
+      home: "Inicio",
+      roomName: "Nombre de la Sala",
+      ready: "Listo",
+      maxPlayers: "Jugadores Máximos",
+      gameType: "Tipo de Juego",
+      ai: "IA",
+      waitingForPlayers: "Esperando jugadores...",
+      chat: "Chat",
+      typeMessage: "Escribe un mensaje...",
+      host: "ANFITRIÓN"
+    },
+    pong: {
+      pressEnterToStart: "PRESIONA ENTER",
+      toStart: "PARA COMENZAR",
+      player: "Jugador",
+      aiPlayer: "IA"
     }
   }
 } as const;
 
+type DotPrefix<T extends string> = T extends '' ? '' : `.${T}`;
+
+type DotNestedKeys<T> = {
+  [K in keyof T & string]: T[K] extends object
+    ? `${K}.${keyof T[K] & string}`
+    : `${K}`
+}[keyof T & string];
+
 type Language = keyof typeof translations;
-type TranslationKeys = 
-  | 'home.title'
-  | 'home.subtitle'
-  | 'home.description'
-  | 'home.login'
-  | 'auth.login.title'
-  | 'auth.login.username'
-  | 'auth.login.password'
-  | 'auth.login.submit'
-  | 'auth.login.forgotPassword'
-  | 'auth.login.createAccount'
-  | 'auth.createAccount.title'
-  | 'auth.createAccount.username'
-  | 'auth.createAccount.email'
-  | 'auth.createAccount.password'
-  | 'auth.createAccount.confirmPassword'
-  | 'auth.createAccount.submit'
-  | 'auth.createAccount.backToLogin'
-  | 'auth.forgotPassword.title'
-  | 'auth.forgotPassword.description'
-  | 'auth.forgotPassword.email'
-  | 'auth.forgotPassword.submit'
-  | 'auth.forgotPassword.backToLogin'
-  | 'auth.changePassword.title'
-  | 'auth.changePassword.currentPassword'
-  | 'auth.changePassword.newPassword'
-  | 'auth.changePassword.confirmNewPassword'
-  | 'auth.changePassword.submit'
-  | 'auth.changePassword.backToProfile'
-  | 'menu.title'
-  | 'menu.profile'
-  | 'menu.playLocal'
-  | 'menu.multiplayer'
-  | 'menu.friends'
-  | 'profile.title'
-  | 'profile.editProfile'
-  | 'profile.changePassword'
-  | 'profile.logout'
-  | 'profile.stats.wins'
-  | 'profile.stats.games'
-  | 'profile.stats.rating'
-  | 'profile.recentActivity'
-  | 'profile.wonAgainst'
-  | 'profile.addedFriend'
-  | 'profile.hoursAgo'
-  | 'profile.daysAgo'
-  | 'profile.edit.title'
-  | 'profile.edit.username'
-  | 'profile.edit.email'
-  | 'profile.edit.avatar'
-  | 'profile.edit.submit'
-  | 'profile.edit.backToProfile'
-  | 'social.title'
-  | 'social.searchPlaceholder'
-  | 'social.friends.title'
-  | 'social.friends.addFriend'
-  | 'social.friends.online'
-  | 'social.friends.offline'
-  | 'social.friends.message'
-  | 'social.friends.play'
-  | 'social.friendRequests.title'
-  | 'social.friendRequests.accept'
-  | 'social.friendRequests.decline'
-  | 'social.chat.title'
-  | 'social.chat.newChat'
-  | 'social.chat.ago'
-  | 'friends.backToSocial'
-  | 'friends.online'
-  | 'friends.offline'
-  | 'friends.lastSeen'
-  | 'friends.stats.wins'
-  | 'friends.stats.games'
-  | 'friends.stats.rating'
-  | 'friends.sendMessage'
-  | 'friends.inviteToGame'
-  | 'friends.removeFriend';
+type TranslationKeys = DotNestedKeys<typeof translations>;
 
 export function getLanguage(): Language {
   const subdomain = localStorage.getItem('lang');

@@ -1,4 +1,5 @@
 import { getAuthToken } from '../../utils/auth';
+import { t } from '../../utils/translations';
 
 export class profil {
 
@@ -156,7 +157,7 @@ export class profil {
 	private createMatchItem(match: any): string {
 		const gameIcon = match.gameType === 'pong' ? 'fa-table-tennis' : 'fa-cubes';
 		const gameTypeClass = match.gameType === 'pong' ? 'pong' : 'block';
-		const resultText = match.result === 'victory' ? 'Victory' : match.result === 'defeat' ? 'Defeat' : 'Draw';
+		const resultText = match.result === 'victory' ? t('social.victory') : match.result === 'defeat' ? t('social.defeat') : t('social.draw');
 		const dateText = this.formatDate(match.date);
 
 		return `
@@ -183,11 +184,11 @@ export class profil {
 		const diffDays = Math.floor(diffHours / 24);
 
 		if (diffHours < 1) {
-			return 'Just now';
+			return t('social.justNow');
 		} else if (diffHours < 24) {
 			return `${diffHours}h ago`;
 		} else if (diffDays === 1) {
-			return 'Yesterday';
+			return t('social.yesterday');
 		} else {
 			return `${diffDays}d ago`;
 		}

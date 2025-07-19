@@ -65,7 +65,7 @@ export function renderSocial() {
                 <img src="../../public/avatar.png" alt="User Avatar" class="invitation-avatar">
                 <div class="invitation-info">
                   <span class="invitation-name">Player789</span>
-                  <span class="invitation-time">2 hours ago</span>
+                  					<span class="invitation-time">2 ${t('social.hoursAgo')}</span>
                 </div>
                 <div class="invitation-actions">
                   <button class="invitation-btn ${t('social.friendRequests.accept')}">
@@ -93,7 +93,7 @@ export function renderSocial() {
                 <img src="../../public/avatar.png" alt="Chat Avatar" class="chat-avatar">
                 <div class="chat-info">
                   <span class="chat-name">Player123</span>
-                  <span class="chat-last-message">Hey, want to play a game?</span>
+                  					<span class="chat-last-message">${t('social.heyWantToPlay')}</span>
                 </div>
                 <span class="chat-time">2m</span>
               </div>
@@ -102,7 +102,7 @@ export function renderSocial() {
                 <img src="../../public/avatar.png" alt="Chat Avatar" class="chat-avatar">
                 <div class="chat-info">
                   <span class="chat-name">Player456</span>
-                  <span class="chat-last-message">Good game!</span>
+                  					<span class="chat-last-message">${t('social.goodGame')}</span>
                 </div>
                 <span class="chat-time">1h</span>
               </div>
