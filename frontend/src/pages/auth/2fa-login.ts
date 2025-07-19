@@ -1,32 +1,13 @@
 import { getAuthToken } from '../../utils/auth';
-import { fetchMe, update2FAState, userInfo } from '../social/utils';
+import { fetchMe2fa } from '../social/utils';
 
-// Exemple de page /tfa pour activer la 2FA
-export function render2FA() {
+export function render2FALogin() {
   const htmlContent = `
     <div class="tfa-wrapper">
       <div class="tfa-container">
         <div class="tfa-header">
-          <button class="back-button" id="backBtn">
-            <i class="fas fa-arrow-left"></i>
-            Retour au profil
-          </button>
           <h1>Authentification à deux facteurs</h1>
         </div>
-        
-        <div class="tfa-content">
-          <div class="step-info">
-            <p>Scannez le QR code avec votre application d'authentification Google Authenticator</p>
-          </div>
-          
-          <div class="qr-section" id="qrSection">
-            <div class="qr-placeholder">
-              <i class="fas fa-qrcode"></i>
-              <p>Génération du QR code...</p>
-            </div>
-          </div>
-
-
           
           <div class="verification-section">
             <label for="verificationCode">Entrez le code de vérification :</label>
@@ -203,22 +184,11 @@ export function render2FA() {
   `;
 
   setTimeout(async () => {
-    const backBtn = document.getElementById('backBtn');
     const activateBtn = document.getElementById('activateBtn') as HTMLInputElement;
     const verificationCode = document.getElementById('verificationCode') as HTMLInputElement;
-    const qrSection = document.getElementById('qrSection');
 
-    if (!qrSection) {
-      throw new Error('qrSection element not found');
-    }
-
-    if (backBtn) {
-      backBtn.addEventListener('click', () => {
-        window.history.pushState({}, '', '/me');
-        window.dispatchEvent(new PopStateEvent('popstate'));
-      });
-    }
-    const user = await fetchMe()
+    const user = await fetchMe2fa()
+    console.log(`user = ${JSON.stringify(user, null, 8)}`)
   
     const authToken = getAuthToken();
     if (!authToken) {
@@ -227,21 +197,6 @@ export function render2FA() {
       window.dispatchEvent(new PopStateEvent('popstate'));
       return;
     }
-
-    const response = await fetch(`/api/me/${user.id}`, {
-
-      method: 'POST',
-      headers: {
-          'Content-Type': 'application/json',
-          'x-access-token': authToken
-        },
-      body: JSON.stringify({
-					user,
-				})
-    });
-
-    const data = await response.json(); 
-    qrSection.innerHTML = data.qrcode;
 
     // Gestion de l'activation 2FA
     if (activateBtn && verificationCode) {
@@ -281,35 +236,18 @@ export function render2FA() {
           });
 
           const checkCode = await responseCode.json();
+          console.log(`checkCode = ${checkCode.checkCode}`)
           if (!checkCode.checkCode)
             alert(`❌ Code incorrect`);
 
           if (checkCode.checkCode) {
-            activateBtn.disabled = true;
-            activateBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Activation...';
-
-            const info = await userInfo();
-            const success = await update2FAState(1, info.user.id);
-
-            if (success) {
-              alert('✅ Authentification à deux facteurs activée avec succès');
-              setTimeout(() => {
-                window.history.pushState({}, '', '/me');
-                window.dispatchEvent(new PopStateEvent('popstate'));
-              }, 2000);
-            }
-            else {
-              alert(`❌  Authentification à deux facteurs n'a pas pu etre activée`);
-              activateBtn.disabled = false;
-              activateBtn.innerHTML = '<i class="fa-solid fa-lock"></i> Activer 2FA';
-            }
+            window.history.pushState({}, '', '/main');
+            window.dispatchEvent(new PopStateEvent('popstate'));
           }
         }
         catch (error) {
-          console.error('Erreur lors de l\'activation 2FA:', error);
-          alert('❌ Erreur lors de l\'activation de l\'authentification à deux facteurs');
-          activateBtn.disabled = false;
-          activateBtn.innerHTML = '<i class="fa-solid fa-lock"></i> Activer 2FA';
+          console.log(`error = ${error}`)
+          console.error('Stack trace :', error.stack)
         }
       });
     }

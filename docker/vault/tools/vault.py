@@ -140,6 +140,22 @@ class VaultManager:
             print(f"Erreur lors du stockage du secret JWT: {e}")
             return False
     
+    def store_key_secret(self, token: str, jwt_key: str) -> bool:
+        """Store KEY_SECRET secret in Vault"""
+        print("Ajout du secret KEY_SECRET...")
+        try:
+            response = self.session.post(
+                f"{self.vault_url}/v1/secret/data/KEY",
+                headers={"X-Vault-Token": token},
+                json={"data": {"KEY_SECRET": jwt_key}},
+                timeout=30
+            )
+            response.raise_for_status()
+            return True
+        except requests.exceptions.RequestException as e:
+            print(f"Erreur lors du stockage du secret JWT: {e}")
+            return False
+    
     def generate_random_secret(self, length: int = 24) -> str:
         """Generate a random secret string"""
         import secrets
@@ -151,6 +167,24 @@ class VaultManager:
             if JWT:
                 print("Utilisation du secret JWT existant :", JWT)
                 return JWT
+            else:
+                alphabet = string.ascii_letters + string.digits
+                return ''.join(secrets.choice(alphabet) for _ in range(length))
+        except:
+            print("Erreur lors de la génération du secret aléatoire")
+            sys.exit(1)
+
+    def generate_random_secret_2fa(self, length: int = 24) -> str:
+        """Generate a random secret string"""
+        import secrets
+        import string
+        import dotenv
+        try :
+            dotenv.load_dotenv("/tmp/vault.env")
+            KEY = os.getenv('KEY_SECRET')
+            if KEY:
+                print("Utilisation du secret KEY_SECRET existant :", KEY)
+                return KEY
             else:
                 alphabet = string.ascii_letters + string.digits
                 return ''.join(secrets.choice(alphabet) for _ in range(length))
@@ -208,7 +242,24 @@ def main():
             print("Échec du stockage du secret JWT")
             vault_manager.stop_vault_server()
             sys.exit(1)
+        key_secret = vault_manager.generate_random_secret_2fa()
+        if not vault_manager.store_key_secret(vault_token, key_secret):
+            print("Échec du stockage du secret JWT")
+            vault_manager.stop_vault_server()
+            sys.exit(1)
+
+        env_content = f"""VAULT_KEY_1={vault_key}
+VAULT_TOKEN={vault_token}
+KEY_SECRET={key_secret}
+VAULT_JWT_KEY={jwt_secret}"""
         print("Configuration de Vault terminée avec succès")
+        try:
+            with open('/tmp/vault.env', 'w') as f:
+                f.write(env_content)
+            print("Variables d'environnement sauvegardées dans /tmp/vault.env")
+        except Exception as e:
+            print(f"Impossible de sauvegarder les variables d'environnement: {e}")
+
     else:
         print("Vault n'est pas initialisé, initialisation en cours...")
         
@@ -236,10 +287,17 @@ def main():
             print("Échec du stockage du secret JWT")
             vault_manager.stop_vault_server()
             sys.exit(1)
+
+        key_secret = vault_manager.generate_random_secret_2fa()
+        if not vault_manager.store_key_secret(vault_token, key_secret):
+            print("Échec du stockage du secret JWT")
+            vault_manager.stop_vault_server()
+            sys.exit(1)
         
         print("Configuration de Vault terminée avec succès")
         env_content = f"""VAULT_KEY_1={vault_key}
 VAULT_TOKEN={vault_token}
+KEY_SECRET={key_secret}
 VAULT_JWT_KEY={jwt_secret}
 """
         try:
