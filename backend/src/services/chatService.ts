@@ -11,7 +11,6 @@ interface RoomData {
 	maxPlayers: number;
 	users: User[];
 	host: string;
-	isGameStarted: boolean;
 	ai: number;
 }
 

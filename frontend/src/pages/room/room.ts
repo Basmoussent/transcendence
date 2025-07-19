@@ -14,7 +14,6 @@ interface RoomData {
 	maxPlayers: number;
 	users: User[];
 	host: string;
-	isGameStarted: boolean;
 	ai: number;
 }
 
@@ -148,14 +147,14 @@ export class Room {
 				break;
 
 			case 'notLog':
+				this.ws.close();
 				window.history.pushState({}, '', '/login');
 				window.dispatchEvent(new Event('popstate'));
-				this.ws.close();
 				break;
 			case 'error':
-				window.history.pushState({}, '', '/login');
-				window.dispatchEvent(new Event('popstate'));
 				this.ws.close();
+				window.history.pushState({}, '', '/matchmaking');
+				window.dispatchEvent(new Event('popstate'));
 				break;
 			default:
 				console.warn(`Unknown event type received: ${data.type}`);

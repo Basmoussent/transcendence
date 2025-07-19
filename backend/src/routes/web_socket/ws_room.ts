@@ -16,7 +16,6 @@ interface Room {
 	maxPlayers: number;
 	users: Map<string, User>;
 	host: string;
-	isGameStarted: boolean;
 	ai: number;
 }
 
@@ -30,7 +29,6 @@ async function broadcastRoomUpdate(app: FastifyInstance, room: Room) {
 		maxPlayers: room.maxPlayers,
 		users: Array.from(room.users.values()).map(u => ({ username: u.username, isReady: u.isReady })),
 		host: room.host,
-		isGameStarted: room.isGameStarted,
 		ai: room.ai,
 	};
 
@@ -64,6 +62,7 @@ function broadcastSystemMessage(room: Room, content: string) {
 }
 
 export async function handleRoom(app: FastifyInstance, socket: WebSocket, req: FastifyRequest) {
+
 	try {
 		const token = req.headers['x-access-token'] ? req.headers['x-access-token'] : req.cookies['x-access-token']; 
 			
@@ -100,31 +99,31 @@ export async function handleRoom(app: FastifyInstance, socket: WebSocket, req: F
 				maxPlayers: game.users_needed,
 				users: new Map(),
 				host: username,
-				isGameStarted: false,
 				ai: 0,
 			};
 
 			rooms.set(uuid!, room);
 		}
 
-		if (room.maxPlayers === room.users.size + room.ai) {
+		// le bouton est déjà désactivé quand la room est pleine
 
-			console.log(JSON.stringify({
-				room_users_size : room.users.size,
-				room_ai : room.ai,
-				maxplayer: room.maxPlayers,
-				taille_actuelle: room.users.size + room.ai
-			}))
-			socket.send(JSON.stringify({
-				type: 'error',
-				message: 'Room is full' }));
-				console.log('je vais close le socket')
-			return;
-		}
+		// mettre en place de supprimer les ia si quelqu'un rejoint qu'il fallait 3 personnes et que yavait 2 pesonnes + une ia
+		// if (room.maxPlayers === room.users.size + room.ai) {
+
+		// 	console.log(JSON.stringify({
+		// 		room_users_size : room.users.size,
+		// 		room_ai : room.ai,
+		// 		maxplayer: room.maxPlayers,
+		// 		taille_actuelle: room.users.size + room.ai
+		// 	}))
+		// 	socket.send(JSON.stringify({
+		// 		type: 'error',
+		// 		message: 'Room is full' }));
+		// 		console.log('je vais close le socket')
+		// 	return;
+		// }
 
 		room.users.set(username, user);
-
-		console.warn(`room.maxPlayers === room.users.size + room.ai --> ${room.maxPlayers} === ${room.users.size} + ${room.ai}`)
 
 		broadcastSystemMessage(room, `${username} has joined the room.`);
 		await broadcastRoomUpdate(app, room);
@@ -199,9 +198,6 @@ export async function handleRoom(app: FastifyInstance, socket: WebSocket, req: F
 						if (!allReady)
 							return;
 
-						console.log(`Starting game for room ${uuid!}`);
-						currentRoom.isGameStarted = true;
-
 						const gameStartMessage = JSON.stringify({ 
 							type: 'game_starting',
 							gameType: currentRoom.gameType
@@ -220,28 +216,27 @@ export async function handleRoom(app: FastifyInstance, socket: WebSocket, req: F
 
 		socket.on('close', async () => {
 
-			const roomToLeave = rooms.get(uuid!);
-			if (roomToLeave) {
-				roomToLeave.users.delete(username);
-				console.log(`${username} disconnected from room ${uuid!}`);
+			const roomToLeave = rooms.get(uuid!)!;
+			
+			roomToLeave.users.delete(username);
+			console.log(`${username} disconnected from room ${uuid!}`);
 
-				if (roomToLeave.users.size === 0) {
-					rooms.delete(uuid!);
-					console.log(`Room ${uuid!} deleted because empty`);
-					app.gameService.deleteGame(uuid);
-				}
-				else { // delegate host
-					if (roomToLeave.host === username) {
-						roomToLeave.host = roomToLeave.users.keys().next().value;
-						console.log(`${roomToLeave.host} is the new host.`);
-					}
-					broadcastSystemMessage(roomToLeave, `${username} has left the room.`);
-					await broadcastRoomUpdate(app, roomToLeave);
-					await app.roomService.updateGame(roomToLeave);
-				}
+			if (roomToLeave.users.size === 0) {
+				rooms.delete(uuid!);
+				console.log(`Room ${uuid!} deleted because empty`);
+				app.gameService.deleteGame(uuid);
+			}
+			else {
+				if (roomToLeave.host === username)
+					roomToLeave.host = roomToLeave.users.keys().next().value!;
+
+				broadcastSystemMessage(roomToLeave, `${username} has left the room.`);
+				await broadcastRoomUpdate(app, roomToLeave);
+				await app.roomService.updateGame(roomToLeave);
 			}
 		});
-	} catch (error) {
+	}
+	catch (error) {
 		console.error('Error in handleRoom:', error);
 		socket.close();
 	}
