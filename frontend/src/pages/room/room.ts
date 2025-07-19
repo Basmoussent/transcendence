@@ -224,26 +224,13 @@ export class Room {
 		 }));
 	}
 
-
 	private leaveRoom() {
-		if (this.ws.readyState === WebSocket.OPEN) {
-			this.ws.send(JSON.stringify({
-				type: 'leave_room',
-				token: this.token,
-			 }));
-		}
 		this.ws.close();
 		window.history.pushState({}, '', '/matchmaking');
 		window.dispatchEvent(new Event('popstate'));
 	}
 
 	private goHome() {
-		if (this.ws.readyState === WebSocket.OPEN) {
-			this.ws.send(JSON.stringify({
-				type: 'leave_room',
-				token: this.token,
-			 }));
-		}
 		this.ws.close();
 		window.history.pushState({}, '', '/main');
 		window.dispatchEvent(new Event('popstate'));

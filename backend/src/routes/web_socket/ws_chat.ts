@@ -238,7 +238,7 @@ async function denyFriend(app: FastifyInstance, user: UserChat, friendName: stri
 		return;
 	}
 
-	app.friendService.denyRelation(relation.id)
+	await app.friendService.denyRelation(relation.id)
 	const message = JSON.stringify({
 		type: 'updateUI'
 	});

@@ -41,5 +41,23 @@ export class GameService {
 		return Promise.resolve(null); 
 	}
 
+	async deleteGame(uuid: string) {
+
+		try {
+			await new Promise<void>((resolve, reject) => {
+				this.db.run(
+					'DELETE FROM games WHERE uuid = ?',
+					[ uuid ],
+					(err: any) => {
+						err ? reject(err) : resolve (); }
+				);
+			});
+		}
+		catch (err: any) {
+			console.log(`${uuid} game supprimé`)
+		}
+		return Promise.resolve(null); 
+	}
+
 
 }
