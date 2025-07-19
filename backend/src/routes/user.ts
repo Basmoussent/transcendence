@@ -24,74 +24,79 @@ interface UserData {
 }
 
 async function userRoutes(app: FastifyInstance) {
-    app.get('/me', async (request: FastifyRequest, reply: FastifyReply) => {
-        // Récupérer le token depuis les headers ou les cookies
-        let token = request.headers['x-access-token'] as string;
-        
-        if (!token) {
-          token = request.cookies['x-access-token'];
-        }
-        
-        if (!token) {
-            return reply.status(401).send({ error: 'Token d\'authentification manquant' });
-        }
-
-        try {
-            const decoded = app.jwt.verify(token) as { user: string };
-            const email = decoded.user;
-
-            const database = db.getDatabase();
-            if (!database) {
-                return reply.status(500).send({ error: 'Erreur de connexion à la base de données' });
+        app.get('/me', async (request: FastifyRequest, reply: FastifyReply) => {
+            // Récupérer le token depuis les headers ou les cookies
+            let token = request.headers['x-access-token'] as string;
+            
+            if (!token) {
+              token = request.cookies['x-access-token'];
             }
-
-            // Récupération des données utilisateur
-            const user = await new Promise<UserData | null>((resolve, reject) => {
-                database.get(
-                    'SELECT * FROM users WHERE email = ?',
-                    [email],
-                    (err: any, row: UserData | undefined) => {
-                        if (err) {
-                            reject(err);
-                        } else {
-                            resolve(row || null);
+            
+            if (!token) {
+                return reply.status(401).send({ error: 'Token d\'authentification manquant' });
+            }
+    
+            try {
+                const decoded = app.jwt.verify(token) as { user: string };
+                const email = decoded.user;
+    
+                const database = db.getDatabase();
+                if (!database) {
+                    return reply.status(500).send({ error: 'Erreur de connexion à la base de données' });
+                }
+    
+                // Récupération des données utilisateur
+                const user = await new Promise<UserData | null>((resolve, reject) => {
+                    database.get(
+                        'SELECT * FROM users WHERE email = ?',
+                        [email],
+                        (err: any, row: UserData | undefined) => {
+                            if (err) {
+                                reject(err);
+                            } else {
+                                resolve(row || null);
+                            }
                         }
-                    }
-                );
-            });
-
-            if (!user) {
-                return reply.status(404).send({ error: 'Utilisateur non trouvé' });
+                    );
+                });
+    
+                if (!user) {
+                    return reply.status(404).send({ error: 'Utilisateur non trouvé' });
+                }
+                console.log('user', user);
+                // Récupération des statistiques (pour l'instant des valeurs par défaut)
+                // TODO: Implémenter la vraie logique des statistiques
+                const userStats = await app.userService.retrieveStats(user.id);
+                console.log('userStats', userStats);
+                const win = userStats.pong_wins + userStats.block_wins;
+                const games = userStats.pong_games + userStats.block_games;
+                const rating = userStats.rating;
+                const stats = {
+                    win: win,
+                    games: games,
+                    rating: rating
+                };
+    
+                return reply.send({
+                    user: {
+                        id: user.id,
+                        username: user.username,
+                        email: user.email,
+                        avatar_url: user.avatar_url || 'avatar.png',
+                        language: user.language,
+                        two_fact_auth: user.two_fact_auth || 0,
+                    },
+                    stats: stats
+                });
+            } catch (err: any) {
+                console.error('❌ Error in /me endpoint:', err);
+                if (err.name === 'JsonWebTokenError') {
+                    return reply.status(401).send({ error: 'Token invalide ou expiré' });
+                }
+                return reply.status(500).send({ error: 'Erreur serveur interne' });
             }
-
-            // Récupération des statistiques (pour l'instant des valeurs par défaut)
-            // TODO: Implémenter la vraie logique des statistiques
-            // const stats = {
-            //     win: user.stats.wins,
-            //     pong_games: user.stats.pong_games,
-            //     block_games: user.stats.block_games,
-            //     rating: user.stats.rating
-            // };
-
-            return reply.send({
-                user: {
-                    id: user.id,
-                    username: user.username,
-                    email: user.email,
-                    avatar_url: user.avatar_url || 'avatar.png',
-                    language: user.language,
-                    two_fact_auth: user.two_fact_auth || 0,
-                },
-                // stats: stats
-            });
-        } catch (err: any) {
-            console.error('❌ Error in /me endpoint:', err);
-            if (err.name === 'JsonWebTokenError') {
-                return reply.status(401).send({ error: 'Token invalide ou expiré' });
-            }
-            return reply.status(500).send({ error: 'Erreur serveur interne' });
-        }
-    });
+        });
+    
 
     app.get('/uploads/:filename', async (request: FastifyRequest, reply: FastifyReply) => {
         const { filename } = request.params as { filename: string };
