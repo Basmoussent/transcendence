@@ -1,13 +1,8 @@
 import { db } from '../database';
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import { v4 as uuidv4, validate as uuidValidate } from 'uuid';
-import sqlite3 from 'sqlite3';
-import jwt from '@fastify/jwt';
-import bcrypt from 'bcrypt';
-import fs from 'fs'
-import util from 'util'
-import { pipeline } from 'stream'
-import path from 'path';
+import { redis } from '../index';
+
 
 export interface Game {
 	id: number,

@@ -494,6 +494,31 @@ const getTemplate = () => {
 		background: rgba(255, 255, 255, 0.3);
 	}
 
+	/* Loading Indicator */
+	.loading-indicator {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		gap: 10px;
+		padding: 20px;
+		color: rgba(255, 255, 255, 0.7);
+		font-size: 0.9rem;
+		animation: pulse 1.5s ease-in-out infinite;
+	}
+
+	.loading-indicator i {
+		color: #4a90e2;
+	}
+
+	@keyframes pulse {
+		0%, 100% {
+			opacity: 0.6;
+		}
+		50% {
+			opacity: 1;
+		}
+	}
+
 	/* Animations */
 	@keyframes fadeIn {
 		from {

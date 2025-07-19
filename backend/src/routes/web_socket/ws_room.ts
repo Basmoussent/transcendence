@@ -1,6 +1,7 @@
 import { FastifyInstance, FastifyRequest } from 'fastify';
 import { WebSocket } from 'ws';
 import { matchmaking, broadcastMatchmaking } from './ws_matchmaking';
+import { db } from '../../database';
 
 interface User {
 	username: string;
@@ -41,11 +42,11 @@ async function broadcastRoomUpdate(app: FastifyInstance, room: Room) {
 		if (user.socket.readyState === WebSocket.OPEN)
 			user.socket.send(message); });
 
-	const tmp = JSON.stringify({
+	const updateMessage = {
 		type: 'updateUI'
-	})
+	};
 
-	broadcastMatchmaking(JSON.parse(tmp.toString()));
+	broadcastMatchmaking(updateMessage);
 
 	await app.roomService.updateGame(room);
 
@@ -208,6 +209,38 @@ export async function handleRoom(app: FastifyInstance, socket: WebSocket, req: F
 					currentRoom.users.forEach(u => u.socket.send(gameStartMessage));
 					rooms.delete(uuid!);
 					break;
+				
+				case 'leave_room':
+					try {	
+						app.jwt.verify(data.token);
+						const decoded = app.jwt.verify(data.token as string) as { user: string; name: string };
+						const username = decoded.name;
+						currentRoom.users.delete(username);
+						console.log(`${username} has left the room.`);
+						if (currentRoom && currentRoom.users.size === 0)
+						{
+							rooms.delete(uuid!);
+							console.log(`Room ${uuid!} deleted because empty`);
+							const database = db.getDatabase();
+							const stmt = await database.prepare('DELETE FROM games WHERE uuid = ?');
+							stmt.run(uuid!);
+							console.log(`Game ${uuid!} deleted from database`);
+						}
+							else
+							{
+								await broadcastRoomUpdate(app, currentRoom);
+								currentRoom.users.forEach(async u => {
+									if (u.username === username)
+										currentRoom.users.delete(username);
+									await app.roomService.updateGame(currentRoom);
+								});
+							}
+						
+					}
+					catch (error) {
+						console.error('Invalid message format:', error);
+					}
+					break;
 			}
 		}
 		catch (error) {
@@ -225,6 +258,13 @@ export async function handleRoom(app: FastifyInstance, socket: WebSocket, req: F
 			if (roomToLeave.users.size === 0) {
 				rooms.delete(uuid!);
 				console.log(`Room ${uuid!} deleted because empty`);
+				// Supprimer aussi de la base de données
+				if (uuid) {
+					const database = db.getDatabase();
+					const stmt = await database.prepare('DELETE FROM games WHERE uuid = ?');
+					stmt.run(uuid);
+					console.log(`Game ${uuid} deleted from database`);
+				}
 			}
 			else { // delegate host
 				if (roomToLeave.host === username) {
@@ -233,6 +273,8 @@ export async function handleRoom(app: FastifyInstance, socket: WebSocket, req: F
 				}
 				broadcastSystemMessage(roomToLeave, `${username} has left the room.`);
 				await broadcastRoomUpdate(app, roomToLeave);
+				// Mettre à jour la base de données
+				await app.roomService.updateGame(roomToLeave);
 			}
 		}
 	});

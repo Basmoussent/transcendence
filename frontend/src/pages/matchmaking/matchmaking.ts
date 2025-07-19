@@ -47,6 +47,16 @@ export class matchmaking {
 
 		this.setupMutationObserver();
 
+		// Ajouter un listener pour nettoyer quand l'utilisateur quitte la page
+		window.addEventListener('beforeunload', () => {
+			this.stopPolling();
+			if (this.ws.readyState === WebSocket.OPEN) {
+				this.ws.send(JSON.stringify({
+					type: 'leave'
+				}));
+			}
+		});
+
 		this.pong = false;
 		this.brick = false;
 
@@ -57,17 +67,21 @@ export class matchmaking {
 		this.ws.onopen = () => {
 			console.log(`${this.username} est arrive sur matchmaking`)
 			this.updateUI();
+			this.startPolling();
 		}
 
 		this.ws.onerror = (error) => {
 			console.error(`❌ ${this.username} n'a pas pu creer de websocket:`, error)}
 
 		this.ws.onclose = (event) => {
-			console.log(`${this.username} part de la page matchmaking`)}
+			console.log(`${this.username} part de la page matchmaking`);
+			this.stopPolling();
+		}
 
 		this.ws.onmessage = (event) =>  {
 			const data = JSON.parse(event.data);
-			this.handleEvents(data);}
+			this.handleEvents(data);
+		}
 
 	}
 	
@@ -166,6 +180,7 @@ export class matchmaking {
 		});
 
 		this.homeBtn.addEventListener('click', () => {
+			this.stopPolling();
 			window.history.pushState({}, '', `/main`);
 			window.dispatchEvent(new PopStateEvent('popstate'));
 			this.ws.send(JSON.stringify({
@@ -234,9 +249,11 @@ export class matchmaking {
 
 		switch (data.type) {
 			case 'updateUI':
+				console.log('Received updateUI event, updating available games...');
 				this.updateUI();
 				break;
 			case 'notLog':
+				this.stopPolling();
 				window.history.pushState({}, '', '/login');
 				window.dispatchEvent(new Event('popstate'));
 				this.ws.close();
@@ -253,17 +270,31 @@ export class matchmaking {
 
 	private async updateAvailableGames() {
 
-		const gameList = await this.loadAvailableGames();
-		
-		if (gameList === -1) {
-			return ;
-		}
-		const inject = await this.gamesToDiv(gameList);
-		
-		const container = document.getElementById('available-games');
+		try {
+			// Ajouter un indicateur de chargement
+			const container = document.getElementById('available-games');
+			if (container) {
+				const loadingIndicator = document.createElement('div');
+				loadingIndicator.className = 'loading-indicator';
+				loadingIndicator.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Updating games...';
+				container.appendChild(loadingIndicator);
+			}
 
-		if (container && typeof inject === 'string') {
-			this.availableGames.innerHTML = inject;
+			const gameList = await this.loadAvailableGames();
+			
+			if (gameList === -1) {
+				console.log('No games available or error occurred');
+				return;
+			}
+			
+			const inject = await this.gamesToDiv(gameList);
+			
+			if (container && typeof inject === 'string') {
+				this.availableGames.innerHTML = inject;
+				console.log(`Updated available games: ${gameList.length} games found`);
+			}
+		} catch (error) {
+			console.error('Error updating available games:', error);
 		}
 	}
 
@@ -274,6 +305,27 @@ export class matchmaking {
 			tmp += game.divConverion();
 
 		return tmp;
+	}
+
+	private pollingInterval: number | null = null;
+
+	private startPolling() {
+		if (this.pollingInterval) {
+			clearInterval(this.pollingInterval);
+		}
+		
+		this.pollingInterval = setInterval(() => {
+			if (this.ws.readyState === WebSocket.OPEN) {
+				this.updateUI();
+			}
+		}, 3000);
+	}
+
+	private stopPolling() {
+		if (this.pollingInterval) {
+			clearInterval(this.pollingInterval);
+			this.pollingInterval = null;
+		}
 	}
 
 	private async loadAvailableGames(): Promise<Available[] | -1> {
