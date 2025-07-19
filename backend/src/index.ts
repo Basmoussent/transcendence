@@ -116,11 +116,23 @@ async function setup() {
 	// Register JWT
 	console.log('🔑 Getting JWT secret from Vault...');
 	const jwtSecret = await getSecretFromVault("JWT", "JWT_KEY") || "secret";
-	console.log("JWT = ", jwtSecret);
+	const jwtSecret2 = await getSecretFromVault("KEY", "KEY_SECRET") || "key_secret";
+	console.log(`JWT = ${jwtSecret} -  KEY_SECRET = ${jwtSecret2} `)
 	console.log('🔑 Registering JWT plugin...');
-	await fastify.register(require('@fastify/jwt'), {
-		secret: jwtSecret
-	})
+	await fastify.register(jwt, {
+		secret: jwtSecret,
+		decoratorName: 'jwt' // explicite (optionnel)
+	});
+
+	await fastify.register(jwt, {
+	secret: jwtSecret2,
+		namespace: 'jwt2fa',
+		decoratorName: 'jwt2fa' // explicite
+	});
+	console.log('=== TOUTES LES PROPRIÉTÉS DE FASTIFY ===');
+	console.log(Object.getOwnPropertyNames(fastify));
+
+	
 	console.log('✅ JWT plugin registered');
 
 	console.log('🏠 Setting up basic routes...');

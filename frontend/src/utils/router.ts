@@ -24,6 +24,7 @@ import { renderPong } from '../pages/pong/pong';
 import { initAlive } from './auth';
 import { renderProfil } from '../pages/social/renderProfil';
 import { render2FA } from '../pages/auth/activate-2fa';
+import { render2FALogin } from '../pages/auth/2fa-login';
 
 export async function router() {
 	// Clear translation cache to ensure fresh translations
@@ -33,7 +34,7 @@ export async function router() {
 	const app = document.getElementById('app');
 	if (!app) return;
 
-	const publicRoutes = ['/', '/lang','/login', '/create-account', '/forgot-password', '/block', '/block1v1'];
+	const publicRoutes = ['/', '/lang','/login', '/create-account', '/forgot-password'];
 	const token = getAuthToken();
 
 	let uuid: string = '';
@@ -65,6 +66,11 @@ export async function router() {
 		if (response.status === 401) {
 			window.history.pushState({}, '', '/login');
 			app.innerHTML = renderLogin();
+			return;
+		}
+		else if (response.ok && response.temp) {
+			console.log("jvais render2fa login")
+			app.innerHTML = render2FALogin();
 			return;
 		}
 	};
@@ -170,7 +176,7 @@ export async function router() {
 				},
 			});
 			console.log("response:", response);
-			if (response.ok) {
+			if (response.ok && response.temp) {
 				initAlive();
 			}
 		} catch (e) {

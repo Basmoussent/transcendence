@@ -79,14 +79,22 @@ export class login {
 			} else {
 				console.log('Token attendu dans les cookies');
 			}
-			
-			
-			// Attendre un peu pour que les cookies soient bien définis
-			setTimeout(() => {
-				console.log('🔄 Redirection vers /main');
-				window.history.pushState({}, '', '/main');
-				window.dispatchEvent(new PopStateEvent('popstate'));
-			}, 100);
+
+			if (response.message === "2FA needed") {
+					setTimeout(() => {
+					console.log('🔄 Redirection vers /2fa-login');
+					window.history.pushState({}, '', '/');
+					window.dispatchEvent(new PopStateEvent('popstate'));
+				}, 100);
+			}
+			else {
+				// Attendre un peu pour que les cookies soient bien définis
+				setTimeout(() => {
+					console.log('🔄 Redirection vers /main');
+					window.history.pushState({}, '', '/main');
+					window.dispatchEvent(new PopStateEvent('popstate'));
+				}, 100);
+			}
 			
 		} catch (err) {
 			console.error('❌ Network or server error', err);
