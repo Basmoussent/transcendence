@@ -110,8 +110,7 @@ export class matchmaking {
 	private async loadUsername() {
 		try {
 			const name = await fetchUsername();
-			this.username = name || 'unknown';
-			console.log("C'est MOI", this.username);
+			this.username = name || 'fetch username pas marché';
 		}
 		catch (err) {
 			console.error("Erreur fetchUsername :", err); }
