@@ -3,7 +3,6 @@ import { sanitizeHtml } from '../../utils/sanitizer';
 import { t } from '../../utils/translations';
 import { profil } from './profil'
 
-
 export function renderProfil(uuid: string) {
 
 	setTimeout(async () => {
