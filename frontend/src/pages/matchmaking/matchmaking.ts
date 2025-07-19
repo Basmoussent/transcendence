@@ -26,6 +26,7 @@ export class matchmaking {
 	private resetBtn: HTMLElement;
 	private options: HTMLElement;
 	private availableGames: HTMLElement;
+
 	private username: string;
 
 	private joinBtn: Map<number,HTMLElement> = new Map();
@@ -327,6 +328,8 @@ export class matchmaking {
 			this.pollingInterval = null;
 		}
 	}
+
+
 
 	private async loadAvailableGames(): Promise<Available[] | -1> {
 	

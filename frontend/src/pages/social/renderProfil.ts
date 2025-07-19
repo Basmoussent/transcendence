@@ -211,39 +211,10 @@ function getTemplate() {
 			<div id="gameHistory" class="profile-section">
 				<div class="section-header">
 				<i class="fas fa-history"></i>
-				<h2>Activité récente</h2>
+				<h2>Historique des parties</h2>
 				</div>
-				<div class="recent-activity">
-				<div class="activity-item">
-					<div class="activity-icon">
-					<i class="fas fa-gamepad"></i>
-					</div>
-					<div class="activity-content">
-					<h4>Partie de Pong remportée</h4>
-					<p>Victoire contre Marie_G dans une partie serrée</p>
-					</div>
-					<div class="activity-time">Il y a 2h</div>
-				</div>
-				<div class="activity-item">
-					<div class="activity-icon">
-					<i class="fas fa-trophy"></i>
-					</div>
-					<div class="activity-content">
-					<h4>Nouveau succès débloqué</h4>
-					<p>Succès "Série de feu" obtenu</p>
-					</div>
-					<div class="activity-time">Il y a 1 jour</div>
-				</div>
-				<div class="activity-item">
-					<div class="activity-icon">
-					<i class="fas fa-users"></i>
-					</div>
-					<div class="activity-content">
-					<h4>Nouvel ami ajouté</h4>
-					<p>Thomas_42 a accepté votre demande d'ami</p>
-					</div>
-					<div class="activity-time">Il y a 3 jours</div>
-				</div>
+				<div class="match-history-container" id="match-history-list">
+					<!-- Les parties seront générées par JavaScript -->
 				</div>
 			</div>
 
@@ -577,6 +548,149 @@ function getTemplate() {
         .achievement-info p {
 		color: rgba(255, 255, 255, 0.7);
 		font-size: 0.9em;
+        }
+
+        .match-history-container {
+		display: flex;
+		flex-direction: column;
+		gap: 12px;
+		max-height: 400px;
+		overflow-y: auto;
+        }
+
+        .match-history-container::-webkit-scrollbar {
+		width: 6px;
+        }
+
+        .match-history-container::-webkit-scrollbar-track {
+		background: rgba(255, 255, 255, 0.05);
+		border-radius: 3px;
+        }
+
+        .match-history-container::-webkit-scrollbar-thumb {
+		background: rgba(255, 255, 255, 0.2);
+		border-radius: 3px;
+        }
+
+        .match-history-container::-webkit-scrollbar-thumb:hover {
+		background: rgba(255, 255, 255, 0.3);
+        }
+
+        .match-item {
+		display: flex;
+		align-items: center;
+		gap: 15px;
+		padding: 15px;
+		background: rgba(255, 255, 255, 0.1);
+		border-radius: 12px;
+		border-left: 4px solid;
+		transition: all 0.3s ease;
+		position: relative;
+		overflow: hidden;
+        }
+
+        .match-item::before {
+		content: '';
+		position: absolute;
+		top: 0;
+		left: 0;
+		right: 0;
+		height: 2px;
+		background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+		opacity: 0;
+		transition: opacity 0.3s ease;
+        }
+
+        .match-item:hover::before {
+		opacity: 1;
+        }
+
+        .match-item:hover {
+		transform: translateX(5px);
+		background: rgba(255, 255, 255, 0.15);
+        }
+
+        .match-item.victory {
+		border-left-color: #10B981;
+        }
+
+        .match-item.defeat {
+		border-left-color: #EF4444;
+        }
+
+        .match-item.draw {
+		border-left-color: #6B7280;
+        }
+
+        .match-icon {
+		width: 45px;
+		height: 45px;
+		border-radius: 50%;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		font-size: 1.2em;
+		color: white;
+		flex-shrink: 0;
+        }
+
+        .match-icon.pong {
+		background: linear-gradient(135deg, #3B82F6, #1D4ED8);
+        }
+
+        .match-icon.block {
+		background: linear-gradient(135deg, #8B5CF6, #7C3AED);
+        }
+
+        .match-content {
+		flex: 1;
+		min-width: 0;
+        }
+
+        .match-result {
+		font-size: 1.1rem;
+		font-weight: 700;
+		margin-bottom: 4px;
+        }
+
+        .match-item.victory .match-result {
+		color: #10B981;
+        }
+
+        .match-item.defeat .match-result {
+		color: #EF4444;
+        }
+
+        .match-item.draw .match-result {
+		color: #6B7280;
+        }
+
+        .match-details {
+		display: flex;
+		align-items: center;
+		gap: 15px;
+		font-size: 0.9rem;
+		color: rgba(255, 255, 255, 0.8);
+        }
+
+        .match-opponent {
+		font-weight: 600;
+		color: rgba(255, 255, 255, 0.9);
+        }
+
+        .match-score {
+		background: rgba(255, 255, 255, 0.1);
+		padding: 4px 8px;
+		border-radius: 6px;
+		font-weight: 600;
+		font-size: 0.85rem;
+        }
+
+        .match-date {
+		color: rgba(255, 255, 255, 0.6);
+		font-size: 0.8rem;
+		margin-left: auto;
+		flex-shrink: 0;
         }
 
         .recent-activity {

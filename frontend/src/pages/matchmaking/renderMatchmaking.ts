@@ -17,7 +17,7 @@ export function renderMatchmaking() {
 
 const getTemplate = () => {
 	const html =  `
-	<div class="flex gap-12 h-screen justify-center items-center px-8" id="options-container">
+	<div class="flex gap-12 h-screen justify-center items-center px-8 pb-40" id="options-container">
 		<button class="home-button" id="homeBtn">
 			<i class="fas fa-home"></i>
 			Home
@@ -81,6 +81,8 @@ const getTemplate = () => {
 			</div>
 		</div>
 	</div>
+
+
 
 	<style>
 	.glass-panel {
@@ -518,6 +520,8 @@ const getTemplate = () => {
 			opacity: 1;
 		}
 	}
+
+
 
 	/* Animations */
 	@keyframes fadeIn {
