@@ -18,6 +18,7 @@ export class profil {
 
 	constructor (me: any, user: any, stats: any) {
 
+		this.me = me;
 		this.user = user;
 		this.stats = stats;
 

@@ -96,6 +96,7 @@ export class UserService {
 			};
 		}
 	}
+	
 	async generateQrcode(user: any) {
 		try {
 		// recup mail et secret_key du user

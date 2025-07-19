@@ -1,7 +1,7 @@
 import { getAuthToken } from '../../utils/auth';
 import { sanitizeHtml } from '../../utils/sanitizer';
 import { t } from '../../utils/translations';
-import {profil } from './profil'
+import { profil } from './profil'
 
 
 export function renderProfil(uuid: string) {
@@ -10,17 +10,55 @@ export function renderProfil(uuid: string) {
 		try {
 			const me = await loadMe();
 			const user = await loadUserInfo(uuid);
+			const stats = await loadUserStats(uuid);
+
+			console.log(JSON.stringify(me, null, 8));
 			console.log(JSON.stringify(user, null, 8));
+			console.log(JSON.stringify(stats, null, 8));
 
-			const stats = "les stats stp"
-
-			new friend(me, user, stats);
+			new profil(me, user, stats);
 		}
 		catch (err:any) {
 			console.log(err);
 		}
 	}, 0);
 	return getTemplate();
+}
+
+async function loadMe() {
+
+	try {
+		const token = getAuthToken();
+		if (!token) {
+			alert('❌ Token d\'authentification manquant');
+			window.history.pushState({}, '', '/login');
+			window.dispatchEvent(new PopStateEvent('popstate'));
+			return '';
+		}
+
+		const response = await fetch('/api/me', {
+			method: 'GET',
+			headers: {
+				'Content-Type': 'application/json',
+				'x-access-token': token
+			}
+		});
+
+		if (response.ok) {
+			const result = await response.json();
+			const userData = {
+				username: sanitizeHtml(result.user?.username),
+				email: sanitizeHtml(result.user?.email),
+			};
+			return (userData);
+		} else {
+			console.error('Erreur lors de la récupération des données utilisateur');
+		}
+	}
+	catch (err) {
+		console.error(`fail de recup me dans loadme renderFriends`);
+	}
+
 }
 
 async function loadUserInfo(username: string) {
@@ -59,7 +97,7 @@ async function loadUserInfo(username: string) {
 	}
 }
 
-async function loadMe() {
+async function loadUserStats(username: string) {
 
 	try {
 		const token = getAuthToken();
@@ -70,30 +108,37 @@ async function loadMe() {
 			return '';
 		}
 
-		const response = await fetch('/api/me', {
+		const response = await fetch(`/api/user/stats/?username=${username}`, {
 			method: 'GET',
 			headers: {
 				'Content-Type': 'application/json',
-				'x-access-token': token
-			}
+				'x-access-token': token }
 		});
-
+	
 		if (response.ok) {
 			const result = await response.json();
-			const userData = {
-				username: sanitizeHtml(result.user?.username),
-				email: sanitizeHtml(result.user?.email),
+			const userStats = {
+				mmr: result.data?.mmr,
+				pong_games: result.data?.pong_games,
+				pong_wins: result.data?.pong_wins,
+				block_games: result.data?.block_games,
+				block_wins: result.data?.block_wins,
+				rating: result.data?.rating,
+				id: result.data?.id,
 			};
-			return (userData);
-		} else {
-			console.error('Erreur lors de la récupération des données utilisateur');
+			return (userStats);
 		}
+		else 
+			console.error('pblm recuperer les stats du user dont on veut render le profil');
 	}
 	catch (err) {
-		console.error(`fail de recup me dans loadme renderFriends`);
+		console.error(`pblm recuperer les stats du user dont on veut render le profil${err}`);
 	}
 
 }
+
+
+
 
 function getTemplate() {
 	return `
