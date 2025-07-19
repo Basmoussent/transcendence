@@ -342,19 +342,10 @@ async function userRoutes(app: FastifyInstance) {
     })
 
 
-
     app.post('/me/:userid', async function (request: FastifyRequest, reply: FastifyReply) {
 
         try {
-            const database = db.getDatabase();
-
             const { user } = request.body as { user?: any };
-
-
-
-            // console.log(`niwdoqwndoqnwodiqnoinwd `, JSON.stringify(user, null, 8));
-
-
 
             if (!user)
                 throw new Error ("missing user in the request body");
@@ -373,6 +364,53 @@ async function userRoutes(app: FastifyInstance) {
         catch (err: any) {
             return reply.status(500).send({
                 error: 'erreur GET /user:userId',
+                details: err.message });
+        }
+    })
+
+    app.post('/me/verify-code', async function (request: FastifyRequest, reply: FastifyReply) {
+
+        try {
+            const { user, code } = request.body as { user?: any, code: any };
+
+            const database = db.getDatabase(); // pour recup le secret
+            if (!database) {
+                return reply.status(500).send({ error: 'Erreur de connexion à la base de données' });
+            }
+
+
+
+            if (!user)
+                throw new Error ("missing user in the request body");
+
+            if (!code)
+                throw new Error ("missing code in the request body");
+
+            const secret = await new Promise<string>((resolve, reject) => {
+                database.get(
+                    'SELECT secret_key FROM users WHERE id = ?',
+                    [user.id],
+                    (err: any, row: string) => {
+                        err ? reject(err) : resolve(row);
+                    }
+                );
+            });
+
+            try {
+                const checkCode = await app.userService.verifiyCode(code, secret.secret_key);
+
+                console.log(JSON.stringify(checkCode, null, 8))
+                return reply.send({
+                    checkCode: checkCode
+                });
+            }
+            catch (err: any) {
+                console.log(`pblm verify code`)
+            }
+        }
+        catch (err: any) {
+            return reply.status(500).send({
+                error: 'erreur GET /verify-code',
                 details: err.message });
         }
     })

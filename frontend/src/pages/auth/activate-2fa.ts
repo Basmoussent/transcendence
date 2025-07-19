@@ -212,7 +212,6 @@ export function render2FA() {
       throw new Error('qrSection element not found');
     }
 
-    // Gestion du bouton retour
     if (backBtn) {
       backBtn.addEventListener('click', () => {
         window.history.pushState({}, '', '/profil');
@@ -220,7 +219,7 @@ export function render2FA() {
       });
     }
     const user = await fetchMe()
-   
+  
     const authToken = getAuthToken();
     if (!authToken) {
       alert('❌ Token d\'authentification manquant');
@@ -253,7 +252,7 @@ export function render2FA() {
           alert('❌ Veuillez entrer un code à 6 chiffres');
           return;
         }
-        
+
         const codeRegex = /^\d{6}$/;
         if (!codeRegex.test(code)) {
           alert('❌ Veuillez entrer des chiffres uniquement');
@@ -269,26 +268,41 @@ export function render2FA() {
             return;
           }
 
-          // !!! check ici que le code est bon
-          // attention doit etre fait cote serveur
+          const responseCode = await fetch(`/api/me/verify-code`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'x-access-token': authToken
+            },
+            body: JSON.stringify({
+              user,
+              code
+            })
+          });
 
-          activateBtn.disabled = true;
-          activateBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Activation...';
+          const checkCode = await responseCode.json();
+          if (!checkCode.checkCode)
+            alert(`❌ Code incorrect`);
 
-          const info = await userInfo();
-          const success = await update2FAState(1, info.user.id);
+          if (checkCode.checkCode) {
+            activateBtn.disabled = true;
+            activateBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Activation...';
 
-          if (success) {
-            alert('✅ Authentification à deux facteurs activée avec succès');
-            setTimeout(() => {
-              window.history.pushState({}, '', '/profil');
-              window.dispatchEvent(new PopStateEvent('popstate'));
-            }, 2000);
-          }
-          else {
-            alert(`❌  Authentification à deux facteurs n'a pas pu etre activée'}`);
-            activateBtn.disabled = false;
-            activateBtn.innerHTML = '<i class="fa-solid fa-lock"></i> Activer 2FA';
+            const info = await userInfo();
+            const success = await update2FAState(1, info.user.id);
+
+            if (success) {
+              alert('✅ Authentification à deux facteurs activée avec succès');
+              setTimeout(() => {
+                window.history.pushState({}, '', '/profil');
+                window.dispatchEvent(new PopStateEvent('popstate'));
+              }, 2000);
+            }
+            else {
+              alert(`❌  Authentification à deux facteurs n'a pas pu etre activée`);
+              activateBtn.disabled = false;
+              activateBtn.innerHTML = '<i class="fa-solid fa-lock"></i> Activer 2FA';
+            }
           }
         }
         catch (error) {

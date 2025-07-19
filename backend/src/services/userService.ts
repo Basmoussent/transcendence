@@ -1,7 +1,7 @@
 import { redis } from '../index';
 import { db } from '../database';
 import QRCode from 'qrcode';
-
+import { authenticator } from 'otplib';
 
 interface UserData {
 	id: number;
@@ -70,11 +70,9 @@ export class UserService {
 	async generateQrcode(user: any) {
 		try {
 		// recup mail et secret_key du user
-			const datab = db.getDatabase();
+			const userEmail = user.email;
 
-			const userEmail = user.email
-			
-			const userSecretKey: any = await new Promise<string | null>((resolve, reject) => {
+			const userSecretKey: string = await new Promise<string>((resolve, reject) => {
 				this.db.get(
 					'SELECT secret_key FROM users WHERE email = ?',
 					[ userEmail ],
@@ -83,13 +81,13 @@ export class UserService {
 				);
 			});
 
-			if (!userSecretKey)
+			if (!userSecretKey.secret_key)
 				console.log('eteins la secret key est pas recup')
 
 			// generer l'url otp qui sera utilisee pour le qrcode
-			const otpUrl = generateOtpAuthUrl(userSecretKey, userEmail, 'Transcendence');
+			const otpUrl = generateOtpAuthUrl(userSecretKey.secret_key, userEmail, 'Transcendence');
 
-			// generer et afficher le qrcode
+			// generer et renvoyer le qrcode
 			try {
 				const qrCodeDataUrl = await QRCode.toDataURL(otpUrl, {
 					width: 200,
@@ -108,7 +106,6 @@ export class UserService {
 				return tmp;
 			}
 			catch (qrError) {
-				console.log("2");
 				console.error('Erreur lors de la génération du QR code:', qrError);
 				return `
 					<div class="qr-placeholder">
@@ -117,8 +114,6 @@ export class UserService {
 					</div>
 				`;
 			}
-
-
 		}
 		catch (error) {
 			console.error('Erreur lors du chargement des informations utilisateur:', error);
@@ -130,8 +125,13 @@ export class UserService {
 			`;
 		}
 	}
-}
 
+	async verifiyCode(userInputCode: string, secret: string): Promise<boolean> {
+
+		console.log(`code renseigne ${userInputCode} -- secre ${secret}`)
+		return authenticator.check(userInputCode, secret);
+	}
+}
 
 function generateOtpAuthUrl(secret_key: string, email: string, issuer: string) {
 	return `otpauth://totp/${issuer}:${email}?secret=${secret_key}&issuer=${issuer}&algorithm=SHA1&digits=6&period=30`;
