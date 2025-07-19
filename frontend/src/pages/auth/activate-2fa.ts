@@ -124,8 +124,6 @@ export function render2FA() {
         background: white;
         padding: 10px;
       }
-
-
       
       .verification-section {
         margin-top: 30px;
