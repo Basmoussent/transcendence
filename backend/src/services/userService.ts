@@ -1,7 +1,7 @@
 import { redis } from '../index';
 import { db } from '../database';
 import QRCode from 'qrcode';
-
+import { authenticator } from 'otplib';
 
 interface UserData {
 	id: number;
@@ -67,44 +67,12 @@ export class UserService {
 		return false;
 	}
 
-	async retrieveStats(username: string) {
-		try {
-			const user = await new Promise<any>((resolve, reject) => {
-				this.db.get(
-					'SELECT * FROM statistics WHERE username = ?',
-					[ username ],
-					(err: any, row: any | undefined) => {
-					err ? reject(err) : resolve(row || null); }
-				);
-			});
-			return user || {
-				pong_wins: 0,
-				block_wins: 0,
-				pong_games: 0,
-				block_games: 0,
-				rating: 800
-			};
-		}
-		catch (err: any) {
-			console.log(`le user ${username} n'a pas de stats`)
-			return {
-				pong_wins: 0,
-				block_wins: 0,
-				pong_games: 0,
-				block_games: 0,
-				rating: 800
-			};
-		}
-	}
-	
 	async generateQrcode(user: any) {
 		try {
 		// recup mail et secret_key du user
-			const datab = db.getDatabase();
+			const userEmail = user.email;
 
-			const userEmail = user.email
-			
-			const userSecretKey: any = await new Promise<string | null>((resolve, reject) => {
+			const userSecretKey: string = await new Promise<string>((resolve, reject) => {
 				this.db.get(
 					'SELECT secret_key FROM users WHERE email = ?',
 					[ userEmail ],
@@ -113,13 +81,13 @@ export class UserService {
 				);
 			});
 
-			if (!userSecretKey)
+			if (!userSecretKey.secret_key)
 				console.log('eteins la secret key est pas recup')
 
 			// generer l'url otp qui sera utilisee pour le qrcode
-			const otpUrl = generateOtpAuthUrl(userSecretKey, userEmail, 'Transcendence');
+			const otpUrl = generateOtpAuthUrl(userSecretKey.secret_key, userEmail, 'Transcendence');
 
-			// generer et afficher le qrcode
+			// generer et renvoyer le qrcode
 			try {
 				const qrCodeDataUrl = await QRCode.toDataURL(otpUrl, {
 					width: 200,
@@ -138,7 +106,6 @@ export class UserService {
 				return tmp;
 			}
 			catch (qrError) {
-				console.log("2");
 				console.error('Erreur lors de la génération du QR code:', qrError);
 				return `
 					<div class="qr-placeholder">
@@ -147,8 +114,6 @@ export class UserService {
 					</div>
 				`;
 			}
-
-
 		}
 		catch (error) {
 			console.error('Erreur lors du chargement des informations utilisateur:', error);
@@ -160,8 +125,30 @@ export class UserService {
 			`;
 		}
 	}
-}
 
+	async verifiyCode(userInputCode: string, secret: string): Promise<boolean> {
+		console.log(`secret = ${secret} et code = ${userInputCode}`)
+		return authenticator.check(userInputCode, secret);
+	}
+
+	async retrieveStats(id: number) {
+		try {
+			const user = await new Promise<UserData | null>((resolve, reject) => {
+				this.db.get(
+					'SELECT * FROM statistics WHERE username = ?', // tu te basais sur le user_id mais le champs dans la db c'est username zignew
+					[ id ],
+					(err: any, row: UserData | undefined) => {
+					err ? reject(err) : resolve(row || null); }
+				);
+			});
+			return user;
+		}
+		catch (err: any) {
+			console.log(`le user ${id} n'existe pas`)
+		}
+		return Promise.resolve(null); 
+	}
+}
 
 function generateOtpAuthUrl(secret_key: string, email: string, issuer: string) {
 	return `otpauth://totp/${issuer}:${email}?secret=${secret_key}&issuer=${issuer}&algorithm=SHA1&digits=6&period=30`;

@@ -55,6 +55,7 @@ async function userRoutes(app: FastifyInstance) {
 					return reply.status(404).send({ error: 'Utilisateur non trouvé' });
 
 				console.log('user', user);
+
 				// Récupération des statistiques (pour l'instant des valeurs par défaut)
 				// TODO: Implémenter la vraie logique des statistiques
 				const userStats = await app.userService.retrieveStats(user.username);
@@ -326,19 +327,10 @@ async function userRoutes(app: FastifyInstance) {
 	})
 
 
-
 	app.post('/me/:userid', async function (request: FastifyRequest, reply: FastifyReply) {
 
-		try {
-			const database = db.getDatabase();
-
-			const { user } = request.body as { user?: any };
-
-
-
-			// console.log(`niwdoqwndoqnwodiqnoinwd `, JSON.stringify(user, null, 8));
-
-
+        try {
+            const { user } = request.body as { user?: any };
 
 			if (!user)
 				throw new Error ("missing user in the request body");
@@ -360,6 +352,53 @@ async function userRoutes(app: FastifyInstance) {
 				details: err.message });
 		}
 	})
+
+    app.post('/me/verify-code', async function (request: FastifyRequest, reply: FastifyReply) {
+
+        try {
+            const { user, code } = request.body as { user?: any, code: any };
+
+            const database = db.getDatabase(); // pour recup le secret
+            if (!database) {
+                return reply.status(500).send({ error: 'Erreur de connexion à la base de données' });
+            }
+
+
+
+            if (!user)
+                throw new Error ("missing user in the request body");
+
+            if (!code)
+                throw new Error ("missing code in the request body");
+
+            const secret = await new Promise<string>((resolve, reject) => {
+                database.get(
+                    'SELECT secret_key FROM users WHERE id = ?',
+                    [user.id],
+                    (err: any, row: string) => {
+                        err ? reject(err) : resolve(row);
+                    }
+                );
+            });
+
+            try {
+                const checkCode = await app.userService.verifiyCode(code, secret.secret_key);
+
+                console.log(JSON.stringify(checkCode, null, 8))
+                return reply.send({
+                    checkCode: checkCode
+                });
+            }
+            catch (err: any) {
+                console.log(`pblm verify code`)
+            }
+        }
+        catch (err: any) {
+            return reply.status(500).send({
+                error: 'erreur GET /verify-code',
+                details: err.message });
+        }
+    })
 
 	app.get('/user/stats/:username', async function (request: FastifyRequest, reply: FastifyReply) {
 		try {

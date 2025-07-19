@@ -4,8 +4,8 @@ CREATE TABLE IF NOT EXISTS users (
   email VARCHAR UNIQUE NOT NULL,
   password_hash VARCHAR NOT NULL,
   two_fact_auth BOOLEAN DEFAULT false,
-  secret_key VARCHAR DEFAULT NULL,
-  avatar_url VARCHAR,
+  secret_key VARCHAR NOT NULL,
+  avatar_url TEXT,
   language VARCHAR DEFAULT 'fr',
   created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );

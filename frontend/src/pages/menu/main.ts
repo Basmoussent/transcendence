@@ -36,7 +36,7 @@ export class main {
 
 	private setupEvents() {
 		this.profileBtn.addEventListener('click', () => {
-			window.history.pushState({}, '', '/profil');
+			window.history.pushState({}, '', '/me');
 			window.dispatchEvent(new PopStateEvent('popstate'));
 		});
 		

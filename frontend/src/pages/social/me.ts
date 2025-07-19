@@ -489,6 +489,8 @@ export async function renderMe() {
 		// Gestion bouton 2FA
 		if (TFABtn) {
 			TFABtn.addEventListener('click', async () => {
+			
+			console.log('iqubwiduqbwiudbqiwudbq')
 			const info = await userInfo();
 
 			if (info.user.two_fact_auth) {
