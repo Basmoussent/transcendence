@@ -26,12 +26,17 @@ import { createClient } from 'redis';
 const fastify = Fastify({ logger: { level: 'debug' } });
 
 declare module 'fastify' {
-
 	interface FastifyInstance {
 		userService: UserService;
 		friendService: FriendService;
 		gameService: GameService;
 		roomService: RoomService;
+		chatService: ChatService;
+		jwt: any;
+		jwt2fa: {
+			sign: (payload: any) => string;
+			verify: (token: string) => any;
+		};
 	}
 }
 
@@ -58,8 +63,47 @@ async function setup() {
 	fastify.decorate('gameService', new GameService(db.getDatabase()));
 	fastify.decorate('roomService', new RoomService(db.getDatabase()));
 	fastify.decorate('chatService', new ChatService(db.getDatabase()));
+	
 
 	console.log('✅ Services decorated');
+
+	// Register JWT FIRST (before routes)
+	console.log('🔑 Getting JWT secret from Vault...');
+	const jwtSecret = await getSecretFromVault("JWT", "JWT_KEY") || "secret";
+	const jwtSecret2 = await getSecretFromVault("KEY", "KEY_SECRET") || "key_secret";
+	console.log(`JWT = ${jwtSecret} -  KEY_SECRET = ${jwtSecret2} `)
+	console.log('🔑 Registering JWT plugins...');
+	
+	// Register first JWT plugin
+	await fastify.register(jwt, {
+		secret: jwtSecret,
+		decoratorName: 'jwt'
+	});
+
+	// Create a separate JWT instance for 2FA
+	const jwt2faInstance = {
+		sign: (payload: any) => {
+			// Use the same JWT library but with different secret
+			const jwt = require('jsonwebtoken');
+			return jwt.sign(payload, jwtSecret2);
+		},
+		verify: (token: string) => {
+			const jwt = require('jsonwebtoken');
+			return jwt.verify(token, jwtSecret2);
+		}
+	};
+	
+	// Manually decorate the fastify instance with jwt2fa
+	fastify.decorate('jwt2fa', jwt2faInstance);
+	console.log('✅ Manually decorated jwt2fa');
+	
+	// Debug: Check if JWT decorators are available
+	console.log('🔍 Debug JWT decorators:');
+	console.log('jwt decorator:', typeof fastify.jwt);
+	console.log('jwt2fa decorator:', typeof fastify.jwt2fa);
+	console.log('All decorators:', Object.keys(fastify).filter(key => key.includes('jwt')));
+	
+	console.log('✅ JWT plugins registered');
 
 	// Register CORS
 	console.log('🌐 Registering CORS...');
@@ -107,21 +151,13 @@ async function setup() {
 	await fastify.register(friendRoutes, { prefix: "/friend" });
 	console.log('✅ Friend routes registered');
 
-
 	console.log('📡 Registering WebSocket routes...');
 	await fastify.register(require('@fastify/websocket'));
 	await fastify.register(webSocketRoutes);
 	console.log('✅ WebSocket routes registered');
 
-	// Register JWT
-	console.log('🔑 Getting JWT secret from Vault...');
-	const jwtSecret = await getSecretFromVault("JWT", "JWT_KEY") || "secret";
-	console.log("JWT = ", jwtSecret);
-	console.log('🔑 Registering JWT plugin...');
-	await fastify.register(require('@fastify/jwt'), {
-		secret: jwtSecret
-	})
-	console.log('✅ JWT plugin registered');
+	console.log('=== TOUTES LES PROPRIÉTÉS DE FASTIFY ===');
+	console.log(Object.getOwnPropertyNames(fastify));
 
 	console.log('🏠 Setting up basic routes...');
 	fastify.get('/', async () => {

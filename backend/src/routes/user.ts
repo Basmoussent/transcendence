@@ -25,71 +25,136 @@ interface UserData {
 }
 
 async function userRoutes(app: FastifyInstance) {
-		app.get('/me', async (request: FastifyRequest, reply: FastifyReply) => {
+	app.get('/me', async (request: FastifyRequest, reply: FastifyReply) => {
 
-			const token = request.headers['x-access-token'] ? request.headers['x-access-token'] : request.cookies['x-access-token']; 
-			
-			if (!token)
-				return reply.status(401).send({ error: 'Token d\'authentification manquant' });
-	
-			try {
-				const decoded = app.jwt.verify(token) as { user: string };
-				const email = decoded.user;
-	
-				const database = db.getDatabase();
-				if (!database) {
-					return reply.status(500).send({ error: 'Erreur de connexion à la base de données' });
-				}
-	
-				// Récupération des données utilisateur
-				const user = await new Promise<UserData | null>((resolve, reject) => {
-					database.get(
-						'SELECT * FROM users WHERE email = ?',
-						[email],
-						(err: any, row: UserData | undefined) => {
-							err ? reject(err) : resolve(row || null); }
-					);
-				});
-	
-				if (!user)
-					return reply.status(404).send({ error: 'Utilisateur non trouvé' });
+		const token = request.headers['x-access-token'] ? request.headers['x-access-token'] : request.cookies['x-access-token'];
 
-				console.log('user', user);
+		if (!token)
+			return reply.status(401).send({ error: 'Token d\'authentification manquant' });
 
-				// Récupération des statistiques (pour l'instant des valeurs par défaut)
-				// TODO: Implémenter la vraie logique des statistiques
-				const userStats = await app.userService.retrieveStats(user.username);
-				console.log('userStats', userStats);
-				const win = userStats.pong_wins + userStats.block_wins;
-				const games = userStats.pong_games + userStats.block_games;
-				const rating = userStats.rating;
-				const stats = {
-					win: win,
-					games: games,
-					rating: rating
-				};
-	
-				return reply.send({
-					user: {
-						id: user.id,
-						username: user.username,
-						email: user.email,
-						avatar_url: user.avatar_url || 'avatar.png',
-						language: user.language,
-						two_fact_auth: user.two_fact_auth || 0,
-						secret_key: user.secret_key || "rien"
-					},
-					stats: stats
-				});
-			} catch (err: any) {
-				console.error('❌ Error in /me endpoint:', err);
-				if (err.name === 'JsonWebTokenError') {
-					return reply.status(401).send({ error: 'Token invalide ou expiré' });
-				}
-				return reply.status(500).send({ error: 'Erreur serveur interne' });
+		try {
+			const decoded = app.jwt.verify(token) as { user: string };
+			const email = decoded.user;
+
+			const database = db.getDatabase();
+			if (!database) {
+				return reply.status(500).send({ error: 'Erreur de connexion à la base de données' });
 			}
-		});
-	
+
+			// Récupération des données utilisateur
+			const user = await new Promise<UserData | null>((resolve, reject) => {
+				database.get(
+					'SELECT * FROM users WHERE email = ?',
+					[email],
+					(err: any, row: UserData | undefined) => {
+						err ? reject(err) : resolve(row || null);
+					}
+				);
+			});
+
+			if (!user)
+				return reply.status(404).send({ error: 'Utilisateur non trouvé' });
+
+			console.log('user', user);
+
+			// Récupération des statistiques (pour l'instant des valeurs par défaut)
+			// TODO: Implémenter la vraie logique des statistiques
+			const userStats = await app.userService.retrieveStats(user.username);
+			console.log('userStats', userStats);
+			const win = userStats.pong_wins + userStats.block_wins;
+			const games = userStats.pong_games + userStats.block_games;
+			const rating = userStats.rating;
+			const stats = {
+				win: win,
+				games: games,
+				rating: rating
+			};
+
+			return reply.send({
+				user: {
+					id: user.id,
+					username: user.username,
+					email: user.email,
+					avatar_url: user.avatar_url || 'avatar.png',
+					language: user.language,
+					two_fact_auth: user.two_fact_auth || 0,
+				},
+				stats: stats
+			});
+		} catch (err: any) {
+			console.error('❌ Error in /me endpoint:', err);
+			if (err.name === 'JsonWebTokenError') {
+				return reply.status(401).send({ error: 'Token invalide ou expiré' });
+			}
+			return reply.status(500).send({ error: 'Erreur serveur interne' });
+		}
+	});
+
+	app.get('/me2fa', async (request: FastifyRequest, reply: FastifyReply) => {
+
+		const token = request.headers['x-access-token'] ? request.headers['x-access-token'] : request.cookies['x-access-token'];
+
+		if (!token)
+			return reply.status(401).send({ error: 'Token d\'authentification manquant' });
+
+		try {
+			const decoded = app.jwt2fa.verify(token) as { name: string };
+			const username = decoded.name;
+
+			const database = db.getDatabase();
+			if (!database) {
+				return reply.status(500).send({ error: 'Erreur de connexion à la base de données' });
+			}
+
+			// Récupération des données utilisateur
+			const user = await new Promise<UserData | null>((resolve, reject) => {
+				database.get(
+					'SELECT * FROM users WHERE username = ?',
+					[username],
+					(err: any, row: UserData | undefined) => {
+						err ? reject(err) : resolve(row || null);
+					}
+				);
+			});
+
+			if (!user)
+				return reply.status(404).send({ error: 'Utilisateur non trouvé' });
+
+			console.log('user', user);
+
+			// Récupération des statistiques (pour l'instant des valeurs par défaut)
+			// TODO: Implémenter la vraie logique des statistiques
+			const userStats = await app.userService.retrieveStats(user.username);
+			console.log('userStats', userStats);
+			const win = userStats.pong_wins + userStats.block_wins;
+			const games = userStats.pong_games + userStats.block_games;
+			const rating = userStats.rating;
+			const stats = {
+				win: win,
+				games: games,
+				rating: rating
+			};
+
+			return reply.send({
+				user: {
+					id: user.id,
+					username: user.username,
+					email: user.email,
+					avatar_url: user.avatar_url || 'avatar.png',
+					language: user.language,
+					two_fact_auth: user.two_fact_auth || 0,
+				},
+				stats: stats
+			});
+		} catch (err: any) {
+			console.error('❌ Error in /me endpoint:', err);
+			if (err.name === 'JsonWebTokenError') {
+				return reply.status(401).send({ error: 'Token invalide ou expiré' });
+			}
+			return reply.status(500).send({ error: 'Erreur serveur interne' });
+		}
+	});
+
 
 	app.get('/uploads/:filename', async (request: FastifyRequest, reply: FastifyReply) => {
 		const { filename } = request.params as { filename: string };
@@ -118,7 +183,7 @@ async function userRoutes(app: FastifyInstance) {
 			if (!token) {
 				token = request.cookies['x-access-token'];
 			}
-			
+
 			if (!token) {
 				return reply.status(401).send({ error: 'Token d\'authentification manquant' });
 			}
@@ -136,7 +201,8 @@ async function userRoutes(app: FastifyInstance) {
 					'SELECT id, username, email, avatar_url, language FROM users WHERE email = ?',
 					[email],
 					(err: any, row: UserData | undefined) => {
-						err ? reject(err) : resolve(row || null); }
+						err ? reject(err) : resolve(row || null);
+					}
 				);
 			});
 
@@ -180,11 +246,12 @@ async function userRoutes(app: FastifyInstance) {
 					'UPDATE users SET avatar_url = ? WHERE email = ?',
 					[filename, email],
 					(err: any) => {
-						err ? reject(err) : resolve(); }
+						err ? reject(err) : resolve();
+					}
 				);
 			});
 
-			return reply.send({ 
+			return reply.send({
 				message: 'Avatar uploadé avec succès',
 				filename: filename,
 				avatar_url: `/api/uploads/${filename}`
@@ -197,7 +264,7 @@ async function userRoutes(app: FastifyInstance) {
 			}
 			return reply.status(500).send({ error: 'Erreur lors de l\'upload de l\'avatar', details: err.message });
 		}
-		
+
 	});
 
 	app.get('/user/:userid', async function (request: FastifyRequest, reply: FastifyReply) {
@@ -210,14 +277,15 @@ async function userRoutes(app: FastifyInstance) {
 			const { userid } = request.query as { userid?: number };
 
 			if (!userid)
-				throw new Error ("missing userid in the request body");
+				throw new Error("missing userid in the request body");
 
 			const user = await new Promise<UserData | null>((resolve, reject) => {
 				database.get(
 					'SELECT * FROM users WHERE id = ?',
-					[ userid ],
+					[userid],
 					(err: any, row: UserData | undefined) => {
-						err ? reject(err) : resolve(row || null); }
+						err ? reject(err) : resolve(row || null);
+					}
 				);
 			});
 			return reply.send({
@@ -228,7 +296,8 @@ async function userRoutes(app: FastifyInstance) {
 		catch (err: any) {
 			return reply.status(500).send({
 				error: 'erreur GET /user:userId',
-				details: err.message });
+				details: err.message
+			});
 		}
 	})
 
@@ -240,14 +309,15 @@ async function userRoutes(app: FastifyInstance) {
 			const { username } = request.query as { username?: string };
 
 			if (!username)
-				throw new Error ("missing username in the request body");
+				throw new Error("missing username in the request body");
 
 			const user = await new Promise<UserData | null>((resolve, reject) => {
 				database.get(
 					'SELECT * FROM users WHERE username = ?',
-					[ username ],
+					[username],
 					(err: any, row: UserData | undefined) => {
-						err ? reject(err) : resolve(row || null); }
+						err ? reject(err) : resolve(row || null);
+					}
 				);
 			});
 			return reply.send({
@@ -258,24 +328,26 @@ async function userRoutes(app: FastifyInstance) {
 		catch (err: any) {
 			return reply.status(500).send({
 				error: 'erreur GET /user/username:username',
-				details: err.message });
+				details: err.message
+			});
 		}
 	})
 
 	app.put('/username/2fa', async function (request: FastifyRequest, reply: FastifyReply) {
 		try {
 			const database = db.getDatabase();
-			const {status, userId} = request.body as { status: boolean, userId: number };
+			const { status, userId } = request.body as { status: boolean, userId: number };
 
 			console.log(`on change la 2fa du user ${userId} on change pour bool = ${status}`)
 
 			await new Promise<void>((resolve, reject) => {
 				database.run(
 					'UPDATE users SET two_fact_auth = ? WHERE id = ?',
-					[ status ? 1 : 0, userId ],
-					function(err: any) {
+					[status ? 1 : 0, userId],
+					function (err: any) {
 						err ? reject(err) : resolve();
-			})})
+					})
+			})
 
 			reply.send({
 				success: true,
@@ -293,7 +365,7 @@ async function userRoutes(app: FastifyInstance) {
 
 	app.get('/profile/:username', async function (request: FastifyRequest, reply: FastifyReply) {
 		const { username } = request.params as { username: string };
-		
+
 		const database = db.getDatabase();
 		if (!database) {
 			return reply.status(500).send({ error: 'Erreur de connexion à la base de données' });
@@ -304,7 +376,8 @@ async function userRoutes(app: FastifyInstance) {
 				'SELECT id, username, email, avatar_url, language FROM users WHERE username = ?',
 				[username],
 				(err: any, row: UserData | undefined) => {
-					err ? reject(err) : resolve(row || null); }
+					err ? reject(err) : resolve(row || null);
+				}
 			);
 		});
 
@@ -329,11 +402,11 @@ async function userRoutes(app: FastifyInstance) {
 
 	app.post('/me/:userid', async function (request: FastifyRequest, reply: FastifyReply) {
 
-        try {
-            const { user } = request.body as { user?: any };
+		try {
+			const { user } = request.body as { user?: any };
 
 			if (!user)
-				throw new Error ("missing user in the request body");
+				throw new Error("missing user in the request body");
 
 			try {
 				const qrcode = await app.userService.generateQrcode(user);
@@ -349,56 +422,75 @@ async function userRoutes(app: FastifyInstance) {
 		catch (err: any) {
 			return reply.status(500).send({
 				error: 'erreur GET /user:userId',
-				details: err.message });
+				details: err.message
+			});
 		}
 	})
 
-    app.post('/me/verify-code', async function (request: FastifyRequest, reply: FastifyReply) {
+	app.post('/me/verify-code', async function (request: FastifyRequest, reply: FastifyReply) {
 
-        try {
-            const { user, code } = request.body as { user?: any, code: any };
+		try {
+			const { user, code } = request.body as { user?: any, code: any };
 
-            const database = db.getDatabase(); // pour recup le secret
-            if (!database) {
-                return reply.status(500).send({ error: 'Erreur de connexion à la base de données' });
-            }
+			const database = db.getDatabase();
+			console.log(`user = ${user} et code = ${code}`)
+			console.log(`request.body = ${JSON.stringify(request.body, null, 8)}`)
 
+			if (!user)
+				throw new Error("missing user in the request body");
 
+			if (!code)
+				throw new Error("missing code in the request body");
 
-            if (!user)
-                throw new Error ("missing user in the request body");
+			const secret = await app.userService.findByUsername(user);
+			console.log(`secret = ${secret}`)
 
-            if (!code)
-                throw new Error ("missing code in the request body");
+			try {
+				let checkCode = await app.userService.verifiyCode(code, secret.secret_key);
+				if (checkCode) {
+					const origin = request.headers.origin || '';
+					const host = request.headers.host || '';
+					let cookieDomain;
 
-            const secret = await new Promise<string>((resolve, reject) => {
-                database.get(
-                    'SELECT secret_key FROM users WHERE id = ?',
-                    [user.id],
-                    (err: any, row: string) => {
-                        err ? reject(err) : resolve(row);
-                    }
-                );
-            });
+					// Log pour debug
+					console.log('🔍 Debug cookie domain:', { origin, host });
 
-            try {
-                const checkCode = await app.userService.verifiyCode(code, secret.secret_key);
+					if (origin.includes('entropy.local') || host.includes('entropy.local')) {
+						cookieDomain = '.entropy.local'; // Avec le point pour partager entre sous-domaines
+					} else if (origin.includes('localhost') || host.includes('localhost')) {
+						const hostParts = host.split('.');
+						if (hostParts.length > 1)
+							cookieDomain = `.${hostParts.slice(-1).join('.')}`; // .localhost
+						else
+							cookieDomain = ".localhost"; // Pas de domaine pour localhost simple
+					}
 
-                console.log(JSON.stringify(checkCode, null, 8))
-                return reply.send({
-                    checkCode: checkCode
-                });
-            }
-            catch (err: any) {
-                console.log(`pblm verify code`)
-            }
-        }
-        catch (err: any) {
-            return reply.status(500).send({
-                error: 'erreur GET /verify-code',
-                details: err.message });
-        }
-    })
+					console.log(`avant le sign`)
+					const token = app.jwt.sign({ user: secret.email, name: secret.username });
+					console.log(`après le sign`)
+					return reply.header(
+						'Set-Cookie',
+						`x-access-token=${token}; Path=/; Domain=${cookieDomain}; SameSite=Lax; Max-Age=${7 * 24 * 60 * 60}`).send({
+							checkCode: checkCode
+						})
+				}
+
+				return reply.send({
+					checkCode: checkCode
+				});
+
+			}
+			catch (err: any) {
+				console.log(`pblm verify code`, err)
+			}
+		}
+		catch (err: any) {
+			return reply.status(500).send({
+				error: 'erreur GET /verify-code',
+				details: err.message
+			});
+		}
+	})
 
 	app.get('/user/stats/:username', async function (request: FastifyRequest, reply: FastifyReply) {
 		try {
@@ -408,7 +500,7 @@ async function userRoutes(app: FastifyInstance) {
 			console.log(`niwdoqwndoqnwodiqnoinwd `, JSON.stringify(username, null, 8));
 
 			if (!username)
-				throw new Error ("missing username in the request body");
+				throw new Error("missing username in the request body");
 
 			try {
 				const result = await app.userService.retrieveStats(username);
@@ -424,7 +516,8 @@ async function userRoutes(app: FastifyInstance) {
 		catch (err: any) {
 			return reply.status(500).send({
 				error: 'erreur GET /user/stats/:username',
-				details: err.message });
+				details: err.message
+			});
 		}
 
 	})
