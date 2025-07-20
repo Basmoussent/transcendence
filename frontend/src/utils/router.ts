@@ -1,5 +1,4 @@
 import { renderHome, initializeHomeEvents } from '../pages/menu/main';
-import { cleanupEventListeners } from './eventManager';
 import { renderLogin } from '../pages/auth/login';
 import { renderCreateAccount } from '../pages/auth/create-account';
 import { renderForgotPassword, initializeForgotPasswordEvents } from '../pages/auth/forgot-password';
@@ -39,7 +38,6 @@ export async function router() {
 	const token = getAuthToken();
 
 	let uuid: string = '';
-
 	
 	if (path.startsWith('/multipong/') || path.startsWith('/pong/') || path.startsWith('/block/') || path.startsWith('/block1v1/') ||
 			path.startsWith('/room/') || path.startsWith('/profil/')) {
@@ -83,87 +81,49 @@ export async function router() {
 		return;
 	}
 
-
-	let view = '';
 	console.log("path:", path);
-	switch (path) {
-		case '/':
-			view = renderHome();
-			break;
-		case '/lang':
+
+	const renderView: { [key: string]: (uuid?: string) => Promise<string> | string } = {
+		'/': () => renderHome(),
+		'/login': () => renderLogin(),
+		'/lang': async () => {
 			const lastPath = localStorage.getItem('lastPath');
 			if (lastPath && lastPath !== '/lang') {
-				console.log('log', lastPath)
+				console.log('log', lastPath);
 				setTimeout(() => {
-				window.history.pushState({}, '', lastPath);
-				router();
-				localStorage.removeItem('lastPath');
+					window.history.pushState({}, '', lastPath);
+					router();
+					localStorage.removeItem('lastPath');
 				}, 100);
+				return ''; // Aucun rendu immédiat, car redirection
 			} else {
-				console.log('log', lastPath)
-				view = renderHome();
+				console.log('log', lastPath);
 				window.history.pushState({}, '', '/');
+				return renderHome();
 			}
-			break;
-		case '/login':
-			view = renderLogin();
-			break;
-		case '/create-account':
-			view = renderCreateAccount();
-			break;
-		case '/forgot-password':
-			view = renderForgotPassword();
-			break;
-		case '/main':
-			view = renderMain();
-			break;
-		case '/me':
-			view = await renderMe();
-			break;
-		case '/profil':
-			view = renderProfil(uuid);
-			break;
-		case '/matchmaking':
-			view = renderMatchmaking();
-			break;
-		case '/change-password':
-			view = renderChangePassword();
-			break;
-		case '/edit-profil':
-			view = renderEditProfil();
-			break;
-		case '/room':
-			if (!uuid)
-				return ;
-			view = renderRoom(uuid);
-			break;
-		case '/chat':
-			view = renderChat();
-			break;
-		case '/2fa':
-			view = render2FA();
-			break;
-		case '/block':
-			view = renderBlock(uuid);
-			break;
-		case '/block1v1':
-			view = renderBlock1v1(uuid);
-			break;
-		case '/pong':
-			view = renderPong(uuid);
-			break;
-		case '/multipong':
-			view = renderMultiPong(uuid);
-			break;
-		case '/tournament':
-			view = renderTournaments();
-			break;
-		default:
-			view = render404();
+		},
+		'/create-account': () => renderCreateAccount(),
+		'/forgot-password': () => renderForgotPassword(),
+		'/main': () => renderMain(),
+		'/me': async () => await renderMe(),
+		'/profil': (uuid?: string) => renderProfil(uuid!),
+		'/matchmaking': () => renderMatchmaking(),
+		'/change-password': () => renderChangePassword(),
+		'/edit-profil': () => renderEditProfil(),
+		'/room': (uuid?: string) => uuid ? renderRoom(uuid) : '',
+		'/chat': () => renderChat(),
+		'/2fa': () => render2FA(),
+		'/block': (uuid?: string) => renderBlock(uuid!),
+		'/block1v1': (uuid?: string) => renderBlock1v1(uuid!),
+		'/pong': (uuid?: string) => renderPong(uuid!),
+		'/multipong': (uuid?: string) => renderMultiPong(uuid!),
+		'/tournament': () => renderTournaments(),
+	};
 
-		cleanEvents();
-		
-	}
+	let view = '';
+	const render = renderView[path];
+
+	view = render ? await render(uuid) : render404()
 	app.innerHTML = view;
 
 	const tokenAuth = getAuthToken();
@@ -184,49 +144,25 @@ export async function router() {
 		} catch (e) {
 			console.error('Erreur lors de la vérification du token:', e);
 		}
-		// console.log("initAlive");
-		// console.log(tokenAuth);
+		
 	}
 
 	// Initialiser les événements après le rendu pour les pages qui en ont besoin
+	const initEvents: { [key: string]: () => void } = {
+		'/': initializeHomeEvents,
+		'/lang': initializeHomeEvents,
+		'/forgot-password': initializeForgotPasswordEvents,
+		'/change-password': initializeChangePasswordEvents,
+		'/edit-profil': initializeEditProfileEvents,
+	};
+
 	setTimeout(() => {
-		switch (path) {
-			case '/':
-				initializeHomeEvents();
-				break;
-			case '/lang':
-				initializeHomeEvents();
-				break;
-			case '/forgot-password':
-				initializeForgotPasswordEvents();
-				break;
-			case '/change-password':
-				initializeChangePasswordEvents();
-				break;
-			case '/edit-profil':
-				initializeEditProfileEvents();
-				break;
-		}
+		const init = initEvents[path];
+		
+		if (init)
+			init();
 	}, 0);
 }
 
 
 
-// const routeRenderMap = {
-// 	'/': () => renderHome(),
-// 	'/lang': () => renderHome(),
-// 	'/login': () => renderLogin(),
-// 	'/create-account': () => renderCreateAccount(),
-// 	'/forgot-password': () => renderForgotPassword(),
-// 	'/main': () => renderMain(),
-// 	'/friends': () => renderSocial(),
-// 	'/profil': () => renderProfil(),
-// 	'/multiplayer': () => renderMultiplayer(),
-// 	'/matchmaking': () => renderMatchmaking(),
-// 	'/block': () => renderBlock(),
-// 	'/block1v1': () => renderBlock1v1(),
-// 	'/change-password': () => renderChangePassword(),
-// 	'/edit-profil': () => renderEditProfil(),
-// 	'/pong': () => renderPong(),
-// 	'/chat': () => renderChat()
-// };

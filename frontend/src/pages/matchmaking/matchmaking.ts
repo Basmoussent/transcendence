@@ -61,6 +61,8 @@ export class matchmaking {
 		this.setJoinBtns();
 		this.launchRoom();
 
+		this.setupMutationObserver();
+
 		this.ws.onopen = () => {
 			console.log(`${this.username} est arrive sur matchmaking`)
 			this.updateUI();
@@ -79,6 +81,29 @@ export class matchmaking {
 			const data = JSON.parse(event.data);
 			this.handleEvents(data);
 		}
+
+	}
+
+	private setupMutationObserver() {
+		const observer = new MutationObserver((mutations) => {
+			mutations.forEach((mutation) => {
+			mutation.addedNodes.forEach((node) => {
+				if (node.nodeType === Node.ELEMENT_NODE) {
+				const element = node as Element;
+				const joinButtons = element.querySelectorAll('[id^="join"][id$="Btn"]');
+				
+				joinButtons.forEach((btn) => {
+					const gameId = btn.id.replace('join', '').replace('Btn', '');
+					btn.addEventListener('click', () => {
+					this.joinRoom(Number(gameId));
+					});
+				});
+				}
+			});
+			});
+		});
+
+		observer.observe(document.body, { childList: true, subtree: true });
 
 	}
 	
@@ -174,16 +199,10 @@ export class matchmaking {
 			window.history.pushState({}, '', `/room/${uuid}`);
 			window.dispatchEvent(new PopStateEvent('popstate'));
 
-			this.cleanEvents();
-
 			this.ws.send(JSON.stringify({
 				type: 'updateUI',
 			}));
 		});
-	}
-
-	private cleanEvents() {
-
 	}
 
 	private async joinRoom(gameId: number) {

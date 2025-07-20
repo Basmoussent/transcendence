@@ -7,8 +7,8 @@ interface ActiveListener {
 let events: ActiveListener[] = [];
 
 export function addEvent(element: HTMLElement, type: string, handler: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions) {
-  element.addEventListener(type, handler, options);
-  events.push({ element, type, handler });
+	element.addEventListener(type, handler, options);
+	events.push({ element, type, handler });
 }
 
 export function cleanEvents() {

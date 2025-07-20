@@ -347,13 +347,3 @@ export function renderHome(): string {
 		</style>
 	`;
 }
-
-function initializeHomeEvents() {
-	const loginBtn = document.getElementById('loginBtn');
-	addEvent(loginBtn, 'click', () => {
-		window.history.pushState({}, '', '/login');
-		window.dispatchEvent(new PopStateEvent('popstate'));
-	});
-}
-
-export { initializeHomeEvents };

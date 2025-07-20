@@ -194,3 +194,6 @@ jsp comment gerer les event de merde la
 
 
 // comment faire pour utiliser addEvent psque c'est dans du html la louche nn ?
+
+
+cleanEvents() --> bizarre que je ne puisse pas le mettre au début du routeur
