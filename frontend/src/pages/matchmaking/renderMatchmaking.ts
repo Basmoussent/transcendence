@@ -30,13 +30,13 @@ const getTemplate = () => {
 				
 				<!-- Title -->
 				<div class="title-section">
-					<h1 class="main-title">Create a Game</h1>
-					<p class="subtitle">Choose your game type and launch a room</p>
+					<h1 class="main-title">${t('matchmaking.createGame')}</h1>
+					<p class="subtitle">${t('matchmaking.chooseGameType')}</p>
 				</div>
 
 				<!-- Game Type Selection -->
 				<div class="game-type-section">
-					<h2 class="section-title">Game Type</h2>
+					<h2 class="section-title">${t('matchmaking.gameType')}</h2>
 					<div class="game-type-buttons">
 						<button class="game-type-button pong-button" id="pongBtn">
 							<i class="fas fa-table-tennis"></i>
@@ -53,11 +53,11 @@ const getTemplate = () => {
 				<div class="action-buttons">
 					<button class="action-button launch-button" id="launchBtn">
 						<i class="fas fa-rocket"></i>
-						<span>Launch Room</span>
+						<span>${t('matchmaking.launchRoom')}</span>
 					</button>
 					<button class="action-button reset-button" id="resetBtn">
 						<i class="fas fa-undo"></i>
-						<span>Reset</span>
+						<span>${t('matchmaking.reset')}</span>
 					</button>
 				</div>
 			</div>
@@ -66,8 +66,8 @@ const getTemplate = () => {
 		<!-- Join Game Section -->
 		<div class="glass-panel w-2/6 flex flex-col gap-5 justify-start items-center py-8 px-6 h-10/12">
 			<div class="join-header">
-				<h1 class="join-title">Join a Game</h1>
-				<p class="join-subtitle">Available rooms</p>
+				<h1 class="join-title">${t('matchmaking.joinGame')}</h1>
+				<p class="join-subtitle">${t('matchmaking.availableRooms')}</p>
 			</div>
 
 			<div class="available-games-container" id="available-games">
@@ -76,8 +76,8 @@ const getTemplate = () => {
 					<div class="empty-icon">
 						<i class="fas fa-gamepad"></i>
 					</div>
-					<p class="empty-text">No active games</p>
-					<p class="empty-subtext">Create a game to get started</p>
+					<p class="empty-text">${t('matchmaking.noActiveGames')}</p>
+					<p class="empty-subtext">${t('matchmaking.createGameToStart')}</p>
 				</div>
 			</div>
 		</div>

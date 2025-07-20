@@ -10,31 +10,29 @@ export function render2FA() {
         <div class="tfa-header">
           <button class="back-button" id="backBtn">
             <i class="fas fa-arrow-left"></i>
-            Retour au profil
+            ${t('auth.twoFactorAuth.backToProfile')}
           </button>
-          <h1>Authentification à deux facteurs</h1>
+          <h1>${t('auth.twoFactorAuth.title')}</h1>
         </div>
         
         <div class="tfa-content">
           <div class="step-info">
-            <p>Scannez le QR code avec votre application d'authentification Google Authenticator</p>
+            <p>${t('auth.twoFactorAuth.scanQR')}</p>
           </div>
           
           <div class="qr-section" id="qrSection">
             <div class="qr-placeholder">
               <i class="fas fa-qrcode"></i>
-              <p>Génération du QR code...</p>
+              <p>${t('auth.twoFactorAuth.generatingQR')}</p>
             </div>
           </div>
-
-
-          
+       
           <div class="verification-section">
-            <label for="verificationCode">Entrez le code de vérification :</label>
+            <label for="verificationCode">${t('auth.twoFactorAuth.verificationCode')}</label>
             <input type="text" id="verificationCode" maxlength="6">
             <button class="activate-btn" id="activateBtn">
               <i class="fa-solid fa-lock"></i>
-              Activer 2FA
+              ${t('auth.twoFactorAuth.activate')}
             </button>
           </div>
         </div>

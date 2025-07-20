@@ -1,5 +1,6 @@
 import { Pong } from '../../game/pong/pong';
 import { sanitizeHtml } from '../../utils/sanitizer';
+import { t } from '../../utils/translations';
 
 export function renderTournaments() {
   const html =  `
@@ -10,7 +11,7 @@ export function renderTournaments() {
   <div class="tournaments-header">
     <button class="home-button" id="homeBtn">
         <i class="fas fa-home"></i>
-        Home
+         ${t('social.home')}
     </button>
     <h1 class="tournaments-title">
       <i class="fas fa-trophy"></i>

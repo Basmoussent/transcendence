@@ -130,7 +130,8 @@ export const translations = {
       message: "Message",
       statistics: "Statistiques",
       gamePlayed: "Parties jouées",
-      winrate: "Taux de victoire"
+      winrate: "Taux de victoire",
+      noGameFound: "Aucune partie trouvée"
     },
     friends: {
       backToSocial: "Retour",
@@ -195,6 +196,7 @@ export const translations = {
       cancel: "Annuler"
     },
     game: {
+      home: "Accueil",
       blockGame: "Block Game",
       pongGame: "Pong Game",
       tournament: "Tournoi",
@@ -231,6 +233,7 @@ export const translations = {
       home: "Accueil",
       roomName: "Nom de la salle",
       ready: "Prêt",
+      notReady: "Pas prêt",
       maxPlayers: "Joueurs maximum",
       gameType: "Type de jeu",
       ai: "IA",
@@ -377,7 +380,8 @@ export const translations = {
       message: "Message",
       statistics: "Statistics",
       gamePlayed: "Games played",
-      winrate: "Winrate"
+      winrate: "Winrate",
+      noGameFound: "No game found"
     },
     friends: {
       backToSocial: "Back",
@@ -478,6 +482,7 @@ export const translations = {
       home: "Home",
       roomName: "Room Name",
       ready: "Ready",
+      notReady: "Not ready",
       maxPlayers: "Max Players",
       gameType: "Game Type",
       ai: "AI",
@@ -624,7 +629,8 @@ export const translations = {
       message: "Mensaje",
       statistics: "Estadísticas",
       gamePlayed: "Partidas jugadas",
-      winrate: "Tasa de victoria"
+      winrate: "Tasa de victoria",
+      noGameFound: "No se ha encontrado ningún juego"
     },
     friends: {
       backToSocial: "Volver",
@@ -725,6 +731,7 @@ export const translations = {
       home: "Inicio",
       roomName: "Nombre de la Sala",
       ready: "Listo",
+      notReady: "No listo",
       maxPlayers: "Jugadores Máximos",
       gameType: "Tipo de Juego",
       ai: "IA",
@@ -741,7 +748,6 @@ export const translations = {
     }
   }
 } as const;
-
 
 type DotNestedKeys<T> = {
   [K in keyof T & string]: T[K] extends object
