@@ -1,6 +1,7 @@
 import { sanitizeHtml } from '../../utils/sanitizer';
 import { fetchMe, fetchUserInfo, loadMe } from './utils';
 import { getAuthToken } from '../../utils/auth';
+import { t } from '../../utils/translations';
 
 export interface UserChat {
 	username: string;
@@ -250,6 +251,9 @@ export class Chat {
 
 		const relations: Relation[] | null = await fetchUserRelations(this.me.username);
 
+
+		console.log(JSON.stringify(relations, null, 8))
+
 		if (!relations || !relations.length) {
 			console.log("t'as pas d'amis mgl")
 			return;
@@ -281,7 +285,7 @@ export class Chat {
 						</div>
 						<div class="friend-info">
 							<div class="friend-name">${sanitizeHtml(friend.username)}</div>
-							<div class="friend-status">En ligne</div>
+							<div class="friend-status">${t('chat.online')}</div>
 						</div>
 						<div class="friend-actions">
 							<button class="action-btn chat-btn">
@@ -309,7 +313,7 @@ export class Chat {
 						</div>
 						<div class="friend-info">
 							<div class="friend-name">${sanitizeHtml(friend.username)}</div>
-							<div class="friend-status">Demande d'ami</div>
+							<div class="friend-status">${t('chat.requests')}</div>
 						</div>
 						<div class="friend-actions">
 							<button class="action-btn accept-btn">
@@ -354,7 +358,7 @@ export class Chat {
 		</div>
 		<div class="chat-header-info">
 			<h3>${sanitizeHtml(user.username)}</h3>
-			<p>En ligne</p>
+			<p>${t('chat.online')}</p>
 		</div>
 		`;
 
@@ -397,7 +401,7 @@ export class Chat {
 async function fetchUserRelations(username: string): Promise<Relation[]|null> {
 
 	try {
-		const response = await fetch(`/api/friend/relations?username=${username}`);
+		const response = await fetch(`/api/friend/relations/?username=${username}`);
 		
 		if (!response.ok) {
 			const errorData = await response.json();
@@ -406,17 +410,9 @@ async function fetchUserRelations(username: string): Promise<Relation[]|null> {
 
 		const result = await response.json();
 
-		if (response.ok) {
-			const relations: Relation[] = result.relations.map((relation:any) => ({
-				id: relation.id,
-				user_1: relation.user_1,
-				user_2: relation.user_2,
-				user1_state: relation.user1_state,
-				user2_state: relation.user2_state
-			}));
-			console.log("Relations:", relations);
-			return relations;
-		}
+		if (response.ok)
+			return result.relations;
+		
 		console.error("error retrieve relations of a user");
 		return null;
 	}

@@ -1,6 +1,7 @@
 import { fetchUsername, logEndGame, postGame } from "../gameUtils.ts";
 import { Ball, Paddle, brick, createRandomBrick, PowerUp, PowerUpType, getPowerUpFromBrick } from "./blockUtils.ts";
 import { getAuthToken } from '../../utils/auth.ts'
+import { t } from '../../utils/translations.ts'
 
 export interface Game {
 	id: number,
@@ -172,7 +173,7 @@ export class Block {
 		this.ctx.fillStyle = 'white';
 		this.ctx.font = '32px Arial';
 		this.ctx.textAlign = 'center';
-		this.ctx.fillText('PRESS ENTER TO START', this.width / 2, this.height / 2);
+		this.ctx.fillText(t('block.pressEnterToStart'), this.width / 2, this.height / 2);
 		this.ctx.globalAlpha = 1;
 	}
 

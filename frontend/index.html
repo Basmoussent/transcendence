@@ -133,9 +133,8 @@
           }
           }
           
-          // Update the URL without full page reload using history API
-          localStorage.setItem('lang', lang);
-          localStorage.setItem('lastPath', window.location.pathname);
+          sessionStorage.setItem('lang', lang);
+          sessionStorage.setItem('lastPath', window.location.pathname);
           window.history.pushState({}, '', '/lang');
           
           const buttons = document.querySelectorAll('.language-btn');
@@ -179,7 +178,7 @@
       }
 
       async function ensureSubdomain() {
-        const lang = localStorage.getItem('lang') || 'en';
+        const lang = sessionStorage.getItem('lang') || 'en';
         const hostname = window.location.hostname;
         const currentLang = hostname.split('.')[0];
         

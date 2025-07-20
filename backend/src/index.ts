@@ -5,7 +5,6 @@ import Fastify from 'fastify';
 import cors from '@fastify/cors';
 import jwt from '@fastify/jwt';
 import websocket from '@fastify/websocket';
-import cookie from '@fastify/cookie';
 import multipart from '@fastify/multipart'
 import { db } from './database';
 import { UserService } from './services/userService';
@@ -52,7 +51,6 @@ async function setup() {
 
 	console.log('🚀 Starting setup...');
 
-	// Initialize database first
 	console.log('📦 Initializing database...');
 	await db.initialize();
 	console.log('✅ Database initialized');
@@ -67,14 +65,12 @@ async function setup() {
 
 	console.log('✅ Services decorated');
 
-	// Register JWT FIRST (before routes)
 	console.log('🔑 Getting JWT secret from Vault...');
 	const jwtSecret = await getSecretFromVault("JWT", "JWT_KEY") || "secret";
 	const jwtSecret2 = await getSecretFromVault("KEY", "KEY_SECRET") || "key_secret";
 	console.log(`JWT = ${jwtSecret} -  KEY_SECRET = ${jwtSecret2} `)
 	console.log('🔑 Registering JWT plugins...');
 	
-	// Register first JWT plugin
 	await fastify.register(jwt, {
 		secret: jwtSecret,
 		decoratorName: 'jwt'
@@ -93,26 +89,13 @@ async function setup() {
 		}
 	};
 	
-	// Manually decorate the fastify instance with jwt2fa
 	fastify.decorate('jwt2fa', jwt2faInstance);
-	console.log('✅ Manually decorated jwt2fa');
-	
-	// Debug: Check if JWT decorators are available
-	console.log('🔍 Debug JWT decorators:');
-	console.log('jwt decorator:', typeof fastify.jwt);
-	console.log('jwt2fa decorator:', typeof fastify.jwt2fa);
-	console.log('All decorators:', Object.keys(fastify).filter(key => key.includes('jwt')));
-	
-	console.log('✅ JWT plugins registered');
 
 	// Register CORS
 	console.log('🌐 Registering CORS...');
 	await fastify.register(cors, {
 		origin: [
 		'https://localhost:2443',
-		'https://fr.localhost:5173',
-		'https://en.localhost:5173',
-		'https://es.localhost:5173',
 		'https://fr.entropy.local',
 		'https://en.entropy.local',
 		'https://es.entropy.local'
@@ -122,13 +105,9 @@ async function setup() {
 		exposedHeaders: ['x-access-token'],
 		methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
 		allowedHeaders: ['Content-Type', 'Authorization', 'x-access-token']
-		// louche qu'on puisse pas faire de get depuis le port 2443 sans methods et allowedHeaders
 	});
 	console.log('✅ CORS registered');
 
-	console.log('🍪 Registering cookie plugin...');
-	await fastify.register(cookie);
-	console.log('✅ Cookie plugin registered');
 
 	console.log('📁 Registering multipart plugin...');
 	await fastify.register(multipart, {
@@ -138,7 +117,6 @@ async function setup() {
 	});
 	console.log('✅ Multipart plugin registered');
 
-	// on enregistre les routes definis, qui seront chacune sur /prefix/nom_de_la_route
 	console.log('🛣️ Registering routes...');
 	await fastify.register(authRoutes, { prefix: "/auth" });
 	console.log('✅ Auth routes registered');
@@ -152,7 +130,7 @@ async function setup() {
 	console.log('✅ Friend routes registered');
 
 	console.log('📡 Registering WebSocket routes...');
-	await fastify.register(require('@fastify/websocket'));
+	await fastify.register(require('@fastify/websocket'));//TALAN
 	await fastify.register(webSocketRoutes);
 	console.log('✅ WebSocket routes registered');
 

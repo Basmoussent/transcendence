@@ -1,68 +1,68 @@
 CREATE TABLE IF NOT EXISTS users (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
-  username VARCHAR UNIQUE NOT NULL,
-  email VARCHAR UNIQUE NOT NULL,
-  password_hash VARCHAR NOT NULL,
-  two_fact_auth BOOLEAN DEFAULT false,
-  secret_key VARCHAR NOT NULL,
-  avatar_url TEXT,
-  language VARCHAR DEFAULT 'fr',
-  created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+	id INTEGER PRIMARY KEY AUTOINCREMENT,
+	username VARCHAR UNIQUE NOT NULL,
+	email VARCHAR UNIQUE NOT NULL,
+	password_hash VARCHAR NOT NULL,
+	two_fact_auth BOOLEAN DEFAULT false,
+	secret_key VARCHAR NOT NULL,
+	avatar_url TEXT,
+	language VARCHAR DEFAULT 'fr',
+	created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE IF NOT EXISTS games (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
-  uuid VARCHAR UNIQUE NOT NULL,
-  game_type VARCHAR NOT NULL,
-  player1 VARCHAR NOT NULL,
-  player2 VARCHAR,
-  player3 VARCHAR,
-  player4 VARCHAR,
-  users_needed INTEGER,
-  ai INTEGER DEFAULT 0,
-  start_time VARCHAR,
-  end_time VARCHAR,
-  winner VARCHAR
+	id INTEGER PRIMARY KEY AUTOINCREMENT,
+	uuid VARCHAR UNIQUE NOT NULL,
+	game_type VARCHAR NOT NULL,
+	player1 VARCHAR NOT NULL,
+	player2 VARCHAR,
+	player3 VARCHAR,
+	player4 VARCHAR,
+	users_needed INTEGER,
+	ai INTEGER DEFAULT 0,
+	start_time VARCHAR,
+	end_time VARCHAR,
+	winner VARCHAR
 );
 
 CREATE TABLE IF NOT EXISTS chats (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
-  type VARCHAR NOT NULL,
-  name VARCHAR,
-  created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+	id INTEGER PRIMARY KEY AUTOINCREMENT,
+	type VARCHAR NOT NULL,
+	name VARCHAR,
+	created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE IF NOT EXISTS friends (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
-  user_1 VARCHAR REFERENCES users(username),
-  user_2 VARCHAR REFERENCES users(username),
-  user1_state VARCHAR(36) NOT NULL,
-  user2_state VARCHAR(36) NOT NULL
+	id INTEGER PRIMARY KEY AUTOINCREMENT,
+	user_1 VARCHAR REFERENCES users(username),
+	user_2 VARCHAR REFERENCES users(username),
+	user1_state VARCHAR(36) NOT NULL,
+	user2_state VARCHAR(36) NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS chat_history (
-  chat_id INTEGER PRIMARY KEY,
-  user1 VARCHAR REFERENCES users(username),
-  user2 VARCHAR REFERENCES users(username),
-  FOREIGN KEY (chat_id) REFERENCES friends(id)
+	chat_id INTEGER PRIMARY KEY,
+	user1 VARCHAR REFERENCES users(username),
+	user2 VARCHAR REFERENCES users(username),
+	FOREIGN KEY (chat_id) REFERENCES friends(id)
 );
 
 CREATE TABLE IF NOT EXISTS messages (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
-  chat_id INTEGER REFERENCES chat_history(chat_id),
-  sender_username VARCHAR REFERENCES users(username),
-  content TEXT NOT NULL,
-  created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+	id INTEGER PRIMARY KEY AUTOINCREMENT,
+	chat_id INTEGER REFERENCES chat_history(chat_id),
+	sender_username VARCHAR REFERENCES users(username),
+	content TEXT NOT NULL,
+	created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE IF NOT EXISTS statistics (
-  username VARCHAR REFERENCES users(username) ON DELETE CASCADE,
-  mmr INTEGER DEFAULT 800,
-  pong_games INTEGER DEFAULT 0,
-  pong_wins INTEGER DEFAULT 0,
-  block_games INTEGER DEFAULT 0,
-  block_wins INTEGER DEFAULT 0,
-  rating INTEGER
+	username VARCHAR REFERENCES users(username) ON DELETE CASCADE,
+	mmr INTEGER DEFAULT 800,
+	pong_games INTEGER DEFAULT 0,
+	pong_wins INTEGER DEFAULT 0,
+	block_games INTEGER DEFAULT 0,
+	block_wins INTEGER DEFAULT 0,
+	rating INTEGER
 )
 
 -- CREATE TABLE IF NOT EXISTS tournaments (

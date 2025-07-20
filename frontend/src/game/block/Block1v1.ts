@@ -1,5 +1,6 @@
 import { brick, Ball, Paddle, createRandomBrick } from "./blockUtils.ts";
 import { getAuthToken } from '../../utils/auth.ts'
+import { t } from '../../utils/translations.ts'
 
 export interface Game {
 	id: number,
@@ -159,9 +160,9 @@ export class Block1v1 {
 		this.ctx.fillStyle = 'white';
 		this.ctx.font = '32px Arial';
 		this.ctx.textAlign = 'center';
-		this.ctx.fillText('PRESS ENTER TO START', this.width / 2, this.height / 2);
-		this.ctx.fillText('PLAYER 1: A/D KEYS', this.width / 2, this.height / 2 + 40);
-		this.ctx.fillText('PLAYER 2: ARROW KEYS', this.width / 2, this.height / 2 + 80);
+		this.ctx.fillText(t('block.pressEnterToStart'), this.width / 2, this.height / 2);
+		this.ctx.fillText(t('block.player1Controls'), this.width / 2, this.height / 2 + 40);
+		this.ctx.fillText(t('block.player2Controls'), this.width / 2, this.height / 2 + 80);
 		this.ctx.globalAlpha = 1;
 	}
 
@@ -338,11 +339,11 @@ export class Block1v1 {
 		if (!this.status && this.winner !== "nobody") {
 			this.ctx.globalAlpha = 0.9;
 			this.ctx.fillStyle = 'white';
-			this.ctx.font = '48px Arial';
-			this.ctx.textAlign = 'center';
-			this.ctx.fillText(`${this.winner} WINS!`, this.width / 2, this.height / 2);
-			this.ctx.font = '24px Arial';
-			this.ctx.fillText('Press ENTER to play again', this.width / 2, this.height / 2 + 50);
+					this.ctx.font = '48px Arial';
+		this.ctx.textAlign = 'center';
+		this.ctx.fillText(`${this.winner} ${t('block.wins')}`, this.width / 2, this.height / 2);
+		this.ctx.font = '24px Arial';
+		this.ctx.fillText(t('block.pressEnterToPlayAgain'), this.width / 2, this.height / 2 + 50);
 			this.ctx.globalAlpha = 1;
 		}
 	}

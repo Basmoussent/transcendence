@@ -178,22 +178,17 @@ async function userRoutes(app: FastifyInstance) {
 
 	app.post('/upload/avatar', async function (request: FastifyRequest, reply: FastifyReply) {
 		try {
-			let token = request.headers['x-access-token'] as string;
-			if (!token) {
-				token = request.cookies['x-access-token'];
-			}
+			const token = request.headers['x-access-token'] ? request.headers['x-access-token'] : request.cookies['x-access-token']; 
 
-			if (!token) {
+			if (!token)
 				return reply.status(401).send({ error: 'Token d\'authentification manquant' });
-			}
 
 			const decoded = app.jwt.verify(token) as { user: string };
 			const email = decoded.user;
 
 			const database = db.getDatabase();
-			if (!database) {
+			if (!database)
 				return reply.status(500).send({ error: 'Erreur de connexion à la base de données' });
-			}
 
 			const user = await new Promise<UserData | null>((resolve, reject) => {
 				database.get(
@@ -205,28 +200,26 @@ async function userRoutes(app: FastifyInstance) {
 				);
 			});
 
-			if (!user) {
+			if (!user)
 				return reply.status(404).send({ error: 'Utilisateur non trouvé' });
-			}
 
 			const data = await request.file();
-			if (!data) {
+
+			if (!data)
 				return reply.status(400).send({ error: 'Aucun fichier reçu' });
-			}
 
 			const allowedMimes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
-			if (!allowedMimes.includes(data.mimetype)) {
-				return reply.status(400).send({ error: 'Type de fichier non autorisé. Utilisez JPEG, PNG, GIF ou WebP' });
-			}
 
-			if (data.file.bytesRead > 5 * 1024 * 1024) {
+			if (!allowedMimes.includes(data.mimetype))
+				return reply.status(400).send({ error: 'Type de fichier non autorisé. Utilisez JPEG, PNG, GIF ou WebP' });
+
+			if (data.file.bytesRead > 5 * 1024 * 1024)
 				return reply.status(400).send({ error: 'Fichier trop volumineux. Taille maximum: 5MB' });
-			}
 
 			const uploadsDir = path.join(__dirname, '../../uploads');
-			if (!fs.existsSync(uploadsDir)) {
+
+			if (!fs.existsSync(uploadsDir))
 				fs.mkdirSync(uploadsDir, { recursive: true });
-			}
 
 			const ext = path.extname(data.filename || '') || '.jpg';
 			const timestamp = Date.now();
@@ -256,11 +249,12 @@ async function userRoutes(app: FastifyInstance) {
 				avatar_url: `/api/uploads/${filename}`
 			});
 
-		} catch (err: any) {
+		}
+		catch (err: any) {
 			console.error('Erreur pendant l\'upload d\'avatar :', err);
-			if (err.name === 'JsonWebTokenError') {
+			if (err.name === 'JsonWebTokenError')
 				return reply.status(401).send({ error: 'Token invalide ou expiré' });
-			}
+
 			return reply.status(500).send({ error: 'Erreur lors de l\'upload de l\'avatar', details: err.message });
 		}
 
@@ -366,9 +360,8 @@ async function userRoutes(app: FastifyInstance) {
 		const { username } = request.params as { username: string };
 
 		const database = db.getDatabase();
-		if (!database) {
+		if (!database)
 			return reply.status(500).send({ error: 'Erreur de connexion à la base de données' });
-		}
 
 		const user = await new Promise<UserData | null>((resolve, reject) => {
 			database.get(
@@ -380,9 +373,8 @@ async function userRoutes(app: FastifyInstance) {
 			);
 		});
 
-		if (!user) {
+		if (!user)
 			return reply.status(404).send({ error: 'Utilisateur non trouvé' });
-		}
 
 		const isOnline = await app.userService.isOnline(user.id);
 
@@ -447,30 +439,14 @@ async function userRoutes(app: FastifyInstance) {
 			try {
 				let checkCode = await app.userService.verifiyCode(code, secret.secret_key);
 				if (checkCode) {
-					const origin = request.headers.origin || '';
-					const host = request.headers.host || '';
-					let cookieDomain;
-
-					// Log pour debug
-					console.log('🔍 Debug cookie domain:', { origin, host });
-
-					if (origin.includes('entropy.local') || host.includes('entropy.local')) {
-						cookieDomain = '.entropy.local'; // Avec le point pour partager entre sous-domaines
-					} else if (origin.includes('localhost') || host.includes('localhost')) {
-						const hostParts = host.split('.');
-						if (hostParts.length > 1)
-							cookieDomain = `.${hostParts.slice(-1).join('.')}`; // .localhost
-						else
-							cookieDomain = ".localhost"; // Pas de domaine pour localhost simple
-					}
 
 					console.log(`avant le sign`)
 					const token = app.jwt.sign({ user: secret.email, name: secret.username });
 					console.log(`après le sign`)
 					return reply.header(
-						'Set-Cookie',
-						`x-access-token=${token}; Path=/; Domain=${cookieDomain}; SameSite=Lax; Max-Age=${7 * 24 * 60 * 60}`).send({
-							checkCode: checkCode
+						"x-access-token", token)
+								.send({
+						checkCode: checkCode
 						})
 				}
 
@@ -496,11 +472,10 @@ async function userRoutes(app: FastifyInstance) {
 			const database = db.getDatabase();
 
 			const { username } = request.query as { username?: any };
-			console.log(`niwdoqwndoqnwodiqnoinwd `, JSON.stringify(username, null, 8));
 
 			if (!username)
 				throw new Error("missing username in the request body");
-
+			
 			try {
 				const result = await app.userService.retrieveStats(username);
 				return reply.send({
@@ -518,7 +493,6 @@ async function userRoutes(app: FastifyInstance) {
 				details: err.message
 			});
 		}
-
 	})
 }
 

@@ -1,6 +1,7 @@
 import { PADDLE_OFFSET, Player } from "../const";
 import { Paddle } from "./multi-paddle";
 import { Ball } from "./multi-ball";
+import { t } from '../../../utils/translations';
 
 export class PaddleAI {
   name: string;
@@ -21,7 +22,7 @@ export class PaddleAI {
   // mode: number; // easy = 0 / middle = 1 / hard = 2
 
   constructor(width: number, height: number, color: string) {
-    this.name = "AI Player";
+    this.name = t('pong.aiPlayer');
     this.width = width;
     this.height = height;
     this.x = 0;

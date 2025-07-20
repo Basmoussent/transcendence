@@ -10,8 +10,31 @@ interface Relation {
 }
 
 async function friendRoutes(app: FastifyInstance) {
+
+	app.get('/:username', async function (request: FastifyRequest, reply: FastifyReply) {
+
+		try {
+			const database = db.getDatabase();
+
+			const { username } = request.query as { username?: string};
+
+			console.log('🔍 Debug - Requested friends for username:', username);
+
+			if (!username)
+				throw new Error ("missing username in the request body");
+
+			const friends = app.friendService.getFriends(username);
+
+			return friends;
+		}
+		catch (err: any) {
+			return reply.status(500).send({
+				error: 'erreur GET /friend/:username',
+				details: err.message });
+		}
+	})
 	
-	app.get('/relations', async function (request: FastifyRequest, reply: FastifyReply) {
+	app.get('/relations/:username', async function (request: FastifyRequest, reply: FastifyReply) {
 
 		try {
 			const database = db.getDatabase();
@@ -33,8 +56,9 @@ async function friendRoutes(app: FastifyInstance) {
 				);
 			});
 
+			// const relations = app.friendService.getRelations();
+
 			console.log('🔍 Debug - Found relations:', relations);
-			console.log(`SELECT * FROM friends WHERE user_1 = '${username}' OR user_2 = '${username}'`);
 
 			return reply.send({
 				message: `friends du user ${username}`,
@@ -44,7 +68,7 @@ async function friendRoutes(app: FastifyInstance) {
 		catch (err: any) {
 			console.error('❌ Error in /relations:', err);
 			return reply.status(500).send({
-				error: 'erreur GET /friend/username',
+				error: 'erreur GET /friend/relations/:username',
 				details: err.message });
 		}
 	});
@@ -80,10 +104,12 @@ async function friendRoutes(app: FastifyInstance) {
 	})
 
 	app.get('/history', async function (request: FastifyRequest, reply: FastifyReply) {
+
 		const { user1, user2 } = request.query as { user1?: string, user2?: string };
-		if (!user1 || !user2) {
+
+		if (!user1 || !user2)
 			return reply.status(400).send({ error: 'user1 and user2 are required' });
-		}
+
 		const history = await app.chatService.retrieveChatHistory(user1, user2);
 		return reply.send(history);
 	});

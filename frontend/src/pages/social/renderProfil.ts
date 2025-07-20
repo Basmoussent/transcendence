@@ -3,20 +3,19 @@ import { sanitizeHtml } from '../../utils/sanitizer';
 import { t } from '../../utils/translations';
 import { profil } from './profil'
 
-
 export function renderProfil(uuid: string) {
 
 	setTimeout(async () => {
 		try {
-			const me = await loadMe();
-			const user = await loadUserInfo(uuid);
-			const stats = await loadUserStats(uuid);
 
-			console.log(JSON.stringify(me, null, 8));
-			console.log(JSON.stringify(user, null, 8));
-			console.log(JSON.stringify(stats, null, 8));
+			const data = {
+				me: await loadMe(),
+				user: await loadUserInfo(uuid),
+				stats: await loadUserStats(uuid),
+				friends: await loadUserFriends(uuid)
+			}
 
-			new profil(me, user, stats);
+			new profil(data);
 		}
 		catch (err:any) {
 			console.log(err);
@@ -118,13 +117,13 @@ async function loadUserStats(username: string) {
 		if (response.ok) {
 			const result = await response.json();
 			const userStats = {
-				mmr: result.data?.mmr,
-				pong_games: result.data?.pong_games,
-				pong_wins: result.data?.pong_wins,
-				block_games: result.data?.block_games,
-				block_wins: result.data?.block_wins,
-				rating: result.data?.rating,
-				id: result.data?.id,
+				mmr: result.stats?.mmr,
+				pong_games: result.stats?.pong_games,
+				pong_wins: result.stats?.pong_wins,
+				block_games: result.stats?.block_games,
+				block_wins: result.stats?.block_wins,
+				rating: result.stats?.rating,
+				id: result.stats?.id,
 			};
 			return (userStats);
 		}
@@ -137,19 +136,44 @@ async function loadUserStats(username: string) {
 
 }
 
+async function loadUserFriends(username: string) {
+	try {
+		const token = getAuthToken();
+		if (!token) {
+			alert('❌ Token d\'authentification manquant');
+			window.history.pushState({}, '', '/login');
+			window.dispatchEvent(new PopStateEvent('popstate'));
+			return '';
+		}
 
+		const response = await fetch(`/api/friend/?username=${username}`, {
+			method: 'GET',
+			headers: {
+				'Content-Type': 'application/json',
+				'x-access-token': token }
+		});
+	
+		if (response.ok)
+			return await response.json();
+		else 
+			console.error('gros gros zig');
 
+	}
+	catch (err) {
+		console.error(`pas réussi a récup les amis de cette personnes zignew que tu es`)
+	}
+}
 
 function getTemplate() {
 	return `
 		<button class="home-button" id="homeBtn">
 			<i class="fas fa-home"></i>
-			Home
+			${t('social.home')}
 		</button>
 		
 		<button class="home-button" onclick="goHome()">
         <i class="fas fa-home"></i>
-        Home
+        ${t('social.home')}
 		</button>
 
 		<div class="container">
@@ -164,17 +188,17 @@ function getTemplate() {
 				<h1 id="username"> talan</h1>
 				<div class="profile-status">
 					<div class="status-dot"></div>
-					<span>En ligne</span>
+					<span>${t('social.online')}</span>
 				</div>
 				</div>
 				<div class="profile-actions">
 					<button id="addFriend" "class="action-btn btn-primary">
 						<i class="fas fa-user-plus"></i>
-						Ajouter ami
+						${t('social.addFriend')}
 					</button>
 					<button id="sendMsg" class="action-btn btn-secondary">
 						<i class="fas fa-envelope"></i>
-						Message
+						${t('social.message')}
 					</button>
 				</div>
 			</div>
@@ -184,20 +208,20 @@ function getTemplate() {
 			<div class="profile-section">
 				<div class="section-header">
 				<i class="fas fa-chart-bar"></i>
-				<h2>Statistiques</h2>
+				<h2>${t('social.statistics')}</h2>
 				</div>
 					<div class="stats-grid">
 						<div class="stat-card">
 							<div id="gamePlayed" class="stat-number">1,247</div>
-							<div class="stat-label">Game played</div>
-						</div>
-						<div class="stat-card">
-							<div id="winrate" class="stat-number">68%</div>
-							<div class="stat-label">Winrate</div>
-						</div>
-						<div class="stat-card">
-							<div id="victory" class="stat-number">42</div>
-							<div class="stat-label">Victory</div>
+													<div class="stat-label">${t('social.gamePlayed')}</div>
+					</div>
+					<div class="stat-card">
+						<div id="winrate" class="stat-number">68%</div>
+						<div class="stat-label">${t('social.winrate')}</div>
+					</div>
+					<div class="stat-card">
+						<div id="victory" class="stat-number">42</div>
+						<div class="stat-label">${t('social.victory')}</div>
 						</div>
 						<div class="stat-card">
 							<div id="rank" class="stat-number">42</div>
@@ -211,39 +235,10 @@ function getTemplate() {
 			<div id="gameHistory" class="profile-section">
 				<div class="section-header">
 				<i class="fas fa-history"></i>
-				<h2>Activité récente</h2>
+				<h2>Historique des parties</h2>
 				</div>
-				<div class="recent-activity">
-				<div class="activity-item">
-					<div class="activity-icon">
-					<i class="fas fa-gamepad"></i>
-					</div>
-					<div class="activity-content">
-					<h4>Partie de Pong remportée</h4>
-					<p>Victoire contre Marie_G dans une partie serrée</p>
-					</div>
-					<div class="activity-time">Il y a 2h</div>
-				</div>
-				<div class="activity-item">
-					<div class="activity-icon">
-					<i class="fas fa-trophy"></i>
-					</div>
-					<div class="activity-content">
-					<h4>Nouveau succès débloqué</h4>
-					<p>Succès "Série de feu" obtenu</p>
-					</div>
-					<div class="activity-time">Il y a 1 jour</div>
-				</div>
-				<div class="activity-item">
-					<div class="activity-icon">
-					<i class="fas fa-users"></i>
-					</div>
-					<div class="activity-content">
-					<h4>Nouvel ami ajouté</h4>
-					<p>Thomas_42 a accepté votre demande d'ami</p>
-					</div>
-					<div class="activity-time">Il y a 3 jours</div>
-				</div>
+				<div class="match-history-container" id="match-history-list">
+					<!-- Les parties seront générées par JavaScript -->
 				</div>
 			</div>
 
@@ -261,12 +256,12 @@ function getTemplate() {
 				<div class="friend-card">
 					<div class="friend-avatar">T</div>
 					<div class="friend-name">Thomas_42</div>
-					<div class="friend-status">En ligne</div>
+					<div class="friend-status">${t('social.online')}</div>
 				</div>
 				<div class="friend-card">
 					<div class="friend-avatar">S</div>
 					<div class="friend-name">Sophie_K</div>
-					<div class="friend-status">En ligne</div>
+					<div class="friend-status">${t('social.online')}</div>
 				</div>
 				<div class="friend-card">
 					<div class="friend-avatar">L</div>
@@ -365,6 +360,13 @@ function getTemplate() {
 		background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="20" cy="20" r="2" fill="rgba(255,255,255,0.1)"/><circle cx="80" cy="40" r="3" fill="rgba(255,255,255,0.1)"/><circle cx="40" cy="70" r="1.5" fill="rgba(255,255,255,0.1)"/><circle cx="70" cy="80" r="2.5" fill="rgba(255,255,255,0.1)"/></svg>');
 		animation: float 6s ease-in-out infinite;
         }
+
+	#gameHistory {
+		max-height: 400px; /* Ou la hauteur fixe que tu souhaites */
+		overflow-y: auto;
+		padding-right: 10px; /* Pour éviter que la scrollbar ne cache du contenu */
+	}
+
 
         .profile-avatar {
 		position: absolute;
@@ -577,6 +579,149 @@ function getTemplate() {
         .achievement-info p {
 		color: rgba(255, 255, 255, 0.7);
 		font-size: 0.9em;
+        }
+
+        .match-history-container {
+		display: flex;
+		flex-direction: column;
+		gap: 12px;
+		max-height: 400px;
+		overflow-y: auto;
+        }
+
+        .match-history-container::-webkit-scrollbar {
+		width: 6px;
+        }
+
+        .match-history-container::-webkit-scrollbar-track {
+		background: rgba(255, 255, 255, 0.05);
+		border-radius: 3px;
+        }
+
+        .match-history-container::-webkit-scrollbar-thumb {
+		background: rgba(255, 255, 255, 0.2);
+		border-radius: 3px;
+        }
+
+        .match-history-container::-webkit-scrollbar-thumb:hover {
+		background: rgba(255, 255, 255, 0.3);
+        }
+
+        .match-item {
+		display: flex;
+		align-items: center;
+		gap: 15px;
+		padding: 15px;
+		background: rgba(255, 255, 255, 0.1);
+		border-radius: 12px;
+		border-left: 4px solid;
+		transition: all 0.3s ease;
+		position: relative;
+		overflow: hidden;
+        }
+
+        .match-item::before {
+		content: '';
+		position: absolute;
+		top: 0;
+		left: 0;
+		right: 0;
+		height: 2px;
+		background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+		opacity: 0;
+		transition: opacity 0.3s ease;
+        }
+
+        .match-item:hover::before {
+		opacity: 1;
+        }
+
+        .match-item:hover {
+		transform: translateX(5px);
+		background: rgba(255, 255, 255, 0.15);
+        }
+
+        .match-item.victory {
+		border-left-color: #10B981;
+        }
+
+        .match-item.defeat {
+		border-left-color: #EF4444;
+        }
+
+        .match-item.draw {
+		border-left-color: #6B7280;
+        }
+
+        .match-icon {
+		width: 45px;
+		height: 45px;
+		border-radius: 50%;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		font-size: 1.2em;
+		color: white;
+		flex-shrink: 0;
+        }
+
+        .match-icon.pong {
+		background: linear-gradient(135deg, #3B82F6, #1D4ED8);
+        }
+
+        .match-icon.block {
+		background: linear-gradient(135deg, #8B5CF6, #7C3AED);
+        }
+
+        .match-content {
+		flex: 1;
+		min-width: 0;
+        }
+
+        .match-result {
+		font-size: 1.1rem;
+		font-weight: 700;
+		margin-bottom: 4px;
+        }
+
+        .match-item.victory .match-result {
+		color: #10B981;
+        }
+
+        .match-item.defeat .match-result {
+		color: #EF4444;
+        }
+
+        .match-item.draw .match-result {
+		color: #6B7280;
+        }
+
+        .match-details {
+		display: flex;
+		align-items: center;
+		gap: 15px;
+		font-size: 0.9rem;
+		color: rgba(255, 255, 255, 0.8);
+        }
+
+        .match-opponent {
+		font-weight: 600;
+		color: rgba(255, 255, 255, 0.9);
+        }
+
+        .match-score {
+		background: rgba(255, 255, 255, 0.1);
+		padding: 4px 8px;
+		border-radius: 6px;
+		font-weight: 600;
+		font-size: 0.85rem;
+        }
+
+        .match-date {
+		color: rgba(255, 255, 255, 0.6);
+		font-size: 0.8rem;
+		margin-left: auto;
+		flex-shrink: 0;
         }
 
         .recent-activity {

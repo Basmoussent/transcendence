@@ -248,6 +248,43 @@ async function gameRoutes(app: FastifyInstance) {
 
 	})
 
+	app.get('/user/:username/history', async function (request: FastifyRequest, reply: FastifyReply) {
+		try {
+			const database = db.getDatabase();
+			const { username } = request.params as { username: string };
+
+			if (!username) {
+				throw new Error("missing username in the request params");
+			}
+
+			const games = await new Promise<Game[]>((resolve, reject) => {
+				database.all(
+					`SELECT * FROM games 
+					WHERE (player1 = ? OR player2 = ? OR player3 = ? OR player4 = ?) 
+					ORDER BY end_time DESC 
+					LIMIT 20`,
+					[username, username, username, username],
+					(err: any, rows: Game[] | undefined) => {
+						err ? reject(err) : resolve(rows || []);
+					}
+				);
+			});
+
+			return reply.send({
+				message: 'success',
+				username: username,
+				games: games,
+				total: games.length
+			});
+		}
+		catch (err: any) {
+			console.error('erreur GET /games/user/:username/history :', err);
+			if (err.name === 'JsonWebTokenError')
+				return reply.status(401).send({ error: 'Token invalide ou expiré' });
+			return reply.status(500).send({ error: 'erreur GET /games/user/:username/history', details: err.message });
+		}
+	});
+
 }
 
 

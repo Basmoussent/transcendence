@@ -26,6 +26,7 @@ export class matchmaking {
 	private resetBtn: HTMLElement;
 	private options: HTMLElement;
 	private availableGames: HTMLElement;
+
 	private username: string;
 
 	private joinBtn: Map<number,HTMLElement> = new Map();
@@ -272,13 +273,6 @@ export class matchmaking {
 		try {
 			// Ajouter un indicateur de chargement
 			const container = document.getElementById('available-games');
-			if (container) {
-				const loadingIndicator = document.createElement('div');
-				loadingIndicator.className = 'loading-indicator';
-				loadingIndicator.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Updating games...';
-				container.appendChild(loadingIndicator);
-			}
-
 			const gameList = await this.loadAvailableGames();
 			
 			if (gameList === -1) {
@@ -326,6 +320,8 @@ export class matchmaking {
 			this.pollingInterval = null;
 		}
 	}
+
+
 
 	private async loadAvailableGames(): Promise<Available[] | -1> {
 	

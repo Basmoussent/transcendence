@@ -4,9 +4,7 @@ import { renderCreateAccount } from '../pages/auth/create-account';
 import { renderForgotPassword, initializeForgotPasswordEvents } from '../pages/auth/forgot-password';
 import { renderMain } from '../pages/menu/renderMain';
 import { render404 } from '../components/404';
-import { renderSocial } from '../pages/social/social';
 import { renderMe } from '../pages/social/me';
-import { renderMultiplayer, initializeMultiplayerEvents } from '../pages/game/multiplayer';
 import { renderMatchmaking } from '../pages/matchmaking/renderMatchmaking';
 import { renderTournaments, initializeTournamentEvents } from '../pages/game/tournament';
 import { renderBlock } from '../pages/block/main';
@@ -89,13 +87,13 @@ export async function router() {
 			view = renderHome();
 			break;
 		case '/lang':
-			const lastPath = localStorage.getItem('lastPath');
+			const lastPath = sessionStorage.getItem('lastPath');
 			if (lastPath && lastPath !== '/lang') {
 				console.log('log', lastPath)
 				setTimeout(() => {
 				window.history.pushState({}, '', lastPath);
 				router();
-				localStorage.removeItem('lastPath');
+				sessionStorage.removeItem('lastPath');
 				}, 100);
 			} else {
 				console.log('log', lastPath)
@@ -115,30 +113,20 @@ export async function router() {
 		case '/main':
 			view = renderMain();
 			break;
-		case '/friends':
-			view = renderSocial();
-			break;
 		case '/me':
 			view = await renderMe();
 			break;
 		case '/profil':
 			view = await renderProfil(uuid);
 			break;
-		case '/multiplayer':
-			view = renderMultiplayer();
-			break;
 		case '/matchmaking':
 			view = renderMatchmaking();
 			break;
-		
 		case '/change-password':
 			view = renderChangePassword();
 			break;
 		case '/edit-profil':
 			view = renderEditProfil();
-			break;
-		case '/tournament':
-			view = renderTournaments();
 			break;
 		case '/room':
 			if (!uuid)
@@ -162,6 +150,9 @@ export async function router() {
 			break;
 		case '/multipong':
 			view = renderMultiPong(uuid);
+			break;
+		case '/tournament':
+			view = renderTournaments();
 			break;
 		default:
 			view = render404();
@@ -201,9 +192,6 @@ export async function router() {
 				break;
 			case '/forgot-password':
 				initializeForgotPasswordEvents();
-				break;
-			case '/multiplayer':
-				initializeMultiplayerEvents();
 				break;
 			case '/change-password':
 				initializeChangePasswordEvents();

@@ -33,29 +33,19 @@ function getTemplate() {
 						${t('menu.playLocal')}
 					</button>
 					
-					<button class="menu-button multiplayer-button" id="multiplayerBtn">
-						<i class="fas fa-users"></i>
-						${t('menu.multiplayer')}
-					</button>
-
 					<button class="menu-button tournament-button" id="tournamentBtn">
 						<i class="fa-solid fa-medal"></i>
-						Tournament
+						${t('menu.tournament')}
 					</button>
 					
-					<button class="menu-button friends-button" id="friendsBtn">
-						<i class="fas fa-user-friends"></i>
-						${t('menu.friends')}
-					</button>
-
 					<button class="menu-button chat-button" id="chatBtn">
 						<i class="fas fa-user-friends"></i>
-						Chat
+						${t('menu.chat')}
 					</button>
 
 					<button class="menu-button logout-button" id="logoutBtn">
 						<i class="fas fa-sign-out-alt"></i>
-						Logout
+						${t('menu.logout')}
 					</button>
 				</div>
 			</div>

@@ -1,5 +1,6 @@
 import { getAuthToken } from '../../utils/auth';
 import { fetchMe2fa } from '../social/utils';
+import { t } from '../../utils/translations';
 
 export function render2FALogin() {
   const htmlContent = `
@@ -14,7 +15,7 @@ export function render2FALogin() {
             <input type="text" id="verificationCode" maxlength="6">
             <button class="activate-btn" id="activateBtn">
               <i class="fa-solid fa-lock"></i>
-              Activer 2FA
+              Vérifier le code
             </button>
           </div>
         </div>
@@ -245,7 +246,7 @@ export function render2FALogin() {
             window.dispatchEvent(new PopStateEvent('popstate'));
           }
         }
-        catch (error) {
+        catch (error: any) {
           console.log(`error = ${error}`)
           console.error('Stack trace :', error.stack)
         }
