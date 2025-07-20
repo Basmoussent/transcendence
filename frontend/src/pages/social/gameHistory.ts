@@ -43,7 +43,7 @@ export async function renderGameHistory(username: string) {
 					</div>
 				</div>
 				<div class="game-date">
-					${formatDate(game.end_time)}
+					${formatDate(game.end_time || '')}
 				</div>
 			</div>
 		`).join('')

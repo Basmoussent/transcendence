@@ -443,6 +443,109 @@ function getTemplate() {
 		padding-right: 10px; /* Pour éviter que la scrollbar ne cache du contenu */
 	}
 
+	/* Styles pour les éléments d'historique des parties */
+	.game-history-item {
+		background: rgba(255, 255, 255, 0.05);
+		border-radius: 15px;
+		padding: 20px;
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		transition: all 0.3s ease;
+		flex-wrap: wrap;
+		gap: 15px;
+		margin-bottom: 15px;
+	}
+
+	.game-history-item:hover {
+		background: rgba(255, 255, 255, 0.1);
+		transform: translateY(-2px);
+	}
+
+	.game-info {
+		display: flex;
+		flex-direction: column;
+		gap: 8px;
+	}
+
+	.game-type {
+		font-weight: bold;
+		color: #4a90e2;
+		font-size: 1.1em;
+	}
+
+	.game-players {
+		display: flex;
+		align-items: center;
+		gap: 8px;
+		flex-wrap: wrap;
+	}
+
+	.player {
+		font-weight: 500;
+	}
+
+	.vs {
+		color: #ccc;
+		font-size: 0.9em;
+	}
+
+	.game-result {
+		font-weight: bold;
+		padding: 4px 12px;
+		border-radius: 20px;
+		font-size: 0.9em;
+		text-align: center;
+		display: inline-block;
+		width: fit-content;
+	}
+
+	.game-result.victoire {
+		background: rgba(46, 204, 113, 0.2);
+		color: #2ecc71;
+	}
+
+	.game-result.défaite {
+		background: rgba(231, 76, 60, 0.2);
+		color: #e74c3c;
+	}
+
+	.game-result.en cours {
+		background: rgba(241, 196, 15, 0.2);
+		color: #f1c40f;
+	}
+
+	.game-date {
+		color: #ccc;
+		font-size: 0.9em;
+		text-align: right;
+	}
+
+	.no-games {
+		text-align: center;
+		color: #ccc;
+		font-style: italic;
+		padding: 40px;
+	}
+
+	.recent-activity {
+		display: flex;
+		flex-direction: column;
+		gap: 15px;
+	}
+
+	@media (max-width: 768px) {
+		.game-history-item {
+			flex-direction: column;
+			align-items: flex-start;
+			gap: 15px;
+		}
+
+		.game-date {
+			text-align: left;
+		}
+	}
+
 
         .profile-avatar {
 		position: absolute;
