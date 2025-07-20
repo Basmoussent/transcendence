@@ -157,7 +157,6 @@ export async function router() {
 		'/forgot-password': initializeForgotPasswordEvents,
 		'/main': initializeMainEvents,
 		'/me': initializeMeEvents,
-		'/profil': initializeProfilEvents,
 		'/matchmaking': initializeMatchmakingEvents,
 		'/change-password': initializeChangePasswordEvents,
 		'/edit-profil': initializeEditProfileEvents,
@@ -168,6 +167,7 @@ export async function router() {
 
 	const initEventsUuid: { [key:string]: (uuid: string) => void } = {
 
+		'/profil': initializeProfilEvents,
 		'/room': initializeRoomEvents,
 		'/block': initializeBlockEvents,
 		'/block1v1': initializeBlock1v1Events,
@@ -178,8 +178,7 @@ export async function router() {
 	setTimeout(() => {
 		const init = initEvents[path];
 		const initUuid = initEventsUuid[path];
-		
-		
+
 		var el = document.getElementById('app'),
 		elClone = el!.cloneNode(true);
 
@@ -187,7 +186,7 @@ export async function router() {
 
 		if (init)
 			init();
-		else {
+		else if (initUuid){
 			initUuid(uuid)
 		}
 	}, 0);

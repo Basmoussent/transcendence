@@ -15,6 +15,7 @@ export class profil {
 	private winrate: HTMLElement;
 	private mmr: HTMLElement;
 	private rank: HTMLElement;
+	
 	private gameHistory: HTMLElement;
 	private friendsGrid: HTMLElement;
 
@@ -39,7 +40,6 @@ export class profil {
 		this.gameHistory = this.getElement('gameHistory');
 		this.friendsGrid = this.getElement('friends');
 
-
 		// recup les relations de /me voir si ya user, 
 		this.isMyFriend = false;
 
@@ -50,7 +50,7 @@ export class profil {
 		console.log("setupEvents")
 		setTimeout(() => {
 			this.updateInfo();
-		}, 1000);
+		}, 0);
 	}
 
 	private getElement(id: string): HTMLElement {
