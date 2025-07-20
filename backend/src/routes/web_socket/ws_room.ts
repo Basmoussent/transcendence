@@ -71,9 +71,9 @@ export async function handleRoom(app: FastifyInstance, socket: WebSocket, req: F
 		// 	at Object.<anonymous> (/app/src/routes/web-socket.ts:15:13)
 
 
-		const token = req.headers['x-access-token'] 
-
-		req.headers
+		console.log("req.cookies", req.cookies);
+		const token =  req.cookies['x-access-token'];
+		console.log("token is ", token);
 			
 		if (!token) {
 			console.log('⚠️  Aucun token fourni. Détails de la requête :');
@@ -108,6 +108,12 @@ export async function handleRoom(app: FastifyInstance, socket: WebSocket, req: F
 
 			rooms.set(uuid!, room);
 		}
+
+		const user = {
+			username: username,
+			isReady: false,
+			socket: socket,
+		};
 
 		
 		// le bouton est déjà désactivé quand la room est pleine
