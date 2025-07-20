@@ -11,6 +11,8 @@ export interface Available {
 	player3?: string,
 	player4?: string,
 	users_needed: number,
+	averageWinrate?: number,
+	playersWithStats?: Array<{username: string, winrate: number}>,
 	divConverion(): string;
 };
 
@@ -326,6 +328,8 @@ export class matchmaking {
 					player3: sanitizeHtml(game?.player3),
 					player4: sanitizeHtml(game?.player4),
 					users_needed:(sanitizeHtml(game.users_needed)),
+					averageWinrate: game.averageWinrate || 0,
+					playersWithStats: game.playersWithStats || [],
 					divConverion(): string {
 						// Calculer le nombre de joueurs actuels
 						const currentPlayers = [this.player1, this.player2, this.player3, this.player4]
@@ -343,6 +347,11 @@ export class matchmaking {
 							.filter(player => player && player.trim() !== '')
 							.join(', ');
 						
+						// Générer la liste des joueurs avec leurs winrates
+						const playersWithWinrates = this.playersWithStats?.map((player: {username: string, winrate: number}) => 
+							`${player.username} (${player.winrate}%)`
+						).join(', ') || playersList;
+						
 						return `
 							<div class="game-card" ${!isFull ? `onclick="joinGame('${this.gameId}')"` : ''}>
 								<div class="game-header">
@@ -359,10 +368,16 @@ export class matchmaking {
 										<span>${currentPlayers}/${totalSlots}</span>
 									</div>
 								</div>
-								${playersList ? `
+								${this.averageWinrate !== undefined ? `
+									<div class="winrate-info">
+										<i class="fas fa-trophy"></i>
+										<span>Avg Winrate: ${this.averageWinrate}%</span>
+									</div>
+								` : ''}
+								${playersWithWinrates ? `
 									<div class="players-list">
 										<i class="fas fa-user"></i>
-										<span>${playersList}</span>
+										<span>${playersWithWinrates}</span>
 									</div>
 								` : ''}
 								${!isFull ? `

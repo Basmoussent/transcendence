@@ -2,7 +2,7 @@
 -- Exécutez ces commandes dans votre base de données SQLite
 
 -- Partie 1: Pong 1v1 terminée
-INSERT INTO games (uuid, game_type, player1, player2, users_needed, ai, start_time, end_time, winner) 
+INSERT INTO history (uuid, game_type, player1, player2, users_needed, ai, start_time, end_time, winner) 
 VALUES (
     '550e8400-e29b-41d4-a716-446655440001',
     'pong',
@@ -16,7 +16,7 @@ VALUES (
 );
 
 -- Partie 2: Block 1v1 terminée
-INSERT INTO games (uuid, game_type, player1, player2, users_needed, ai, start_time, end_time, winner) 
+INSERT INTO history (uuid, game_type, player1, player2, users_needed, ai, start_time, end_time, winner) 
 VALUES (
     '550e8400-e29b-41d4-a716-446655440002',
     'block',
@@ -30,7 +30,7 @@ VALUES (
 );
 
 -- Partie 3: Pong 2v2 terminée
-INSERT INTO games (uuid, game_type, player1, player2, player3, player4, users_needed, ai, start_time, end_time, winner) 
+INSERT INTO history (uuid, game_type, player1, player2, player3, player4, users_needed, ai, start_time, end_time, winner) 
 VALUES (
     '550e8400-e29b-41d4-a716-446655440003',
     'pong',
@@ -46,7 +46,7 @@ VALUES (
 );
 
 -- Partie 4: Pong 1v1 contre IA terminée
-INSERT INTO games (uuid, game_type, player1, player2, users_needed, ai, start_time, end_time, winner) 
+INSERT INTO history (uuid, game_type, player1, player2, users_needed, ai, start_time, end_time, winner) 
 VALUES (
     '550e8400-e29b-41d4-a716-446655440004',
     'pong',
@@ -60,7 +60,7 @@ VALUES (
 );
 
 -- Partie 5: Block 1v1 en cours (pas de winner ni end_time)
-INSERT INTO games (uuid, game_type, player1, player2, users_needed, ai, start_time) 
+INSERT INTO history (uuid, game_type, player1, player2, users_needed, ai, start_time) 
 VALUES (
     '550e8400-e29b-41d4-a716-446655440005',
     'block',
@@ -74,7 +74,7 @@ VALUES (
 -- Bonus: Quelques parties supplémentaires pour avoir plus de données
 
 -- Partie 6: Pong 1v1 terminée
-INSERT INTO games (uuid, game_type, player1, player2, users_needed, ai, start_time, end_time, winner) 
+INSERT INTO history (uuid, game_type, player1, player2, users_needed, ai, start_time, end_time, winner) 
 VALUES (
     '550e8400-e29b-41d4-a716-446655440006',
     'pong',
@@ -88,7 +88,7 @@ VALUES (
 );
 
 -- Partie 7: Block 1v1 terminée
-INSERT INTO games (uuid, game_type, player1, player2, users_needed, ai, start_time, end_time, winner) 
+INSERT INTO history (uuid, game_type, player1, player2, users_needed, ai, start_time, end_time, winner) 
 VALUES (
     '550e8400-e29b-41d4-a716-446655440007',
     'block',
@@ -102,7 +102,7 @@ VALUES (
 );
 
 -- Partie 8: Pong 2v2 terminée
-INSERT INTO games (uuid, game_type, player1, player2, player3, player4, users_needed, ai, start_time, end_time, winner) 
+INSERT INTO history (uuid, game_type, player1, player2, player3, player4, users_needed, ai, start_time, end_time, winner) 
 VALUES (
     '550e8400-e29b-41d4-a716-446655440008',
     'pong',
@@ -118,7 +118,7 @@ VALUES (
 );
 
 -- Partie 9: Block contre IA terminée
-INSERT INTO games (uuid, game_type, player1, player2, users_needed, ai, start_time, end_time, winner) 
+INSERT INTO history (uuid, game_type, player1, player2, users_needed, ai, start_time, end_time, winner) 
 VALUES (
     '550e8400-e29b-41d4-a716-446655440009',
     'block',
@@ -132,7 +132,7 @@ VALUES (
 );
 
 -- Partie 10: Pong 1v1 terminée (partie récente)
-INSERT INTO games (uuid, game_type, player1, player2, users_needed, ai, start_time, end_time, winner) 
+INSERT INTO history (uuid, game_type, player1, player2, users_needed, ai, start_time, end_time, winner) 
 VALUES (
     '550e8400-e29b-41d4-a716-446655440010',
     'pong',
@@ -148,7 +148,7 @@ VALUES (
 -- Parties pour l'utilisateur "q" - pour tester getUserGameHistory
 
 -- Partie 11: q joue Pong 1v1 et gagne
-INSERT INTO games (uuid, game_type, player1, player2, users_needed, ai, start_time, end_time, winner) 
+INSERT INTO history (uuid, game_type, player1, player2, users_needed, ai, start_time, end_time, winner) 
 VALUES (
     '550e8400-e29b-41d4-a716-446655440011',
     'pong',
@@ -162,7 +162,7 @@ VALUES (
 );
 
 -- Partie 12: q joue Block 1v1 et perd
-INSERT INTO games (uuid, game_type, player1, player2, users_needed, ai, start_time, end_time, winner) 
+INSERT INTO history (uuid, game_type, player1, player2, users_needed, ai, start_time, end_time, winner) 
 VALUES (
     '550e8400-e29b-41d4-a716-446655440012',
     'block',
@@ -176,7 +176,7 @@ VALUES (
 );
 
 -- Partie 13: q joue Pong 2v2 et gagne
-INSERT INTO games (uuid, game_type, player1, player2, player3, player4, users_needed, ai, start_time, end_time, winner) 
+INSERT INTO history (uuid, game_type, player1, player2, player3, player4, users_needed, ai, start_time, end_time, winner) 
 VALUES (
     '550e8400-e29b-41d4-a716-446655440013',
     'pong',
@@ -192,7 +192,7 @@ VALUES (
 );
 
 -- Partie 14: q joue contre IA et gagne
-INSERT INTO games (uuid, game_type, player1, player2, users_needed, ai, start_time, end_time, winner) 
+INSERT INTO history (uuid, game_type, player1, player2, users_needed, ai, start_time, end_time, winner) 
 VALUES (
     '550e8400-e29b-41d4-a716-446655440014',
     'pong',
@@ -206,7 +206,7 @@ VALUES (
 );
 
 -- Partie 15: q joue Block 1v1 et gagne
-INSERT INTO games (uuid, game_type, player1, player2, users_needed, ai, start_time, end_time, winner) 
+INSERT INTO history (uuid, game_type, player1, player2, users_needed, ai, start_time, end_time, winner) 
 VALUES (
     '550e8400-e29b-41d4-a716-446655440015',
     'block',
@@ -220,7 +220,7 @@ VALUES (
 );
 
 -- Partie 16: q joue Pong 1v1 et perd
-INSERT INTO games (uuid, game_type, player1, player2, users_needed, ai, start_time, end_time, winner) 
+INSERT INTO history (uuid, game_type, player1, player2, users_needed, ai, start_time, end_time, winner) 
 VALUES (
     '550e8400-e29b-41d4-a716-446655440016',
     'pong',
@@ -234,7 +234,7 @@ VALUES (
 );
 
 -- Partie 17: q joue Block contre IA et perd
-INSERT INTO games (uuid, game_type, player1, player2, users_needed, ai, start_time, end_time, winner) 
+INSERT INTO history (uuid, game_type, player1, player2, users_needed, ai, start_time, end_time, winner) 
 VALUES (
     '550e8400-e29b-41d4-a716-446655440017',
     'block',
@@ -248,7 +248,7 @@ VALUES (
 );
 
 -- Partie 18: q joue Pong 2v2 et perd
-INSERT INTO games (uuid, game_type, player1, player2, player3, player4, users_needed, ai, start_time, end_time, winner) 
+INSERT INTO history (uuid, game_type, player1, player2, player3, player4, users_needed, ai, start_time, end_time, winner) 
 VALUES (
     '550e8400-e29b-41d4-a716-446655440018',
     'pong',
@@ -264,7 +264,7 @@ VALUES (
 );
 
 -- Partie 19: q joue Block 1v1 et gagne (partie récente)
-INSERT INTO games (uuid, game_type, player1, player2, users_needed, ai, start_time, end_time, winner) 
+INSERT INTO history (uuid, game_type, player1, player2, users_needed, ai, start_time, end_time, winner) 
 VALUES (
     '550e8400-e29b-41d4-a716-446655440019',
     'block',
@@ -278,7 +278,7 @@ VALUES (
 );
 
 -- Partie 20: q joue Pong 1v1 et gagne (partie très récente)
-INSERT INTO games (uuid, game_type, player1, player2, users_needed, ai, start_time, end_time, winner) 
+INSERT INTO history (uuid, game_type, player1, player2, users_needed, ai, start_time, end_time, winner) 
 VALUES (
     '550e8400-e29b-41d4-a716-446655440020',
     'pong',
