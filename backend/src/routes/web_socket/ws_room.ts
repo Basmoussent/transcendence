@@ -64,7 +64,16 @@ function broadcastSystemMessage(room: Room, content: string) {
 export async function handleRoom(app: FastifyInstance, socket: WebSocket, req: FastifyRequest) {
 
 	try {
-		const token = req.headers['x-access-token'] ? req.headers['x-access-token'] : req.cookies['x-access-token']; 
+
+
+		// Error in handleRoom: TypeError: Cannot read properties of undefined (reading 'x-access-token')
+		// 	at handleRoom (/app/src/routes/web_socket/ws_room.ts:67:92)
+		// 	at Object.<anonymous> (/app/src/routes/web-socket.ts:15:13)
+
+
+		const token = req.headers['x-access-token'] 
+
+		req.headers
 			
 		if (!token) {
 			console.log('⚠️  Aucun token fourni. Détails de la requête :');
@@ -86,11 +95,6 @@ export async function handleRoom(app: FastifyInstance, socket: WebSocket, req: F
 		if (!game)
 			return;
 
-		const user: User = {
-			username: username,
-			isReady: false, 
-			socket: socket };
-
 		if (!room) {
 			room = {
 				id: uuid,
@@ -105,6 +109,7 @@ export async function handleRoom(app: FastifyInstance, socket: WebSocket, req: F
 			rooms.set(uuid!, room);
 		}
 
+		
 		// le bouton est déjà désactivé quand la room est pleine
 
 		// mettre en place de supprimer les ia si quelqu'un rejoint qu'il fallait 3 personnes et que yavait 2 pesonnes + une ia
@@ -244,4 +249,20 @@ export async function handleRoom(app: FastifyInstance, socket: WebSocket, req: F
 		console.error('Error in handleRoom:', error);
 		socket.close();
 	}
+}
+
+
+async function fetchMyUsername() {
+
+
+	try {
+
+
+
+	}
+	catch (err) {
+		console.error("non non dans le mauvais")
+	}
+
+
 }

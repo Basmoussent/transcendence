@@ -96,7 +96,7 @@ export class Room {
 		};
 
 		this.ws.onerror = (error) => console.error(`${this.username} onerror ${this.uuid}:`, error);
-		this.ws.onclose = (event) => console.log(`${this.username} ferme ${this.username}:`, event.code, event.reason);
+		this.ws.onclose = (event) => console.log(`close le socket ${this.username} car :`, event.code, event.reason);
 		
 		this.ws.onmessage = (event) => {
 			try {

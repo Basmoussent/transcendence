@@ -82,33 +82,18 @@ export async function router() {
 	}
 
 	console.log("path:", path);
-<<<<<<< HEAD
 
 	const renderView: { [key: string]: (uuid?: string) => Promise<string> | string } = {
 		'/': () => renderHome(),
 		'/login': () => renderLogin(),
 		'/lang': async () => {
 			const lastPath = localStorage.getItem('lastPath');
-=======
-	switch (path) {
-		case '/':
-			view = renderHome();
-			break;
-		case '/lang':
-			const lastPath = sessionStorage.getItem('lastPath');
->>>>>>> main
 			if (lastPath && lastPath !== '/lang') {
 				console.log('log', lastPath);
 				setTimeout(() => {
-<<<<<<< HEAD
 					window.history.pushState({}, '', lastPath);
 					router();
 					localStorage.removeItem('lastPath');
-=======
-				window.history.pushState({}, '', lastPath);
-				router();
-				sessionStorage.removeItem('lastPath');
->>>>>>> main
 				}, 100);
 				return ''; // Aucun rendu immédiat, car redirection
 			} else {
@@ -190,7 +175,6 @@ export async function router() {
 	}
 
 	setTimeout(() => {
-<<<<<<< HEAD
 		const init = initEvents[path];
 		const initUuid = initEventsUuid[path];
 		
@@ -206,24 +190,6 @@ export async function router() {
 			init();
 		else {
 			initUuid(uuid)
-=======
-		switch (path) {
-			case '/':
-				initializeHomeEvents();
-				break;
-			case '/lang':
-				initializeHomeEvents();
-				break;
-			case '/forgot-password':
-				initializeForgotPasswordEvents();
-				break;
-			case '/change-password':
-				initializeChangePasswordEvents();
-				break;
-			case '/edit-profil':
-				initializeEditProfileEvents();
-				break;
->>>>>>> main
 		}
 	}, 0);
 }

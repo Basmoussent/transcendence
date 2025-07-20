@@ -254,10 +254,6 @@ export class matchmaking {
 		try {
 			// Ajouter un indicateur de chargement
 			const container = document.getElementById('available-games');
-<<<<<<< HEAD
-
-=======
->>>>>>> main
 			const gameList = await this.loadAvailableGames();
 			
 			if (gameList === -1) {
