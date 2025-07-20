@@ -118,11 +118,6 @@ block --> max 2 players
 pour pong ajouter card ia pour chaque ia presente
 
 
-Error: SQLITE_CONSTRAINT: UNIQUE constraint failed: users.email
-[ERROR] 20:34:13 Error: SQLITE_CONSTRAINT: UNIQUE constraint failed: users.email
-^C%
-
-
 trouver un moyen de passer les infos a la classe pong lors de la construction 
 	|
 	|__ un window.history.pushState({}, '', '/pong');
@@ -170,3 +165,25 @@ si un user se connecte alors qu'il est deja connecte on deco l'ancienne instance
 
 creer une game avec 3 joueurs --> des le debut la limite est a 2 a cause du selector de nb player pour le host je crois
 donc si une 3 eme personne essaie de rejoindre ca le fait quitter direct.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+profil :
+
+
+
+	afficher historique des parties du joueurs, pouvoir scroll
+
+	lister tous ses amis // state1 == 'normal' state_2 == 'normal'
+	injecter seulement ceux qui ne t'ont pas bloqué

@@ -52,7 +52,6 @@ async function setup() {
 
 	console.log('🚀 Starting setup...');
 
-	// Initialize database first
 	console.log('📦 Initializing database...');
 	await db.initialize();
 	console.log('✅ Database initialized');
@@ -67,14 +66,12 @@ async function setup() {
 
 	console.log('✅ Services decorated');
 
-	// Register JWT FIRST (before routes)
 	console.log('🔑 Getting JWT secret from Vault...');
 	const jwtSecret = await getSecretFromVault("JWT", "JWT_KEY") || "secret";
 	const jwtSecret2 = await getSecretFromVault("KEY", "KEY_SECRET") || "key_secret";
 	console.log(`JWT = ${jwtSecret} -  KEY_SECRET = ${jwtSecret2} `)
 	console.log('🔑 Registering JWT plugins...');
 	
-	// Register first JWT plugin
 	await fastify.register(jwt, {
 		secret: jwtSecret,
 		decoratorName: 'jwt'
@@ -122,7 +119,6 @@ async function setup() {
 		exposedHeaders: ['x-access-token'],
 		methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
 		allowedHeaders: ['Content-Type', 'Authorization', 'x-access-token']
-		// louche qu'on puisse pas faire de get depuis le port 2443 sans methods et allowedHeaders
 	});
 	console.log('✅ CORS registered');
 
@@ -138,7 +134,6 @@ async function setup() {
 	});
 	console.log('✅ Multipart plugin registered');
 
-	// on enregistre les routes definis, qui seront chacune sur /prefix/nom_de_la_route
 	console.log('🛣️ Registering routes...');
 	await fastify.register(authRoutes, { prefix: "/auth" });
 	console.log('✅ Auth routes registered');
@@ -152,7 +147,7 @@ async function setup() {
 	console.log('✅ Friend routes registered');
 
 	console.log('📡 Registering WebSocket routes...');
-	await fastify.register(require('@fastify/websocket'));
+	await fastify.register(require('@fastify/websocket'));//TALAN
 	await fastify.register(webSocketRoutes);
 	console.log('✅ WebSocket routes registered');
 

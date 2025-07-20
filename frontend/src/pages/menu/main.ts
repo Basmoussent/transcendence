@@ -6,8 +6,6 @@ export class main {
 	private profileBtn: HTMLElement;
 	private chatBtn: HTMLElement;
 	private matchmakingBtn: HTMLElement;
-	private multiplayerBtn: HTMLElement;
-	private friendsBtn: HTMLElement;
 
 	private logoutBtn: HTMLElement;
 	private tournamentBtn: HTMLElement;
@@ -16,12 +14,10 @@ export class main {
 	constructor() {
 
 		this.profileBtn = this.getElement('profileBtn');
-		this.chatBtn = this.getElement('chatBtn');
 		this.matchmakingBtn = this.getElement('matchmakingBtn');
-		this.multiplayerBtn = this.getElement('multiplayerBtn');
-		this.friendsBtn = this.getElement('friendsBtn');
-		this.logoutBtn = this.getElement('logoutBtn');
 		this.tournamentBtn = this.getElement('tournamentBtn');
+		this.chatBtn = this.getElement('chatBtn');
+		this.logoutBtn = this.getElement('logoutBtn');
 
 		this.setupEvents();
 
@@ -52,16 +48,6 @@ export class main {
 
 		this.chatBtn.addEventListener('click', () => {
 			window.history.pushState({}, '', '/chat');
-			window.dispatchEvent(new PopStateEvent('popstate'));
-		});
-
-		this.multiplayerBtn.addEventListener('click', () => {
-			window.history.pushState({}, '', '/multiplayer');
-			window.dispatchEvent(new PopStateEvent('popstate'));
-		});
-
-		this.friendsBtn.addEventListener('click', () => {
-			window.history.pushState({}, '', '/friends');
 			window.dispatchEvent(new PopStateEvent('popstate'));
 		});
 

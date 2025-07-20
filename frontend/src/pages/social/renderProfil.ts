@@ -3,20 +3,19 @@ import { sanitizeHtml } from '../../utils/sanitizer';
 import { t } from '../../utils/translations';
 import { profil } from './profil'
 
-
 export function renderProfil(uuid: string) {
 
 	setTimeout(async () => {
 		try {
-			const me = await loadMe();
-			const user = await loadUserInfo(uuid);
-			const stats = await loadUserStats(uuid);
 
-			console.log(JSON.stringify(me, null, 8));
-			console.log(JSON.stringify(user, null, 8));
-			console.log(JSON.stringify(stats, null, 8));
+			const data = {
+				me: await loadMe(),
+				user: await loadUserInfo(uuid),
+				stats: await loadUserStats(uuid),
+				friends: await loadUserFriends(uuid)
+			}
 
-			new profil(me, user, stats);
+			new profil(data);
 		}
 		catch (err:any) {
 			console.log(err);
@@ -118,13 +117,13 @@ async function loadUserStats(username: string) {
 		if (response.ok) {
 			const result = await response.json();
 			const userStats = {
-				mmr: result.data?.mmr,
-				pong_games: result.data?.pong_games,
-				pong_wins: result.data?.pong_wins,
-				block_games: result.data?.block_games,
-				block_wins: result.data?.block_wins,
-				rating: result.data?.rating,
-				id: result.data?.id,
+				mmr: result.stats?.mmr,
+				pong_games: result.stats?.pong_games,
+				pong_wins: result.stats?.pong_wins,
+				block_games: result.stats?.block_games,
+				block_wins: result.stats?.block_wins,
+				rating: result.stats?.rating,
+				id: result.stats?.id,
 			};
 			return (userStats);
 		}
@@ -137,8 +136,33 @@ async function loadUserStats(username: string) {
 
 }
 
+async function loadUserFriends(username: string) {
+	try {
+		const token = getAuthToken();
+		if (!token) {
+			alert('❌ Token d\'authentification manquant');
+			window.history.pushState({}, '', '/login');
+			window.dispatchEvent(new PopStateEvent('popstate'));
+			return '';
+		}
 
+		const response = await fetch(`/api/friend/?username=${username}`, {
+			method: 'GET',
+			headers: {
+				'Content-Type': 'application/json',
+				'x-access-token': token }
+		});
+	
+		if (response.ok)
+			return await response.json();
+		else 
+			console.error('gros gros zig');
 
+	}
+	catch (err) {
+		console.error(`pas réussi a récup les amis de cette personnes zignew que tu es`)
+	}
+}
 
 function getTemplate() {
 	return `
@@ -336,6 +360,13 @@ function getTemplate() {
 		background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="20" cy="20" r="2" fill="rgba(255,255,255,0.1)"/><circle cx="80" cy="40" r="3" fill="rgba(255,255,255,0.1)"/><circle cx="40" cy="70" r="1.5" fill="rgba(255,255,255,0.1)"/><circle cx="70" cy="80" r="2.5" fill="rgba(255,255,255,0.1)"/></svg>');
 		animation: float 6s ease-in-out infinite;
         }
+
+	#gameHistory {
+		max-height: 400px; /* Ou la hauteur fixe que tu souhaites */
+		overflow-y: auto;
+		padding-right: 10px; /* Pour éviter que la scrollbar ne cache du contenu */
+	}
+
 
         .profile-avatar {
 		position: absolute;

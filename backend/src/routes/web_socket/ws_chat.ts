@@ -128,7 +128,6 @@ async function loadMe(app: FastifyInstance, username: string): Promise<UserData>
 
 function sendChatMessage(username: string, data: any) {
 
-
 	const message = JSON.stringify({
 		type: 'chat_message',
 		username: username,
@@ -199,10 +198,13 @@ async function addFriend(app: FastifyInstance, user: UserChat, friendName: strin
 	
 	console.log(`${user.username} requested ${friendName} to be friends`)
 	// send au user le statut de la demande
-	user.socket.send(JSON.stringify({
-		type: 'updateUI',
-		message: 'new friend relation' }))
-	// send au friend l'invitation s'il est connecte
+
+	const message = JSON.stringify({
+		type: 'updateUI'
+	});
+
+	user.socket.send(message)
+	live.get(friend.username)?.socket.send(message);
 	// dans update UI livechat -- onglet demandes
 	// on passe sur tous les friends du user et afficher seulement les instances ou le state de l'autre user est à `asking`
 }
@@ -228,6 +230,8 @@ async function acceptFriend(app: FastifyInstance, user: UserChat, friendName: st
 }
 
 async function denyFriend(app: FastifyInstance, user: UserChat, friendName: string) {
+
+	console.log("oaindozaindoaizndoaizndoianz")
 
 	const friend = await app.userService.findByUsername(friendName);
 	const relations: Relation[] = await app.friendService.getRelations(user.username);

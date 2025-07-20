@@ -4,9 +4,7 @@ import { renderCreateAccount } from '../pages/auth/create-account';
 import { renderForgotPassword, initializeForgotPasswordEvents } from '../pages/auth/forgot-password';
 import { renderMain } from '../pages/menu/renderMain';
 import { render404 } from '../components/404';
-import { renderSocial } from '../pages/social/social';
 import { renderMe } from '../pages/social/me';
-import { renderMultiplayer, initializeMultiplayerEvents } from '../pages/game/multiplayer';
 import { renderMatchmaking } from '../pages/matchmaking/renderMatchmaking';
 import { renderTournaments, initializeTournamentEvents } from '../pages/game/tournament';
 import { renderBlock } from '../pages/block/main';
@@ -115,29 +113,21 @@ export async function router() {
 		case '/main':
 			view = renderMain();
 			break;
-		case '/friends':
-			view = renderSocial();
-			break;
 		case '/me':
 			view = await renderMe();
 			break;
 		case '/profil':
 			view = await renderProfil(uuid);
 			break;
-		case '/multiplayer':
-			view = renderMultiplayer();
-			break;
 		case '/matchmaking':
 			view = renderMatchmaking();
 			break;
-		
 		case '/change-password':
 			view = renderChangePassword();
 			break;
 		case '/edit-profil':
 			view = renderEditProfil();
 			break;
-		
 		case '/room':
 			if (!uuid)
 				return ;
@@ -160,6 +150,9 @@ export async function router() {
 			break;
 		case '/multipong':
 			view = renderMultiPong(uuid);
+			break;
+		case '/tournament':
+			view = renderTournaments();
 			break;
 		default:
 			view = render404();

@@ -14,6 +14,25 @@ export class FriendService {
 		this.db = database;
 	}
 
+	async getFriends(username: string) {
+		
+		try {
+			const friends = await new Promise<Relation[]| null>((resolve, reject) => {
+				this.db.all(
+					'SELECT * FROM friends WHERE (user_1 = ? OR user_2 = ?) AND user1_state = ? AND user2_state = ?',
+					[ username, username, 'normal', 'normal'],
+					(err: any, rows: Relation[] | undefined) => {
+					err ? reject(err) : resolve(rows || null); }
+				)
+			})
+			return friends;
+		}
+		catch (err: any) {
+			console.log(`le user ${username} n'a pas d'amis`)
+		}
+		return Promise.resolve(null); 
+	}
+
 	async getRelations(username: string) {
 
 		try {
@@ -28,7 +47,7 @@ export class FriendService {
 			return relations;
 		}
 		catch (err: any) {
-			console.log(`le user ${username} n'a pas d'amis`)
+			console.log(`le user ${username} n'a pas de relations`)
 		}
 		return Promise.resolve(null); 
 	}

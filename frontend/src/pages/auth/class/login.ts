@@ -54,10 +54,10 @@ export class login {
 
 		try {
 			const response = await fetch('/api/auth/login', {
-			method: 'POST',
-			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({ username, password }),
-			credentials: 'include'
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ username, password }),
+				credentials: 'include'
 			});
 
 			const result = await response.json();
@@ -76,9 +76,9 @@ export class login {
 				console.log('🎫 Token reçu dans le header');
 				setAuthToken(token);
 				console.log(`le token des familles `, token)
-			} else {
-				console.log('Token attendu dans les cookies');
 			}
+			else
+				console.log('Token attendu dans les cookies');
 
 			if (response.message === "2FA needed") {
 					setTimeout(() => {
