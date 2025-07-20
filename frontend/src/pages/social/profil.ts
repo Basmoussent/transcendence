@@ -7,6 +7,7 @@ export class profil {
 	private user: any;
 	private stats: any;
 	private friends: any;
+	private relation: any;
 
 	private homeBtn: HTMLElement;
 	private username: HTMLElement;
@@ -18,12 +19,15 @@ export class profil {
 	private gameHistory: HTMLElement;
 	private friendsGrid: HTMLElement;
 
+	private isMyFriend: boolean;
+
 	constructor (data: any) {
 
 		this.me = data.me;
 		this.user = data.user;
 		this.stats = data.stats;
 		this.friends = data.friends;
+		this.relation = data.relation;
 
 
 		this.homeBtn = this.getElement('homeBtn');
@@ -35,6 +39,13 @@ export class profil {
 		this.rank = this.getElement('rank');
 		this.gameHistory = this.getElement('gameHistory');
 		this.friendsGrid = this.getElement('friends');
+
+
+		// recup les relations de /me voir si ya user, 
+		this.isMyFriend = false;
+
+
+		// si this.me.username === this.user.username --> pas possible, on redirige vers /me
 
 		this.setupEvents();
 
@@ -58,8 +69,9 @@ export class profil {
 
 		this.addFriendBtn.addEventListener('click', async () => {
 			await this.addFriend();
-
 			this.addFriendBtn.textContent = 'requested'
+
+			//mmieux changer l'affichage
 
 		})
 
@@ -73,8 +85,6 @@ export class profil {
 		this.mmr.textContent = this.stats.mmr;
 		this.winrate.textContent = this.stats.pong_games + this.stats.block_games ? `${(this.stats.pong_wins + this.stats.block_wins + this.stats.block_games) * 100}%` : 'N/A';
 		this.rank.textContent = "rank tt le monde via mmr";
-
-		// this.friendsGrid.textContent = '';
 
 
 		for (const friend of this.friends) {
@@ -98,7 +108,19 @@ export class profil {
         }
 
 	private async addFriend() {
+		
+		//pas possible de s'ajouter soit meme car pas possible d'arriver sur cette page, on redirige vers /me
 
+
+		console.log(`🔍 Debug - addFriend called: ${this.me.username} wants to add ${this.user.username}`);
+
+			
+		// 2 - check si une relation n'existe pas déjà
+
+		// via  this.relation
+		
+	/*
+		/// on fais vraiment la request
 		try {
 			const token = getAuthToken();
 			if (!token) {
@@ -108,39 +130,24 @@ export class profil {
 				return null;
 			}
 	
-			const response = await fetch(`/api/friend/${this.user.username}`, {
+			await fetch(`/api/friend/`, {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',
 					'x-access-token': token,
 				},
+				body: JSON.stringify({
+					user_1: this.me.username,
+					user_2: this.user.username,
+					user1_state: 'waiting',
+					user2_state: 'requested'
+				})
 			});
-		
-			if (response.ok) {
-				const result = await response.json();
-				console.log("on a bien recup la game", result);
-				const game: Game = {
-					id: Number(result.id),
-					uuid: sanitizeHtml(result.uuid),
-					game_type: sanitizeHtml(result.game_type),
-					player1: sanitizeHtml(result.player1),
-					player2: sanitizeHtml(result?.player2),
-					player3: sanitizeHtml(result?.player3),
-					player4: sanitizeHtml(result?.player4),
-					winner: sanitizeHtml(result?.winner),
-					users_needed:(Number(result.users_needed)),
-					start_time: sanitizeHtml(result?.start_time),
-					end_time: sanitizeHtml(result?.end_time),
-				};
-				return game;
-			}
-			else 
-				console.error("erreur specific getGame");
-
 		}
 		catch (err) {
 			console.error(`nn nn c'est pas bon mgl`)
 		}
+			*/
 
 	}
 
