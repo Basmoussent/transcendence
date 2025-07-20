@@ -31,6 +31,7 @@ export class Room {
 	private startBtn: HTMLButtonElement;
 	private leaveBtn: HTMLButtonElement;
 	private sendBtn: HTMLButtonElement;
+	private inviteBtn: HTMLButtonElement;
 	private increaseAiBtn: HTMLButtonElement;
 	private decreaseAiBtn: HTMLButtonElement;
 
@@ -61,6 +62,7 @@ export class Room {
 		this.sendBtn = this.getElement('sendBtn') as HTMLButtonElement;
 		this.increaseAiBtn = this.getElement('increaseAI') as HTMLButtonElement;
 		this.decreaseAiBtn = this.getElement('decreaseAI') as HTMLButtonElement;
+		this.inviteBtn = this.getElement('inviteBtn') as HTMLButtonElement;
 		this.chatInput = this.getElement('chatInput') as HTMLInputElement;
 		this.playersContainer = this.getElement('playersContainer');
 		this.roomSettings = this.getElement('roomSettings');
@@ -119,6 +121,7 @@ export class Room {
 		addEvent(this.startBtn, 'click', () => this.startGame());
 		addEvent(this.leaveBtn, 'click', () => this.leaveRoom());
 		addEvent(this.homeBtn, 'click', () => this.goHome());
+		addEvent(this.inviteBtn, 'click', () => this.invite());
 		addEvent(this.increaseAiBtn, 'click', () => this.increase());
 		addEvent(this.decreaseAiBtn, 'click', () => this.decrease());
 		addEvent(this.gameTypeSelect, 'change', () => this.gameTypeChanged());
@@ -237,6 +240,11 @@ export class Room {
 		this.ws.close();
 		window.history.pushState({}, '', '/main');
 		window.dispatchEvent(new Event('popstate'));
+	}
+
+	private invite() {
+		console.log('doanzdoinazoidnao')
+		// 
 	}
 
 	private updateUI() {

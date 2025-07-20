@@ -48,10 +48,15 @@ const getTemplate = () => {
 						<i class="fas fa-check"></i>
 						${t('room.ready')}
 					</button>
+					<button class="control-btn invite-btn" id="inviteBtn">
+						<i class="fas fa-user-plus"></i>
+						Inviter des joueurs
+					</button>
 					<button class="control-btn leave-btn" id="leaveBtn">
 						<i class="fas fa-sign-out-alt"></i>
 						${t('room.leaveRoom')}
 					</button>
+					
 				</div>
 			
 				<div class="room-settings hidden" id="roomSettings">
@@ -212,6 +217,45 @@ const getTemplate = () => {
 		transform: translateY(-2px);
 		box-shadow: 0 8px 20px rgba(107, 114, 128, 0.3);
 	}
+
+	.invite-btn {
+		background: linear-gradient(135deg, #1F487E 0%, #376996 100%);
+        }
+
+        .invite-btn:hover {
+		transform: translateY(-2px);
+		box-shadow: 0 8px 20px rgba(139, 92, 246, 0.3);
+        }
+
+	.invite-section {
+            margin-bottom: 24px;
+        }
+
+        .invite-label {
+		color: rgba(255, 255, 255, 0.9);
+		margin-bottom: 8px;
+		font-weight: 500;
+        }
+
+        .invite-input-container {
+		display: flex;
+		gap: 8px;
+		margin-bottom: 16px;
+        }
+
+        .invite-input {
+		flex: 1;
+		padding: 12px;
+		border: 1px solid rgba(255, 255, 255, 0.3);
+		border-radius: 10px;
+		background: rgba(255, 255, 255, 0.1);
+		color: white;
+		font-size: 0.9em;
+        }
+
+        .invite-input::placeholder {
+		color: rgba(255, 255, 255, 0.5);
+        }
 
 	.ai-button {
 		padding: 0.25rem 0.75rem;

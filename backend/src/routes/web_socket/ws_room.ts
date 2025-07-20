@@ -207,6 +207,7 @@ export async function handleRoom(app: FastifyInstance, socket: WebSocket, req: F
 						// si le host mais que user needed est a 2 alors qu'il y a 3 personnes plus une ia dans la room 
 						// |____ supprimer l'ia et mettre userneeded a 3
 						currentRoom.maxPlayers = data.players
+						currentRoom.ai = 0;
 						await broadcastRoomUpdate(app, currentRoom);
 						await app.roomService.updateGame(room)
 						break;
