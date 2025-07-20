@@ -157,29 +157,31 @@ export async function router() {
 		'/forgot-password': initializeForgotPasswordEvents,
 		'/main': initializeMainEvents,
 		'/me': initializeMeEvents,
-		'/profil': initializeProfilEvents,
 		'/matchmaking': initializeMatchmakingEvents,
 		'/change-password': initializeChangePasswordEvents,
 		'/edit-profil': initializeEditProfileEvents,
-		'/room': initializeRoomEvents,
 		'/chat': initializeChatEvents,
 		'/2fa': initialize2FAEvents,
+		
+		'/tournament': initializeTournamentEvents,
+	};
+
+	const initEventsUuid: { [key:string]: (uuid: string) => void } = {
+		'/profil': initializeProfilEvents,
+		'/room': initializeRoomEvents,
 		'/block': initializeBlockEvents,
 		'/block1v1': initializeBlock1v1Events,
 		'/pong': initializePongEvents,
 		'/multipong': initializeMultiPongEvents,
-		'/tournament': initializeTournamentEvents,
-	};
+	}
 
 	setTimeout(() => {
 		const init = initEvents[path];
 		
-		if (init) {
-			if (path.startsWith('/profil/') || path.startsWith('/room/') || path.startsWith('/block/') || path.startsWith('/block1v1/') || path.startsWith('/pong/') || path.startsWith('/multipong/')) {
-				init(uuid);
-			} else {
-				init();
-			}
+		if (init)
+			init();
+		else {
+			initEventsUuid[path](uuid)
 		}
 	}, 0);
 }

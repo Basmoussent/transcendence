@@ -1,4 +1,5 @@
 import { getAuthToken } from '../../utils/auth';
+import { addEvent } from '../../utils/eventManager';
 
 export class profil {
 
@@ -56,8 +57,9 @@ export class profil {
 
 		addEvent(this.addFriendBtn, 'click', async () => {
 			await this.addFriend();
-
 			this.addFriendBtn.textContent = 'requested'
+
+			//mmieux changer l'affichage
 
 		})
 
@@ -71,8 +73,6 @@ export class profil {
 		this.mmr.textContent = this.stats.mmr;
 		this.winrate.textContent = this.stats.pong_games + this.stats.block_games ? `${(this.stats.pong_wins + this.stats.block_wins + this.stats.block_games) * 100}%` : 'N/A';
 		this.rank.textContent = "rank tt le monde via mmr";
-
-		// this.friendsGrid.textContent = '';
 
 
 		for (const friend of this.friends) {
@@ -106,35 +106,19 @@ export class profil {
 				return null;
 			}
 	
-			const response = await fetch(`/api/friend/${this.user.username}`, {
+			await fetch(`/api/friend/`, {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',
 					'x-access-token': token,
 				},
+				body: JSON.stringify({
+					user_1: this.me.username,
+					user_2: this.user.username,
+					user1_state: 'waiting',
+					user2_state: 'requested'
+				})
 			});
-		
-			if (response.ok) {
-				const result = await response.json();
-				console.log("on a bien recup la game", result);
-				const game: Game = {
-					id: Number(result.id),
-					uuid: sanitizeHtml(result.uuid),
-					game_type: sanitizeHtml(result.game_type),
-					player1: sanitizeHtml(result.player1),
-					player2: sanitizeHtml(result?.player2),
-					player3: sanitizeHtml(result?.player3),
-					player4: sanitizeHtml(result?.player4),
-					winner: sanitizeHtml(result?.winner),
-					users_needed:(Number(result.users_needed)),
-					start_time: sanitizeHtml(result?.start_time),
-					end_time: sanitizeHtml(result?.end_time),
-				};
-				return game;
-			}
-			else 
-				console.error("erreur specific getGame");
-
 		}
 		catch (err) {
 			console.error(`nn nn c'est pas bon mgl`)

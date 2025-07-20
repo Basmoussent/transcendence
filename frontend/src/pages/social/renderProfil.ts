@@ -17,6 +17,11 @@ export async function initializeProfilEvents(uuid: string) {
 			stats: await loadUserStats(uuid),
 			friends: await loadUserFriends(uuid)
 		};
+
+		console.log(JSON.stringify(data.me, null, 12))
+		console.log(JSON.stringify(data.user, null, 12))
+		console.log(JSON.stringify(data.stats, null, 12))
+		console.log(JSON.stringify(data.friends, null, 12))
 		new profil(data);
 	} catch (err: any) {
 		console.log(err);
@@ -65,6 +70,8 @@ async function loadMe() {
 }
 
 async function loadUserInfo(username: string) {
+
+	console.log(username)
 	try {
 		const token = getAuthToken();
 		if (!token) {

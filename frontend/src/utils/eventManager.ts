@@ -15,9 +15,7 @@ export function cleanEvents() {
 
 	console.log(`🧹 Suppression de tous les événements enregistrés :`);
 	events.forEach((listener, index) => {
-		console.log(`🔹 [${index}] Element:`, listener.element);
-		console.log(`    Type: ${listener.type}`);
-		console.log(`    Handler:`, listener.handler);
+		console.log(`clean ${listener.element}`);
 		listener.element.removeEventListener(listener.type, listener.handler);
 	});
 

@@ -63,6 +63,7 @@ async function friendRoutes(app: FastifyInstance) {
 				throw new Error("missing fields for a new friendship");
 
 			await app.friendService.createRelation(user_1, user_2, user1_state, user2_state)
+
 		}
 		catch (err: any) {
 			return reply.status(500).send({

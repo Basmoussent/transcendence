@@ -102,9 +102,7 @@ export class matchmaking {
 			});
 			});
 		});
-
 		observer.observe(document.body, { childList: true, subtree: true });
-
 	}
 	
 	private async loadUsername() {
@@ -180,19 +178,11 @@ export class matchmaking {
 	private async launchRoom() {
 
 		addEvent(this.launchBtn, 'click', async () => {
-			// Vérifier qu'un type de jeu est sélectionné
-			if (!this.pong && !this.brick) {
-				alert('Please select a game type first!');
-				return;
-			}
-
 			let tmp = {
 				game_type: this.pong ? "pong" : "block",
 				player1: this.username,
-				users_needed: 2 // Par défaut 2 joueurs, sera configuré dans la room
+				users_needed: 2
 			}
-
-			cleanEvents();
 
 			var uuid = await postGame(tmp);
 
