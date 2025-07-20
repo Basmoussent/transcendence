@@ -115,12 +115,11 @@ export class Pong {
 			ai: result.game.ai,
 		}
 
-		console.log(`les infos de la game => ${JSON.stringify(this.data, null, 12)}`)
+		// console.log(`les infos de la game => ${JSON.stringify(this.data, null, 12)}`)
 	}
 
 	// positions et tailles de base en fonction de la taille du canvas
 	private setupPaddles(): void {
-		console.log('Setting up paddles...');
 		this.paddles[0].x = PADDLE_OFFSET;
 		this.paddles[0].y = (this.height - this.paddles[0].height) / 2;
 
@@ -129,9 +128,6 @@ export class Pong {
 	}
 
 	private setupCanvas(): void {
-		console.log('Setting up canvas...');
-		console.log('this.width = ', this.width)
-		console.log('this.height = ', this.height)
 		this.canvas.width = this.canvas.clientWidth || 800;
 		this.canvas.height = this.canvas.clientHeight || 600;
 		this.width = this.canvas.width;

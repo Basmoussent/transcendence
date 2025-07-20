@@ -84,8 +84,7 @@ export class MultiPong {
 
 		const result = await response.json();
 
-        console.log("Résultat brut de l'API :", result);
-
+        // console.log("Résultat brut de l'API :", result);
 
 		this.data = {
 			id: result.game.id,
@@ -96,11 +95,15 @@ export class MultiPong {
 			player3: result.game.player3,
 			player4: result.game.player4,
 			users_needed: result.game.users_needed,
-			ai: result.game.ai,
+			ai: result.game.ai
 		}
 
-        console.log(`les infos de la game => ${JSON.stringify(this.data, null, 12)}`)
+        // console.log(`les infos de la game => ${JSON.stringify(this.data, null, 12)}`)
 	}
+
+    // private initPlayers(): void {
+    //     this.paddles.push(new Paddle())
+    // }
 
     public init(): void {
         console.log('Initializing paddle game...');
@@ -116,7 +119,6 @@ export class MultiPong {
 
     // positions et tailles de base en fonction de la taille du canvas
     private setupPaddles(): void {
-        console.log('Setting up paddles...');
         this.paddles[0].x = PADDLE_OFFSET;
         this.paddles[0].y = (this.height - this.paddles[0].height) / 2;
 
@@ -137,9 +139,6 @@ export class MultiPong {
     }
 
     private setupCanvas(): void {
-        console.log('Setting up canvas...');
-        console.log('this.width = ', this.width)
-        console.log('this.height = ', this.height)
         this.canvas.width = this.canvas.clientWidth || 600;
         this.canvas.height = this.canvas.clientHeight || 600;
         this.width = this.canvas.width;
@@ -303,7 +302,8 @@ export class MultiPong {
     private ballPaddleCollision(): void {
         if (this.ball.x - this.ball.radius <= this.paddles[0].x + this.paddles[0].width && this.ball.y + this.ball.radius >= this.paddles[0].y && this.ball.y - this.ball.radius <= this.paddles[0].y + this.paddles[0].height && this.ball.x > this.paddles[0].x) {
 
-            this.ball.addBallSpeed();
+            if (this.getNbrOfPlayers() < 3)
+                this.ball.addBallSpeed();
             this.ball.speedX *= -1;
             this.ball.adjustBallDir(this.paddles[0], this.getNbrOfPlayers());
 
@@ -315,7 +315,8 @@ export class MultiPong {
             this.lastPlayerColl = 0;
         }
         if (this.ball.x + this.ball.radius >= this.paddles[1].x && this.ball.y + this.ball.radius >= this.paddles[1].y && this.ball.y - this.ball.radius <= this.paddles[1].y + this.paddles[1].height && this.ball.x < this.paddles[1].x + this.paddles[1].width) {
-            this.ball.addBallSpeed();
+            if (this.getNbrOfPlayers() < 3)
+                this.ball.addBallSpeed();
             this.ball.speedX *= -1;
             this.ball.adjustBallDir(this.paddles[1], this.getNbrOfPlayers());
 
@@ -338,7 +339,6 @@ export class MultiPong {
             this.ball.y > player3.y) {
 
             this.ball.speedY *= -1;
-            this.ball.addBallSpeedMulti();
             this.adjustBallDirMultiplayer(this.ball, player3);
             this.addBallDeviation();
             // repositionner balle pour eviter comportement bizarre
@@ -356,7 +356,6 @@ export class MultiPong {
             this.ball.y < player4.y + player4.height) {
 
             this.ball.speedY *= -1;
-            this.ball.addBallSpeedMulti();
             this.adjustBallDirMultiplayer(this.ball, player4);
             this.addBallDeviation();
 
