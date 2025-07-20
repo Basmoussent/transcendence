@@ -45,6 +45,17 @@ export async function router() {
 
 		uuid = path.substring(it + 1);
 		path = path.substring(0, it);
+
+		if (!uuid) {
+			console.error("pblm ya pas le uuid ou bien le username pour une page qui en a besoin")
+			return;
+		}
+
+		// { '/multipong/','/pong/', '/block/', '/block1v1/', '/room/' }
+		// verifier que la game existe dans la db et qu'elle n'a pas de starting time encore
+
+		// '/profil/' verifier que le user existe dans la db et que celui qui appel cette route n'est pas bloque par le user
+
 	}
 
 	if (!publicRoutes.includes(path) && !token) {

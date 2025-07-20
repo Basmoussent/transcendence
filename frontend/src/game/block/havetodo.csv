@@ -197,3 +197,9 @@ jsp comment gerer les event de merde la
 
 
 cleanEvents() --> bizarre que je ne puisse pas le mettre au début du routeur
+
+
+
+voir pourquoi quand tu crees ta game l'autre ne peut pas directement la rejoindre
+supprimer une ia si quelqu'un rejoint ou quoi revoir la logique
+

@@ -178,6 +178,10 @@ export async function handleRoom(app: FastifyInstance, socket: WebSocket, req: F
 						break;
 						
 					case 'maxPlayer':
+
+						//mettre a la bonne valeur:
+						// si le host mais que user needed est a 2 alors qu'il y a 3 personnes plus une ia dans la room 
+						// |____ supprimer l'ia et mettre userneeded a 3
 						currentRoom.maxPlayers = data.players
 						await broadcastRoomUpdate(app, currentRoom);
 						await app.roomService.updateGame(room)
@@ -208,6 +212,12 @@ export async function handleRoom(app: FastifyInstance, socket: WebSocket, req: F
 
 						if (!allReady)
 							return;
+
+						//ajuster le bon nombre de user dans la game
+						if (currentRoom.users.size !== currentRoom.maxPlayers)
+							currentRoom.maxPlayers= currentRoom.users.size;
+
+						await broadcastRoomUpdate(app, currentRoom);
 
 						const gameStartMessage = JSON.stringify({ 
 							type: 'game_starting',

@@ -184,18 +184,31 @@ export class Room {
 	
 	private increase() {
 
-		if (this.roomData?.users?.length && (this.roomData?.maxPlayers === this.roomData?.users?.length + this.roomData?.ai))
+		if (this.roomData?.maxPlayers == (this.howMuchUsers() + this.roomData!.ai))
 			return;
+
 		this.ws.send(JSON.stringify({
 			type: 'increase',
 			token: this.token,
 		 }));
 	}
 
+	private howMuchUsers(): number {
+
+		console.log(JSON.stringify(this.roomData?.users, null, 8))
+		let i = 0;
+		this.roomData!.users.forEach(user => {
+			if (user)
+				++i;
+		});
+		return i;
+	}
+
 	private decrease() {
 
-		if (this.roomData?.users?.length && this.roomData?.users?.length === 0)
+		if (this.roomData!.ai <= 0)
 			return;
+
 		this.ws.send(JSON.stringify({
 			type: 'decrease',
 			token: this.token,
@@ -383,6 +396,7 @@ export class Room {
 				message: 'je launch une game',
 				token: this.token
 			}));
+
 			// faire le new block ou pong avec info de la game dans le constructeur
 			if (this.roomData?.host === this.username) {
 				if (gameType === 'pong' && this.roomData.users.length > 2)
