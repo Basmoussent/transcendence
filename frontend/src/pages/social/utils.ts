@@ -1,5 +1,6 @@
 import { getAuthToken } from '../../utils/auth';
 import { sanitizeHtml } from '../../utils/sanitizer';
+import { t } from '../../utils/translations';
 
 interface UserData {
 	id: number;
@@ -142,12 +143,11 @@ export async function update2FAState(status: number, userId: number): Promise<bo
 		if (!response.ok)
 			throw new Error('Échec de la requête PUT /2fa');
 
-		if (data.success)
-			return true;
-		else
-			throw new Error(data.error || 'Echec de la mise a jour du 2FA status');
-	}
-	catch (error) {
+        if (data.success)
+            return true;
+        else
+            		throw new Error(data.error || 'Échec de la mise à jour du statut 2FA');
+    } catch (error) {
 		console.error('reverse2FAstatus failed: ', error);
 		return false;
 	}

@@ -2,6 +2,7 @@ import { getAuthToken, removeAuthToken } from '../../utils/auth';
 import { sanitizeHtml } from '../../utils/sanitizer';
 import { t } from '../../utils/translations';
 import { userInfo, update2FAState } from './utils';
+import { getUserGameHistory } from '../../game/gameUtils';
 
 export async function renderMe() {
 	let userData = {
@@ -51,90 +52,182 @@ export async function renderMe() {
 		console.error("Error rendering profile page:", error);
 	}
 
+	// Récupérer l'historique des parties
+	let gameHistory: any[] = [];
+	try {
+		gameHistory = await getUserGameHistory(userData.username);
+		console.log("📊 Parties récupérées pour", userData.username, ":", gameHistory.length);
+		console.log("🎮 Détail des parties:", gameHistory);
+	} catch (error) {
+		console.error("Error fetching game history:", error);
+	}
+
 	// Construire l'URL de l'avatar
 	const avatarUrl = userData.avatar.startsWith('http') || userData.avatar.startsWith('/api/')
 		? userData.avatar
 		: `/api/uploads/${userData.avatar}`;
 
+	// Fonctions utilitaires pour l'historique des parties
+	const formatDate = (timestamp: string) => {
+		if (!timestamp) return 'N/A';
+		const date = new Date(parseInt(timestamp));
+		return date.toLocaleString();
+	};
+
+	const getGameResult = (game: any, username: string) => {
+		if (!game.winner) return 'En cours';
+		if (game.winner === username) return 'Victoire';
+		return 'Défaite';
+	};
+
+	const getGameTypeLabel = (gameType: string) => {
+		switch (gameType) {
+			case 'pong':
+				return 'Pong';
+			case 'block':
+				return 'Block';
+			default:
+				return gameType;
+		}
+	};
+
+	const gameHistoryHtml = gameHistory.length > 0 
+		? gameHistory.slice(0, 5).map((game, index) => {
+			console.log(`🎮 Partie ${index + 1}:`, game);
+			return `
+			<div class="game-history-item">
+				<div class="game-info">
+					<div class="game-type">${getGameTypeLabel(game.game_type)}</div>
+					<div class="game-players">
+						<span class="player">${game.player1}</span>
+						${game.player2 ? `<span class="vs">vs</span><span class="player">${game.player2}</span>` : ''}
+						${game.player3 ? `<span class="vs">vs</span><span class="player">${game.player3}</span>` : ''}
+						${game.player4 ? `<span class="vs">vs</span><span class="player">${game.player4}</span>` : ''}
+					</div>
+					<div class="game-result ${getGameResult(game, userData.username).toLowerCase()}">
+						${getGameResult(game, userData.username)}
+					</div>
+				</div>
+				<div class="game-date">
+					${formatDate(game.end_time)}
+				</div>
+			</div>
+		`}).join('')
+		: '<div class="no-games">Aucune partie récente</div>';
+	
+
 	// Déterminer le texte et l'icône du bouton 2FA
-	const tfaButtonText = userData.twoFactorEnabled ? 'Deactivate 2FA' : 'Activate 2FA';
+	const tfaButtonText = userData.twoFactorEnabled ? 'Désactiver 2FA' : 'Activer 2FA';
 	const tfaButtonIcon = userData.twoFactorEnabled ? 'fa-solid fa-lock-open' : 'fa-solid fa-lock';
 
 	const htmlContent = `
 		<div class="profile-wrapper">
-			<div class="profile-container">
-				<div class="profile-header">
-					<button class="home-button" id="homeBtn">
-							<i class="fas fa-home"></i>
-							Home
-					</button>
-					<div class="profile-avatar">
-						<img src="${avatarUrl}" alt="Profile Avatar" class="avatar-image" onerror="this.src='../../public/avatar.png'">
-						<button class="change-avatar-btn" id="changeAvatarBtn">
-							<i class="fas fa-camera"></i>
+			<div class="profile-stack">
+				<div class="profile-container">
+					<div class="profile-header">
+						<button class="home-button" id="homeBtn">
+								<i class="fas fa-home"></i>
+								Accueil
 						</button>
-						<input type="file" id="avatarInput" accept="image/*" style="display: none;">
+						<div class="profile-avatar">
+							<img src="${avatarUrl}" alt="Profile Avatar" class="avatar-image" onerror="this.src='../../public/avatar.png'">
+							<button class="change-avatar-btn" id="changeAvatarBtn">
+								<i class="fas fa-camera"></i>
+							</button>
+							<input type="file" id="avatarInput" accept="image/*" style="display: none;">
+						</div>
+						<div class="profile-info">
+							<h1 class="username">${userData.username}</h1>
+							<p class="email">${userData.email}</p>
+							<div class="status online">
+								<i class="fas fa-circle"></i> En ligne
+							</div>
+						</div>
+						<button class="action-button logout">
+							<i class="fas fa-sign-out-alt"></i>
+							Déconnexion
+						</button>
 					</div>
-					<div class="profile-info">
-						<h1 class="username">${userData.username}</h1>
-						<p class="email">${userData.email}</p>
-						<div class="status online">
-							<i class="fas fa-circle"></i> Online
+
+					<div class="profile-stats">
+						<div class="stat-card">
+							<i class="fas fa-trophy"></i>
+							<div class="stat-info">
+								<span class="stat-value">${userData.wins}</span>
+								<span class="stat-label">Victoires</span>
+							</div>
+						</div>
+						<div class="stat-card">
+							<i class="fas fa-gamepad"></i>
+							<div class="stat-info">
+								<span class="stat-value">${userData.games}</span>
+								<span class="stat-label">Parties</span>
+							</div>
+						</div>
+						<div class="stat-card">
+							<i class="fas fa-star"></i>
+							<div class="stat-info">
+								<span class="stat-value">${userData.rating}</span>
+								<span class="stat-label">Classement</span>
+							</div>
 						</div>
 					</div>
-					<button class="action-button logout">
-						<i class="fas fa-sign-out-alt"></i>
-						${t('profile.logout')}
-					</button>
+
+					<div class="profile-actions">
+						<button class="action-button edit-profile">
+							<i class="fas fa-edit"></i>
+							Modifier le profil
+						</button>
+						<button class="action-button change-password">
+							<i class="fas fa-key"></i>
+							Changer le mot de passe
+						</button>
+						<button class="action-button TFA-button" id="TFABtn" data-enabled="${userData.twoFactorEnabled}">
+							<i class="fa-solid ${tfaButtonIcon}"></i>
+							${tfaButtonText}
+						</button>
+					</div>
 				</div>
 
-				<div class="profile-stats">
-					<div class="stat-card">
-						<i class="fas fa-trophy"></i>
-						<div class="stat-info">
-							<span class="stat-value">${userData.wins}</span>
-							<span class="stat-label">${t('profile.stats.wins')}</span>
+				<!-- Section Historique des Parties -->
+				<div class="game-history-section">
+					<div class="game-history-container">
+						<div class="game-history-header">
+							<h2>Historique des Parties Récentes</h2>
+							<button class="view-all-games-btn" id="viewAllGamesBtn">
+								<i class="fas fa-history"></i>
+								Voir tout l'historique
+							</button>
+						</div>
+						
+						<div class="game-history-content">
+							<div class="games-list">
+								${gameHistoryHtml}
+							</div>
 						</div>
 					</div>
-					<div class="stat-card">
-						<i class="fas fa-gamepad"></i>
-						<div class="stat-info">
-							<span class="stat-value">${userData.games}</span>
-							<span class="stat-label">${t('profile.stats.games')}</span>
-						</div>
-					</div>
-					<div class="stat-card">
-						<i class="fas fa-star"></i>
-						<div class="stat-info">
-							<span class="stat-value">${userData.rating}</span>
-							<span class="stat-label">${t('profile.stats.rating')}</span>
-						</div>
-					</div>
-				</div>
-
-				<div class="profile-actions">
-					<button class="action-button edit-profile">
-						<i class="fas fa-edit"></i>
-						${t('profile.editProfile')}
-					</button>
-					<button class="action-button change-password">
-						<i class="fas fa-key"></i>
-						${t('profile.changePassword')}
-					</button>
-					<button class="action-button TFA-button" id="TFABtn" data-enabled="${userData.twoFactorEnabled}">
-						<i class="fa-solid ${tfaButtonIcon}"></i>
-						${tfaButtonText}
-					</button>
 				</div>
 			</div>
 		</div>
 
+		
+
 		<style>
 
 			.profile-wrapper {
-				height: 100vh;
+				min-height: 100vh;
 				display: flex;
 				justify-content: center;
+				align-items: flex-start;
+				padding: 20px;
+			}
+
+			.profile-stack {
+				width: 90%;
+				max-width: 800px;
+				display: flex;
+				flex-direction: column;
+				gap: 30px;
 				align-items: center;
 			}
 
@@ -201,8 +294,7 @@ export async function renderMe() {
 			.profile-container {
 				position: relative;
 				z-index: 2;
-				width: 90%;
-				max-width: 800px;
+				width: 100%;
 				background: rgba(255, 255, 255, 0.1);
 				backdrop-filter: blur(10px);
 				border-radius: 20px;
@@ -445,6 +537,162 @@ export async function renderMe() {
 					height: 30px;
 				}
 			}
+
+			/* Styles pour la section Historique des Parties */
+			.game-history-section {
+				width: 100%;
+			}
+
+			.game-history-container {
+				background: rgba(255, 255, 255, 0.1);
+				backdrop-filter: blur(10px);
+				border-radius: 20px;
+				padding: 30px;
+				box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+				border: 1px solid rgba(255, 255, 255, 0.18);
+				color: white;
+			}
+
+			.game-history-header {
+				display: flex;
+				justify-content: space-between;
+				align-items: center;
+				margin-bottom: 25px;
+			}
+
+			.game-history-header h2 {
+				margin: 0;
+				font-size: 1.5em;
+				color: white;
+			}
+
+			.view-all-games-btn {
+				display: flex;
+				align-items: center;
+				gap: 8px;
+				padding: 10px 20px;
+				border: none;
+				border-radius: 10px;
+				background: linear-gradient(135deg, #4a90e2 0%, #357abd 100%);
+				color: white;
+				cursor: pointer;
+				transition: all 0.3s ease;
+				font-weight: 600;
+			}
+
+			.view-all-games-btn:hover {
+				transform: translateY(-2px);
+				box-shadow: 0 5px 15px rgba(74, 144, 226, 0.4);
+			}
+
+			.games-list {
+				display: flex;
+				flex-direction: column;
+				gap: 15px;
+			}
+
+			.game-history-item {
+				background: rgba(255, 255, 255, 0.05);
+				border-radius: 15px;
+				padding: 20px;
+				display: flex;
+				justify-content: space-between;
+				align-items: center;
+				transition: all 0.3s ease;
+			}
+
+			.game-history-item:hover {
+				background: rgba(255, 255, 255, 0.1);
+				transform: translateY(-2px);
+			}
+
+			.game-info {
+				display: flex;
+				flex-direction: column;
+				gap: 8px;
+			}
+
+			.game-type {
+				font-weight: bold;
+				color: #4a90e2;
+				font-size: 1.1em;
+			}
+
+			.game-players {
+				display: flex;
+				align-items: center;
+				gap: 8px;
+				flex-wrap: wrap;
+			}
+
+			.player {
+				font-weight: 500;
+			}
+
+			.vs {
+				color: #ccc;
+				font-size: 0.9em;
+			}
+
+			.game-result {
+				font-weight: bold;
+				padding: 4px 12px;
+				border-radius: 20px;
+				font-size: 0.9em;
+				text-align: center;
+				display: inline-block;
+				width: fit-content;
+			}
+
+			.game-result.victoire {
+				background: rgba(46, 204, 113, 0.2);
+				color: #2ecc71;
+			}
+
+			.game-result.défaite {
+				background: rgba(231, 76, 60, 0.2);
+				color: #e74c3c;
+			}
+
+			.game-result.en cours {
+				background: rgba(241, 196, 15, 0.2);
+				color: #f1c40f;
+			}
+
+			.game-date {
+				color: #ccc;
+				font-size: 0.9em;
+				text-align: right;
+			}
+
+			.no-games {
+				text-align: center;
+				color: #ccc;
+				font-style: italic;
+				padding: 40px;
+			}
+
+			@media (max-width: 768px) {
+				.game-history-container {
+					padding: 20px;
+				}
+
+				.game-history-header {
+					flex-direction: column;
+					text-align: center;
+					gap: 15px;
+				}
+
+				.game-history-item {
+					flex-direction: column;
+					align-items: flex-start;
+					gap: 15px;
+				}
+
+				.game-date {
+					text-align: left;
+				}
+			}
 		</style>
 	`;
 
@@ -456,6 +704,7 @@ export async function renderMe() {
 		const avatarInput = document.getElementById('avatarInput') as HTMLInputElement;
 		const homeBtn = document.getElementById('homeBtn');
 		const TFABtn = document.getElementById('TFABtn');
+		const viewAllGamesBtn = document.getElementById('viewAllGamesBtn');
 	
 		if (homeBtn) {
 			homeBtn.addEventListener('click', () => {
@@ -495,13 +744,13 @@ export async function renderMe() {
 
 			if (info.user.two_fact_auth) {
 				// desactiver 2FA
-				const confirmation = confirm('Êtes-vous sûr de vouloir désactiver l\'authentification à deux facteurs ?');
+				const confirmation = confirm(t('social.confirmDisable2FA'));
 				
 				if (confirmation) {
 					const success = await update2FAState(0, info.user.id);
 
 					if (success) {
-						TFABtn.innerHTML = '<i class="fa-solid fa-lock"></i> Activate 2FA';
+						TFABtn.innerHTML = '<i class="fa-solid fa-lock"></i> ' + t('social.activate2FA');
 						alert('✅ 2FA désactivée avec succès');
 					}
 					else
@@ -564,12 +813,21 @@ export async function renderMe() {
 						// Recharger la page pour afficher le nouvel avatar
 						window.location.reload();
 					} else {
-						alert(`❌ Erreur: ${result.error || 'Erreur inconnue'}`);
+						alert(`❌ Erreur: ${result.error || t('social.unknownError')}`);
 					}
 				} catch (err) {
 					console.error('Erreur lors de l\'upload:', err);
 					alert('❌ Erreur lors de l\'upload de l\'avatar');
 				}
+			});
+		}
+
+		// Gestion du bouton "Voir tout l'historique"
+		if (viewAllGamesBtn) {
+			viewAllGamesBtn.addEventListener('click', () => {
+				// Rediriger vers la page d'historique complet
+				window.history.pushState({}, '', `/history/${userData.username}`);
+				window.dispatchEvent(new PopStateEvent('popstate'));
 			});
 		}
 	}, 0);

@@ -21,7 +21,7 @@ export function renderEditProfil(): string {
 									<div class="upload-icon">
 										<i class="fas fa-upload"></i>
 									</div>
-									<span class="upload-text">Upload</span>
+									<span class="upload-text">${t('social.upload')}</span>
 								</label>
 								<input type="file" id="customAvatarInput" accept="image/*" style="display: none;">
 							</div>
@@ -152,13 +152,13 @@ function initializeEditProfileEvents() {
 
 			// Vérifier le type de fichier
 			if (!file.type.startsWith('image/')) {
-				alert('❌ Veuillez sélectionner une image valide');
+				alert('❌ ' + t('social.selectValidImage'));
 				return;
 			}
 
 			// Vérifier la taille (5MB max)
 			if (file.size > 5 * 1024 * 1024) {
-				alert('❌ L\'image est trop volumineuse. Taille maximum: 5MB');
+				alert('❌ ' + t('social.imageTooLarge'));
 				return;
 			}
 
@@ -185,7 +185,7 @@ function initializeEditProfileEvents() {
 				const result = await response.json();
 				
 				if (response.ok) {
-					alert('✅ Avatar uploadé avec succès');
+					alert('✅ ' + t('social.avatarUploadSuccess'));
 					// Rediriger vers la page de profil avec le router SPA
 					window.history.pushState({}, '', '/profil');
 					window.dispatchEvent(new PopStateEvent('popstate'));
@@ -194,7 +194,7 @@ function initializeEditProfileEvents() {
 				}
 			} catch (err) {
 				console.error('Erreur lors de l\'upload:', err);
-				alert('❌ Erreur lors de l\'upload de l\'avatar');
+				alert('❌ ' + t('social.avatarUploadError'));
 			}
 		});
 
@@ -211,7 +211,6 @@ function initializeEditProfileEvents() {
 		const username = (document.getElementById('username') as HTMLInputElement).value;
 		const selectedAvatar = (document.querySelector('input[name="avatar"]:checked') as HTMLInputElement)?.value || 'avatar.png';
 		
-		// Si c'est un avatar personnalisé, ne pas traiter ici car l'upload est géré séparément
 		if (selectedAvatar === 'custom') {
 			return;
 		}
@@ -241,8 +240,7 @@ function initializeEditProfileEvents() {
 				alert(`❌ Erreur: ${result.error || 'Erreur inconnue'}`);
 			} else {
 				alert('✅ Profil modifié avec succès');
-				// Rediriger vers la page de profil avec le router SPA
-				window.history.pushState({}, '', '/profil');
+				window.history.pushState({}, '', '/me');
 				window.dispatchEvent(new PopStateEvent('popstate'));
 			}
 		} catch (err) {

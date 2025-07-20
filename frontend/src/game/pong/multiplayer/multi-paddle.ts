@@ -1,5 +1,6 @@
 import { PADDLE_OFFSET, Player } from "../const";
 import { PaddleAI } from "./multi-paddle-ai";
+import { t } from '../../../utils/translations';
 
 export class Paddle {
     name: string;
@@ -12,7 +13,7 @@ export class Paddle {
     color: string;
 
     constructor(width: number, height: number, color: string) {
-        this.name = "Player";
+        this.name = t('pong.player');
         this.width = width;
         this.height = height;
         this.x = 0;

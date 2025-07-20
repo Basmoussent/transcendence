@@ -1,5 +1,6 @@
 import { getAuthToken } from '../../utils/auth';
 import { fetchMe, update2FAState, userInfo } from '../social/utils';
+import { t } from '../../utils/translations';
 
 // Exemple de page /tfa pour activer la 2FA
 export function render2FA() {
@@ -219,6 +220,13 @@ export function render2FA() {
       });
     }
     const user = await fetchMe()
+    
+    if (!user) {
+      alert('❌ Impossible de récupérer les informations utilisateur');
+      window.history.pushState({}, '', '/login');
+      window.dispatchEvent(new PopStateEvent('popstate'));
+      return;
+    }
   
     const authToken = getAuthToken();
     if (!authToken) {

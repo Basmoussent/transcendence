@@ -1,5 +1,6 @@
 import { getAuthToken } from '../../utils/auth';
 import { sanitizeHtml } from '../../utils/sanitizer';
+import { t } from '../../utils/translations';
 
 interface User {
 	username: string;

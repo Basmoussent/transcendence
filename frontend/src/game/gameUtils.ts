@@ -280,3 +280,53 @@ export async function getGameByUuid(uuid: string): Promise<number> {
 		console.error('Erreur réseau ou autre problème :', error); }
 	return (-1);
 }
+
+export async function getUserGameHistory(username: string): Promise<Game[]> {
+	
+	try {
+		const token = getAuthToken();
+		if (!token) {
+			alert('❌ Token d\'authentification manquant');
+			window.history.pushState({}, '', '/login');
+			window.dispatchEvent(new PopStateEvent('popstate'));
+			return [];
+		}
+
+		const response = await fetch(`/api/games/user/${encodeURIComponent(username)}/history`, {
+			method: 'GET',
+			headers: {
+				'Content-Type': 'application/json',
+				'x-access-token': token,
+			},
+		});
+	
+		if (response.ok) {
+			const result = await response.json();
+			console.log("Historique des parties récupéré:", result);
+			
+			const games: Game[] = result.games.map((game: any) => ({
+				id: Number(game.id),
+				uuid: sanitizeHtml(game.uuid),
+				game_type: sanitizeHtml(game.game_type),
+				player1: sanitizeHtml(game.player1),
+				player2: sanitizeHtml(game.player2),
+				player3: sanitizeHtml(game.player3),
+				player4: sanitizeHtml(game.player4),
+				winner: sanitizeHtml(game.winner),
+				users_needed: Number(game.users_needed),
+				start_time: sanitizeHtml(game.start_time),
+				end_time: sanitizeHtml(game.end_time),
+			}));
+			
+			return games;
+		}
+		else {
+			console.error("Erreur lors de la récupération de l'historique des parties");
+			return [];
+		}
+	}
+	catch (error) {
+		console.error("Erreur getUserGameHistory:", error);
+		return [];
+	}
+}
