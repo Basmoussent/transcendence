@@ -146,7 +146,7 @@ export async function update2FAState(status: number, userId: number): Promise<bo
         if (data.success)
             return true;
         else
-            		throw new Error(data.error || t('social.twoFAUpdateFailed'));
+            		throw new Error(data.error || 'Échec de la mise à jour du statut 2FA');
     } catch (error) {
 		console.error('reverse2FAstatus failed: ', error);
 		return false;

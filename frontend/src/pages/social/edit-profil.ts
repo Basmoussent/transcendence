@@ -211,7 +211,6 @@ function initializeEditProfileEvents() {
 		const username = (document.getElementById('username') as HTMLInputElement).value;
 		const selectedAvatar = (document.querySelector('input[name="avatar"]:checked') as HTMLInputElement)?.value || 'avatar.png';
 		
-		// Si c'est un avatar personnalisé, ne pas traiter ici car l'upload est géré séparément
 		if (selectedAvatar === 'custom') {
 			return;
 		}
@@ -241,8 +240,7 @@ function initializeEditProfileEvents() {
 				alert(`❌ Erreur: ${result.error || 'Erreur inconnue'}`);
 			} else {
 				alert('✅ Profil modifié avec succès');
-				// Rediriger vers la page de profil avec le router SPA
-				window.history.pushState({}, '', '/profil');
+				window.history.pushState({}, '', '/me');
 				window.dispatchEvent(new PopStateEvent('popstate'));
 			}
 		} catch (err) {
