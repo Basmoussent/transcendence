@@ -1,5 +1,6 @@
 import { brick, Ball, Paddle, createRandomBrick } from "./blockUtils.ts";
 import { getAuthToken } from '../../utils/auth.ts'
+import { addEvent } from '../../utils/eventManager.ts';
 
 export interface Game {
 	id: number,
@@ -67,13 +68,13 @@ export class Block1v1 {
 	}
 
 	private setupEventListeners(): void {
-		window.addEventListener('resize', () => {
+		addEvent(window, 'resize', () => {
 			this.setupCanvas();
 		});
-		window.addEventListener('keydown', (e) => {
+		addEvent(window, 'keydown', (e) => {
 			this.keys[e.key.toLowerCase()] = true;
 		});
-		window.addEventListener('keyup', (e) => {
+		addEvent(window, 'keyup', (e) => {
 			this.keys[e.key.toLowerCase()] = false;
 		});
 	}

@@ -1,5 +1,6 @@
 import { getAuthToken } from '../../utils/auth';
 import { sanitizeHtml } from '../../utils/sanitizer';
+import { addEvent } from '../../utils/eventManager';
 
 interface User {
 	username: string;
@@ -72,7 +73,6 @@ export class Room {
 
 		this.token = getAuthToken();
 		
-
 		this.chatInput.focus();
 		this.setupWsEvents();
 		this.setupClickEvents();
@@ -109,19 +109,19 @@ export class Room {
 
 	private setupClickEvents() {
 
-		this.chatInput.addEventListener('keypress', (e) => {
+		addEvent(this.chatInput, 'keypress', (e) => {
 			if (e.key === 'Enter') this.sendChatMessage();
 		});
 
-		this.sendBtn.addEventListener('click', () => this.sendChatMessage());
-		this.readyBtn.addEventListener('click', () => this.toggleReadyState());
-		this.startBtn.addEventListener('click', () => this.startGame());
-		this.leaveBtn.addEventListener('click', () => this.leaveRoom());
-		this.homeBtn.addEventListener('click', () => this.goHome());
-		this.increaseAiBtn.addEventListener('click', () => this.increase());
-		this.decreaseAiBtn.addEventListener('click', () => this.decrease());
-		this.gameTypeSelect.addEventListener('change', () => this.gameTypeChanged());
-		this.maxPlayersSelect.addEventListener('change', () => this.maxPlayersChanged());
+		addEvent(this.sendBtn, 'click', () => this.sendChatMessage());
+		addEvent(this.readyBtn, 'click', () => this.toggleReadyState());
+		addEvent(this.startBtn, 'click', () => this.startGame());
+		addEvent(this.leaveBtn, 'click', () => this.leaveRoom());
+		addEvent(this.homeBtn, 'click', () => this.goHome());
+		addEvent(this.increaseAiBtn, 'click', () => this.increase());
+		addEvent(this.decreaseAiBtn, 'click', () => this.decrease());
+		addEvent(this.gameTypeSelect, 'change', () => this.gameTypeChanged());
+		addEvent(this.maxPlayersSelect, 'change', () => this.maxPlayersChanged());
     
 	}
 

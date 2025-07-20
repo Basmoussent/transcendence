@@ -1,5 +1,6 @@
 import { t } from '../../utils/translations';
 import { createAccount } from './class/createAccount'
+import { addEvent } from '../../utils/eventManager';
 
 export function renderCreateAccount() {
 
@@ -135,13 +136,13 @@ function initializeCreateAccountEvents() {
 	
 	// Gestion du bouton retour au login
 	if (backToLoginBtn) {
-		backToLoginBtn.addEventListener('click', () => {
+		addEvent(backToLoginBtn, 'click', () => {
 			window.history.pushState({}, '', '/login');
 			window.dispatchEvent(new PopStateEvent('popstate'));
 		});
 	}
 
-	createAccountForm?.addEventListener('submit', async (e) => {
+	addEvent(createAccountForm, 'submit', async (e) => {
 		e.preventDefault();
 
 		const username = (document.getElementById('username') as HTMLInputElement).value;

@@ -187,3 +187,10 @@ profil :
 
 	lister tous ses amis // state1 == 'normal' state_2 == 'normal'
 	injecter seulement ceux qui ne t'ont pas bloqué
+
+
+
+jsp comment gerer les event de merde la
+
+
+// comment faire pour utiliser addEvent psque c'est dans du html la louche nn ?

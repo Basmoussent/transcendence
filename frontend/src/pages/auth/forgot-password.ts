@@ -1,4 +1,5 @@
 import { t } from '../../utils/translations';
+import { addEvent } from '../../utils/eventManager';
 
 export function renderForgotPassword(): string {
 	return `
@@ -54,20 +55,22 @@ function initializeForgotPasswordEvents() {
 
 	// Gestion du bouton retour au login
 	if (backToLoginBtn) {
-		backToLoginBtn.addEventListener('click', () => {
+		addEvent(backToLoginBtn, 'click', () => {
 			window.history.pushState({}, '', '/login');
 			window.dispatchEvent(new PopStateEvent('popstate'));
 		});
 	}
 
-	forgotPasswordForm?.addEventListener('submit', (e) => {
-		e.preventDefault();
-		const email = (document.getElementById('email') as HTMLInputElement).value;
-		
-		// TODO: Implement actual password reset logic here
-		console.log('Password reset attempt:', { email });
-		alert('Si un compte existe avec cet email, vous recevrez un lien de réinitialisation.');
-	});
+	if (forgotPasswordForm) {
+		addEvent(forgotPasswordForm, 'submit', (e: any) => {
+			e.preventDefault();
+			const email = (document.getElementById('email') as HTMLInputElement).value;
+			
+			// TODO: Implement actual password reset logic here
+			console.log('Password reset attempt:', { email });
+			alert('Si un compte existe avec cet email, vous recevrez un lien de réinitialisation.');
+		});
+	}
 }
 
 export { initializeForgotPasswordEvents };

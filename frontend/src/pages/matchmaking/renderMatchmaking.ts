@@ -1,16 +1,9 @@
-import { Available, matchmaking,  } from "./matchmaking";
-import { getAuthToken } from '../../utils/auth';
-import { sanitizeHtml } from '../../utils/sanitizer';
+import { matchmaking } from "./matchmaking";
 
 export function renderMatchmaking() {
 
 	setTimeout(async () => {
-		try {
-			new matchmaking();
-		}
-		catch (err:any) {
-			console.log(err);
-		}
+		new matchmaking();
 	}, 0);
 	return getTemplate();
 }
@@ -581,16 +574,3 @@ const getTemplate = () => {
 	`;
 	return html;
 }
-
-function initializeMatchmakingEvents() {
-	const button = document.getElementById('homeBtn');
-	if (button) {
-		button.addEventListener('click', () => {
-		window.history.pushState({}, '', '/main');
-		window.dispatchEvent(new PopStateEvent('popstate'));
-		});
-	}
-	return;
-}
-
-export { initializeMatchmakingEvents };

@@ -1,4 +1,5 @@
 import { t } from '../../utils/translations';
+import { addEvent } from '../../utils/eventManager';
 import { removeAuthToken } from '../../utils/auth';
 
 export class main {
@@ -31,28 +32,28 @@ export class main {
 	}
 
 	private setupEvents() {
-		this.profileBtn.addEventListener('click', () => {
+		addEvent(this.profileBtn, 'click', () => {
 			window.history.pushState({}, '', '/me');
 			window.dispatchEvent(new PopStateEvent('popstate'));
 		});
 		
-		this.matchmakingBtn.addEventListener('click', () => {
+		addEvent(this.matchmakingBtn, 'click', () => {
 			window.history.pushState({}, '', '/matchmaking');
 			window.dispatchEvent(new PopStateEvent('popstate'));
 		});
 
-		this.tournamentBtn.addEventListener('click', () => {
+		addEvent(this.tournamentBtn, 'click', () => {
 			window.history.pushState({}, '', '/tournament');
 			window.dispatchEvent(new PopStateEvent('popstate'));
 		});
 
-		this.chatBtn.addEventListener('click', () => {
+		addEvent(this.chatBtn, 'click', () => {
 			window.history.pushState({}, '', '/chat');
 			window.dispatchEvent(new PopStateEvent('popstate'));
 		});
 
 		
-		this.logoutBtn.addEventListener('click', async () => {
+		addEvent(this.logoutBtn, 'click', async () => {
 			try {
 				console.log('🚪 Tentative de logout...');
 				removeAuthToken();
@@ -349,7 +350,7 @@ export function renderHome(): string {
 
 function initializeHomeEvents() {
 	const loginBtn = document.getElementById('loginBtn');
-	loginBtn?.addEventListener('click', () => {
+	addEvent(loginBtn, 'click', () => {
 		window.history.pushState({}, '', '/login');
 		window.dispatchEvent(new PopStateEvent('popstate'));
 	});

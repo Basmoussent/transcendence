@@ -1,4 +1,5 @@
 import { renderHome, initializeHomeEvents } from '../pages/menu/main';
+import { cleanupEventListeners } from './eventManager';
 import { renderLogin } from '../pages/auth/login';
 import { renderCreateAccount } from '../pages/auth/create-account';
 import { renderForgotPassword, initializeForgotPasswordEvents } from '../pages/auth/forgot-password';
@@ -15,7 +16,6 @@ import { renderChangePassword, initializeChangePasswordEvents } from '../pages/a
 import { renderEditProfil, initializeEditProfileEvents } from '../pages/social/edit-profil';
 import { getAuthToken } from './auth';
 import { clearTranslationCache } from './translations';
-import { getGame } from '@/game/gameUtils';
 
 import { renderMultiPong } from '../pages/pong/multiplayer-pong';
 import { renderPong } from '../pages/pong/pong';
@@ -24,7 +24,10 @@ import { renderProfil } from '../pages/social/renderProfil';
 import { render2FA } from '../pages/auth/activate-2fa';
 import { render2FALogin } from '../pages/auth/2fa-login';
 
+import { cleanEvents } from './eventManager';
+
 export async function router() {
+
 	// Clear translation cache to ensure fresh translations
 	clearTranslationCache();
 	
@@ -79,6 +82,7 @@ export async function router() {
 		app.innerHTML = renderMain();
 		return;
 	}
+
 
 	let view = '';
 	console.log("path:", path);
@@ -156,6 +160,9 @@ export async function router() {
 			break;
 		default:
 			view = render404();
+
+		cleanEvents();
+		
 	}
 	app.innerHTML = view;
 
@@ -192,9 +199,6 @@ export async function router() {
 				break;
 			case '/forgot-password':
 				initializeForgotPasswordEvents();
-				break;
-			case '/multiplayer':
-				initializeMultiplayerEvents();
 				break;
 			case '/change-password':
 				initializeChangePasswordEvents();

@@ -1,6 +1,8 @@
 import { sanitizeHtml } from '../../utils/sanitizer';
 import { fetchMe, fetchUserInfo, loadMe } from './utils';
 import { getAuthToken } from '../../utils/auth';
+import { addEvent } from '../../utils/eventManager';
+import { addEvent } from '../../utils/eventManager';
 
 export interface UserChat {
 	username: string;
@@ -154,21 +156,21 @@ export class Chat {
 		}
 	}
 
-	private setupClickEvents() {
-		this.sendBtn.addEventListener('click', () => this.sendChatMessage());
-		this.chatInput.addEventListener('keypress', (e) => {
+		private setupClickEvents() {
+		addEvent(this.sendBtn, 'click', () => this.sendChatMessage());
+		addEvent(this.chatInput, 'keypress', (e) => {
 			if (e.key === 'Enter') {
 				e.preventDefault();
 				this.sendChatMessage();
 			}
 		});
-		this.homeBtn.addEventListener('click', () => {
+		addEvent(this.homeBtn, 'click', () => {
 			window.history.pushState({}, '', '/main');
 			window.dispatchEvent(new Event('popstate'));
 		});
 
 		this.tabs.forEach(tab => {
-			tab.addEventListener('click', () => {
+			addEvent(tab, 'click', () => {
 				const tabName = tab.dataset.tab;
 				if (!tabName) return;
 
@@ -185,7 +187,7 @@ export class Chat {
 			});
 		});
 
-		this.addFriendBtn.addEventListener('click', () => this.sendFriendRequest());
+		addEvent(this.addFriendBtn, 'click', () => this.sendFriendRequest());
 	}
 
 	private sendFriendRequest() {

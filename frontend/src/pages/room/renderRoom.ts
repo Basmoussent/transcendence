@@ -1,26 +1,6 @@
 import { getAuthToken } from '../../utils/auth';
-import { sanitizeHtml } from '../../utils/sanitizer';
 import { Room } from './room'
 import { fetchUsername } from '../../game/gameUtils';
-
-interface User {
-	id: string;
-	username: string;
-	avatar?: string;
-	status: 'online' | 'away' | 'playing';
-	isReady: boolean;
-}
-
-interface RoomData {
-	id: string;
-	name: string;
-	gameType: 'pong' | 'block';
-	maxPlayers: number;
-	currentPlayers: number;
-	users: User[];
-	isStarted: boolean;
-	host: string;
-}
 
 export function renderRoom(uuid: string) {
 

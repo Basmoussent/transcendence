@@ -1,3 +1,5 @@
+import { addEvent } from '../../../utils/eventManager';
+
 export class createAccount {
 	private createAccountForm: HTMLElement;
 	private backToLoginBtn: HTMLElement;
@@ -32,12 +34,12 @@ export class createAccount {
 
 	private setupEvents() {
 
-		this.backToLoginBtn.addEventListener('click', () => {
+		addEvent(this.backToLoginBtn, 'click', () => {
 			window.history.pushState({}, '', '/login');
 			window.dispatchEvent(new PopStateEvent('popstate'));
 		});
 
-		this.createAccountForm.addEventListener('submit', async (e) => {
+		addEvent(this.createAccountForm, 'submit', async (e) => {
 			e.preventDefault();
 			await this.submit();
 		})

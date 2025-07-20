@@ -217,8 +217,12 @@ export async function handleRoom(app: FastifyInstance, socket: WebSocket, req: F
 		socket.on('close', async () => {
 
 			const roomToLeave = rooms.get(uuid!)!;
-			
-			roomToLeave.users.delete(username);
+
+			if (!roomToLeave)
+				return;
+
+			if (roomToLeave)
+			roomToLeave.users?.delete(username);
 			console.log(`${username} disconnected from room ${uuid!}`);
 
 			if (roomToLeave.users.size === 0) {
@@ -234,6 +238,7 @@ export async function handleRoom(app: FastifyInstance, socket: WebSocket, req: F
 				await broadcastRoomUpdate(app, roomToLeave);
 				await app.roomService.updateGame(roomToLeave);
 			}
+			
 		});
 	}
 	catch (error) {

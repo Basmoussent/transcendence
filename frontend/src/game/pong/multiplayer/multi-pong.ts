@@ -3,6 +3,7 @@ import { Paddle } from "./multi-paddle";
 import { PaddleAI } from "./multi-paddle-ai";
 import { getAuthToken } from '../../../utils/auth';
 import { PADDLE_OFFSET, Player, PADDLE1_COLOR, PADDLE2_COLOR, PADDLE3_COLOR, PADDLE4_COLOR } from "../const";
+import { addEvent } from '../../../utils/eventManager';
 
 export interface Game {
 	id: number,
@@ -154,11 +155,11 @@ export class MultiPong {
 
     // pendant qu'on appuie sur une touche this.keys[touche] = true
     private setupEventListeners(): void {
-        window.addEventListener('keydown', (e) => {
+        addEvent(window, 'keydown', (e) => {
             this.keys[e.key.toLowerCase()] = true;
         });
 
-        window.addEventListener('keyup', (e) => {
+        addEvent(window, 'keyup', (e) => {
             this.keys[e.key.toLowerCase()] = false;
         });
     }

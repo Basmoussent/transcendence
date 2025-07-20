@@ -1,5 +1,6 @@
 import { getAuthToken } from '../../utils/auth';
 import { fetchMe, update2FAState, userInfo } from '../social/utils';
+import { addEvent } from '../../utils/eventManager';
 
 // Exemple de page /tfa pour activer la 2FA
 export function render2FA() {
@@ -213,7 +214,7 @@ export function render2FA() {
     }
 
     if (backBtn) {
-      backBtn.addEventListener('click', () => {
+      addEvent(backBtn, 'click', () => {
         window.history.pushState({}, '', '/me');
         window.dispatchEvent(new PopStateEvent('popstate'));
       });
@@ -245,7 +246,7 @@ export function render2FA() {
 
     // Gestion de l'activation 2FA
     if (activateBtn && verificationCode) {
-      activateBtn.addEventListener('click', async () => {
+      addEvent(activateBtn, 'click', async () => {
         const code = verificationCode.value.trim();
 
         if (code.length !== 6) {
@@ -313,7 +314,7 @@ export function render2FA() {
         }
       });
     }
-  }, 0);
+  }, 0)
 
   return htmlContent;
 }

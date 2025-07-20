@@ -1,13 +1,14 @@
 import '/src/style.css';
 import { router } from './utils/router.ts';
+import { addEvent } from './utils/eventManager.ts';
 
 function init() {
-	window.addEventListener('popstate', router);
+	addEvent(window, 'popstate', router);
 	
 	// Listen for language changes to trigger router
-	window.addEventListener('languageChanged', router);
+	addEvent(window, 'languageChanged', router);
 	
-	document.addEventListener('click', (e) => {
+	addEvent(document, 'click', (e) => {
 		const target = e.target as HTMLElement;
 		if (target.matches('a[data-link]')) {
 			e.preventDefault();

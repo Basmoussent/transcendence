@@ -49,12 +49,12 @@ export class profil {
 
 	private setupEvents() {
 
-		this.homeBtn.addEventListener('click', () => {
+		addEvent(this.homeBtn, 'click', () => {
 			window.history.pushState({}, '', '/main');
 			window.dispatchEvent(new Event('popstate'));
 		});
 
-		this.addFriendBtn.addEventListener('click', async () => {
+		addEvent(this.addFriendBtn, 'click', async () => {
 			await this.addFriend();
 
 			this.addFriendBtn.textContent = 'requested'

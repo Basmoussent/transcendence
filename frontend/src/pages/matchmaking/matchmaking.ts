@@ -1,6 +1,7 @@
 import { Game, fetchUsername, getUuid, postGame } from '../../game/gameUtils'
 import { getAuthToken } from '../../utils/auth';
 import { sanitizeHtml } from '../../utils/sanitizer';
+import { addEvent } from '../../utils/eventManager';
 
 export interface Available {
 	gameId: number,
@@ -43,8 +44,6 @@ export class matchmaking {
 		this.options = this.getElement("game-options");
 		this.availableGames = this.getElement('available-games');
 
-		this.setupMutationObserver();
-
 		// Ajouter un listener pour nettoyer quand l'utilisateur quitte la page
 		window.addEventListener('beforeunload', () => {
 			this.stopPolling();
@@ -83,28 +82,6 @@ export class matchmaking {
 
 	}
 	
-	private setupMutationObserver() {
-		const observer = new MutationObserver((mutations) => {
-			mutations.forEach((mutation) => {
-			mutation.addedNodes.forEach((node) => {
-				if (node.nodeType === Node.ELEMENT_NODE) {
-				const element = node as Element;
-				const joinButtons = element.querySelectorAll('[id^="join"][id$="Btn"]');
-				
-				joinButtons.forEach((btn) => {
-					const gameId = btn.id.replace('join', '').replace('Btn', '');
-					btn.addEventListener('click', () => {
-					this.joinRoom(Number(gameId));
-					});
-				});
-				}
-			});
-			});
-		});
-		
-		observer.observe(document.body, { childList: true, subtree: true });
-	}
-
 	private async loadUsername() {
 		try {
 			const name = await fetchUsername();
@@ -130,7 +107,7 @@ export class matchmaking {
 
 	private gameOptions(): void {
 
-		this.pongBtn.addEventListener('click', () => {
+		addEvent(this.pongBtn, 'click', () => {
 			if (this.pong)
 				return ;
 
@@ -147,7 +124,7 @@ export class matchmaking {
 			console.log("pongBtn classes:", this.pongBtn.classList);
 		});
 
-		this.blockBtn.addEventListener('click', () => {
+		addEvent(this.blockBtn, 'click', () => {
 			if (this.brick)
 				return ;
 
@@ -164,7 +141,7 @@ export class matchmaking {
 			console.log("blockBtn classes:", this.blockBtn.classList);
 		});
 
-		this.homeBtn.addEventListener('click', () => {
+		addEvent(this.homeBtn, 'click', () => {
 			this.stopPolling();
 			window.history.pushState({}, '', `/main`);
 			window.dispatchEvent(new PopStateEvent('popstate'));
@@ -177,7 +154,7 @@ export class matchmaking {
 
 	private async launchRoom() {
 
-		this.launchBtn.addEventListener('click', async () => {
+		addEvent(this.launchBtn, 'click', async () => {
 			// Vérifier qu'un type de jeu est sélectionné
 			if (!this.pong && !this.brick) {
 				alert('Please select a game type first!');
@@ -197,10 +174,16 @@ export class matchmaking {
 			window.history.pushState({}, '', `/room/${uuid}`);
 			window.dispatchEvent(new PopStateEvent('popstate'));
 
+			this.cleanEvents();
+
 			this.ws.send(JSON.stringify({
 				type: 'updateUI',
 			}));
 		});
+	}
+
+	private cleanEvents() {
+
 	}
 
 	private async joinRoom(gameId: number) {
@@ -219,7 +202,7 @@ export class matchmaking {
 	private setJoinBtns() {
 
 		for (let [id, btn] of this.joinBtn) {
-			btn.addEventListener('click', () => {
+			addEvent(btn, 'click', () => {
 				this.joinRoom(Number(id));
 			});
 		}
@@ -349,7 +332,6 @@ export class matchmaking {
 						
 						// Déterminer le statut
 						const totalSlots = parseInt(this.users_needed) || 2;
-						const isWaiting = currentPlayers < totalSlots;
 						const isFull = currentPlayers >= totalSlots;
 						
 						const statusClass = isFull ? 'status-full' : (currentPlayers > 1 ? 'status-playing' : 'status-waiting');
