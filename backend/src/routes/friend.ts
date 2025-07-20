@@ -72,6 +72,25 @@ async function friendRoutes(app: FastifyInstance) {
 		}
 	})
 
+	app.get('/relation', async function (request: FastifyRequest, reply: FastifyReply) {
+
+		try {
+			const { user1, user2,} = request.body as { user1?: string, user2?: string };
+
+			if (!user1 || !user2)
+				throw new Error("missing fields pour rechercher la relation");
+
+			await app.friendService.searchRelation(user1, user2)
+
+		}
+		catch (err: any) {
+			return reply.status(500).send({
+				error: 'erreur chercher relation',
+				details: err.message });
+		}
+
+	})
+
 	app.get('/history', async function (request: FastifyRequest, reply: FastifyReply) {
 
 		try {

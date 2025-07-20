@@ -11,29 +11,84 @@ export function renderProfil(uuid: string) {
 export async function initializeProfilEvents(uuid: string) {
 	console.log('Initializing profil page events');
 	try {
+
+		const me = await loadMe();
+		const user = await loadUserInfo(uuid);
+
+		if (!me || !user) {
+			console.error("ya pas les infos de celui qui va sur la page // celui dont on veut voir le profil")
+			return ;
+		}
+
+		const [ stats, friends, relation ] = await Promise.all([
+			loadUserStats(uuid),
+			loadUserFriends(uuid),
+			loadRelation(me.username, user.username)
+		]);
+
 		const data = {
-			me: await loadMe(),
-			user: await loadUserInfo(uuid),
-			stats: await loadUserStats(uuid),
-			friends: await loadUserFriends(uuid)
+			me,
+			user,
+			stats,
+			friends,
+			relation
 		};
 
 		console.log(JSON.stringify(data.me, null, 12))
 		console.log(JSON.stringify(data.user, null, 12))
 		console.log(JSON.stringify(data.stats, null, 12))
 		console.log(JSON.stringify(data.friends, null, 12))
+
 		new profil(data);
-	} catch (err: any) {
+
+	}
+	catch (err: any) {
 		console.log(err);
 	}
 
 	const homeBtn = document.getElementById('homeBtn') as HTMLElement;
+
 	if (homeBtn) {
 		addEvent(homeBtn, 'click', () => {
 			window.history.pushState({}, '', '/main');
 			window.dispatchEvent(new PopStateEvent('popstate'));
 		});
 	}
+}
+
+async function loadRelation(user1: string, user2: string) {
+
+	try {
+		const token = getAuthToken();
+		if (!token) {
+			alert('❌ Token d\'authentification manquant');
+			window.history.pushState({}, '', '/login');
+			window.dispatchEvent(new PopStateEvent('popstate'));
+			return '';
+		}
+
+		const response = await fetch('/api/friend/relation', {
+			method: 'GET',
+			headers: {
+				'Content-Type': 'application/json',
+				'x-access-token': token
+			},
+			body: JSON.stringify({
+				user1: user1,
+				user2: user2,
+			})
+		});
+
+		if (response.ok) {
+			const result = await response.json();
+			return (result);
+		} else {
+			console.error('Erreur lors de la récupération des données utilisateur');
+		}
+	} catch (err) {
+		console.error(`fail de recup me dans loadme renderFriends`);
+	}
+
 }
 
 async function loadMe() {

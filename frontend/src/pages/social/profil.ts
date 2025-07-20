@@ -8,6 +8,7 @@ export class profil {
 	private user: any;
 	private stats: any;
 	private friends: any;
+	private relation: any;
 
 	private homeBtn: HTMLElement;
 	private username: HTMLElement;
@@ -19,12 +20,15 @@ export class profil {
 	private gameHistory: HTMLElement;
 	private friendsGrid: HTMLElement;
 
+	private isMyFriend: boolean;
+
 	constructor (data: any) {
 
 		this.me = data.me;
 		this.user = data.user;
 		this.stats = data.stats;
 		this.friends = data.friends;
+		this.relation = data.relation;
 
 
 		this.homeBtn = this.getElement('homeBtn');
@@ -36,6 +40,13 @@ export class profil {
 		this.rank = this.getElement('rank');
 		this.gameHistory = this.getElement('gameHistory');
 		this.friendsGrid = this.getElement('friends');
+
+
+		// recup les relations de /me voir si ya user, 
+		this.isMyFriend = false;
+
+
+		// si this.me.username === this.user.username --> pas possible, on redirige vers /me
 
 		this.setupEvents();
 
@@ -98,7 +109,19 @@ export class profil {
         }
 
 	private async addFriend() {
+		
+		//pas possible de s'ajouter soit meme car pas possible d'arriver sur cette page, on redirige vers /me
 
+
+		console.log(`🔍 Debug - addFriend called: ${user.username} wants to add ${friendName}`);
+
+			
+		// 2 - check si une relation n'existe pas déjà
+
+		// via  this.relation
+		
+	/*
+		/// on fais vraiment la request
 		try {
 			const token = getAuthToken();
 			if (!token) {
@@ -125,6 +148,7 @@ export class profil {
 		catch (err) {
 			console.error(`nn nn c'est pas bon mgl`)
 		}
+			*/
 
 	}
 
