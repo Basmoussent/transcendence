@@ -4,15 +4,17 @@ import { t } from '../../utils/translations';
 import { profil } from './profil'
 
 export async function renderProfil(uuid: string) {
-	console.log('Initializing profil page events');
-	try {
+	return getTemplate(); // => retourne une string HTML
+}
 
+export async function initializeProfilEvents(uuid:string) {
+	try {
 		const me = await loadMe();
 		const user = await loadUserInfo(uuid);
 
 		if (!me || !user) {
-			console.error("ya pas les infos de celui qui va sur la page // celui dont on veut voir le profil")
-			return getTemplate();
+			console.error("ya pas les infos");
+			return;
 		}
 
 		const [ stats, friends, relation ] = await Promise.all([
@@ -21,41 +23,21 @@ export async function renderProfil(uuid: string) {
 			loadRelation(me.username, user.username)
 		]);
 
-		// Vérifier que toutes les données sont valides
 		if (!stats || !friends) {
 			console.error("Données manquantes pour afficher le profil");
-			return getTemplate();
 		}
 
-		const data = {
-			me,
-			user,
-			stats,
-			friends,
-			relation
-		};
+		const data = { me, user, stats, friends, relation };
 
+		await new Promise(resolve => requestAnimationFrame(resolve));
+ 
 		new profil(data);
-		console.log("renderProfil")
-		return getTemplate();
-
 	}
-	catch (err: any) {
+	catch (err) {
 		console.log(err);
-		return getTemplate();
 	}
 }
 
-export function initializeProfilEvents() {
-	console.log("initializeProfilEvents")
-	const homeBtn = document.getElementById('homeBtn') as HTMLElement;
-	if (homeBtn) {
-		homeBtn.addEventListener('click', () => {
-			window.history.pushState({}, '', '/main');
-			window.dispatchEvent(new PopStateEvent('popstate'));
-		});
-	}
-}
 
 async function loadRelation(user1: string, user2: string) {
 
@@ -287,19 +269,19 @@ function getTemplate() {
 				</div>
 					<div class="stats-grid">
 						<div class="stat-card">
-							<div id="gamePlayed" class="stat-number">1,247</div>
+							<div id="gamePlayed" class="stat-number"></div>
 							<div class="stat-label">Game played</div>
 						</div>
 						<div class="stat-card">
-							<div id="winrate" class="stat-number">68%</div>
+							<div id="winrate" class="stat-number"></div>
 							<div class="stat-label">Winrate</div>
 						</div>
 						<div class="stat-card">
-							<div id="mmr" class="stat-number">42</div>
+							<div id="mmr" class="stat-number"></div>
 							<div class="stat-label">MMR</div>
 						</div>
 						<div class="stat-card">
-							<div id="rank" class="stat-number">42</div>
+							<div id="rank" class="stat-number"></div>
 							<div class="stat-label">Rank</div>
 					</div>
 				</div>
