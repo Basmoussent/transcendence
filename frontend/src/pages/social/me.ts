@@ -1,6 +1,6 @@
 import { getAuthToken, removeAuthToken } from '../../utils/auth';
 import { sanitizeHtml } from '../../utils/sanitizer';
-import { t } from '../../utils/translations';
+import { t, TranslationKeys } from '../../utils/translations';
 import { userInfo, update2FAState } from './utils';
 import { getUserGameHistory } from '../../game/gameUtils';
 
@@ -13,7 +13,7 @@ export async function renderMe() {
 		games: 0,
 		rating: 0,
 		preferred_language: 'en',
-		twoFactorEnabled: false // Ajout du champ 2FA
+		twoFactorEnabled: false
 	};
 
 	try {
@@ -43,7 +43,7 @@ export async function renderMe() {
 				games: (result.stats?.games) || 0,
 				rating: (result.stats?.rating) || 0,
 				preferred_language: sanitizeHtml(result.user?.language) || 'en',
-				twoFactorEnabled: result.user?.two_fact_auth || false // Récupération du statut 2FA
+				twoFactorEnabled: result.user?.two_fact_auth || false
 			};
 		} else {
 			console.error('Erreur lors de la récupération des données utilisateur');
@@ -52,7 +52,6 @@ export async function renderMe() {
 		console.error("Error rendering profile page:", error);
 	}
 
-	// Récupérer l'historique des parties
 	let gameHistory: any[] = [];
 	try {
 		gameHistory = await getUserGameHistory(userData.username);
@@ -62,12 +61,10 @@ export async function renderMe() {
 		console.error("Error fetching game history:", error);
 	}
 
-	// Construire l'URL de l'avatar
 	const avatarUrl = userData.avatar.startsWith('http') || userData.avatar.startsWith('/api/')
 		? userData.avatar
 		: `/api/uploads/${userData.avatar}`;
 
-	// Fonctions utilitaires pour l'historique des parties
 	const formatDate = (timestamp: string) => {
 		if (!timestamp) return 'N/A';
 		const date = new Date(parseInt(timestamp));
@@ -116,7 +113,6 @@ export async function renderMe() {
 		: '<div class="no-games">Aucune partie récente</div>';
 	
 
-	// Déterminer le texte et l'icône du bouton 2FA
 	const tfaButtonText = userData.twoFactorEnabled ? 'Désactiver 2FA' : 'Activer 2FA';
 	const tfaButtonIcon = userData.twoFactorEnabled ? 'fa-solid fa-lock-open' : 'fa-solid fa-lock';
 
@@ -176,11 +172,11 @@ export async function renderMe() {
 					<div class="profile-actions">
 						<button class="action-button edit-profile">
 							<i class="fas fa-edit"></i>
-							Modifier le profil
+							${t('profile.editProfile')}
 						</button>
 						<button class="action-button change-password">
 							<i class="fas fa-key"></i>
-							Changer le mot de passe
+							${t('profile.changePassword')}
 						</button>
 						<button class="action-button TFA-button" id="TFABtn" data-enabled="${userData.twoFactorEnabled}">
 							<i class="fa-solid ${tfaButtonIcon}"></i>
