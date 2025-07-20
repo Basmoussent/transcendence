@@ -11,6 +11,8 @@ export interface Available {
 	player3?: string,
 	player4?: string,
 	users_needed: number,
+	averageWinrate?: number,
+	playersWithStats?: Array<{username: string, winrate: number}>,
 	divConverion(): string;
 };
 
@@ -91,8 +93,9 @@ export class matchmaking {
 			mutation.addedNodes.forEach((node) => {
 				if (node.nodeType === Node.ELEMENT_NODE) {
 				const element = node as Element;
-				const joinButtons = element.querySelectorAll('[id^="join"][id$="Btn"]');
 				
+				// Gérer les boutons Join
+				const joinButtons = element.querySelectorAll('[id^="join"][id$="Btn"]');
 				joinButtons.forEach((btn) => {
 					const gameId = btn.id.replace('join', '').replace('Btn', '');
 					this.gameId = Number(gameId);
@@ -104,11 +107,51 @@ export class matchmaking {
 						});
 					}
 				});
+
+				// Gérer les clics sur les cartes de jeu
+				const gameCards = element.querySelectorAll('.game-card[data-game-id]');
+				gameCards.forEach((card) => {
+					const gameId = card.getAttribute('data-game-id');
+					if (gameId) {
+						addEvent(card, 'click', () => {
+							this.gameId = Number(gameId);
+							this.joinIt();
+						});
+					}
+				});
 				}
 			});
 			});
 		});
 		observer.observe(document.body, { childList: true, subtree: true });
+	}
+
+	private initializeExistingButtons() {
+		// Initialiser les boutons qui existent déjà
+		const joinButtons = document.querySelectorAll('[id^="join"][id$="Btn"]');
+		joinButtons.forEach((btn) => {
+			const gameId = btn.id.replace('join', '').replace('Btn', '');
+			this.gameId = Number(gameId);
+
+			if (!this.joinBtn.has(Number(gameId))) {
+				this.joinBtn.set(Number(gameId), btn as HTMLElement);
+				addEvent(btn, 'click', () => {
+					this.joinIt();
+				});
+			}
+		});
+
+		// Initialiser les clics sur les cartes de jeu existantes
+		const gameCards = document.querySelectorAll('.game-card[data-game-id]');
+		gameCards.forEach((card) => {
+			const gameId = card.getAttribute('data-game-id');
+			if (gameId) {
+				addEvent(card, 'click', () => {
+					this.gameId = Number(gameId);
+					this.joinIt();
+				});
+			}
+		});
 	}
 	
 	private async loadUsername() {
@@ -266,6 +309,10 @@ export class matchmaking {
 			if (container && typeof inject === 'string') {
 				this.availableGames.innerHTML = inject;
 				console.log(`Updated available games: ${gameList.length} games found`);
+				
+				setTimeout(() => {
+					this.initializeExistingButtons();
+				}, 0);
 			}
 		} catch (error) {
 			console.error('Error updating available games:', error);
@@ -326,6 +373,8 @@ export class matchmaking {
 					player3: sanitizeHtml(game?.player3),
 					player4: sanitizeHtml(game?.player4),
 					users_needed:(sanitizeHtml(game.users_needed)),
+					averageWinrate: game.averageWinrate || 0,
+					playersWithStats: game.playersWithStats || [],
 					divConverion(): string {
 						// Calculer le nombre de joueurs actuels
 						const currentPlayers = [this.player1, this.player2, this.player3, this.player4]
@@ -343,8 +392,13 @@ export class matchmaking {
 							.filter(player => player && player.trim() !== '')
 							.join(', ');
 						
+						// Générer la liste des joueurs avec leurs winrates
+						const playersWithWinrates = this.playersWithStats?.map((player: {username: string, winrate: number}) => 
+							`${player.username} (${player.winrate}%)`
+						).join(', ') || playersList;
+						
 						return `
-							<div class="game-card" ${!isFull ? `onclick="joinGame('${this.gameId}')"` : ''}>
+							<div class="game-card" ${!isFull ? `data-game-id="${this.gameId}"` : ''}>
 								<div class="game-header">
 									<h3 class="game-title">${this.game_type}</h3>
 									<span class="game-status ${statusClass}">${statusText}</span>
@@ -359,10 +413,16 @@ export class matchmaking {
 										<span>${currentPlayers}/${totalSlots}</span>
 									</div>
 								</div>
-								${playersList ? `
+								${this.averageWinrate !== undefined ? `
+									<div class="winrate-info">
+										<i class="fas fa-trophy"></i>
+										<span>Avg Winrate: ${this.averageWinrate}%</span>
+									</div>
+								` : ''}
+								${playersWithWinrates ? `
 									<div class="players-list">
 										<i class="fas fa-user"></i>
-										<span>${playersList}</span>
+										<span>${playersWithWinrates}</span>
 									</div>
 								` : ''}
 								${!isFull ? `

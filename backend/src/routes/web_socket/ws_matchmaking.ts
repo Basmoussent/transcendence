@@ -10,6 +10,18 @@ export function broadcastMatchmaking(data: any) {
 			user.send(JSON.stringify(data))
 }
 
+export async function broadcastMatchmakingWithWinrates(app: FastifyInstance, data: any) {
+	// Si c'est une mise à jour de l'UI, on peut enrichir avec les winrates
+	if (data.type === 'updateUI') {
+		// Les winrates sont déjà calculés dans l'API /available
+		// On peut juste envoyer le signal de mise à jour
+	}
+	
+	for (const user of matchmaking)
+		if (user.readyState === WebSocket.OPEN)
+			user.send(JSON.stringify(data))
+}
+
 export function handleMatchmaking(socket: WebSocket, req: FastifyRequest) {
 	const token = req.headers['x-access-token'] ? req.headers['x-access-token'] : req.cookies['x-access-token']; 
 		
