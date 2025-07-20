@@ -454,8 +454,8 @@ export async function renderMe() {
 		const changePasswordButton = document.querySelector('.action-button.change-password');
 		const changeAvatarBtn = document.getElementById('changeAvatarBtn');
 		const avatarInput = document.getElementById('avatarInput') as HTMLInputElement;
-		const homeBtn = document.getElementById('homeBtn');
 		const TFABtn = document.getElementById('TFABtn');
+		const homeBtn = document.getElementById('homeBtn');
 	
 		if (homeBtn) {
 			homeBtn.addEventListener('click', () => {

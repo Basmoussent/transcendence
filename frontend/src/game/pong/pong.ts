@@ -50,11 +50,7 @@ export class Pong {
 		this.end = false;
 		this.lastPlayerColl = -1;
 
-		// !!! modifier ca avec les infos de la partie
-		this.paddles = [
-			new Paddle(20, 100, PADDLE1_COLOR),
-			new Paddle(20, 100, PADDLE2_COLOR),
-		];
+		this.paddles = this.initPlayers();
 
 		this.ball = new Ball(this.height, this.width);
 		this.keys = {};
@@ -116,6 +112,20 @@ export class Pong {
 		}
 
 		// console.log(`les infos de la game => ${JSON.stringify(this.data, null, 12)}`)
+	}
+
+	private initPlayers(): [Paddle, Paddle | PaddleAI] {
+		let ai_player = this.data.ai;
+
+		const paddle1 = new Paddle(20, 100, PADDLE1_COLOR); // player1 toujours un player
+		let paddle2: Paddle | PaddleAI;
+
+		if (ai_player > 0)
+			paddle2 = new PaddleAI(20, 100, PADDLE2_COLOR);
+		else
+			paddle2 = new Paddle(20, 100, PADDLE2_COLOR);
+
+		return [paddle1, paddle2];
 	}
 
 	// positions et tailles de base en fonction de la taille du canvas

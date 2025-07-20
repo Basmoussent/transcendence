@@ -137,7 +137,9 @@ export async function router() {
 		case '/edit-profil':
 			view = renderEditProfil();
 			break;
-		
+		case '/tournament':
+			view = renderTournaments();
+			break;
 		case '/room':
 			if (!uuid)
 				return ;

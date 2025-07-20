@@ -48,12 +48,7 @@ export class MultiPong {
         this.lastPlayerColl = -1;
 
         // !!! modifier ca avec les infos de la partie
-        this.paddles = [
-            new Paddle(20, 100, PADDLE1_COLOR),
-            new PaddleAI(20, 100, PADDLE2_COLOR),
-            new PaddleAI(100, 20, PADDLE3_COLOR),
-            new PaddleAI(100, 20, PADDLE4_COLOR)
-        ];
+        this.paddles = this.initPlayers();
 
         this.ball = new Ball(this.height, this.width);
         this.keys = {};
@@ -101,9 +96,51 @@ export class MultiPong {
         // console.log(`les infos de la game => ${JSON.stringify(this.data, null, 12)}`)
 	}
 
-    // private initPlayers(): void {
-    //     this.paddles.push(new Paddle())
-    // }
+    private initPlayers(): [Paddle, Paddle | PaddleAI, Player?, Player?] {
+        let players: number = this.data.users_needed - 1;
+        let ai_players: number = this.data.ai;
+
+        const paddles: Player[] = [];
+
+        // player1 toujours un player
+        paddles.push(new Paddle(20, 100, PADDLE1_COLOR));
+
+        // player2 soit un player soit une ia
+        if (players > 0) {
+            paddles.push(new Paddle(20, 100, PADDLE2_COLOR));
+            players -= 1;
+        }
+        else {
+            paddles.push(new PaddleAI(20, 100, PADDLE2_COLOR));
+            ai_players -= 1;
+        }
+
+        // player3 soit player soit ia soit aucun des deux
+        if (players > 0) {
+            paddles.push(new Paddle(100, 20, PADDLE3_COLOR));
+            players -= 1;
+        }
+        else if (ai_players > 0) {
+            paddles.push(new PaddleAI(100, 20, PADDLE3_COLOR));
+            ai_players -= 1;
+        }
+        else
+            paddles.push(null);
+
+        // player4 soit player soit ia soit aucun des deux
+        if (players > 0) {
+            paddles.push(new Paddle(100, 20, PADDLE3_COLOR));
+            players -= 1;
+        }
+        else if (ai_players > 0) {
+            paddles.push(new PaddleAI(100, 20, PADDLE4_COLOR));
+            ai_players -= 1;
+        }
+        else
+            paddles.push(null);
+
+        return paddles as [Paddle, Paddle | PaddleAI, Player?, Player?];
+    }
 
     public init(): void {
         console.log('Initializing paddle game...');

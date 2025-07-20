@@ -44,3 +44,6 @@ https://jwt.io/introduction
             // Payload: contient les claims
                 // infos sur l'utilisateur
             // Signature
+
+
+bouton home a l page tournois
