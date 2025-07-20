@@ -8,7 +8,7 @@ export function render2FALogin() {
     <div class="tfa-wrapper">
       <div class="tfa-container">
         <div class="tfa-header">
-          <h1>Authentification à deux facteurs</h1>
+          <h1>${t('twoFactorAuth.title')}</h1>
         </div>
           
           <div class="verification-section">

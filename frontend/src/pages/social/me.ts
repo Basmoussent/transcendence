@@ -1,7 +1,6 @@
 import { getAuthToken, removeAuthToken } from '../../utils/auth';
 import { sanitizeHtml } from '../../utils/sanitizer';
-import { addEvent } from '../../utils/eventManager';
-import { t } from '../../utils/translations';
+import { t, TranslationKeys } from '../../utils/translations';
 import { userInfo, update2FAState } from './utils';
 import { getUserGameHistory } from '../../game/gameUtils';
 
@@ -14,7 +13,7 @@ export async function renderMe() {
 		games: 0,
 		rating: 0,
 		preferred_language: 'en',
-		twoFactorEnabled: false // Ajout du champ 2FA
+		twoFactorEnabled: false
 	};
 
 	try {
@@ -44,7 +43,7 @@ export async function renderMe() {
 				games: (result.stats?.games) || 0,
 				rating: (result.stats?.rating) || 0,
 				preferred_language: sanitizeHtml(result.user?.language) || 'en',
-				twoFactorEnabled: result.user?.two_fact_auth || false // Récupération du statut 2FA
+				twoFactorEnabled: result.user?.two_fact_auth || false
 			};
 		} else {
 			console.error('Erreur lors de la récupération des données utilisateur');
@@ -53,7 +52,6 @@ export async function renderMe() {
 		console.error("Error rendering profile page:", error);
 	}
 
-	// Récupérer l'historique des parties
 	let gameHistory: any[] = [];
 	try {
 		gameHistory = await getUserGameHistory(userData.username);
@@ -63,12 +61,10 @@ export async function renderMe() {
 		console.error("Error fetching game history:", error);
 	}
 
-	// Construire l'URL de l'avatar
 	const avatarUrl = userData.avatar.startsWith('http') || userData.avatar.startsWith('/api/')
 		? userData.avatar
 		: `/api/uploads/${userData.avatar}`;
 
-	// Fonctions utilitaires pour l'historique des parties
 	const formatDate = (timestamp: string) => {
 		if (!timestamp) return 'N/A';
 		const date = new Date(parseInt(timestamp));
@@ -117,7 +113,6 @@ export async function renderMe() {
 		: '<div class="no-games">Aucune partie récente</div>';
 	
 
-	// Déterminer le texte et l'icône du bouton 2FA
 	const tfaButtonText = userData.twoFactorEnabled ? 'Désactiver 2FA' : 'Activer 2FA';
 	const tfaButtonIcon = userData.twoFactorEnabled ? 'fa-solid fa-lock-open' : 'fa-solid fa-lock';
 
@@ -177,11 +172,11 @@ export async function renderMe() {
 					<div class="profile-actions">
 						<button class="action-button edit-profile">
 							<i class="fas fa-edit"></i>
-							Modifier le profil
+							${t('profile.editProfile')}
 						</button>
 						<button class="action-button change-password">
 							<i class="fas fa-key"></i>
-							Changer le mot de passe
+							${t('profile.changePassword')}
 						</button>
 						<button class="action-button TFA-button" id="TFABtn" data-enabled="${userData.twoFactorEnabled}">
 							<i class="fa-solid ${tfaButtonIcon}"></i>
@@ -221,11 +216,12 @@ export async function renderMe() {
 				justify-content: center;
 				align-items: flex-start;
 				padding: 20px;
+				box-sizing: border-box;
 			}
 
 			.profile-stack {
-				width: 90%;
-				max-width: 800px;
+				width: 100%;
+				max-width: 1200px;
 				display: flex;
 				flex-direction: column;
 				gap: 30px;
@@ -303,7 +299,8 @@ export async function renderMe() {
 				box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
 				border: 1px solid rgba(255, 255, 255, 0.18);
 				animation: fadeIn 0.5s ease-out;
-				overflow: auto;
+				overflow: hidden;
+				box-sizing: border-box;
 			}
 
 			.profile-header {
@@ -311,6 +308,7 @@ export async function renderMe() {
 				align-items: center;
 				gap: 30px;
 				margin-bottom: 40px;
+				flex-wrap: wrap;
 			}
 
 			.home-button {
@@ -392,7 +390,7 @@ export async function renderMe() {
 
 			.profile-stats {
 				display: grid;
-				grid-template-columns: repeat(3, 1fr);
+				grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
 				gap: 15px;
 				margin-bottom: 30px;
 			}
@@ -429,7 +427,7 @@ export async function renderMe() {
 
 			.profile-actions {
 				display: grid;
-				grid-template-columns: repeat(3, 1fr);
+				grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
 				gap: 15px;
 				margin-bottom: 30px;
 			}
@@ -486,6 +484,10 @@ export async function renderMe() {
 			}
 
 			@media (max-width: 768px) {
+				.profile-wrapper {
+					padding: 10px;
+				}
+
 				.profile-container {
 					padding: 20px;
 				}
@@ -517,9 +519,21 @@ export async function renderMe() {
 					width: 100px;
 					height: 100px;
 				}
+
+				.game-history-container {
+					padding: 20px;
+				}
+
+				.games-list {
+					max-height: 300px;
+				}
 			}
 
 			@media (max-width: 480px) {
+				.profile-wrapper {
+					padding: 5px;
+				}
+
 				.profile-container {
 					padding: 15px;
 				}
@@ -537,6 +551,18 @@ export async function renderMe() {
 					width: 30px;
 					height: 30px;
 				}
+
+				.game-history-container {
+					padding: 15px;
+				}
+
+				.games-list {
+					max-height: 250px;
+				}
+
+				.game-history-item {
+					padding: 15px;
+				}
 			}
 
 			/* Styles pour la section Historique des Parties */
@@ -552,6 +578,7 @@ export async function renderMe() {
 				box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
 				border: 1px solid rgba(255, 255, 255, 0.18);
 				color: white;
+				box-sizing: border-box;
 			}
 
 			.game-history-header {
@@ -559,6 +586,8 @@ export async function renderMe() {
 				justify-content: space-between;
 				align-items: center;
 				margin-bottom: 25px;
+				flex-wrap: wrap;
+				gap: 15px;
 			}
 
 			.game-history-header h2 {
@@ -590,6 +619,27 @@ export async function renderMe() {
 				display: flex;
 				flex-direction: column;
 				gap: 15px;
+				max-height: 400px;
+				overflow-y: auto;
+				padding-right: 10px;
+			}
+
+			.games-list::-webkit-scrollbar {
+				width: 8px;
+			}
+
+			.games-list::-webkit-scrollbar-track {
+				background: rgba(255, 255, 255, 0.1);
+				border-radius: 10px;
+			}
+
+			.games-list::-webkit-scrollbar-thumb {
+				background: rgba(255, 255, 255, 0.3);
+				border-radius: 10px;
+			}
+
+			.games-list::-webkit-scrollbar-thumb:hover {
+				background: rgba(255, 255, 255, 0.5);
 			}
 
 			.game-history-item {
@@ -600,6 +650,8 @@ export async function renderMe() {
 				justify-content: space-between;
 				align-items: center;
 				transition: all 0.3s ease;
+				flex-wrap: wrap;
+				gap: 15px;
 			}
 
 			.game-history-item:hover {
@@ -694,6 +746,18 @@ export async function renderMe() {
 					text-align: left;
 				}
 			}
+
+			@media (max-width: 1024px) {
+				.profile-stack {
+					max-width: 95%;
+				}
+			}
+
+			@media (min-width: 1200px) {
+				.profile-stack {
+					max-width: 1400px;
+				}
+			}
 		</style>
 	`;
 }
@@ -707,15 +771,16 @@ export function initializeMeEvents() {
 	const homeBtn = document.getElementById('homeBtn') as HTMLElement;
 	const TFABtn = document.getElementById('TFABtn') as HTMLElement;
 
+	console.log("initializeMeEvents");
 	if (homeBtn) {
-		addEvent(homeBtn, 'click', () => {
+		homeBtn.addEventListener('click', () => {
 			window.history.pushState({}, '', '/main');
 			window.dispatchEvent(new PopStateEvent('popstate'));
 		});
 	}
 
 	if (logoutButton) {
-		addEvent(logoutButton, 'click', () => {
+		logoutButton.addEventListener('click', () => {
 			removeAuthToken();
 			window.history.pushState({}, '', '/login');
 			window.dispatchEvent(new PopStateEvent('popstate'));
@@ -723,14 +788,14 @@ export function initializeMeEvents() {
 	}
 
 	if (editProfileButton) {
-		addEvent(editProfileButton, 'click', () => {
+		editProfileButton.addEventListener('click', () => {
 			window.history.pushState({}, '', '/edit-profil');
 			window.dispatchEvent(new PopStateEvent('popstate'));
 		});
 	}
 
 	if (changePasswordButton) {
-		addEvent(changePasswordButton, 'click', () => {
+		changePasswordButton.addEventListener('click', () => {
 			window.history.pushState({}, '', '/change-password');
 			window.dispatchEvent(new PopStateEvent('popstate'));
 		});
@@ -738,7 +803,7 @@ export function initializeMeEvents() {
 
 	// Gestion bouton 2FA
 	if (TFABtn) {
-		addEvent(TFABtn, 'click', async () => {
+		TFABtn.addEventListener('click', async () => {
 		
 		console.log('iqubwiduqbwiudbqiwudbq')
 		const info = await userInfo();
@@ -767,11 +832,11 @@ export function initializeMeEvents() {
 
 	// Gestion de l'upload d'avatar
 	if (changeAvatarBtn && avatarInput) {
-		addEvent(changeAvatarBtn, 'click', () => {
+		changeAvatarBtn.addEventListener('click', () => {
 			avatarInput.click();
 		});
 
-		addEvent(avatarInput, 'change', async (e) => {
+		avatarInput.addEventListener('change', async (e) => {
 			const file = (e.target as HTMLInputElement).files?.[0];
 			if (!file) return;
 

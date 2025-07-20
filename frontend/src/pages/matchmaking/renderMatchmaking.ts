@@ -475,6 +475,26 @@ const getTemplate = () => {
 		color: #AFC97E;
 	}
 
+	/* Winrate Info */
+	.winrate-info {
+		display: flex;
+		align-items: center;
+		gap: 8px;
+		margin-top: 8px;
+		padding: 6px 10px;
+		background: rgba(255, 193, 7, 0.1);
+		border-radius: 8px;
+		border: 1px solid rgba(255, 193, 7, 0.2);
+		color: #ffc107;
+		font-size: 0.85rem;
+		font-weight: 600;
+	}
+
+	.winrate-info i {
+		color: #ffc107;
+		opacity: 0.9;
+	}
+
 	/* Players List */
 	.players-list {
 		display: flex;

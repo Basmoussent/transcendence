@@ -742,7 +742,6 @@ export const translations = {
   }
 } as const;
 
-type DotPrefix<T extends string> = T extends '' ? '' : `.${T}`;
 
 type DotNestedKeys<T> = {
   [K in keyof T & string]: T[K] extends object
@@ -751,7 +750,7 @@ type DotNestedKeys<T> = {
 }[keyof T & string];
 
 type Language = keyof typeof translations;
-type TranslationKeys = DotNestedKeys<typeof translations>;
+export type TranslationKeys = DotNestedKeys<typeof translations>;
 
 export function getLanguage(): Language {
   const subdomain = sessionStorage.getItem('lang');

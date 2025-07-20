@@ -160,9 +160,60 @@ async function gameRoutes(app: FastifyInstance) {
 						err ? reject(err) : resolve(row || null); }
 				);
 			});
+
+			// Enrichir les jeux avec les winrates des joueurs
+			const gamesWithWinrates = await Promise.all(games?.map(async (game) => {
+				const players = [game.player1, game.player2, game.player3, game.player4]
+					.filter(player => player && player.trim() !== '');
+				
+				let totalWinrate = 0;
+				let playerCount = 0;
+				const playersWithStats = [];
+
+				for (const player of players) {
+					try {
+						console.log(`recup stats pour ${player}`)
+						const stats = await app.userService.retrieveStats(player);
+						console.log("stats", stats)
+						if (stats) {
+							const totalGames = (stats.pong_games || 0) + (stats.block_games || 0);
+							const totalWins = (stats.pong_wins || 0) + (stats.block_wins || 0);
+							const winrate = totalGames > 0 ? Math.round((totalWins / totalGames) * 100) : 0;
+							
+							totalWinrate += winrate;
+							playerCount++;
+							
+							playersWithStats.push({
+								username: player,
+								winrate: winrate
+							});
+						} else {
+							playersWithStats.push({
+								username: player,
+								winrate: 0
+							});
+						}
+					} catch (error) {
+						console.error(`Erreur lors de la récupération des stats pour ${player}:`, error);
+						playersWithStats.push({
+							username: player,
+							winrate: 0
+						});
+					}
+				}
+
+				const averageWinrate = playerCount > 0 ? Math.round(totalWinrate / playerCount) : 0;
+
+				return {
+					...game,
+					playersWithStats,
+					averageWinrate
+				};
+			}) || []);
+
 			return reply.send({
 				message: 'games recu avec succès',
-				games: games,
+				games: gamesWithWinrates,
 			});
 		}
 
@@ -259,7 +310,7 @@ async function gameRoutes(app: FastifyInstance) {
 
 			const games = await new Promise<Game[]>((resolve, reject) => {
 				database.all(
-					`SELECT * FROM games 
+					`SELECT * FROM history 
 					WHERE (player1 = ? OR player2 = ? OR player3 = ? OR player4 = ?) 
 					ORDER BY end_time DESC 
 					LIMIT 20`,
@@ -282,6 +333,35 @@ async function gameRoutes(app: FastifyInstance) {
 			if (err.name === 'JsonWebTokenError')
 				return reply.status(401).send({ error: 'Token invalide ou expiré' });
 			return reply.status(500).send({ error: 'erreur GET /games/user/:username/history', details: err.message });
+		}
+	});
+
+	app.post('/finish/:uuid', async function (request: FastifyRequest, reply: FastifyReply) {
+		try {
+			const { uuid } = request.params as { uuid: string };
+			const { winner } = request.body as { winner: string };
+
+			if (!uuid || !winner) {
+				throw new Error("missing uuid or winner in the request");
+			}
+
+			const success = await app.gameService.moveToHistory(uuid, winner);
+			
+			if (success) {
+				return reply.send({
+					message: 'Partie terminée et déplacée vers history',
+					uuid: uuid,
+					winner: winner
+				});
+			} else {
+				return reply.status(500).send({ error: 'Erreur lors de la finalisation de la partie' });
+			}
+		}
+		catch (err: any) {
+			console.error('erreur POST /games/finish/:uuid :', err);
+			if (err.name === 'JsonWebTokenError')
+				return reply.status(401).send({ error: 'Token invalide ou expiré' });
+			return reply.status(500).send({ error: 'erreur POST /games/finish/:uuid', details: err.message });
 		}
 	});
 

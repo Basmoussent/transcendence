@@ -177,6 +177,7 @@ export async function router() {
 	};
 
 	const initEventsUuid: { [key:string]: (uuid: string) => void } = {
+
 		'/profil': initializeProfilEvents,
 		'/room': initializeRoomEvents,
 		'/block': initializeBlockEvents,
@@ -188,10 +189,7 @@ export async function router() {
 	setTimeout(() => {
 		const init = initEvents[path];
 		const initUuid = initEventsUuid[path];
-		
-		// Nettoyer les événements avant d'initialiser les nouveaux
-		cleanEvents();
-		
+
 		var el = document.getElementById('app'),
 		elClone = el!.cloneNode(true);
 
@@ -199,7 +197,7 @@ export async function router() {
 
 		if (init)
 			init();
-		else {
+		else if (initUuid){
 			initUuid(uuid)
 		}
 	}, 0);
