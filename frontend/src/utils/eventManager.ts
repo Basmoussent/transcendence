@@ -1,12 +1,12 @@
 interface ActiveListener {
-	element: HTMLElement;
+	element: HTMLElement | Element;
 	type: string;
 	handler: EventListenerOrEventListenerObject;
 }
 
 let events: ActiveListener[] = [];
 
-export function addEvent(element: HTMLElement, type: string, handler: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions) {
+export function addEvent(element: HTMLElement | Element, type: string, handler: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions) {
 	element.addEventListener(type, handler, options);
 	events.push({ element, type, handler });
 }

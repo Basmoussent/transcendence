@@ -27,7 +27,6 @@ import { cleanEvents } from './eventManager';
 
 export async function router() {
 
-	// Clear translation cache to ensure fresh translations
 	clearTranslationCache();
 	
 	let path = window.location.pathname;
@@ -78,6 +77,7 @@ export async function router() {
 	if (path === '/login' && token) {
 		window.history.pushState({}, '', '/main');
 		app.innerHTML = renderMain();
+		initializeMainEvents();
 		return;
 	}
 
@@ -86,7 +86,7 @@ export async function router() {
 	const renderView: { [key: string]: (uuid?: string) => Promise<string> | string } = {
 		'/': () => renderHome(),
 		'/login': () => renderLogin(),
-		'/lang': async () => {//c'est quoi ce prout
+		'/lang': async () => {
 			const lastPath = localStorage.getItem('lastPath');
 			if (lastPath && lastPath !== '/lang') {
 				console.log('log', lastPath);
@@ -162,7 +162,6 @@ export async function router() {
 		'/edit-profil': initializeEditProfileEvents,
 		'/chat': initializeChatEvents,
 		'/2fa': initialize2FAEvents,
-		
 		'/tournament': initializeTournamentEvents,
 	};
 
@@ -179,6 +178,12 @@ export async function router() {
 		const init = initEvents[path];
 		const initUuid = initEventsUuid[path];
 		
+		// cleanEvents();
+		var el = document.getElementById('app'),
+		elClone = el!.cloneNode(true);
+
+		el!.parentNode!.replaceChild(elClone, el!);
+
 		if (init)
 			init();
 		else {

@@ -45,8 +45,8 @@ export class matchmaking {
 		this.availableGames = this.getElement('available-games');
 
 		// Ajouter un listener pour nettoyer quand l'utilisateur quitte la page
-		window.addEventListener('beforeunload', () => {
-			this.stopPolling();
+		addEvent(window, 'beforeunload', () => {
+			
 			if (this.ws.readyState === WebSocket.OPEN) {
 				this.ws.send(JSON.stringify({
 					type: 'leave'
@@ -66,7 +66,6 @@ export class matchmaking {
 		this.ws.onopen = () => {
 			console.log(`${this.username} est arrive sur matchmaking`)
 			this.updateUI();
-			this.startPolling();
 		}
 
 		this.ws.onerror = (error) => {
@@ -74,7 +73,7 @@ export class matchmaking {
 
 		this.ws.onclose = (event) => {
 			console.log(`${this.username} part de la page matchmaking`);
-			this.stopPolling();
+			
 		}
 
 		this.ws.onmessage = (event) =>  {
@@ -94,8 +93,11 @@ export class matchmaking {
 				
 				joinButtons.forEach((btn) => {
 					const gameId = btn.id.replace('join', '').replace('Btn', '');
+					btn.removeEventListener('click', () => {
+						this.joinRoom(Number(gameId));
+					});
 					btn.addEventListener('click', () => {
-					this.joinRoom(Number(gameId));
+						this.joinRoom(Number(gameId));
 					});
 				});
 				}
@@ -165,7 +167,7 @@ export class matchmaking {
 		});
 
 		addEvent(this.homeBtn, 'click', () => {
-			this.stopPolling();
+			
 			window.history.pushState({}, '', `/main`);
 			window.dispatchEvent(new PopStateEvent('popstate'));
 			this.ws.send(JSON.stringify({
@@ -232,7 +234,7 @@ export class matchmaking {
 				this.updateUI();
 				break;
 			case 'notLog':
-				this.stopPolling();
+				
 				window.history.pushState({}, '', '/login');
 				window.dispatchEvent(new Event('popstate'));
 				this.ws.close();
@@ -252,12 +254,6 @@ export class matchmaking {
 		try {
 			// Ajouter un indicateur de chargement
 			const container = document.getElementById('available-games');
-			if (container) {
-				const loadingIndicator = document.createElement('div');
-				loadingIndicator.className = 'loading-indicator';
-				loadingIndicator.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Updating games...';
-				container.appendChild(loadingIndicator);
-			}
 
 			const gameList = await this.loadAvailableGames();
 			
@@ -287,25 +283,6 @@ export class matchmaking {
 	}
 
 	private pollingInterval: number | null = null;
-
-	private startPolling() {
-		if (this.pollingInterval) {
-			clearInterval(this.pollingInterval);
-		}
-		
-		this.pollingInterval = setInterval(() => {
-			if (this.ws.readyState === WebSocket.OPEN) {
-				this.updateUI();
-			}
-		}, 3000);
-	}
-
-	private stopPolling() {
-		if (this.pollingInterval) {
-			clearInterval(this.pollingInterval);
-			this.pollingInterval = null;
-		}
-	}
 
 	private async loadAvailableGames(): Promise<Available[] | -1> {
 	
