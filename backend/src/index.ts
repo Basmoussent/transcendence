@@ -96,9 +96,6 @@ async function setup() {
 	await fastify.register(cors, {
 		origin: [
 		'https://localhost:2443',
-		'https://fr.localhost:5173',
-		'https://en.localhost:5173',
-		'https://es.localhost:5173',
 		'https://fr.entropy.local',
 		'https://en.entropy.local',
 		'https://es.entropy.local'
