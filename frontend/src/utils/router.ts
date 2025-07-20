@@ -178,7 +178,9 @@ export async function router() {
 		const init = initEvents[path];
 		const initUuid = initEventsUuid[path];
 		
-		// cleanEvents();
+		// Nettoyer les événements avant d'initialiser les nouveaux
+		cleanEvents();
+		
 		var el = document.getElementById('app'),
 		elClone = el!.cloneNode(true);
 

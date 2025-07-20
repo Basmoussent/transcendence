@@ -1,5 +1,7 @@
 import { matchmaking } from "./matchmaking";
 
+let matchmakingInstance: matchmaking | null = null;
+
 export function renderMatchmaking() {
 	return getTemplate();
 }
@@ -7,7 +9,12 @@ export function renderMatchmaking() {
 export function initializeMatchmakingEvents() {
 	console.log('Initializing matchmaking page events');
 	try {
-		new matchmaking();
+		// Nettoyer l'instance précédente si elle existe
+		if (matchmakingInstance) {
+			matchmakingInstance.destroy();
+		}
+		
+		matchmakingInstance = new matchmaking();
 	} catch (err: any) {
 		console.log(err);
 	}

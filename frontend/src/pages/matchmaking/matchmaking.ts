@@ -29,7 +29,7 @@ export class matchmaking {
 	private username: string;
 
 	private joinBtn: Map<number,HTMLElement> = new Map();
-
+	private gameId: number = 0;
 	constructor() {
 
 		this.ws = new WebSocket(`${window.location.protocol === "https:" ? "wss" : "ws"}://${window.location.host}/api/matchmaking`);
@@ -43,10 +43,10 @@ export class matchmaking {
 		this.launchBtn = this.getElement('launchBtn');
 		this.options = this.getElement("game-options");
 		this.availableGames = this.getElement('available-games');
+		this.gameId = 0;
 
 		// Ajouter un listener pour nettoyer quand l'utilisateur quitte la page
 		addEvent(window, 'beforeunload', () => {
-			
 			if (this.ws.readyState === WebSocket.OPEN) {
 				this.ws.send(JSON.stringify({
 					type: 'leave'
@@ -58,7 +58,6 @@ export class matchmaking {
 		this.brick = false;
 
 		this.gameOptions();
-		this.setJoinBtns();
 		this.launchRoom();
 
 		this.setupMutationObserver();
@@ -82,7 +81,9 @@ export class matchmaking {
 		}
 
 	}
-
+	private async joinIt() {
+		await this.joinRoom(this.gameId);
+	}
 	private setupMutationObserver() {
 		const observer = new MutationObserver((mutations) => {
 			mutations.forEach((mutation) => {
@@ -93,12 +94,14 @@ export class matchmaking {
 				
 				joinButtons.forEach((btn) => {
 					const gameId = btn.id.replace('join', '').replace('Btn', '');
-					btn.removeEventListener('click', () => {
-						this.joinRoom(Number(gameId));
-					});
-					btn.addEventListener('click', () => {
-						this.joinRoom(Number(gameId));
-					});
+					this.gameId = Number(gameId);
+
+					if (!this.joinBtn.has(Number(gameId))) {
+						this.joinBtn.set(Number(gameId), btn as HTMLElement);
+						addEvent(btn, 'click', () => {
+							this.joinIt();
+						});
+					}
 				});
 				}
 			});
@@ -213,12 +216,8 @@ export class matchmaking {
 	}
 
 	private setJoinBtns() {
-
-		for (let [id, btn] of this.joinBtn) {
-			addEvent(btn, 'click', () => {
-				this.joinRoom(Number(id));
-			});
-		}
+		// Cette méthode n'est plus nécessaire car les boutons sont gérés par le MutationObserver
+		// Garder la méthode vide pour compatibilité
 	}
 
 	private handleEvents(data: any) {
@@ -282,7 +281,19 @@ export class matchmaking {
 		return tmp;
 	}
 
-	private pollingInterval: number | null = null;
+
+	public destroy() {
+		// Fermer la WebSocket
+		if (this.ws && this.ws.readyState === WebSocket.OPEN) {
+			this.ws.send(JSON.stringify({
+				type: 'leave'
+			}));
+			this.ws.close();
+		}
+		
+		// Nettoyer les événements spécifiques à cette instance
+		// Les autres événements seront nettoyés par cleanEvents() dans le router
+	}
 
 	private async loadAvailableGames(): Promise<Available[] | -1> {
 	
