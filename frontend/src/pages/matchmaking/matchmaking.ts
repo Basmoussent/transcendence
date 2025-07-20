@@ -93,8 +93,9 @@ export class matchmaking {
 			mutation.addedNodes.forEach((node) => {
 				if (node.nodeType === Node.ELEMENT_NODE) {
 				const element = node as Element;
-				const joinButtons = element.querySelectorAll('[id^="join"][id$="Btn"]');
 				
+				// Gérer les boutons Join
+				const joinButtons = element.querySelectorAll('[id^="join"][id$="Btn"]');
 				joinButtons.forEach((btn) => {
 					const gameId = btn.id.replace('join', '').replace('Btn', '');
 					this.gameId = Number(gameId);
@@ -106,11 +107,51 @@ export class matchmaking {
 						});
 					}
 				});
+
+				// Gérer les clics sur les cartes de jeu
+				const gameCards = element.querySelectorAll('.game-card[data-game-id]');
+				gameCards.forEach((card) => {
+					const gameId = card.getAttribute('data-game-id');
+					if (gameId) {
+						addEvent(card, 'click', () => {
+							this.gameId = Number(gameId);
+							this.joinIt();
+						});
+					}
+				});
 				}
 			});
 			});
 		});
 		observer.observe(document.body, { childList: true, subtree: true });
+	}
+
+	private initializeExistingButtons() {
+		// Initialiser les boutons qui existent déjà
+		const joinButtons = document.querySelectorAll('[id^="join"][id$="Btn"]');
+		joinButtons.forEach((btn) => {
+			const gameId = btn.id.replace('join', '').replace('Btn', '');
+			this.gameId = Number(gameId);
+
+			if (!this.joinBtn.has(Number(gameId))) {
+				this.joinBtn.set(Number(gameId), btn as HTMLElement);
+				addEvent(btn, 'click', () => {
+					this.joinIt();
+				});
+			}
+		});
+
+		// Initialiser les clics sur les cartes de jeu existantes
+		const gameCards = document.querySelectorAll('.game-card[data-game-id]');
+		gameCards.forEach((card) => {
+			const gameId = card.getAttribute('data-game-id');
+			if (gameId) {
+				addEvent(card, 'click', () => {
+					this.gameId = Number(gameId);
+					this.joinIt();
+				});
+			}
+		});
 	}
 	
 	private async loadUsername() {
@@ -268,6 +309,10 @@ export class matchmaking {
 			if (container && typeof inject === 'string') {
 				this.availableGames.innerHTML = inject;
 				console.log(`Updated available games: ${gameList.length} games found`);
+				
+				setTimeout(() => {
+					this.initializeExistingButtons();
+				}, 0);
 			}
 		} catch (error) {
 			console.error('Error updating available games:', error);
@@ -353,7 +398,7 @@ export class matchmaking {
 						).join(', ') || playersList;
 						
 						return `
-							<div class="game-card" ${!isFull ? `onclick="joinGame('${this.gameId}')"` : ''}>
+							<div class="game-card" ${!isFull ? `data-game-id="${this.gameId}"` : ''}>
 								<div class="game-header">
 									<h3 class="game-title">${this.game_type}</h3>
 									<span class="game-status ${statusClass}">${statusText}</span>
