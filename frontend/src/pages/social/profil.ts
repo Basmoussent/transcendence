@@ -1,4 +1,5 @@
 import { getAuthToken } from '../../utils/auth';
+import { loadRelation } from './renderProfil'
 
 export class profil {
 
@@ -11,6 +12,7 @@ export class profil {
 	private homeBtn: HTMLElement;
 	private username: HTMLElement;
 	private addFriendBtn: HTMLElement;
+	private blockBtn: HTMLElement;
 	private gamePlayed: HTMLElement;
 	private winrate: HTMLElement;
 	private mmr: HTMLElement;
@@ -33,18 +35,13 @@ export class profil {
 		this.homeBtn = this.getElement('homeBtn');
 		this.username = this.getElement('username');
 		this.addFriendBtn = this.getElement('addFriend');
+		this.blockBtn = this.getElement('blockBtn');
 		this.gamePlayed = this.getElement('gamePlayed');
 		this.winrate = this.getElement('winrate');
 		this.mmr = this.getElement('mmr');
 		this.rank = this.getElement('rank');
 		this.gameHistory = this.getElement('gameHistory');
 		this.friendsGrid = this.getElement('friends');
-
-		// recup les relations de /me voir si ya user, 
-		this.isMyFriend = false;
-
-
-		// si this.me.username === this.user.username --> pas possible, on redirige vers /me
 
 		this.setupEvents();
 		console.log("setupEvents")
@@ -69,9 +66,18 @@ export class profil {
 
 		this.addFriendBtn.addEventListener('click', async () => {
 			await this.addFriend();
-
 			this.addFriendBtn.textContent = 'requested'
+		})
 
+		this.blockBtn.addEventListener('click', async () => {
+
+			this.relation =  await loadRelation(this.me.username, this.user.username)
+			await this.blockUser();
+
+			if (this.blockBtn.textContent!.trim().includes('Bloquer'))
+				this.blockBtn.innerHTML = '<i class="fas fa-check"></i> Débloquer';
+			else
+				this.blockBtn.innerHTML = '<i class="fas fa-ban"></i> Bloquer';
 		})
 
 
@@ -152,59 +158,61 @@ export class profil {
         }
 
 	private async addFriend() {
+
+		// si c'est un ami --> supprimer l'ami
+		// si c'est pas un ami --> ajouter l'ami
+		// s'il est déjà demandé en ami --> cancel la request d'ami
 		
 		//pas possible de s'ajouter soit meme car pas possible d'arriver sur cette page, on redirige vers /me
 
 		console.log(`🔍 Debug - addFriend called: ${this.me.username} wants to add ${this.user.username}`);
 
 		// 2 - check si une relation n'existe pas déjà
-		// via  this.relation
+		console.log(`dans le bueno ${this.relation}`);
 		
-	/*
+	
 		/// on fais vraiment la request
 		try {
 			const token = getAuthToken();
 			if (!token) {
-				alert('❌ Token d\'authentification manquant');
+				alert('❌ Authentication token not found');
 				window.history.pushState({}, '', '/login');
 				window.dispatchEvent(new PopStateEvent('popstate'));
-				return null;
+				return;
 			}
-	
-			const response = await fetch(`/api/friend/${this.user.username}`, {
+
+			await fetch(`/api/friend`, {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',
 					'x-access-token': token,
 				},
-			});
-		
-			if (response.ok) {
-				const result = await response.json();
-				console.log("on a bien recup la game", result);
-				const game: Game = {
-					id: Number(result.id),
-					uuid: sanitizeHtml(result.uuid),
-					game_type: sanitizeHtml(result.game_type),
-					player1: sanitizeHtml(result.player1),
-					player2: sanitizeHtml(result?.player2),
-					player3: sanitizeHtml(result?.player3),
-					player4: sanitizeHtml(result?.player4),
-					winner: sanitizeHtml(result?.winner),
-					users_needed:(Number(result.users_needed)),
-					start_time: sanitizeHtml(result?.start_time),
-					end_time: sanitizeHtml(result?.end_time),
-				};
-				return game;
-			}
-			else 
-				console.error("erreur specific getGame");
-
+				body: JSON.stringify({
+					user_1: this.me.username,
+					user_2: this.user.username,
+					user1_state: 'waiting',
+					user2_state: 'requested',
+				})
+			})
 		}
 		catch (err) {
 			console.error(`nn nn c'est pas bon mgl`)
 		}
-			*/
+
+	}
+
+	private async blockUser() {
+
+		//reload la relation
+		this.relation = await loadRelation(this.me.user, this.user.username);
+
+		// si l'utilisateur était bloqueé mettre normal normal
+
+		// sinon le bloquer mettre blocked et angry
+
+
+
+
 
 	}
 

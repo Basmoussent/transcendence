@@ -36,6 +36,9 @@ export async function router() {
 	const publicRoutes = ['/', '/lang','/login', '/create-account', '/forgot-password'];
 	const token = getAuthToken();
 
+	//TODO recuperer le username grace au token 
+	
+
 	let uuid: string = '';
 	
 	if (path.startsWith('/multipong/') || path.startsWith('/pong/') || path.startsWith('/block/') || path.startsWith('/block1v1/') ||
@@ -55,6 +58,7 @@ export async function router() {
 		// verifier que la game existe dans la db et qu'elle n'a pas de starting time encore
 
 		// '/profil/' verifier que le user existe dans la db et que celui qui appel cette route n'est pas bloque par le user
+		//  si le username renseigne est celui trouvé via le token changer pour le path pour /me
 
 	}
 

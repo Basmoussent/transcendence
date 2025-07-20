@@ -3,8 +3,8 @@ import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 interface Relation {
 	user_1: string;
 	user_2: string;
-	user1_state: 'normal' | 'requested' | 'waiting' | 'blocked';
-	user2_state: 'normal' | 'requested' | 'waiting' | 'blocked';
+	user1_state: 'normal' | 'requested' | 'waiting' | 'blocked' | 'angry';
+	user2_state: 'normal' | 'requested' | 'waiting' | 'blocked' | 'angry';
 }
 
 async function friendRoutes(app: FastifyInstance) {

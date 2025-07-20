@@ -155,32 +155,14 @@ export async function handleRoom(app: FastifyInstance, socket: WebSocket, req: F
 			socket: socket,
 		};
 
-		
-		// le bouton est déjà désactivé quand la room est pleine
-
-		// mettre en place de supprimer les ia si quelqu'un rejoint qu'il fallait 3 personnes et que yavait 2 pesonnes + une ia
-		// if (room.maxPlayers === room.users.size + room.ai) {
-
-		// 	console.log(JSON.stringify({
-		// 		room_users_size : room.users.size,
-		// 		room_ai : room.ai,
-		// 		maxplayer: room.maxPlayers,
-		// 		taille_actuelle: room.users.size + room.ai
-		// 	}))
-		// 	socket.send(JSON.stringify({
-		// 		type: 'error',
-		// 		message: 'Room is full' }));
-		// 		console.log('je vais close le socket')
-		// 	return;
-		// }
+		if ((room.users.size + room.ai >= room.maxPlayers) && room.ai >= 1)
+			room.ai -= 1;
 
 		room.users.set(username, user);
 
 		broadcastSystemMessage(room, `${username} has joined the room.`);
 
-		if (room.users.size + room.ai >= room.maxPlayers) {
-			room.ai -= 1;
-		}
+		
 		await broadcastRoomUpdate(app, room);
 		await app.roomService.updateGame(room)
 		socket.on('message', async (message: string) => {
