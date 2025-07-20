@@ -2,7 +2,7 @@ import { sanitizeHtml } from '../../utils/sanitizer';
 import { fetchMe, fetchUserInfo, loadMe } from './utils';
 import { getAuthToken } from '../../utils/auth';
 import { addEvent } from '../../utils/eventManager';
-import { addEvent } from '../../utils/eventManager';
+import { t } from '../../utils/translations';
 
 export interface UserChat {
 	username: string;
@@ -286,7 +286,7 @@ export class Chat {
 						</div>
 						<div class="friend-info">
 							<div class="friend-name">${sanitizeHtml(friend.username)}</div>
-							<div class="friend-status">En ligne</div>
+							<div class="friend-status">${t('chat.online')}</div>
 						</div>
 						<div class="friend-actions">
 							<button class="action-btn chat-btn">
@@ -314,7 +314,7 @@ export class Chat {
 						</div>
 						<div class="friend-info">
 							<div class="friend-name">${sanitizeHtml(friend.username)}</div>
-							<div class="friend-status">Demande d'ami</div>
+							<div class="friend-status">${t('chat.requests')}</div>
 						</div>
 						<div class="friend-actions">
 							<button class="action-btn accept-btn">
@@ -359,7 +359,7 @@ export class Chat {
 		</div>
 		<div class="chat-header-info">
 			<h3>${sanitizeHtml(user.username)}</h3>
-			<p>En ligne</p>
+			<p>${t('chat.online')}</p>
 		</div>
 		`;
 

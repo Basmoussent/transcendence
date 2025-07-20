@@ -221,7 +221,6 @@ export async function handleRoom(app: FastifyInstance, socket: WebSocket, req: F
 			if (!roomToLeave)
 				return;
 
-			if (roomToLeave)
 			roomToLeave.users?.delete(username);
 			console.log(`${username} disconnected from room ${uuid!}`);
 

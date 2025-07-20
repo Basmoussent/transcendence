@@ -1,6 +1,7 @@
 import { getAuthToken } from '../../utils/auth';
 import { Room } from './room';
 import { fetchUsername } from '../../game/gameUtils';
+import { t } from '../../utils/translations';
 
 export function renderRoom(uuid: string) {
 	return getTemplate();
@@ -22,14 +23,14 @@ const getTemplate = () => {
 	return `
 		<button class="home-button" id="homeBtn">
 			<i class="fas fa-home"></i>
-			Home
+			${t('room.home')}
 		</button>
 		
 		<div class="flex-1 flex gap-6 p-6 pt-20">
 			<!-- Left Panel - Room Info -->
 			<div class="w-1/3 bg-white/10 backdrop-blur-lg rounded-xl p-6 border border-white/20 shadow-lg">
 				<div class="room-header mb-6">
-					<h1 class="text-2xl font-bold text-white mb-2" id="roomName">Room Name</h1>
+					<h1 class="text-2xl font-bold text-white mb-2" id="roomName">${t('room.roomName')}</h1>
 					<div class="flex items-center gap-4 text-white/80">
 						<div class="flex items-center gap-2">
 							<i class="fas fa-gamepad"></i>
@@ -45,18 +46,19 @@ const getTemplate = () => {
 				<div class="room-controls mb-6">
 					<button class="control-btn ready-btn" id="readyBtn">
 						<i class="fas fa-check"></i>
-						Ready
+						${t('room.ready')}
 					</button>
 					<button class="control-btn leave-btn" id="leaveBtn">
 						<i class="fas fa-sign-out-alt"></i>
-						Leave Room
+						${t('room.leaveRoom')}
 					</button>
 				</div>
 			
 				<div class="room-settings hidden" id="roomSettings">
-					<h3 class="text-lg font-semibold text-white mb-3">Room Settings</h3>
+					<h3 class="text-lg font-semibold text-white mb-3">${t('room.roomSettings')}</h3>
 					<div class="settings-grid">
 						<div class="setting-item" id="max-player">
+							<label class="text-white/80">${t('room.maxPlayers')}</label>
 							<select class="setting-select" id="maxPlayersSelect">
 								<option value="1">1</option>
 								<option value="2">2</option>
@@ -65,14 +67,14 @@ const getTemplate = () => {
 							</select>
 						</div>
 						<div class="setting-item">
-							<label class="text-white/80">Game Type</label>
+							<label class="text-white/80">${t('room.gameType')}</label>
 							<select class="setting-select" id="gameTypeSelect">
 								<option value="pong">Pong</option>
 								<option value="block">Block</option>
 							</select>
 						</div>
 						<div class="setting-item" id="ai-setting">
-							<label class="text-white/80 mb-2 block">AI</label>
+							<label class="text-white/80 mb-2 block">${t('room.ai')}</label>
 							<div class="flex items-center gap-3">
 								<button type="button" class="ai-button control-button" id="decreaseAI"
 									class="px-3 py-1 bg-white/10 border border-white/30 text-white rounded-lg hover:bg-white/20 transition">
@@ -92,10 +94,10 @@ const getTemplate = () => {
 			<!-- Center Panel - Players -->
 			<div class="flex-1 bg-white/10 backdrop-blur-lg rounded-xl p-6 border border-white/20 shadow-lg">
 				<div class="flex items-center justify-between mb-6">
-					<h2 class="text-xl font-bold text-white">Players</h2>
+					<h2 class="text-xl font-bold text-white">${t('room.players')}</h2>
 					<div class="status-indicator" id="gameStatus">
 						<span class="status-dot waiting"></span>
-						<span class="text-white/80">Waiting for players...</span>
+						<span class="text-white/80">${t('room.waitingForPlayers')}</span>
 					</div>
 				</div>
 			
@@ -106,21 +108,21 @@ const getTemplate = () => {
 				<div class="game-actions mt-6 hidden" id="gameActions">
 					<button class="action-btn start-btn " id="startGameBtn" disabled>
 						<i class="fas fa-play"></i>
-						Start Game
+						${t('room.startGame')}
 					</button>
 				</div>
 			</div>
 			
 			<!-- Right Panel - Chat -->
 			<div class="w-1/3 bg-white/10 backdrop-blur-lg rounded-xl p-6 border border-white/20 shadow-lg flex flex-col">
-				<h2 class="text-xl font-bold text-white mb-4">Chat</h2>
+				<h2 class="text-xl font-bold text-white mb-4">${t('room.chat')}</h2>
 			
 				<div class="chat-messages flex-1 overflow-y-auto mb-4" id="chatMessages">
 					<!-- Chat messages will be dynamically added here -->
 				</div>
 			
 				<div class="chat-input-container">
-					<input type="text" class="chat-input" id="chatInput" placeholder="Type a message..." maxlength="200">
+					<input type="text" class="chat-input" id="chatInput" placeholder="${t('room.typeMessage')}" maxlength="200">
 					<button class="send-btn" id="sendBtn">
 						<i class="fas fa-paper-plane"></i>
 					</button>
@@ -305,8 +307,8 @@ const getTemplate = () => {
 		background: rgba(245, 158, 11, 0.1);
 	}
 
-	.player-card.host::before {
-		content: "HOST";
+			.player-card.host::before {
+			content: "${t('room.host')}";
 		position: absolute;
 		top: 5px;
 		right: 5px;

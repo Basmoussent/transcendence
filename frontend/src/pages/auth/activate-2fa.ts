@@ -1,6 +1,7 @@
 import { getAuthToken } from '../../utils/auth';
 import { fetchMe, update2FAState, userInfo } from '../social/utils';
 import { addEvent } from '../../utils/eventManager';
+import { t } from '../../utils/translations';
 
 // Exemple de page /tfa pour activer la 2FA
 export function render2FA() {
@@ -200,9 +201,130 @@ export function render2FA() {
 				margin-top: 10px;
 				font-size: 14px;
 			}
-		</style>
-	`;
-	return htmlContent;
+    </style>
+  `;
+
+  setTimeout(async () => {
+    const backBtn = document.getElementById('backBtn');
+    const activateBtn = document.getElementById('activateBtn') as HTMLInputElement;
+    const verificationCode = document.getElementById('verificationCode') as HTMLInputElement;
+    const qrSection = document.getElementById('qrSection');
+
+    if (!qrSection) {
+      throw new Error('qrSection element not found');
+    }
+
+    if (backBtn) {
+      backBtn.addEventListener('click', () => {
+        window.history.pushState({}, '', '/me');
+        window.dispatchEvent(new PopStateEvent('popstate'));
+      });
+    }
+    const user = await fetchMe()
+    
+    if (!user) {
+      alert('❌ Impossible de récupérer les informations utilisateur');
+      window.history.pushState({}, '', '/login');
+      window.dispatchEvent(new PopStateEvent('popstate'));
+      return;
+    }
+  
+    const authToken = getAuthToken();
+    if (!authToken) {
+      alert('❌ Token d\'authentification manquant');
+      window.history.pushState({}, '', '/login');
+      window.dispatchEvent(new PopStateEvent('popstate'));
+      return;
+    }
+
+    const response = await fetch(`/api/me/${user.id}`, {
+
+      method: 'POST',
+      headers: {
+          'Content-Type': 'application/json',
+          'x-access-token': authToken
+        },
+      body: JSON.stringify({
+					user,
+				})
+    });
+
+    const data = await response.json(); 
+    qrSection.innerHTML = data.qrcode;
+
+    // Gestion de l'activation 2FA
+    if (activateBtn && verificationCode) {
+      activateBtn.addEventListener('click', async () => {
+        const code = verificationCode.value.trim();
+
+        if (code.length !== 6) {
+          alert('❌ Veuillez entrer un code à 6 chiffres');
+          return;
+        }
+
+        const codeRegex = /^\d{6}$/;
+        if (!codeRegex.test(code)) {
+          alert('❌ Veuillez entrer des chiffres uniquement');
+          return;
+        }
+
+        try {
+          const token = getAuthToken();
+          if (!token) {
+            alert('❌ Token d\'authentification manquant');
+            window.history.pushState({}, '', '/login');
+            window.dispatchEvent(new PopStateEvent('popstate'));
+            return;
+          }
+
+          const responseCode = await fetch(`/api/me/verify-code`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'x-access-token': authToken
+            },
+            body: JSON.stringify({
+              user :user?.username,
+              code
+            })
+          });
+
+          const checkCode = await responseCode.json();
+          if (!checkCode.checkCode)
+            alert(`❌ Code incorrect`);
+
+          if (checkCode.checkCode) {
+            activateBtn.disabled = true;
+            activateBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Activation...';
+
+            const info = await userInfo();
+            const success = await update2FAState(1, info.user.id);
+
+            if (success) {
+              alert('✅ Authentification à deux facteurs activée avec succès');
+              setTimeout(() => {
+                window.history.pushState({}, '', '/me');
+                window.dispatchEvent(new PopStateEvent('popstate'));
+              }, 2000);
+            }
+            else {
+              alert(`❌  Authentification à deux facteurs n'a pas pu etre activée`);
+              activateBtn.disabled = false;
+              activateBtn.innerHTML = '<i class="fa-solid fa-lock"></i> Activer 2FA';
+            }
+          }
+        }
+        catch (error) {
+          console.error('Erreur lors de l\'activation 2FA:', error);
+          alert('❌ Erreur lors de l\'activation de l\'authentification à deux facteurs');
+          activateBtn.disabled = false;
+          activateBtn.innerHTML = '<i class="fa-solid fa-lock"></i> Activer 2FA';
+        }
+      });
+    }
+  }, 0);
+
+  return htmlContent;
 }
 
 export async function initialize2FAEvents() {

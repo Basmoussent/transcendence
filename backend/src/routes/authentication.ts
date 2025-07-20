@@ -198,30 +198,7 @@ async function authRoutes(app: FastifyInstance) {
 						const response = reply
 							.status(200)
 
-						const origin = request.headers.origin || '';
-						const host = request.headers.host || '';
-						let cookieDomain;
-
-						// Log pour debug
-						console.log('🔍 Debug cookie domain:', { origin, host });
-
-						if (origin.includes('entropy.local') || host.includes('entropy.local'))
-							cookieDomain = '.entropy.local'; // Avec le point pour partager entre sous-domaines
-						else if (origin.includes('localhost') || host.includes('localhost')) {
-							const hostParts = host.split('.');
-							if (hostParts.length > 1)
-								cookieDomain = `.${hostParts.slice(-1).join('.')}`; // .localhost
-							else
-								cookieDomain = ".localhost"; // Pas de domaine pour localhost simple
-						}
-
 						if (info.two_fact_auth) {
-							console.warn(`bool 2fa quefgwjfge ${info.two_fact_auth}`)
-							console.log('🔍 Debug JWT in auth route:');
-							console.log('app.jwt:', typeof app?.jwt);
-							console.log('app.jwt2fa:', typeof app?.jwt2fa);
-							console.log('Available properties:', Object.keys(app || {}));
-							console.log('All JWT-related properties:', Object.keys(app || {}).filter(key => key.includes('jwt')));
 							
 							if (!app.jwt2fa) {
 								console.error('❌ jwt2fa decorator is not available!');
@@ -231,8 +208,7 @@ async function authRoutes(app: FastifyInstance) {
 							
 							const tfa_token = app.jwt2fa.sign({ name: user.username });
 							response.header(
-								'Set-Cookie',
-								`x-access-token=${tfa_token}; Path=/; Domain=${cookieDomain}; SameSite=Lax; Max-Age=${7 * 24 * 60 * 60}`
+								"x-access-token", tfa_token
 							);
 							resolve(response.send({
 								message: "2FA needed",
@@ -248,26 +224,9 @@ async function authRoutes(app: FastifyInstance) {
 							console.warn(`bool 2fa ${info.two_fact_auth}`)
 							const token = app.jwt.sign({ user: user.email, name: user.username });
 
-
-							console.log('Cookie domain déterminé:', cookieDomain);
-
-							// Envoyer le token dans le header ET dans un cookie
-
-
-							if (cookieDomain) {
-								response.header(
-									'Set-Cookie',
-									`x-access-token=${token}; Path=/; Domain=${cookieDomain}; SameSite=Lax; Max-Age=${7 * 24 * 60 * 60}`
-								);
-							}
-							else {
-								response.header(
-									'Set-Cookie',
-									`x-access-token=${token}; Path=/; SameSite=Lax; Max-Age=${7 * 24 * 60 * 60}`
-								);
-							}
-
-							console.log('Cookie configuré avec succès');
+							response.header(
+								"x-access-token", token
+							);
 
 							resolve(response.send({
 								message: "Login successful",
@@ -297,34 +256,7 @@ async function authRoutes(app: FastifyInstance) {
 	 */
 	app.post('/logout', async (request: FastifyRequest, reply: FastifyReply) => {
 		try {
-			// Déterminer le domaine du cookie selon l'environnement
-			const origin = request.headers.origin || '';
-			const host = request.headers.host || '';
-			let cookieDomain;
-
-			if (origin.includes('entropy.local') || host.includes('entropy.local'))
-				cookieDomain = '.entropy.local';
-			else if (origin.includes('localhost') || host.includes('localhost')) {
-				const hostParts = host.split('.');
-				if (hostParts.length > 1) {
-					cookieDomain = `.${hostParts.slice(-1).join('.')}`;
-				} else {
-					cookieDomain = undefined;
-				}
-			}
-
-			// Supprimer le cookie
-			let cookieString = 'x-access-token=; Path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; HttpOnly';
-
-			if (cookieDomain)
-				cookieString += `; Domain=${cookieDomain}`;
-
-			const response = reply.status(200);
-			response.header('Set-Cookie', cookieString);
-
-			console.log('Cookie supprimé avec succès');
-
-			return response.send({ message: 'Logout successful' });
+			return reply.status(200).send({ message: 'Logout successful' });
 		} catch (error) {
 			console.error('❌ Error during logout:', error);
 			return reply.status(500).send({ error: 'Internal server error' });

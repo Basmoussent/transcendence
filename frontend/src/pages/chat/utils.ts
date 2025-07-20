@@ -1,13 +1,14 @@
 import { Chat, UserChat } from './liveChat';
 import { getAuthToken } from '../../utils/auth';
 import { sanitizeHtml } from '../../utils/sanitizer';
+import { t } from '../../utils/translations';
 
 export async function fetchMe(): Promise<UserChat | void> {
 
 	try {
 		const token = getAuthToken();
 		if (!token) {
-			alert('❌ Token d\'authentification manquant');
+			alert('❌ Authentication token missing');
 			window.history.pushState({}, '', '/login');
 			window.dispatchEvent(new PopStateEvent('popstate'));
 			return;
@@ -48,7 +49,7 @@ export async function fetchUserInfo(username: string): Promise<UserChat | void> 
 	try {
 		const token = getAuthToken();
 		if (!token) {
-			alert('❌ Token d\'authentification manquant');
+			alert('❌ Authentication token missing');
 			window.history.pushState({}, '', '/login');
 			window.dispatchEvent(new PopStateEvent('popstate'));
 			return;

@@ -1,5 +1,6 @@
 import { getAuthToken } from '../../utils/auth';
 import { addEvent } from '../../utils/eventManager';
+import { t } from '../../utils/translations';
 
 export class profil {
 
@@ -39,6 +40,7 @@ export class profil {
 		this.setupEvents();
 
 		this.updateInfo();
+		this.loadMatchHistory();
 	}
 
 	private getElement(id: string): HTMLElement {
@@ -132,6 +134,127 @@ export class profil {
         //     alert(`Interaction avec ${friendName}`);
         //     // Ici vous pouvez ajouter votre logique : ouvrir un chat, voir le profil, etc.
         // }
+
+	private loadMatchHistory() {
+		// Données factices pour l'historique des parties
+		const fakeHistory = [
+			{
+				gameType: 'pong',
+				result: 'victory',
+				opponent: 'Player123',
+				score: '11-8',
+				date: new Date(Date.now() - 2 * 60 * 60 * 1000) // 2 heures ago
+			},
+			{
+				gameType: 'block',
+				result: 'defeat',
+				opponent: 'GamerPro',
+				score: '5-11',
+				date: new Date(Date.now() - 4 * 60 * 60 * 1000) // 4 heures ago
+			},
+			{
+				gameType: 'pong',
+				result: 'victory',
+				opponent: 'Newbie99',
+				score: '11-3',
+				date: new Date(Date.now() - 6 * 60 * 60 * 1000) // 6 heures ago
+			},
+			{
+				gameType: 'block',
+				result: 'draw',
+				opponent: 'EqualPlayer',
+				score: '10-10',
+				date: new Date(Date.now() - 8 * 60 * 60 * 1000) // 8 heures ago
+			},
+			{
+				gameType: 'pong',
+				result: 'defeat',
+				opponent: 'Champion2024',
+				score: '7-11',
+				date: new Date(Date.now() - 12 * 60 * 60 * 1000) // 12 heures ago
+			},
+			{
+				gameType: 'block',
+				result: 'victory',
+				opponent: 'BlockMaster',
+				score: '11-6',
+				date: new Date(Date.now() - 24 * 60 * 60 * 1000) // 1 jour ago
+			},
+			{
+				gameType: 'pong',
+				result: 'victory',
+				opponent: 'PongKing',
+				score: '11-9',
+				date: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000) // 2 jours ago
+			},
+			{
+				gameType: 'block',
+				result: 'defeat',
+				opponent: 'CubeDestroyer',
+				score: '4-11',
+				date: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000) // 3 jours ago
+			},
+			{
+				gameType: 'pong',
+				result: 'victory',
+				opponent: 'SpeedDemon',
+				score: '11-7',
+				date: new Date(Date.now() - 4 * 24 * 60 * 60 * 1000) // 4 jours ago
+			},
+			{
+				gameType: 'block',
+				result: 'victory',
+				opponent: 'BlockNinja',
+				score: '11-5',
+				date: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000) // 5 jours ago
+			}
+		];
+
+		const matchHistoryList = document.getElementById('match-history-list');
+		if (matchHistoryList) {
+			matchHistoryList.innerHTML = fakeHistory.map(match => this.createMatchItem(match)).join('');
+		}
+	}
+
+	private createMatchItem(match: any): string {
+		const gameIcon = match.gameType === 'pong' ? 'fa-table-tennis' : 'fa-cubes';
+		const gameTypeClass = match.gameType === 'pong' ? 'pong' : 'block';
+		const resultText = match.result === 'victory' ? t('social.victory') : match.result === 'defeat' ? t('social.defeat') : t('social.draw');
+		const dateText = this.formatDate(match.date);
+
+		return `
+			<div class="match-item ${match.result}">
+				<div class="match-icon ${gameTypeClass}">
+					<i class="fas ${gameIcon}"></i>
+				</div>
+				<div class="match-content">
+					<div class="match-result">${resultText}</div>
+					<div class="match-details">
+						<span class="match-opponent">vs ${match.opponent}</span>
+						<span class="match-score">${match.score}</span>
+					</div>
+				</div>
+				<div class="match-date">${dateText}</div>
+			</div>
+		`;
+	}
+
+	private formatDate(date: Date): string {
+		const now = new Date();
+		const diffMs = now.getTime() - date.getTime();
+		const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+		const diffDays = Math.floor(diffHours / 24);
+
+		if (diffHours < 1) {
+			return t('social.justNow');
+		} else if (diffHours < 24) {
+			return `${diffHours}h ago`;
+		} else if (diffDays === 1) {
+			return t('social.yesterday');
+		} else {
+			return `${diffDays}d ago`;
+		}
+	}
 
 	// private async addFriend() {
 	// 	const token = getAuthToken();

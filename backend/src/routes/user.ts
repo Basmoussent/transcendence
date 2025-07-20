@@ -440,30 +440,14 @@ async function userRoutes(app: FastifyInstance) {
 			try {
 				let checkCode = await app.userService.verifiyCode(code, secret.secret_key);
 				if (checkCode) {
-					const origin = request.headers.origin || '';
-					const host = request.headers.host || '';
-					let cookieDomain;
-
-					// Log pour debug
-					console.log('🔍 Debug cookie domain:', { origin, host });
-
-					if (origin.includes('entropy.local') || host.includes('entropy.local'))
-						cookieDomain = '.entropy.local'; // Avec le point pour partager entre sous-domaines
-					else if (origin.includes('localhost') || host.includes('localhost')) {
-						const hostParts = host.split('.');
-						if (hostParts.length > 1)
-							cookieDomain = `.${hostParts.slice(-1).join('.')}`; // .localhost
-						else
-							cookieDomain = ".localhost"; // Pas de domaine pour localhost simple
-					}
 
 					console.log(`avant le sign`)
 					const token = app.jwt.sign({ user: secret.email, name: secret.username });
 					console.log(`après le sign`)
 					return reply.header(
-						'Set-Cookie',
-						`x-access-token=${token}; Path=/; Domain=${cookieDomain}; SameSite=Lax; Max-Age=${7 * 24 * 60 * 60}`).send({
-							checkCode: checkCode
+						"x-access-token", token)
+								.send({
+						checkCode: checkCode
 						})
 				}
 

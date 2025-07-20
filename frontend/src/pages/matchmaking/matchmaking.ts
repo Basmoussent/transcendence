@@ -26,6 +26,7 @@ export class matchmaking {
 	private launchBtn: HTMLElement;
 	private options: HTMLElement;
 	private availableGames: HTMLElement;
+
 	private username: string;
 
 	private joinBtn: Map<number,HTMLElement> = new Map();
@@ -253,7 +254,10 @@ export class matchmaking {
 		try {
 			// Ajouter un indicateur de chargement
 			const container = document.getElementById('available-games');
+<<<<<<< HEAD
 
+=======
+>>>>>>> main
 			const gameList = await this.loadAvailableGames();
 			
 			if (gameList === -1) {
@@ -294,6 +298,8 @@ export class matchmaking {
 		// Nettoyer les événements spécifiques à cette instance
 		// Les autres événements seront nettoyés par cleanEvents() dans le router
 	}
+
+
 
 	private async loadAvailableGames(): Promise<Available[] | -1> {
 	

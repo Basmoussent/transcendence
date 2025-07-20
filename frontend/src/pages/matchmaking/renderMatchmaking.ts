@@ -1,6 +1,9 @@
-import { matchmaking } from "./matchmaking";
 
 let matchmakingInstance: matchmaking | null = null;
+import { Available, matchmaking,  } from "./matchmaking";
+import { getAuthToken } from '../../utils/auth';
+import { sanitizeHtml } from '../../utils/sanitizer';
+import { t } from '../../utils/translations';
 
 export function renderMatchmaking() {
 	return getTemplate();
@@ -22,10 +25,10 @@ export function initializeMatchmakingEvents() {
 
 const getTemplate = () => {
 	const html =  `
-	<div class="flex gap-12 h-screen justify-center items-center px-8" id="options-container">
+	<div class="flex gap-12 h-screen justify-center items-center px-8 pb-40" id="options-container">
 		<button class="home-button" id="homeBtn">
 			<i class="fas fa-home"></i>
-			Home
+			${t('matchmaking.home')}
 		</button>
 
 		<div class="glass-panel w-4/6 flex flex-col gap-10 justify-center items-center px-20 py-16 h-10/12">
@@ -78,6 +81,8 @@ const getTemplate = () => {
 			</div>
 		</div>
 	</div>
+
+
 
 	<style>
 	.glass-panel {
@@ -571,6 +576,8 @@ const getTemplate = () => {
 			opacity: 1;
 		}
 	}
+
+
 
 	/* Animations */
 	@keyframes fadeIn {

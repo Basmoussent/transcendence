@@ -2,6 +2,7 @@ import { Game, fetchUsername, getUuid, postGame } from '../../game/gameUtils'
 import { getAuthToken } from '../../utils/auth';
 import { sanitizeHtml } from '../../utils/sanitizer';
 import { Chat } from './liveChat'
+import { t } from '../../utils/translations';
 
 
 export function renderChat() {
@@ -21,7 +22,7 @@ const getTemplate = () => {
 	return `
 	<button class="home-button" id="homeBtn">
 	<i class="fas fa-home"></i>
-	Accueil
+	${t('chat.home')}
 	</button>
 
 	<div class="flex-1 flex gap-6 p-6 pt-20">
@@ -29,28 +30,28 @@ const getTemplate = () => {
 	<div class="w-1/3 bg-white/10 backdrop-blur-lg rounded-xl p-6 border border-white/20 shadow-lg">
 		<h1 class="text-2xl font-bold text-white mb-6">
 		<i class="fas fa-users mr-2"></i>
-		Mes Amis
+		${t('chat.myFriends')}
 		</h1>
 
 		<!-- Barre de recherche -->
 		<div class="search-bar">
 		<i class="fas fa-search search-icon"></i>
-		<input type="text" class="search-input" id="searchInput" placeholder="Rechercher un ami...">
+		<input type="text" class="search-input" id="searchInput" placeholder="${t('chat.searchFriend')}">
 		</div>
 
 		<!-- Onglets -->
 		<div class="tabs">
 		<div class="tab active" data-tab="friends">
 			<i class="fas fa-user-friends mr-2"></i>
-			Amis (<span id="friendsCount">0</span>)
+			${t('chat.friends')} (<span id="friendsCount">0</span>)
 		</div>
 		<div class="tab" data-tab="requests">
 			<i class="fas fa-user-plus mr-2"></i>
-			Demandes (<span id="requestsCount">0</span>)
+			${t('chat.requests')} (<span id="requestsCount">0</span>)
 		</div>
 		<div class="tab" data-tab="add">
 			<i class="fas fa-plus mr-2"></i>
-			Ajouter
+			${t('chat.add')}
 		</div>
 		</div>
 
@@ -73,11 +74,11 @@ const getTemplate = () => {
 		<!-- Ajouter un ami -->
 		<div id="addTab" class="tab-pane hidden">
 			<div class="add-friend-form">
-			<h3 class="text-white mb-4">Ajouter un nouvel ami</h3>
-			<input type="text" class="add-friend-input" id="friendUsernameInput" placeholder="Nom d'utilisateur">
+			<h3 class="text-white mb-4">${t('chat.addNewFriend')}</h3>
+			<input type="text" class="add-friend-input" id="friendUsernameInput" placeholder="${t('chat.username')}">
 			<button class="add-friend-btn" id="addFriendBtn">
 				<i class="fas fa-plus mr-2"></i>
-				Envoyer une demande
+				${t('chat.sendRequest')}
 			</button>
 			</div>
 		</div>
@@ -88,7 +89,7 @@ const getTemplate = () => {
 	<div class="w-2/3 bg-white/10 backdrop-blur-lg rounded-xl p-6 border border-white/20 shadow-lg flex flex-col h-[70vh] relative">
 		<div id="noChatSelected" class="empty-state">
 		<i class="fas fa-comments"></i>
-		<h3>Sélectionnez un ami pour commencer à chatter</h3>
+		<h3>${t('chat.selectFriendToChat')}</h3>
 		</div>
 
 		<div id="chatContainer" class="chat-container hidden flex flex-col h-full">
@@ -104,7 +105,7 @@ const getTemplate = () => {
 
 		<!-- Zone de saisie -->
 		<div class="chat-input-container sticky bottom-0 bg-transparent mt-2">
-			<input type="text" class="chat-input" id="chatInput" placeholder="Tapez votre message..." maxlength="200">
+			<input type="text" class="chat-input" id="chatInput" placeholder="${t('chat.typeMessage')}" maxlength="200">
 			<button class="send-btn" id="sendBtn">
 			<i class="fas fa-paper-plane"></i>
 			</button>
