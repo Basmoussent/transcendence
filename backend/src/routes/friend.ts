@@ -72,6 +72,27 @@ async function friendRoutes(app: FastifyInstance) {
 		}
 	})
 
+	app.post('/relation', async function (request: FastifyRequest, reply: FastifyReply) {
+
+		try {
+			const { user1, user2,} = request.body as { user1?: string, user2?: string };
+
+			if (!user1 || !user2)
+				throw new Error("missing fields pour rechercher la relation");
+
+			const relation = await app.friendService.searchRelation(user1, user2);
+			
+			return reply.send(relation);
+
+		}
+		catch (err: any) {
+			return reply.status(500).send({
+				error: 'erreur chercher relation',
+				details: err.message });
+		}
+
+	})
+
 	app.get('/history', async function (request: FastifyRequest, reply: FastifyReply) {
 
 		try {
@@ -89,6 +110,8 @@ async function friendRoutes(app: FastifyInstance) {
 				details: err.message });
 		}
 	});
+
+	
 }
 
 export default friendRoutes;

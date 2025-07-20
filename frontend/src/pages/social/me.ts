@@ -771,15 +771,16 @@ export function initializeMeEvents() {
 	const homeBtn = document.getElementById('homeBtn') as HTMLElement;
 	const TFABtn = document.getElementById('TFABtn') as HTMLElement;
 
+	console.log("initializeMeEvents");
 	if (homeBtn) {
-		addEvent(homeBtn, 'click', () => {
+		homeBtn.addEventListener('click', () => {
 			window.history.pushState({}, '', '/main');
 			window.dispatchEvent(new PopStateEvent('popstate'));
 		});
 	}
 
 	if (logoutButton) {
-		addEvent(logoutButton, 'click', () => {
+		logoutButton.addEventListener('click', () => {
 			removeAuthToken();
 			window.history.pushState({}, '', '/login');
 			window.dispatchEvent(new PopStateEvent('popstate'));
@@ -787,14 +788,14 @@ export function initializeMeEvents() {
 	}
 
 	if (editProfileButton) {
-		addEvent(editProfileButton, 'click', () => {
+		editProfileButton.addEventListener('click', () => {
 			window.history.pushState({}, '', '/edit-profil');
 			window.dispatchEvent(new PopStateEvent('popstate'));
 		});
 	}
 
 	if (changePasswordButton) {
-		addEvent(changePasswordButton, 'click', () => {
+		changePasswordButton.addEventListener('click', () => {
 			window.history.pushState({}, '', '/change-password');
 			window.dispatchEvent(new PopStateEvent('popstate'));
 		});
@@ -802,7 +803,7 @@ export function initializeMeEvents() {
 
 	// Gestion bouton 2FA
 	if (TFABtn) {
-		addEvent(TFABtn, 'click', async () => {
+		TFABtn.addEventListener('click', async () => {
 		
 		console.log('iqubwiduqbwiudbqiwudbq')
 		const info = await userInfo();
@@ -831,11 +832,11 @@ export function initializeMeEvents() {
 
 	// Gestion de l'upload d'avatar
 	if (changeAvatarBtn && avatarInput) {
-		addEvent(changeAvatarBtn, 'click', () => {
+		changeAvatarBtn.addEventListener('click', () => {
 			avatarInput.click();
 		});
 
-		addEvent(avatarInput, 'change', async (e) => {
+		avatarInput.addEventListener('change', async (e) => {
 			const file = (e.target as HTMLInputElement).files?.[0];
 			if (!file) return;
 

@@ -19,7 +19,7 @@ import { clearTranslationCache } from './translations';
 import { renderMultiPong, initializeMultiPongEvents } from '../pages/pong/multiplayer-pong';
 import { renderPong, initializePongEvents } from '../pages/pong/pong';
 import { initAlive } from './auth';
-import { renderProfil } from '../pages/social/renderProfil';
+import { renderProfil, initializeProfilEvents } from '../pages/social/renderProfil';
 import { render2FA, initialize2FAEvents } from '../pages/auth/activate-2fa';
 import { render2FALogin } from '../pages/auth/2fa-login';
 
@@ -157,6 +157,7 @@ export async function router() {
 		'/forgot-password': initializeForgotPasswordEvents,
 		'/main': initializeMainEvents,
 		'/me': initializeMeEvents,
+		'/profil': initializeProfilEvents,
 		'/matchmaking': initializeMatchmakingEvents,
 		'/change-password': initializeChangePasswordEvents,
 		'/edit-profil': initializeEditProfileEvents,
@@ -166,6 +167,7 @@ export async function router() {
 	};
 
 	const initEventsUuid: { [key:string]: (uuid: string) => void } = {
+
 		'/room': initializeRoomEvents,
 		'/block': initializeBlockEvents,
 		'/block1v1': initializeBlock1v1Events,

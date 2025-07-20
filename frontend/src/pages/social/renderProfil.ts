@@ -3,25 +3,98 @@ import { sanitizeHtml } from '../../utils/sanitizer';
 import { t } from '../../utils/translations';
 import { profil } from './profil'
 
-export function renderProfil(uuid: string) {
+export async function renderProfil(uuid: string) {
+	console.log('Initializing profil page events');
+	try {
 
-	setTimeout(async () => {
-		try {
+		const me = await loadMe();
+		const user = await loadUserInfo(uuid);
 
-			const data = {
-				me: await loadMe(),
-				user: await loadUserInfo(uuid),
-				stats: await loadUserStats(uuid),
-				friends: await loadUserFriends(uuid)
-			}
-
-			new profil(data);
+		if (!me || !user) {
+			console.error("ya pas les infos de celui qui va sur la page // celui dont on veut voir le profil")
+			return getTemplate();
 		}
-		catch (err:any) {
-			console.log(err);
+
+		const [ stats, friends, relation ] = await Promise.all([
+			loadUserStats(uuid),
+			loadUserFriends(uuid),
+			loadRelation(me.username, user.username)
+		]);
+
+		// Vérifier que toutes les données sont valides
+		if (!stats || !friends) {
+			console.error("Données manquantes pour afficher le profil");
+			return getTemplate();
 		}
-	}, 0);
-	return getTemplate();
+
+		const data = {
+			me,
+			user,
+			stats,
+			friends,
+			relation
+		};
+
+		new profil(data);
+		console.log("renderProfil")
+		return getTemplate();
+
+	}
+	catch (err: any) {
+		console.log(err);
+		return getTemplate();
+	}
+}
+
+export function initializeProfilEvents() {
+	console.log("initializeProfilEvents")
+	const homeBtn = document.getElementById('homeBtn') as HTMLElement;
+	if (homeBtn) {
+		homeBtn.addEventListener('click', () => {
+			window.history.pushState({}, '', '/main');
+			window.dispatchEvent(new PopStateEvent('popstate'));
+		});
+	}
+}
+
+async function loadRelation(user1: string, user2: string) {
+
+	try {
+		const token = getAuthToken();
+		if (!token) {
+			alert('❌ Token d\'authentification manquant');
+			window.history.pushState({}, '', '/login');
+			window.dispatchEvent(new PopStateEvent('popstate'));
+			return null;
+		}
+		console.log(JSON.stringify({
+			user1: user1,
+			user2: user2,
+		}, null, 12))
+		const response = await fetch('/api/friend/relation', {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+				'x-access-token': token
+			},
+			body: JSON.stringify({
+				user1: user1,
+				user2: user2,
+			})
+		});
+		console.log(response)
+		if (response.ok) {
+			const result = await response.json();
+			return result;
+		} else {
+			console.error('Erreur lors de la récupération des données utilisateur');
+			return null;
+		}
+	} catch (err) {
+		console.error(`fail de recup me dans loadme renderFriends`, err);
+		return null;
+	}
+
 }
 
 async function loadMe() {
@@ -32,7 +105,7 @@ async function loadMe() {
 			alert('❌ Token d\'authentification manquant');
 			window.history.pushState({}, '', '/login');
 			window.dispatchEvent(new PopStateEvent('popstate'));
-			return '';
+			return null;
 		}
 
 		const response = await fetch('/api/me', {
@@ -49,13 +122,15 @@ async function loadMe() {
 				username: sanitizeHtml(result.user?.username),
 				email: sanitizeHtml(result.user?.email),
 			};
-			return (userData);
+			return userData;
 		} else {
 			console.error('Erreur lors de la récupération des données utilisateur');
+			return null;
 		}
 	}
 	catch (err) {
-		console.error(`fail de recup me dans loadme renderFriends`);
+		console.error(`fail de recup me dans loadme renderFriends`, err);
+		return null;
 	}
 
 }
@@ -68,7 +143,7 @@ async function loadUserInfo(username: string) {
 			alert('❌ Token d\'authentification manquant');
 			window.history.pushState({}, '', '/login');
 			window.dispatchEvent(new PopStateEvent('popstate'));
-			return '';
+			return null;
 		}
 
 		const response = await fetch(`/api/user/username/?username=${username}`, {
@@ -86,13 +161,16 @@ async function loadUserInfo(username: string) {
 				email: sanitizeHtml(result.data?.email),
 				avatar: sanitizeHtml(result.data?.avatar_url) || 'avatar.png',
 			};
-			return (userData);
+			return userData;
 		}
-		else 
+		else {
 			console.error('Erreur lors de la récupération des données utilisateur');
+			return null;
+		}
 	}
 	catch (err) {
 		console.error(`error retreve info du user pour render son profil  ${err}`);
+		return null;
 	}
 }
 
@@ -104,7 +182,7 @@ async function loadUserStats(username: string) {
 			alert('❌ Token d\'authentification manquant');
 			window.history.pushState({}, '', '/login');
 			window.dispatchEvent(new PopStateEvent('popstate'));
-			return '';
+			return null;
 		}
 
 		const response = await fetch(`/api/user/stats/?username=${username}`, {
@@ -125,13 +203,16 @@ async function loadUserStats(username: string) {
 				rating: result.stats?.rating,
 				id: result.stats?.id,
 			};
-			return (userStats);
+			return userStats;
 		}
-		else 
+		else {
 			console.error('pblm recuperer les stats du user dont on veut render le profil');
+			return null;
+		}
 	}
 	catch (err) {
 		console.error(`pblm recuperer les stats du user dont on veut render le profil${err}`);
+		return null;
 	}
 
 }
@@ -143,7 +224,7 @@ async function loadUserFriends(username: string) {
 			alert('❌ Token d\'authentification manquant');
 			window.history.pushState({}, '', '/login');
 			window.dispatchEvent(new PopStateEvent('popstate'));
-			return '';
+			return null;
 		}
 
 		const response = await fetch(`/api/friend/?username=${username}`, {
@@ -153,14 +234,17 @@ async function loadUserFriends(username: string) {
 				'x-access-token': token }
 		});
 	
-		if (response.ok)
+		if (response.ok) {
 			return await response.json();
-		else 
+		} else {
 			console.error('gros gros zig');
+			return null;
+		}
 
 	}
 	catch (err) {
-		console.error(`pas réussi a récup les amis de cette personnes zignew que tu es`)
+		console.error(`pas réussi a récup les amis de cette personnes zignew que tu es`, err);
+		return null;
 	}
 }
 
@@ -171,11 +255,6 @@ function getTemplate() {
 			Home
 		</button>
 		
-		<button class="home-button" onclick="goHome()">
-        <i class="fas fa-home"></i>
-        Home
-		</button>
-
 		<div class="container">
 			<div class="profile-header">
 			<div class="profile-banner">
@@ -192,7 +271,7 @@ function getTemplate() {
 				</div>
 				</div>
 				<div class="profile-actions">
-					<button id="addFriend" "class="action-btn btn-primary">
+					<button id="addFriend" class="action-btn btn-primary">
 						<i class="fas fa-user-plus"></i>
 						Ajouter ami
 					</button>

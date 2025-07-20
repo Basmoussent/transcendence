@@ -140,7 +140,7 @@ function initializeEditProfileEvents() {
 
 	if (backToProfileBtn) {
 		addEvent(backToProfileBtn, 'click', () => {
-			window.history.pushState({}, '', '/profil');
+			window.history.pushState({}, '', '/me');
 			window.dispatchEvent(new PopStateEvent('popstate'));
 		});
 	}
