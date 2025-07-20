@@ -23,7 +23,7 @@ function getCookieDomain(): string | undefined {
 }
 
 export function getAuthToken(): string | null {
-  const localToken = localStorage.getItem('x-access-token');
+  const localToken = sessionStorage.getItem('x-access-token');
   if (localToken) {
     return localToken;
   }
@@ -39,7 +39,7 @@ export function getAuthToken(): string | null {
 }
 
 export function setAuthToken(token: string): void {
-  localStorage.setItem('x-access-token', token);
+  sessionStorage.setItem('x-access-token', token);
   
   const domain = getCookieDomain();
   const isSecure = window.location.protocol === 'https:';
@@ -58,8 +58,8 @@ export function setAuthToken(token: string): void {
 }
 
 export function removeAuthToken(): void {
-  // Supprimer de localStorage
-  localStorage.removeItem('x-access-token');
+  // Supprimer de sessionStorage
+  sessionStorage.removeItem('x-access-token');
   
   // Supprimer le cookie
   const domain = getCookieDomain();

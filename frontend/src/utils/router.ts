@@ -87,13 +87,13 @@ export async function router() {
 			view = renderHome();
 			break;
 		case '/lang':
-			const lastPath = localStorage.getItem('lastPath');
+			const lastPath = sessionStorage.getItem('lastPath');
 			if (lastPath && lastPath !== '/lang') {
 				console.log('log', lastPath)
 				setTimeout(() => {
 				window.history.pushState({}, '', lastPath);
 				router();
-				localStorage.removeItem('lastPath');
+				sessionStorage.removeItem('lastPath');
 				}, 100);
 			} else {
 				console.log('log', lastPath)

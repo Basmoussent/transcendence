@@ -754,7 +754,7 @@ type Language = keyof typeof translations;
 type TranslationKeys = DotNestedKeys<typeof translations>;
 
 export function getLanguage(): Language {
-  const subdomain = localStorage.getItem('lang');
+  const subdomain = sessionStorage.getItem('lang');
   const supportedLanguages = ['en', 'fr', 'es'] as const;
 
   return supportedLanguages.includes(subdomain as Language) ? subdomain as Language : 'en';
