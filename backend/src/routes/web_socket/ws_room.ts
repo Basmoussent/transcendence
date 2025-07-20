@@ -137,6 +137,10 @@ export async function handleRoom(app: FastifyInstance, socket: WebSocket, req: F
 		room.users.set(username, user);
 
 		broadcastSystemMessage(room, `${username} has joined the room.`);
+
+		if (room.users.size + room.ai >= room.maxPlayers) {
+			room.ai -= 1;
+		}
 		await broadcastRoomUpdate(app, room);
 		await app.roomService.updateGame(room)
 		socket.on('message', async (message: string) => {
@@ -147,8 +151,6 @@ export async function handleRoom(app: FastifyInstance, socket: WebSocket, req: F
 				
 				const currentRoom = rooms.get(uuid!)!;
 				const currentUser = currentRoom.users.get(username)!;
-
-				console.log()
 
 				switch (data.type) {
 					case 'toggle_ready':

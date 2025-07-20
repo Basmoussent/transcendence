@@ -1,136 +1,10 @@
-bricks:
-	
-	bleu -> oneshot
-	vert -> two shot
-	rouge -> THREE shot et fragilise les bricks frontalieres
-
-pourquoi ca affiche mal la balle ->
-
-	math trunc enleve la partie  decimale donc moins precis
-
-	faire math floor si speedy > 0
-	faire math ceiling si speedy < 0
-
-
-coder un middleware
-
-pouvoir qui fait que ta balle traverse et tues toutes les bricks
-
-creer une nouvelle game:  -> this.gameId = await logStartGame(this.username);
-
-	eteins ca cree plusieurs game vue que la fonction est async
-	moyen pour recuperer l'id de la game
-	on peut surement avoir l'id de la game avant de lancer la partie avec le matchmaking
-	mais la c'est solo donc faut trouver alternative
-
-
-quand une game est terminee, aller update les wins du user qui a gagne
-
-j'ai cree ma game
-
-je suis dans le chargement
-si ya assez de player on lance
-sinon on att
-
-appuyer sur un boutton pour rejoindre la game
-
-
-
-pour ca ->
-	page en websocket
-
-
-//   allowedHosts: ['frontend', 'localhost', 'fr.entropy.local', 'en.entropy.local', 'es.entropy.local']
-// si on laise ca on peut pas acceder depuis un autre poste
-// pour tester websocket https:// + poste de celui qui a lance le server
-
-
 pour remote --> faire la logique du jeu cote serveur
 	a chaque event envoyer les notif au server de qui a bouge quoi
 	pour chaque client, juste render les infos du game (ou sont les pad, ou est la balle etc...)
 
-
-
-pour update les games available
-
-	rendre la page matchmaking en websocket
-
-	si quelqu'un launch une game et qu'elle ne start pas direct,
-
-	notifier a tous les socket des personnes sur la page que ya une nouvelle game:
-	injecter du div dynamiquement avec les infos de la game que je me passerais en json
-
-
-
-creer une page room avec uuid qui genere une string random
-
-quand la game est lancee fermer la room avec l'uuid et le suppr ?
-
-
-Universally Unique IDentifers (UUIDs)
-
-
 nbre de joueur --> user + ia
-leur username dans player(n) --> modif a user id et faire une fonction pour retrieve le username
-combien d'ia
-pouvoirs oui ou non
-
-
-
-
-	lorsque quelqu'un join la game, le rediriger vers la room cree, afficher l'avatar des membres de la game, combien de personnes il manque
-
-
-launch --> cree la game dans la db, avec son uuid et popstate la room specific au createur
-
-stocker les socket qui se connecte a la room dans une variable specific a cette room (room.uuid par ex.)
-
-pouvoir recevoir des msg
-
-
-
-postgame renvoie 0 alors que ya deja deux games de cree
-
-getuuid(0) renvoie undefined alors que la game 0 existe ?
-
-
-theory !!!!! postgame renvoie l'id de la game creee juste avant ce zig
-
-
-creer la une instance statistics avec le userid qui vient d'etre cree en fetchant /api/me
-
-
-
-a chaque evenement:
-
-	le client envoie au websocket le type d'evenement effectue.
-	dans websocket.ts je prend en compte le changement et modifie roomData en fonction
-	je broadcast à tout le monde qu'il faut update la room en leur tendant roomData
-	chaque client a sa fonction updateUI qui charge l'html 
-
-
-
-
-block --> max 2 players
-	pas d'ia
-
-
-pour pong ajouter card ia pour chaque ia presente
-
-
-trouver un moyen de passer les infos a la classe pong lors de la construction 
-	|
-	|__ un window.history.pushState({}, '', '/pong');
-
-		appele la route /pong qui appele renderPong qui cree le jeu
-			au moment du new pong() il faut lui passer les datas.
-
-
-
 
 faire le middle ware comme ca pas besoin de check le header de toutes les requetes
-
-
 
 vu que chaque user a sa propre interface:
 
@@ -138,44 +12,9 @@ vu que chaque user a sa propre interface:
 					|__ la liste d'amis
 					|__ les demandes d'amis
 
-
-
-
-
 a chaque fois que je send depuis ma classe chat j'envoie le token, automatiser la tache
 
-
-
-
-quand le chef lance
-
-lancer le jeu depuis sa page
-
-
-
-
-
-
 si un user se connecte alors qu'il est deja connecte on deco l'ancienne instance
-
-
-
-
-
-
-creer une game avec 3 joueurs --> des le debut la limite est a 2 a cause du selector de nb player pour le host je crois
-donc si une 3 eme personne essaie de rejoindre ca le fait quitter direct.
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -188,15 +27,6 @@ profil :
 	lister tous ses amis // state1 == 'normal' state_2 == 'normal'
 	injecter seulement ceux qui ne t'ont pas bloqué
 
-
-
-jsp comment gerer les event de merde la
-
-
-// comment faire pour utiliser addEvent psque c'est dans du html la louche nn ?
-
-
-cleanEvents() --> bizarre que je ne puisse pas le mettre au début du routeur
 
 
 

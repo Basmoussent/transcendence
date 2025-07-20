@@ -184,24 +184,13 @@ export class Room {
 	
 	private increase() {
 
-		if (this.roomData?.maxPlayers == (this.howMuchUsers() + this.roomData!.ai))
+		if (this.roomData?.maxPlayers == (this.roomData!.users.length + this.roomData!.ai))
 			return;
 
 		this.ws.send(JSON.stringify({
 			type: 'increase',
 			token: this.token,
 		 }));
-	}
-
-	private howMuchUsers(): number {
-
-		console.log(JSON.stringify(this.roomData?.users, null, 8))
-		let i = 0;
-		this.roomData!.users.forEach(user => {
-			if (user)
-				++i;
-		});
-		return i;
 	}
 
 	private decrease() {
