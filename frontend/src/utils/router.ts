@@ -177,11 +177,12 @@ export async function router() {
 
 	setTimeout(() => {
 		const init = initEvents[path];
+		const initUuid = initEventsUuid[path];
 		
 		if (init)
 			init();
 		else {
-			initEventsUuid[path](uuid)
+			initUuid(uuid)
 		}
 	}, 0);
 }
