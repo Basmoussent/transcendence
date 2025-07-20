@@ -1,4 +1,5 @@
 import { setAuthToken } from '../../../utils/auth';
+import { addEvent } from '../../../utils/eventManager';
 
 export class login {
 
@@ -32,17 +33,20 @@ export class login {
 
 	private setupEvents() {
 
-		this.loginForm.addEventListener('submit', async (e) => {
+		addEvent(this.loginForm, 'submit', async (e) => {
+			console.log("idauzbdoiauzbndoiauzbdoaizubdaoziudbaoziudbazoiudbazoidubai")
 			e.preventDefault();
 			await this.submitLogin();
 		});
 
-		this.forgotPassword.addEventListener('click', () => {
+		addEvent(this.forgotPassword, 'click', () => {
+			console.log("idauzbdoiauzbndoiauzbdoaizubdaoziudbaoziudbazoiudbazoidubai")
 			window.history.pushState({}, '', '/forgot-password');
 			window.dispatchEvent(new PopStateEvent('popstate'));
 		});
 
-		this.createAccount?.addEventListener('click', () => {
+		addEvent(this.createAccount, 'click', () => {
+			console.log("idauzbdoiauzbndoiauzbdoaizubdaoziudbaoziudbazoiudbazoidubai")
 			window.history.pushState({}, '', '/create-account');
 			window.dispatchEvent(new PopStateEvent('popstate'));
 		});

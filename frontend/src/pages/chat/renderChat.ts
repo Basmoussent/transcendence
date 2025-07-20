@@ -6,17 +6,16 @@ import { t } from '../../utils/translations';
 
 
 export function renderChat() {
-
-	setTimeout(async () => {
-		try {
-				const render = new Chat();
-		}
-		catch (err:any) {
-			console.log(`erreur renderChat ${err}`);
-		}
-	}, 0);
-	
 	return getTemplate();
+}
+
+export function initializeChatEvents() {
+	console.log('Initializing chat page events');
+	try {
+		new Chat();
+	} catch (err: any) {
+		console.log(`erreur initializeChatEvents ${err}`);
+	}
 }
 
 const getTemplate = () => {
@@ -662,4 +661,3 @@ const getTemplate = () => {
     </style>
 	`;
 };
-

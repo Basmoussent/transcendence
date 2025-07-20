@@ -1,5 +1,6 @@
 import { getAuthToken } from '../../utils/auth';
 import { fetchMe2fa } from '../social/utils';
+import { addEvent } from '../../utils/eventManager';
 import { t } from '../../utils/translations';
 
 export function render2FALogin() {
@@ -201,7 +202,7 @@ export function render2FALogin() {
 
     // Gestion de l'activation 2FA
     if (activateBtn && verificationCode) {
-      activateBtn.addEventListener('click', async () => {
+      addEvent(activateBtn, 'click', async () => {
         const code = verificationCode.value.trim();
 
         if (code.length !== 6) {

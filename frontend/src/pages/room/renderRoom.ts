@@ -1,46 +1,23 @@
 import { getAuthToken } from '../../utils/auth';
-import { sanitizeHtml } from '../../utils/sanitizer';
-import { Room } from './room'
+import { Room } from './room';
 import { fetchUsername } from '../../game/gameUtils';
 import { t } from '../../utils/translations';
 
-interface User {
-	id: string;
-	username: string;
-	avatar?: string;
-	status: 'online' | 'away' | 'playing';
-	isReady: boolean;
-}
-
-interface RoomData {
-	id: string;
-	name: string;
-	gameType: 'pong' | 'block';
-	maxPlayers: number;
-	currentPlayers: number;
-	users: User[];
-	isStarted: boolean;
-	host: string;
-}
-
 export function renderRoom(uuid: string) {
-
-	setTimeout(async () => {
-		try {
-
-			const username = await fetchUsername();
-			if (username !== undefined) {
-				new Room(username, uuid);
-			}
-		}
-		catch (err:any) {
-			console.log(err);
-		}
-	}, 0);
-	
 	return getTemplate();
 }
 
+export async function initializeRoomEvents(uuid: string) {
+	console.log('Initializing room page events');
+	try {
+		const username = await fetchUsername();
+		if (username !== undefined) {
+			new Room(username, uuid);
+		}
+	} catch (err: any) {
+		console.log(err);
+	}
+}
 
 const getTemplate = () => {
 	return `
@@ -513,4 +490,3 @@ const getTemplate = () => {
 	}
 	</style>`;
 };
-

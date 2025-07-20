@@ -52,13 +52,15 @@ export class FriendService {
 		return Promise.resolve(null); 
 	}
 
-	async createRelation(user_1: string, user_2: string, user_1_state: string, user_2_state: string) {
+	async createRelation(user_1: string, user_2: string, user1_state: string, user2_state: string) {
 
 		try {
+
+			console.log("444444444444")
 			await new Promise<void>((resolve, reject) => {
 				this.db.run(
 					'INSERT INTO friends (user_1, user_2, user1_state, user2_state) VALUES (?, ?, ?, ?)',
-					[ user_1, user_2, user_1_state, user_2_state ],
+					[ user_1, user_2, user1_state, user2_state ],
 					(err: any) => {
 						err ? reject(err) : resolve(); }
 				);

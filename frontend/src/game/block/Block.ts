@@ -1,6 +1,7 @@
 import { fetchUsername, logEndGame, postGame } from "../gameUtils.ts";
 import { Ball, Paddle, brick, createRandomBrick, PowerUp, PowerUpType, getPowerUpFromBrick } from "./blockUtils.ts";
 import { getAuthToken } from '../../utils/auth.ts'
+import { addEvent } from '../../utils/eventManager.ts';
 import { t } from '../../utils/translations.ts'
 
 export interface Game {
@@ -87,13 +88,13 @@ export class Block {
 	}
 
 	private setupEventListeners(): void {
-		window.addEventListener('resize', () => {
+		addEvent(window, 'resize', () => {
 			this.setupCanvas();
 		});
-		window.addEventListener('keydown', (e) => {
+		addEvent(window, 'keydown', (e) => {
 			this.keys[e.key.toLowerCase()] = true;
 		});
-		window.addEventListener('keyup', (e) => {
+		addEvent(window, 'keyup', (e) => {
 			this.keys[e.key.toLowerCase()] = false;
 		});
 	}

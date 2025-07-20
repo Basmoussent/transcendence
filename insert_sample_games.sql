@@ -152,13 +152,13 @@ INSERT INTO games (uuid, game_type, player1, player2, users_needed, ai, start_ti
 VALUES (
     '550e8400-e29b-41d4-a716-446655440011',
     'pong',
-    'q',
+    'polo',
     'alice',
     2,
     0,
     '1703133000000',
     '1703133100000',
-    'q'
+    'polo'
 );
 
 -- Partie 12: q joue Block 1v1 et perd
@@ -167,7 +167,7 @@ VALUES (
     '550e8400-e29b-41d4-a716-446655440012',
     'block',
     'bob',
-    'q',
+    'polo',
     2,
     0,
     '1703134000000',
@@ -180,7 +180,7 @@ INSERT INTO games (uuid, game_type, player1, player2, player3, player4, users_ne
 VALUES (
     '550e8400-e29b-41d4-a716-446655440013',
     'pong',
-    'q',
+    'polo',
     'charlie',
     'david',
     'emma',
@@ -188,7 +188,7 @@ VALUES (
     0,
     '1703135000000',
     '1703135200000',
-    'q'
+    'polo'
 );
 
 -- Partie 14: q joue contre IA et gagne
@@ -196,13 +196,13 @@ INSERT INTO games (uuid, game_type, player1, player2, users_needed, ai, start_ti
 VALUES (
     '550e8400-e29b-41d4-a716-446655440014',
     'pong',
-    'q',
+    'polo',
     'AI_Player',
     2,
     1,
     '1703136000000',
     '1703136100000',
-    'q'
+    'polo'
 );
 
 -- Partie 15: q joue Block 1v1 et gagne
@@ -210,13 +210,13 @@ INSERT INTO games (uuid, game_type, player1, player2, users_needed, ai, start_ti
 VALUES (
     '550e8400-e29b-41d4-a716-446655440015',
     'block',
-    'q',
+    'polo',
     'frank',
     2,
     0,
     '1703137000000',
     '1703137100000',
-    'q'
+    'polo'
 );
 
 -- Partie 16: q joue Pong 1v1 et perd
@@ -225,7 +225,7 @@ VALUES (
     '550e8400-e29b-41d4-a716-446655440016',
     'pong',
     'grace',
-    'q',
+    'polo',
     2,
     0,
     '1703138000000',
@@ -238,7 +238,7 @@ INSERT INTO games (uuid, game_type, player1, player2, users_needed, ai, start_ti
 VALUES (
     '550e8400-e29b-41d4-a716-446655440017',
     'block',
-    'q',
+    'polo',
     'AI_Player',
     2,
     1,
@@ -253,7 +253,7 @@ VALUES (
     '550e8400-e29b-41d4-a716-446655440018',
     'pong',
     'henry',
-    'q',
+    'polo',
     'isabella',
     'jack',
     4,
@@ -268,13 +268,13 @@ INSERT INTO games (uuid, game_type, player1, player2, users_needed, ai, start_ti
 VALUES (
     '550e8400-e29b-41d4-a716-446655440019',
     'block',
-    'q',
+    'polo',
     'kate',
     2,
     0,
     '1703141000000',
     '1703141100000',
-    'q'
+    'polo'
 );
 
 -- Partie 20: q joue Pong 1v1 et gagne (partie très récente)
@@ -282,11 +282,11 @@ INSERT INTO games (uuid, game_type, player1, player2, users_needed, ai, start_ti
 VALUES (
     '550e8400-e29b-41d4-a716-446655440020',
     'pong',
-    'q',
+    'polo',
     'lucas',
     2,
     0,
     '1703142000000',
     '1703142100000',
-    'q'
+    'polo'
 ); 

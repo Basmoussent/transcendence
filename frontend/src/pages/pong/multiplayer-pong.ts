@@ -1,18 +1,19 @@
 import { MultiPong } from '../../game/pong/multiplayer/multi-pong';
 
 export function renderMultiPong(uuid: string) {
-	setTimeout(() => {
-		console.log('Initializing Pong game...');
-		const canvas = document.getElementById('pongGameCanvas') as HTMLCanvasElement;
-		if (!canvas) {
-			console.error('Canvas not found!');
-			return;
-		}
-		console.log('Canvas found, creating game instance...');
-		const game = new MultiPong(canvas, uuid);
-		game.init();
-	}, 0);
 	return getTemplate();
+}
+
+export function initializeMultiPongEvents(uuid: string) {
+	console.log('Initializing Pong game events...');
+	const canvas = document.getElementById('pongGameCanvas') as HTMLCanvasElement;
+	if (!canvas) {
+		console.error('Canvas not found!');
+		return;
+	}
+	console.log('Canvas found, creating game instance...');
+	const game = new MultiPong(canvas, uuid);
+	game.init();
 }
 
 function getTemplate(): string {

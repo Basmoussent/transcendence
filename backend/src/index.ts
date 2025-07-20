@@ -133,6 +133,7 @@ async function setup() {
 	await fastify.register(require('@fastify/websocket'));//TALAN
 	await fastify.register(webSocketRoutes);
 	console.log('✅ WebSocket routes registered');
+	await fastify.register(require('@fastify/cookie'));
 
 	console.log('=== TOUTES LES PROPRIÉTÉS DE FASTIFY ===');
 	console.log(Object.getOwnPropertyNames(fastify));

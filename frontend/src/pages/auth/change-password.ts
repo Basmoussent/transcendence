@@ -1,5 +1,6 @@
 import { t } from '../../utils/translations';
 import { getAuthToken } from '../../utils/auth';
+import { addEvent } from '../../utils/eventManager';
 
 export function renderChangePassword(): string {
 	return `
@@ -60,13 +61,13 @@ function initializeChangePasswordEvents() {
 
 	// Gestion du bouton retour au profil
 	if (backToProfileBtn) {
-		backToProfileBtn.addEventListener('click', () => {
+		addEvent(backToProfileBtn, 'click', () => {
 			window.history.pushState({}, '', '/profil');
 			window.dispatchEvent(new PopStateEvent('popstate'));
 		});
 	}
 
-	changePasswordForm?.addEventListener('submit', async (e) => {
+	addEvent(changePasswordForm, 'submit', async (e) => {
 		e.preventDefault();
 		const currentPassword = (document.getElementById('currentPassword') as HTMLInputElement).value;
 		const newPassword = (document.getElementById('newPassword') as HTMLInputElement).value;
