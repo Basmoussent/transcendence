@@ -1232,7 +1232,7 @@ function checkAndEnableNextMatch(matchId: any) {
 };
 
 // Enter key to add player
-addEvent(document, 'keydown', function(event: KeyboardEvent) {
+document.addEventListener('keydown', function(event: KeyboardEvent) {
   const modal = document.getElementById('addPlayerModal');
   if (event.key === 'Enter' && modal?.style.display === 'block') {
     (window as any).confirmAddPlayer();
@@ -1240,7 +1240,7 @@ addEvent(document, 'keydown', function(event: KeyboardEvent) {
 });
 
 // Hide error message when user types
-addEvent(document, 'input', function(event: Event) {
+document.addEventListener('input', function(event: Event) {
   const target = event.target as HTMLInputElement;
   if (target && target.id === 'playerNameInput') {
     const errorMessage = document.getElementById('errorMessage');

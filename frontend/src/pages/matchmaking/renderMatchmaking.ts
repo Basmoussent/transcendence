@@ -1,11 +1,16 @@
 import { matchmaking } from "./matchmaking";
 
 export function renderMatchmaking() {
-
-	setTimeout(async () => {
-		new matchmaking();
-	}, 0);
 	return getTemplate();
+}
+
+export function initializeMatchmakingEvents() {
+	console.log('Initializing matchmaking page events');
+	try {
+		new matchmaking();
+	} catch (err: any) {
+		console.log(err);
+	}
 }
 
 const getTemplate = () => {
@@ -45,6 +50,7 @@ const getTemplate = () => {
 					</button>
 				</div>
 			</div>
+			
 		</div>
 
 		<div class="glass-panel w-2/6 flex flex-col gap-5 justify-start items-center py-8 px-6 h-10/12">
@@ -121,7 +127,7 @@ const getTemplate = () => {
 		background: #D5CAD6;
 		border-radius: 2px;
 		transform: translateX(-50%);
-		transition: width 0.3s ease;
+		transition: width 0.4s;
 	}
 
 	#oui:hover {

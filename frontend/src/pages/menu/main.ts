@@ -71,6 +71,19 @@ export class main {
 	}
 }
 
+export function initializeHomeEvents() {
+	console.log('Initializing create-account page events');
+	const loginBtn = document.getElementById('loginBtn');
+	
+	// Gestion du bouton retour au login
+	if (loginBtn) {
+		addEvent(loginBtn, 'click', () => {
+			window.history.pushState({}, '', '/login');
+			window.dispatchEvent(new PopStateEvent('popstate'));
+		});
+	}
+}
+
 export function renderHome(): string {
 	return `
 		<div class="home">

@@ -61,7 +61,7 @@ export async function renderMe() {
 	const tfaButtonText = userData.twoFactorEnabled ? 'Deactivate 2FA' : 'Activate 2FA';
 	const tfaButtonIcon = userData.twoFactorEnabled ? 'fa-solid fa-lock-open' : 'fa-solid fa-lock';
 
-	const htmlContent = `
+	return `
 		<div class="profile-wrapper">
 			<div class="profile-container">
 				<div class="profile-header">
@@ -449,131 +449,130 @@ export async function renderMe() {
 		</style>
 	`;
 
-	setTimeout(() => {
-		const logoutButton = document.querySelector('.action-button.logout') as HTMLElement;
-		const editProfileButton = document.querySelector('.action-button.edit-profile') as HTMLElement;
-		const changePasswordButton = document.querySelector('.action-button.change-password') as HTMLElement;
-		const changeAvatarBtn = document.getElementById('changeAvatarBtn') as HTMLElement;
-		const avatarInput = document.getElementById('avatarInput') as HTMLInputElement;
-		const homeBtn = document.getElementById('homeBtn') as HTMLElement;
-		const TFABtn = document.getElementById('TFABtn') as HTMLElement;
-	
-		if (homeBtn) {
-			addEvent(homeBtn, 'click', () => {
-				window.history.pushState({}, '', '/main');
-				window.dispatchEvent(new PopStateEvent('popstate'));
-			});
-		}
+}
 
-		if (logoutButton) {
-			addEvent(logoutButton, 'click', () => {
-				removeAuthToken();
-				window.history.pushState({}, '', '/login');
-				window.dispatchEvent(new PopStateEvent('popstate'));
-			});
-		}
+export function initializeMeEvents() {
+	const logoutButton = document.querySelector('.action-button.logout') as HTMLElement;
+	const editProfileButton = document.querySelector('.action-button.edit-profile') as HTMLElement;
+	const changePasswordButton = document.querySelector('.action-button.change-password') as HTMLElement;
+	const changeAvatarBtn = document.getElementById('changeAvatarBtn') as HTMLElement;
+	const avatarInput = document.getElementById('avatarInput') as HTMLInputElement;
+	const homeBtn = document.getElementById('homeBtn') as HTMLElement;
+	const TFABtn = document.getElementById('TFABtn') as HTMLElement;
 
-		if (editProfileButton) {
-			addEvent(editProfileButton, 'click', () => {
-				window.history.pushState({}, '', '/edit-profil');
-				window.dispatchEvent(new PopStateEvent('popstate'));
-			});
-		}
+	if (homeBtn) {
+		addEvent(homeBtn, 'click', () => {
+			window.history.pushState({}, '', '/main');
+			window.dispatchEvent(new PopStateEvent('popstate'));
+		});
+	}
 
-		if (changePasswordButton) {
-			addEvent(changePasswordButton, 'click', () => {
-				window.history.pushState({}, '', '/change-password');
-				window.dispatchEvent(new PopStateEvent('popstate'));
-			});
-		}
+	if (logoutButton) {
+		addEvent(logoutButton, 'click', () => {
+			removeAuthToken();
+			window.history.pushState({}, '', '/login');
+			window.dispatchEvent(new PopStateEvent('popstate'));
+		});
+	}
 
-		// Gestion bouton 2FA
-		if (TFABtn) {
-			addEvent(TFABtn, 'click', async () => {
+	if (editProfileButton) {
+		addEvent(editProfileButton, 'click', () => {
+			window.history.pushState({}, '', '/edit-profil');
+			window.dispatchEvent(new PopStateEvent('popstate'));
+		});
+	}
+
+	if (changePasswordButton) {
+		addEvent(changePasswordButton, 'click', () => {
+			window.history.pushState({}, '', '/change-password');
+			window.dispatchEvent(new PopStateEvent('popstate'));
+		});
+	}
+
+	// Gestion bouton 2FA
+	if (TFABtn) {
+		addEvent(TFABtn, 'click', async () => {
+		
+		console.log('iqubwiduqbwiudbqiwudbq')
+		const info = await userInfo();
+
+		if (info.user.two_fact_auth) {
+			// desactiver 2FA
+			const confirmation = confirm('Êtes-vous sûr de vouloir désactiver l\'authentification à deux facteurs ?');
 			
-			console.log('iqubwiduqbwiudbqiwudbq')
-			const info = await userInfo();
+			if (confirmation) {
+				const success = await update2FAState(0, info.user.id);
 
-			if (info.user.two_fact_auth) {
-				// desactiver 2FA
-				const confirmation = confirm('Êtes-vous sûr de vouloir désactiver l\'authentification à deux facteurs ?');
-				
-				if (confirmation) {
-					const success = await update2FAState(0, info.user.id);
-
-					if (success) {
-						TFABtn.innerHTML = '<i class="fa-solid fa-lock"></i> Activate 2FA';
-						alert('✅ 2FA désactivée avec succès');
-					}
-					else
-						alert('❌ Erreur lors de la désactivation 2FA');
+				if (success) {
+					TFABtn.innerHTML = '<i class="fa-solid fa-lock"></i> Activate 2FA';
+					alert('✅ 2FA désactivée avec succès');
 				}
+				else
+					alert('❌ Erreur lors de la désactivation 2FA');
 			}
-			else {
-				// activer 2FA
-				window.history.pushState({}, '', '/2fa');
-				window.dispatchEvent(new PopStateEvent('popstate'));
-			}});
 		}
+		else {
+			// activer 2FA
+			window.history.pushState({}, '', '/2fa');
+			window.dispatchEvent(new PopStateEvent('popstate'));
+		}});
+	}
 
-		// Gestion de l'upload d'avatar
-		if (changeAvatarBtn && avatarInput) {
-			addEvent(changeAvatarBtn, 'click', () => {
-				avatarInput.click();
-			});
+	// Gestion de l'upload d'avatar
+	if (changeAvatarBtn && avatarInput) {
+		addEvent(changeAvatarBtn, 'click', () => {
+			avatarInput.click();
+		});
 
-			addEvent(avatarInput, 'change', async (e) => {
-				const file = (e.target as HTMLInputElement).files?.[0];
-				if (!file) return;
+		addEvent(avatarInput, 'change', async (e) => {
+			const file = (e.target as HTMLInputElement).files?.[0];
+			if (!file) return;
 
-				// Vérifier le type de fichier
-				if (!file.type.startsWith('image/')) {
-					alert('❌ Veuillez sélectionner une image valide');
+			// Vérifier le type de fichier
+			if (!file.type.startsWith('image/')) {
+				alert('❌ Veuillez sélectionner une image valide');
+				return;
+			}
+
+			// Vérifier la taille (5MB max)
+			if (file.size > 5 * 1024 * 1024) {
+				alert('❌ L\'image est trop volumineuse. Taille maximum: 5MB');
+				return;
+			}
+
+			try {
+				const token = getAuthToken();
+				if (!token) {
+					alert('❌ Token d\'authentification manquant');
+					window.history.pushState({}, '', '/login');
+					window.dispatchEvent(new PopStateEvent('popstate'));
 					return;
 				}
 
-				// Vérifier la taille (5MB max)
-				if (file.size > 5 * 1024 * 1024) {
-					alert('❌ L\'image est trop volumineuse. Taille maximum: 5MB');
-					return;
+				const formData = new FormData();
+				formData.append('file', file);
+
+				const response = await fetch('/api/upload/avatar', {
+					method: 'POST',
+					headers: {
+						'x-access-token': token
+					},
+					body: formData
+				});
+
+				const result = await response.json();
+
+				if (response.ok) {
+					alert('✅ Avatar mis à jour avec succès');
+					// Recharger la page pour afficher le nouvel avatar
+					window.location.reload();
+				} else {
+					alert(`❌ Erreur: ${result.error || 'Erreur inconnue'}`);
 				}
-
-				try {
-					const token = getAuthToken();
-					if (!token) {
-						alert('❌ Token d\'authentification manquant');
-						window.history.pushState({}, '', '/login');
-						window.dispatchEvent(new PopStateEvent('popstate'));
-						return;
-					}
-
-					const formData = new FormData();
-					formData.append('file', file);
-
-					const response = await fetch('/api/upload/avatar', {
-						method: 'POST',
-						headers: {
-							'x-access-token': token
-						},
-						body: formData
-					});
-
-					const result = await response.json();
-
-					if (response.ok) {
-						alert('✅ Avatar mis à jour avec succès');
-						// Recharger la page pour afficher le nouvel avatar
-						window.location.reload();
-					} else {
-						alert(`❌ Erreur: ${result.error || 'Erreur inconnue'}`);
-					}
-				} catch (err) {
-					console.error('Erreur lors de l\'upload:', err);
-					alert('❌ Erreur lors de l\'upload de l\'avatar');
-				}
-			});
-		}
-	}, 0);
-
-	return htmlContent;
+			} catch (err) {
+				console.error('Erreur lors de l\'upload:', err);
+				alert('❌ Erreur lors de l\'upload de l\'avatar');
+			}
+		});
+	}
 }

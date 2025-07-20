@@ -1,7 +1,7 @@
 import { Game, fetchUsername, getUuid, postGame } from '../../game/gameUtils'
 import { getAuthToken } from '../../utils/auth';
 import { sanitizeHtml } from '../../utils/sanitizer';
-import { addEvent } from '../../utils/eventManager';
+import { addEvent, cleanEvents } from '../../utils/eventManager';
 
 export interface Available {
 	gameId: number,
@@ -191,6 +191,8 @@ export class matchmaking {
 				player1: this.username,
 				users_needed: 2 // Par défaut 2 joueurs, sera configuré dans la room
 			}
+
+			cleanEvents();
 
 			var uuid = await postGame(tmp);
 

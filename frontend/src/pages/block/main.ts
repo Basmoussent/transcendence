@@ -1,17 +1,18 @@
 import { Block } from '../../game/block/Block';
 
 export function renderBlock(uuid: string) {
-	setTimeout(() => {
-		const canvas = document.getElementById('blockGameCanvas') as HTMLCanvasElement;
-		if (!canvas) {
-			console.error('Canvas not found!');
-			return;
-		}
-		new Block(canvas, uuid);
-	}, 0);
-
 	return getTemplate();
 } 
+
+export function initializeBlockEvents(uuid: string) {
+	console.log('Initializing block game events');
+	const canvas = document.getElementById('blockGameCanvas') as HTMLCanvasElement;
+	if (!canvas) {
+		console.error('Canvas not found!');
+		return;
+	}
+	new Block(canvas, uuid);
+}
 
 function getTemplate() {
 	return `

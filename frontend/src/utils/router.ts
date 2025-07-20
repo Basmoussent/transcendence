@@ -1,26 +1,26 @@
 import { renderHome, initializeHomeEvents } from '../pages/menu/main';
-import { renderLogin } from '../pages/auth/login';
-import { renderCreateAccount } from '../pages/auth/create-account';
+import { renderLogin, initializeLoginEvents } from '../pages/auth/login';
+import { renderCreateAccount, initializeCreateAccountEvents } from '../pages/auth/create-account';
 import { renderForgotPassword, initializeForgotPasswordEvents } from '../pages/auth/forgot-password';
-import { renderMain } from '../pages/menu/renderMain';
+import { renderMain, initializeMainEvents } from '../pages/menu/renderMain';
 import { render404 } from '../components/404';
-import { renderMe } from '../pages/social/me';
-import { renderMatchmaking } from '../pages/matchmaking/renderMatchmaking';
+import { renderMe, initializeMeEvents } from '../pages/social/me';
+import { renderMatchmaking, initializeMatchmakingEvents } from '../pages/matchmaking/renderMatchmaking';
 import { renderTournaments, initializeTournamentEvents } from '../pages/game/tournament';
-import { renderBlock } from '../pages/block/main';
-import { renderBlock1v1 } from '../pages/block/block1v1';
-import { renderRoom } from '../pages/room/renderRoom';
-import { renderChat } from '../pages/chat/renderChat';
+import { renderBlock, initializeBlockEvents } from '../pages/block/main';
+import { renderBlock1v1, initializeBlock1v1Events } from '../pages/block/block1v1';
+import { renderRoom, initializeRoomEvents } from '../pages/room/renderRoom';
+import { renderChat, initializeChatEvents } from '../pages/chat/renderChat';
 import { renderChangePassword, initializeChangePasswordEvents } from '../pages/auth/change-password';
 import { renderEditProfil, initializeEditProfileEvents } from '../pages/social/edit-profil';
 import { getAuthToken } from './auth';
 import { clearTranslationCache } from './translations';
 
-import { renderMultiPong } from '../pages/pong/multiplayer-pong';
-import { renderPong } from '../pages/pong/pong';
+import { renderMultiPong, initializeMultiPongEvents } from '../pages/pong/multiplayer-pong';
+import { renderPong, initializePongEvents } from '../pages/pong/pong';
 import { initAlive } from './auth';
-import { renderProfil } from '../pages/social/renderProfil';
-import { render2FA } from '../pages/auth/activate-2fa';
+import { renderProfil, initializeProfilEvents } from '../pages/social/renderProfil';
+import { render2FA, initialize2FAEvents } from '../pages/auth/activate-2fa';
 import { render2FALogin } from '../pages/auth/2fa-login';
 
 import { cleanEvents } from './eventManager';
@@ -86,7 +86,7 @@ export async function router() {
 	const renderView: { [key: string]: (uuid?: string) => Promise<string> | string } = {
 		'/': () => renderHome(),
 		'/login': () => renderLogin(),
-		'/lang': async () => {
+		'/lang': async () => {//c'est quoi ce prout
 			const lastPath = localStorage.getItem('lastPath');
 			if (lastPath && lastPath !== '/lang') {
 				console.log('log', lastPath);
@@ -123,6 +123,7 @@ export async function router() {
 	let view = '';
 	const render = renderView[path];
 
+
 	view = render ? await render(uuid) : render404()
 	app.innerHTML = view;
 
@@ -148,19 +149,38 @@ export async function router() {
 	}
 
 	// Initialiser les événements après le rendu pour les pages qui en ont besoin
-	const initEvents: { [key: string]: () => void } = {
+	const initEvents: { [key: string]: (uuid?: string) => void } = {
 		'/': initializeHomeEvents,
 		'/lang': initializeHomeEvents,
+		'/login': initializeLoginEvents,
+		'/create-account': initializeCreateAccountEvents,
 		'/forgot-password': initializeForgotPasswordEvents,
+		'/main': initializeMainEvents,
+		'/me': initializeMeEvents,
+		'/profil': initializeProfilEvents,
+		'/matchmaking': initializeMatchmakingEvents,
 		'/change-password': initializeChangePasswordEvents,
 		'/edit-profil': initializeEditProfileEvents,
+		'/room': initializeRoomEvents,
+		'/chat': initializeChatEvents,
+		'/2fa': initialize2FAEvents,
+		'/block': initializeBlockEvents,
+		'/block1v1': initializeBlock1v1Events,
+		'/pong': initializePongEvents,
+		'/multipong': initializeMultiPongEvents,
+		'/tournament': initializeTournamentEvents,
 	};
 
 	setTimeout(() => {
 		const init = initEvents[path];
 		
-		if (init)
-			init();
+		if (init) {
+			if (path.startsWith('/profil/') || path.startsWith('/room/') || path.startsWith('/block/') || path.startsWith('/block1v1/') || path.startsWith('/pong/') || path.startsWith('/multipong/')) {
+				init(uuid);
+			} else {
+				init();
+			}
+		}
 	}, 0);
 }
 

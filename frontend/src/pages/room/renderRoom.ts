@@ -1,25 +1,22 @@
 import { getAuthToken } from '../../utils/auth';
-import { Room } from './room'
+import { Room } from './room';
 import { fetchUsername } from '../../game/gameUtils';
 
 export function renderRoom(uuid: string) {
-
-	setTimeout(async () => {
-		try {
-
-			const username = await fetchUsername();
-			if (username !== undefined) {
-				new Room(username, uuid);
-			}
-		}
-		catch (err:any) {
-			console.log(err);
-		}
-	}, 0);
-	
 	return getTemplate();
 }
 
+export async function initializeRoomEvents(uuid: string) {
+	console.log('Initializing room page events');
+	try {
+		const username = await fetchUsername();
+		if (username !== undefined) {
+			new Room(username, uuid);
+		}
+	} catch (err: any) {
+		console.log(err);
+	}
+}
 
 const getTemplate = () => {
 	return `
@@ -491,4 +488,3 @@ const getTemplate = () => {
 	}
 	</style>`;
 };
-

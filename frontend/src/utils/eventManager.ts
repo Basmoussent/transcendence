@@ -13,10 +13,13 @@ export function addEvent(element: HTMLElement, type: string, handler: EventListe
 
 export function cleanEvents() {
 
-	console.log(`on supprime tous les events enregistrés`);
-	events.forEach(listener => {
+	console.log(`🧹 Suppression de tous les événements enregistrés :`);
+	events.forEach((listener, index) => {
+		console.log(`🔹 [${index}] Element:`, listener.element);
+		console.log(`    Type: ${listener.type}`);
+		console.log(`    Handler:`, listener.handler);
 		listener.element.removeEventListener(listener.type, listener.handler);
 	});
-	
+
 	events = [];
 }

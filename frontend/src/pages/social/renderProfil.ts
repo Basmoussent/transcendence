@@ -1,31 +1,37 @@
 import { getAuthToken } from '../../utils/auth';
 import { sanitizeHtml } from '../../utils/sanitizer';
 import { t } from '../../utils/translations';
-import { profil } from './profil'
+import { profil } from './profil';
+import { addEvent } from '../../utils/eventManager';
 
 export function renderProfil(uuid: string) {
-
-	setTimeout(async () => {
-		try {
-
-			const data = {
-				me: await loadMe(),
-				user: await loadUserInfo(uuid),
-				stats: await loadUserStats(uuid),
-				friends: await loadUserFriends(uuid)
-			}
-
-			new profil(data);
-		}
-		catch (err:any) {
-			console.log(err);
-		}
-	}, 0);
 	return getTemplate();
 }
 
-async function loadMe() {
+export async function initializeProfilEvents(uuid: string) {
+	console.log('Initializing profil page events');
+	try {
+		const data = {
+			me: await loadMe(),
+			user: await loadUserInfo(uuid),
+			stats: await loadUserStats(uuid),
+			friends: await loadUserFriends(uuid)
+		};
+		new profil(data);
+	} catch (err: any) {
+		console.log(err);
+	}
 
+	const homeBtn = document.getElementById('homeBtn') as HTMLElement;
+	if (homeBtn) {
+		addEvent(homeBtn, 'click', () => {
+			window.history.pushState({}, '', '/main');
+			window.dispatchEvent(new PopStateEvent('popstate'));
+		});
+	}
+}
+
+async function loadMe() {
 	try {
 		const token = getAuthToken();
 		if (!token) {
@@ -53,15 +59,12 @@ async function loadMe() {
 		} else {
 			console.error('Erreur lors de la récupération des données utilisateur');
 		}
-	}
-	catch (err) {
+	} catch (err) {
 		console.error(`fail de recup me dans loadme renderFriends`);
 	}
-
 }
 
 async function loadUserInfo(username: string) {
-
 	try {
 		const token = getAuthToken();
 		if (!token) {
@@ -75,9 +78,10 @@ async function loadUserInfo(username: string) {
 			method: 'GET',
 			headers: {
 				'Content-Type': 'application/json',
-				'x-access-token': token }
+				'x-access-token': token
+			}
 		});
-	
+
 		if (response.ok) {
 			const result = await response.json();
 			const userData = {
@@ -87,17 +91,14 @@ async function loadUserInfo(username: string) {
 				avatar: sanitizeHtml(result.data?.avatar_url) || 'avatar.png',
 			};
 			return (userData);
-		}
-		else 
+		} else
 			console.error('Erreur lors de la récupération des données utilisateur');
-	}
-	catch (err) {
+	} catch (err) {
 		console.error(`error retreve info du user pour render son profil  ${err}`);
 	}
 }
 
 async function loadUserStats(username: string) {
-
 	try {
 		const token = getAuthToken();
 		if (!token) {
@@ -111,9 +112,10 @@ async function loadUserStats(username: string) {
 			method: 'GET',
 			headers: {
 				'Content-Type': 'application/json',
-				'x-access-token': token }
+				'x-access-token': token
+			}
 		});
-	
+
 		if (response.ok) {
 			const result = await response.json();
 			const userStats = {
@@ -126,14 +128,11 @@ async function loadUserStats(username: string) {
 				id: result.stats?.id,
 			};
 			return (userStats);
-		}
-		else 
+		} else
 			console.error('pblm recuperer les stats du user dont on veut render le profil');
-	}
-	catch (err) {
+	} catch (err) {
 		console.error(`pblm recuperer les stats du user dont on veut render le profil${err}`);
 	}
-
 }
 
 async function loadUserFriends(username: string) {
@@ -150,17 +149,17 @@ async function loadUserFriends(username: string) {
 			method: 'GET',
 			headers: {
 				'Content-Type': 'application/json',
-				'x-access-token': token }
+				'x-access-token': token
+			}
 		});
-	
+
 		if (response.ok)
 			return await response.json();
-		else 
+		else
 			console.error('gros gros zig');
 
-	}
-	catch (err) {
-		console.error(`pas réussi a récup les amis de cette personnes zignew que tu es`)
+	} catch (err) {
+		console.error(`pas réussi a récup les amis de cette personnes zignew que tu es`);
 	}
 }
 
@@ -222,8 +221,8 @@ function getTemplate() {
 						<div class="stat-card">
 							<div id="rank" class="stat-number">42</div>
 							<div class="stat-label">Rank</div>
+						</div>
 					</div>
-				</div>
 			</div>
 
 			

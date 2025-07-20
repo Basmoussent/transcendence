@@ -1,6 +1,6 @@
 import { getAuthToken } from '../../utils/auth';
 import { sanitizeHtml } from '../../utils/sanitizer';
-import { addEvent, cleanEvents } from '../../utils/eventManager';
+import { addEvent } from '../../utils/eventManager';
 
 interface User {
 	username: string;
@@ -150,13 +150,11 @@ export class Room {
 				this.ws.close();
 				window.history.pushState({}, '', '/login');
 				window.dispatchEvent(new Event('popstate'));
-				cleanEvents()
 				break;
 			case 'error':
 				this.ws.close();
 				window.history.pushState({}, '', '/matchmaking');
 				window.dispatchEvent(new Event('popstate'));
-				cleanEvents()
 
 				break;
 			default:
@@ -230,14 +228,12 @@ export class Room {
 		this.ws.close();
 		window.history.pushState({}, '', '/matchmaking');
 		window.dispatchEvent(new Event('popstate'));
-		cleanEvents()
 	}
 
 	private goHome() {
 		this.ws.close();
 		window.history.pushState({}, '', '/main');
 		window.dispatchEvent(new Event('popstate'));
-		cleanEvents()
 	}
 
 	private updateUI() {
@@ -399,8 +395,6 @@ export class Room {
 			}
 			else
 				window.history.pushState({}, '', `/main`);
-
-			cleanEvents();
 
 			window.dispatchEvent(new Event('popstate'));
 		}, 1800);
