@@ -272,13 +272,6 @@ export class matchmaking {
 		try {
 			// Ajouter un indicateur de chargement
 			const container = document.getElementById('available-games');
-			if (container) {
-				const loadingIndicator = document.createElement('div');
-				loadingIndicator.className = 'loading-indicator';
-				loadingIndicator.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Updating games...';
-				container.appendChild(loadingIndicator);
-			}
-
 			const gameList = await this.loadAvailableGames();
 			
 			if (gameList === -1) {
