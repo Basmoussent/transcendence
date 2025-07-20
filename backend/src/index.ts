@@ -5,7 +5,6 @@ import Fastify from 'fastify';
 import cors from '@fastify/cors';
 import jwt from '@fastify/jwt';
 import websocket from '@fastify/websocket';
-import cookie from '@fastify/cookie';
 import multipart from '@fastify/multipart'
 import { db } from './database';
 import { UserService } from './services/userService';
@@ -90,17 +89,7 @@ async function setup() {
 		}
 	};
 	
-	// Manually decorate the fastify instance with jwt2fa
 	fastify.decorate('jwt2fa', jwt2faInstance);
-	console.log('✅ Manually decorated jwt2fa');
-	
-	// Debug: Check if JWT decorators are available
-	console.log('🔍 Debug JWT decorators:');
-	console.log('jwt decorator:', typeof fastify.jwt);
-	console.log('jwt2fa decorator:', typeof fastify.jwt2fa);
-	console.log('All decorators:', Object.keys(fastify).filter(key => key.includes('jwt')));
-	
-	console.log('✅ JWT plugins registered');
 
 	// Register CORS
 	console.log('🌐 Registering CORS...');
@@ -122,9 +111,6 @@ async function setup() {
 	});
 	console.log('✅ CORS registered');
 
-	console.log('🍪 Registering cookie plugin...');
-	await fastify.register(cookie);
-	console.log('✅ Cookie plugin registered');
 
 	console.log('📁 Registering multipart plugin...');
 	await fastify.register(multipart, {

@@ -193,9 +193,6 @@ export async function router() {
 			case '/forgot-password':
 				initializeForgotPasswordEvents();
 				break;
-			case '/multiplayer':
-				initializeMultiplayerEvents();
-				break;
 			case '/change-password':
 				initializeChangePasswordEvents();
 				break;
