@@ -64,7 +64,7 @@ export class Pong {
 		// this.retrieveGameInfo(uuid);
 	}
 
-	public init(): { player1: player1, player2: player1 } {
+	public init(p1: string, p2: string): { player1: player1, player2: player1 } {
 		console.log('Initializing paddle game...');
 		this.setupCanvas();
 		this.setupEventListeners();
@@ -74,9 +74,10 @@ export class Pong {
 		window.addEventListener('resize', () => {
 			this.setupCanvas();
 		});
-
-		const player1 = {name: this.paddles[0].name, score: this.paddles[0].score} as player1;
-		const player2 = {name: this.paddles[1].name, score: this.paddles[1].score} as player1;
+		this.paddles[0].name = p1;
+		this.paddles[1].name = p2;
+		const player1 = {name: p1, score: this.paddles[0].score} as player1;
+		const player2 = {name: p2, score: this.paddles[1].score} as player1;
 		return {player1, player2};
 	};
 

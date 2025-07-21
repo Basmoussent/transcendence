@@ -745,15 +745,12 @@ export function renderTournaments() {
 			});
 		}
     
-    console.log('Initializing Pong game...');
     const canvas = document.getElementById('gameCanvas') as HTMLCanvasElement;
     if (!canvas) {
       console.error('Canvas not found!');
       return;
     }
     console.log('Canvas found, creating game instance...');
-    const game = new Pong(canvas);
-    game.init();
   }, 0);
   return html;
 
@@ -827,6 +824,7 @@ let tournamentData = {
 (window as any).startTournament = function() {
   if (tournamentData.players.length >= 2) {
     tournamentData.inLobby = false;
+    console.log("tournamentData.players:", tournamentData.players);
     generateQuarterFinals();
     updateTournamentDisplay();
   }
@@ -1294,19 +1292,23 @@ document.addEventListener('input', function(event: Event) {
     console.error('Canvas not found!');
     return;
   }
-  console.log('Canvas found, creating game instance...');
+  const match = document.querySelector('[data-match="' + matchId + '"]');
+  const players = match!.querySelectorAll('.player');
+  const p1 = players[0].querySelector('.player-name')?.textContent;
+  const p2 = players[1].querySelector('.player-name')?.textContent;
   const game = new Pong(canvas);
   if (canvas) {
     canvas.classList.add('active');
   }
-  const result = game.init();
+  game.init(p1!, p2!);
+  console.log("game.paddles[0].name :", p1, "game.paddles[1].name :", p2);
   
   const checkGameEnd = () => {
     if (game.end) {
       const p1 = game.paddles[0];
       const p2 = game.paddles[1];
       const winner = p1.score > p2.score ? p1.name : p2.name;
-      // Trouver le bon élément gagnant
+      console.log("p1 :", p1.name, "p2 :", p2.name, "winner :", winner);
       const match = document.querySelector('[data-match="' + matchId + '"]');
       if (match) {
         console.log("match found");
