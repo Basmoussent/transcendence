@@ -39,22 +39,37 @@ export class MultiPong {
         if (!context) {
             throw new Error('Could not get 2D context');
         }
-
-        this.data = this.loadInfo(uuid);
-
         this.ctx = context;
         this.height = canvas.height;
         this.width = canvas.width;
         this.start = false;
         this.end = false;
         this.lastPlayerColl = -1;
+        this.data = null; // sera rempli dans asyncInit
+        this.paddles = [undefined, undefined, undefined, undefined] as unknown as [Paddle, Paddle | PaddleAI, Player?, Player?]; // sera rempli dans asyncInit
+        this.ball = null as any; // sera rempli dans asyncInit
+        this.keys = {};
+        this._uuid = uuid;
+    }
 
-        console.log("data dans init", this.data)
-        // !!! modifier ca avec les infos de la partie
+    private _uuid: string;
+
+    public async asyncInit(): Promise<void> {
+        this.data = await this.loadInfo(this._uuid);
+        console.log("data dans asyncInit", this.data);
+
         this.paddles = this.initPlayers();
 
         this.ball = new Ball(this.height, this.width);
-        this.keys = {};
+
+        this.setupCanvas();
+        this.setupEventListeners();
+        this.startGameLoop();
+
+        // on resize si la taille de la fenetre change
+        window.addEventListener('resize', () => {
+            this.setupCanvas();
+        });
     }
 
     private async loadInfo(uuid: string): Promise<any> {
@@ -107,7 +122,7 @@ export class MultiPong {
 
     private initPlayers(): [Paddle, Paddle | PaddleAI, Player?, Player?] {
 
-        console.log(`les infos de la game => ${JSON.stringify(this.data, null, 12)}`)
+        console.log(`les infos de ladqwdqwdqwdqwdq game => ${JSON.stringify(this.data, null, 12)}`)
 
         let players: number = this.data.users_needed - 1;
         let ai_players: number = this.data.ai;
