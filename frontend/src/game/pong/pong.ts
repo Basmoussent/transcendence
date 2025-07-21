@@ -184,11 +184,11 @@ export class Pong {
 			if (this.start && !this.end) {
 				this.update();
 			}
+			this.render();
 			if (this.end) {
 				this.logTournamentGame();
 				return ;
 			}
-			this.render();
 			requestAnimationFrame(gameLoop);
 		};
 		gameLoop();

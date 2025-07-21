@@ -30,6 +30,8 @@ export class MultiPong {
     private paddles: [Paddle, Paddle | PaddleAI, Player?, Player?];
     private ball: Ball;
     private keys: { [key: string]: boolean };
+    private uuid: string;
+    private winner: string;
 
 	private data: any;
 
@@ -39,6 +41,7 @@ export class MultiPong {
         if (!context) {
             throw new Error('Could not get 2D context');
         }
+        this.uuid = uuid;
         this.ctx = context;
         this.height = canvas.height;
         this.width = canvas.width;
@@ -49,13 +52,11 @@ export class MultiPong {
         this.paddles = [undefined, undefined, undefined, undefined] as unknown as [Paddle, Paddle | PaddleAI, Player?, Player?]; // sera rempli dans asyncInit
         this.ball = null as any; // sera rempli dans asyncInit
         this.keys = {};
-        this._uuid = uuid;
+        this.winner = "";
     }
 
-    private _uuid: string;
-
     public async asyncInit(): Promise<void> {
-        this.data = await this.loadInfo(this._uuid);
+        this.data = await this.loadInfo(this.uuid);
         console.log("data dans asyncInit", this.data);
 
         this.paddles = this.initPlayers();
@@ -239,6 +240,10 @@ export class MultiPong {
                 this.update();
             }
             this.render();
+            if (this.end) {
+				this.logGame();
+				return ;
+			}
             requestAnimationFrame(gameLoop);
         };
         gameLoop();
@@ -328,6 +333,7 @@ export class MultiPong {
             const paddle = this.paddles[i];
             if (paddle && paddle?.winsGame() === true) {
                 this.end = true;
+                this.winner = paddle.name;
                 return;
             }
         }
@@ -545,4 +551,38 @@ export class MultiPong {
                 this.displayStartMsg();
         }
     }
+
+    private async logGame() {
+
+		try {
+			const token = getAuthToken();
+			if (!token) {
+				alert('❌ Token d\'authentification manquant');
+				window.history.pushState({}, '', '/login');
+				window.dispatchEvent(new PopStateEvent('popstate'));
+				return -1;
+			}
+
+			const response = await fetch(`/api/games/finish/${this.uuid}`, {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+					'x-access-token': token,
+				},
+				body: JSON.stringify({
+					winner: this.winner
+				})
+			});
+		
+			if (response.ok) {
+				const result = await response.json();
+				console.log("la game de room est log", result);
+			}
+			else 
+				console.error("erreur pour log la game de room");
+		}
+		catch (err) {
+			console.error("pblm dans multipong.ts pour log la game")
+		}
+	}
 }
