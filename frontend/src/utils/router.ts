@@ -23,8 +23,6 @@ import { renderProfil, initializeProfilEvents } from '../pages/social/renderProf
 import { render2FA, initialize2FAEvents } from '../pages/auth/activate-2fa';
 import { render2FALogin } from '../pages/auth/2fa-login';
 
-import { cleanEvents } from './eventManager';
-
 export async function router() {
 
 	clearTranslationCache();

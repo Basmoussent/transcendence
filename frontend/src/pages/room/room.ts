@@ -1,7 +1,6 @@
-import { getAuthToken } from '../../utils/auth';
+import { getAuthToken, getAuthTokenFromCookie } from '../../utils/auth';
 import { sanitizeHtml } from '../../utils/sanitizer';
 import { addEvent } from '../../utils/eventManager';
-import { t } from '../../utils/translations';
 
 interface User {
 	username: string;
@@ -73,6 +72,7 @@ export class Room {
 		this.maxPlayersSelect = this.getElement('maxPlayersSelect') as HTMLSelectElement;
 
 		this.token = getAuthToken();
+		console.log('token:', this.token);
 		
 		this.chatInput.focus();
 		this.setupWsEvents();

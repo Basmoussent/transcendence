@@ -67,9 +67,13 @@ export class RoomService {
 	async existingRoom(uuid: string) {
 		try {
 			const sql = `SELECT * FROM games WHERE uuid = ?`;
-			const result = await this.db.get(sql, [uuid]);
-			if (result) {
-				return result;
+			const room = await new Promise<any>((resolve, reject) => {
+				this.db.get(sql, uuid, (err: any, room: any) => {
+					err ? reject(err) : resolve(room);
+				});
+			});
+			if (room) {
+				return room;
 			}
 			else {
 				return null;

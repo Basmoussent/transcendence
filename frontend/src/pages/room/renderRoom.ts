@@ -10,6 +10,11 @@ export function renderRoom(uuid: string) {
 export async function initializeRoomEvents(uuid: string) {
 	console.log('Initializing room page events');
 	try {
+		const exists = await checkRoomExists(uuid);
+		if (!exists) {
+			showRoomError();
+			return;
+		}
 		const username = await fetchUsername();
 		if (username !== undefined) {
 			new Room(username, uuid);
@@ -17,6 +22,22 @@ export async function initializeRoomEvents(uuid: string) {
 	} catch (err: any) {
 		console.log(err);
 	}
+}
+
+async function checkRoomExists(uuid: string): Promise<boolean> {
+	try {
+		const response = await fetch(`/api/games/room/existing/${uuid}`);
+		if (!response.ok) return false;
+		const data = await response.json();
+		return data.room;
+	} catch (err: any) {
+		console.log('error:', err);
+		return false;
+	}
+}
+
+function showRoomError() {
+	document.body.innerHTML = `<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);color:white;"><div style='font-size:3em;margin-bottom:20px;'>😢</div><div style='font-size:1.5em;font-weight:bold;margin-bottom:10px;'>Désolé, la room que vous cherchez n'existe plus.</div><a href='/main' style='margin-top:20px;padding:12px 24px;background:#3B82F6;color:white;border-radius:8px;text-decoration:none;font-weight:bold;'>Retour à l'accueil</a></div>`;
 }
 
 const getTemplate = () => {

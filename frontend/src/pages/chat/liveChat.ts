@@ -415,6 +415,7 @@ export class Chat {
 
 	private async loadChatHistoryFromAPI(friendUsername: string) {
 		try {
+			// TODO: protect sql injection
 			const response = await fetch(`/api/friend/history?user1=${this.me.username}&user2=${friendUsername}`, {
 				method: 'GET',
 				headers: {
@@ -471,12 +472,35 @@ export class Chat {
 				dest: this.receiver,
 				content: inviteMsg
 			}));
-			// Affichage immédiat côté host
 			this.addGameInviteMessage(this.me.username, gameType, link);
-			// Rediriger immédiatement l'invitant vers la room
-			window.history.pushState({}, '', link);
-			window.dispatchEvent(new PopStateEvent('popstate'));
+			// Vérifier l'existence de la room avant de rediriger
+			const exists = await this.checkRoomExists(uuid);
+			if (exists) {
+				window.history.pushState({}, '', link);
+				window.dispatchEvent(new PopStateEvent('popstate'));
+			} else {
+				this.showRoomError();
+			}
 		}
+	}
+
+	private async checkRoomExists(uuid: string): Promise<boolean> {
+		try {
+			const response = await fetch(`/room/existing/${uuid}`);
+			if (!response.ok) return false;
+			const data = await response.json();
+			return !!data.exists;
+		} catch {
+			return false;
+		}
+	}
+
+	private showRoomError() {
+		const messageElement = document.createElement('div');
+		messageElement.className = 'chat-message system';
+		messageElement.innerHTML = `<div class="chat-message-content" style="color:#EF4444;font-weight:bold;">Désolé, la room que vous cherchez n'existe plus.</div>`;
+		this.chatMessages.appendChild(messageElement);
+		this.chatMessages.scrollTop = this.chatMessages.scrollHeight;
 	}
 
 	private addGameInviteMessage(username: string, gameType: string, link: string) {
@@ -492,19 +516,31 @@ export class Chat {
 		const gameIcon = gameType === 'pong'
 			? '<span style="background:linear-gradient(135deg,#3B82F6,#10B981);border-radius:50%;padding:8px 10px;display:inline-block;"><i class="fas fa-table-tennis-paddle-ball" style="color:white;font-size:1.3em;"></i></span>'
 			: '<span style="background:linear-gradient(135deg,#B5446E,#9D44B5);border-radius:50%;padding:8px 10px;display:inline-block;"><i class="fas fa-cube" style="color:white;font-size:1.3em;"></i></span>';
+		const uuid = link.split('/').pop() || '';
 		messageElement.innerHTML = `
 			<div class="game-invite-card" style="display:flex;align-items:center;gap:16px;background:rgba(59,130,246,0.10);border-radius:14px;padding:16px 18px 14px 14px;box-shadow:0 2px 8px rgba(59,130,246,0.08);margin:4px 0;">
 				${gameIcon}
 				<div style="flex:1;">
 					<div style="font-weight:bold;font-size:1.08em;color:#3B82F6;margin-bottom:2px;">Invitation à jouer à ${gameLabel}</div>
 					<div style="color:#64748b;font-size:0.98em;margin-bottom:8px;">${isSent ? 'Tu as invité' : username + ' t\'a invité'} à rejoindre une partie.</div>
-					<a href="${link}" class="game-invite-link" style="display:inline-block;padding:7px 18px;background:linear-gradient(135deg,#10B981,#3B82F6);color:white;border-radius:8px;font-weight:bold;text-decoration:none;transition:background 0.2s;box-shadow:0 2px 8px rgba(16,185,129,0.10);margin-top:2px;" onclick="event.preventDefault(); window.history.pushState({}, '', '${link}'); window.dispatchEvent(new PopStateEvent('popstate'));">Rejoindre la partie</a>
+					<a href="${link}" class="game-invite-link" style="display:inline-block;padding:7px 18px;background:linear-gradient(135deg,#10B981,#3B82F6);color:white;border-radius:8px;font-weight:bold;text-decoration:none;transition:background 0.2s;box-shadow:0 2px 8px rgba(16,185,129,0.10);margin-top:2px;" onclick="event.preventDefault(); window.chatInstance && window.chatInstance.handleInviteLinkClick && window.chatInstance.handleInviteLinkClick('${uuid}','${link}');">Rejoindre la partie</a>
 				</div>
 			</div>
 			<div class="chat-message-time" style="align-self:flex-end;">${time}</div>
 		`;
 		this.chatMessages.appendChild(messageElement);
 		this.chatMessages.scrollTop = this.chatMessages.scrollHeight;
+	}
+
+	// Méthode globale pour gérer le clic sur le lien d'invitation
+	public async handleInviteLinkClick(uuid: string, link: string) {
+		const exists = await this.checkRoomExists(uuid);
+		if (exists) {
+			window.history.pushState({}, '', link);
+			window.dispatchEvent(new PopStateEvent('popstate'));
+		} else {
+			this.showRoomError();
+		}
 	}
 }
 

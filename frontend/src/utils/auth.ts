@@ -16,6 +16,17 @@ export function getAuthToken(): string | null {
   return null;
 }
 
+export function getAuthTokenFromCookie(): string | null {
+  const cookies = document.cookie.split(';');
+  for (const cookie of cookies) {
+    const [name, value] = cookie.trim().split('=');
+    if (name === 'x-access-token') {
+      return value;
+    }
+  }
+  return null;
+}
+
 export function getDomain(): string {
   const hostname = window.location.hostname;
   if (hostname.includes('localhost')) {

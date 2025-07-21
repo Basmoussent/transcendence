@@ -1,5 +1,4 @@
 import { Game, fetchUsername, getUuid, postGame } from '../../game/gameUtils'
-import { getAuthToken } from '../../utils/auth';
 import { sanitizeHtml } from '../../utils/sanitizer';
 import { Chat } from './liveChat'
 import { t } from '../../utils/translations';
