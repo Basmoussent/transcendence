@@ -309,7 +309,7 @@ async function gameRoutes(app: FastifyInstance) {
 			});
 		}
 		else {
-			return reply.status(404).send({ error: 'room non trouvée' });
+			return reply.status(200).send({ error: 'room non trouvée', room: false });
 		}
 	});
 
