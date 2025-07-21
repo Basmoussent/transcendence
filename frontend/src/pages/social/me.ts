@@ -113,7 +113,7 @@ export async function renderMe() {
 		: '<div class="no-games">Aucune partie récente</div>';
 	
 
-	const tfaButtonText = userData.twoFactorEnabled ? `${t('social.deactivate2FA')}` : `${t('social.deactivate2FA')}`;
+	const tfaButtonText = userData.twoFactorEnabled ? `${t('social.deactivate2FA')}` : `${t('social.activate2FA')}`;
 	const tfaButtonIcon = userData.twoFactorEnabled ? 'fa-solid fa-lock-open' : 'fa-solid fa-lock';
 
 	return `
