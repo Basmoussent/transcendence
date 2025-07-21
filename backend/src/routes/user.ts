@@ -70,6 +70,8 @@ async function userRoutes(app: FastifyInstance) {
 				rating: rating
 			};
 
+			const isOnline = await app.userService.isOnline(user.id);
+
 			return reply.send({
 				user: {
 					id: user.id,
@@ -78,6 +80,7 @@ async function userRoutes(app: FastifyInstance) {
 					avatar_url: user.avatar_url || 'avatar.png',
 					language: user.language,
 					two_fact_auth: user.two_fact_auth || 0,
+					online: isOnline
 				},
 				stats: stats
 			});
@@ -86,6 +89,29 @@ async function userRoutes(app: FastifyInstance) {
 			if (err.name === 'JsonWebTokenError') {
 				return reply.status(401).send({ error: 'Token invalide ou expiré' });
 			}
+			return reply.status(500).send({ error: 'Erreur serveur interne' });
+		}
+	});
+
+	// Route pour vérifier le statut online d'un utilisateur
+	app.get('/user/:username/status', async (request: FastifyRequest, reply: FastifyReply) => {
+		const { username } = request.params as { username: string };
+		
+		try {
+			const user = await app.userService.findByUsername(username);
+			if (!user) {
+				return reply.status(404).send({ error: 'Utilisateur non trouvé' });
+			}
+			
+			const isOnline = await app.userService.isOnline(user.id);
+			
+			return reply.send({
+				username: user.username,
+				online: isOnline,
+				timestamp: Date.now()
+			});
+		} catch (error) {
+			console.error('❌ Error checking user status:', error);
 			return reply.status(500).send({ error: 'Erreur serveur interne' });
 		}
 	});
@@ -314,9 +340,12 @@ async function userRoutes(app: FastifyInstance) {
 					}
 				);
 			});
+			const isOnline = await app.userService.isOnline(user.id);
+
 			return reply.send({
 				message: `info du user ${username}`,
 				data: user,
+				online: isOnline
 			});
 		}
 		catch (err: any) {

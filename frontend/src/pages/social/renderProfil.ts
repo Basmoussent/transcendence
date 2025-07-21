@@ -142,7 +142,9 @@ async function loadUserInfo(username: string) {
 				username: sanitizeHtml(result.data?.username),
 				email: sanitizeHtml(result.data?.email),
 				avatar: sanitizeHtml(result.data?.avatar_url) || 'avatar.png',
+				online: result.online
 			};
+			console.log("userData", userData)
 			return userData;
 		}
 		else {
@@ -248,8 +250,8 @@ function getTemplate() {
 				<div class="profile-details">
 				<h1 id="username"> talan</h1>
 				<div class="profile-status">
-					<div class="status-dot"></div>
-					<span>En ligne</span>
+					<div class="status-dot" id="statusDot"></div>
+					<span id="online">En ligne</span>
 				</div>
 				</div>
 				<div class="profile-actions">
@@ -599,7 +601,7 @@ function getTemplate() {
 		color: rgba(255, 255, 255, 0.8);
         }
 
-        .profile-status {
+        		.profile-status {
 		display: flex;
 		align-items: center;
 		gap: 8px;
@@ -607,15 +609,51 @@ function getTemplate() {
 		background: rgba(16, 185, 129, 0.2);
 		border-radius: 20px;
 		border: 1px solid rgba(16, 185, 129, 0.3);
+		transition: all 0.3s ease;
         }
 
-        .status-dot {
-		width: 12px;
-		height: 12px;
-		border-radius: 50%;
-		background: #10B981;
-		animation: pulse 2s infinite;
-        }
+		.profile-status.offline {
+			background: rgba(107, 114, 128, 0.2);
+			border: 1px solid rgba(107, 114, 128, 0.3);
+		}
+
+		/* Styles pour le statut en ligne/hors ligne */
+		.online-status {
+			color: #10B981;
+			font-weight: 600;
+		}
+
+		.offline-status {
+			color: #6B7280;
+			font-weight: 600;
+		}
+
+		.status-dot {
+			width: 12px;
+			height: 12px;
+			border-radius: 50%;
+			animation: pulse 2s infinite;
+		}
+
+		.status-dot.online {
+			background: #10B981;
+		}
+
+		.status-dot.offline {
+			background: #6B7280;
+		}
+
+		@keyframes pulse {
+			0% {
+				opacity: 1;
+			}
+			50% {
+				opacity: 0.5;
+			}
+			100% {
+				opacity: 1;
+			}
+		}
 
         .profile-actions {
 		display: flex;

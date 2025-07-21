@@ -20,6 +20,8 @@ export class profil {
 	
 	private gameHistory: HTMLElement;
 	private friendsGrid: HTMLElement;
+	private online: HTMLElement;
+	private statusDot: HTMLElement;
 
 	private isMyFriend: boolean;
 
@@ -41,6 +43,8 @@ export class profil {
 		this.rank = this.getElement('rank');
 		this.gameHistory = this.getElement('gameHistory');
 		this.friendsGrid = this.getElement('friends');
+		this.online = this.getElement('online');
+		this.statusDot = this.getElement('statusDot');
 
 		// recup les relations de /me voir si ya user, 
 		this.isMyFriend = false;
@@ -112,8 +116,19 @@ export class profil {
 			console.error("❌ Element gameHistory non trouvé");
 			return;
 		}
+		if (!this.online) {
+			console.error("❌ Element online non trouvé");
+			return;
+		}
+		if (!this.statusDot) {
+			console.error("❌ Element statusDot non trouvé");
+			return;
+		}
 
 		this.username.textContent = this.user.username || 'Utilisateur inconnu';
+		
+		// Mettre à jour le statut en ligne/hors ligne
+		this.updateOnlineStatus();
 		
 		// Mettre à jour les statistiques
 		const totalGames = (this.stats.pong_games || 0) + (this.stats.block_games || 0);
@@ -146,6 +161,55 @@ export class profil {
 		} else {
 			console.log("👥 Aucun ami à afficher");
 			this.friendsGrid.innerHTML = '<div class="no-friends">Aucun ami pour le moment</div>';
+		}
+	}
+
+	private updateOnlineStatus() {
+		// Pour l'instant, on suppose que l'utilisateur est en ligne
+		// Dans une vraie application, on récupérerait cette info depuis une API
+		const isOnline = this.user.online;
+		
+		if (isOnline) {
+			this.online.textContent = 'En ligne';
+			this.online.className = 'online-status';
+			this.statusDot.className = 'status-dot online';
+			// Mettre à jour le conteneur du statut
+			const statusContainer = this.online.parentElement;
+			if (statusContainer) {
+				statusContainer.className = 'profile-status';
+			}
+		} else {
+			this.online.textContent = 'Hors ligne';
+			this.online.className = 'offline-status';
+			this.statusDot.className = 'status-dot offline';
+			// Mettre à jour le conteneur du statut
+			const statusContainer = this.online.parentElement;
+			if (statusContainer) {
+				statusContainer.className = 'profile-status offline';
+			}
+		}
+	}
+
+	// Méthode pour tester différents statuts (à supprimer en production)
+	public setOnlineStatus(isOnline: boolean) {
+		if (isOnline) {
+			this.online.textContent = 'En ligne';
+			this.online.className = 'online-status';
+			this.statusDot.className = 'status-dot online';
+			// Mettre à jour le conteneur du statut
+			const statusContainer = this.online.parentElement;
+			if (statusContainer) {
+				statusContainer.className = 'profile-status';
+			}
+		} else {
+			this.online.textContent = 'Hors ligne';
+			this.online.className = 'offline-status';
+			this.statusDot.className = 'status-dot offline';
+			// Mettre à jour le conteneur du statut
+			const statusContainer = this.online.parentElement;
+			if (statusContainer) {
+				statusContainer.className = 'profile-status offline';
+			}
 		}
 	}
 
