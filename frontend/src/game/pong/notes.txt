@@ -12,29 +12,12 @@ https://jwt.io/introduction
     // le jeu ne doit jamais etre lance avec paddles[0] ou paddles[1] null/undefined
     // /pong doit etre utilise que pour les 1v1 et /multi-pong pour le reste
 
-// a faire
-
+----------------------------------------------------------------------------------------------------
     // recup donnees du jeu et init a partir de ca: nbr de joueurs et nbr d'ia
     // probleme quand 2 players sans AI
         // fleche du bas fais descendre la page pas que le paddle
 
-    // ajouter les players id au constructeur de Pong + return les scores a la fin de la partie
-
-    // police avec l'API
-        // ajuster texte au milieu pcq la c'est bancal
-
-    // la page principale du site renvoie vers la liste de boutons pas vers login
-    // la page edit profile pourrait etre + lisible
-
-    // sur la page profile
-        // bouger logout vers la gauche un peu
-        // retirer bloc qui fait que l'anim bouge pas
-
-    // pas oublier
-        // retirer /block des pages accessibles sans etre co
-        // bouton activer/desactiver 2FA
-        // tej name des classes paddle si inutile
-        // trouver pq dans la branche de talan les titres sont pas gras
+    // tej name des classes paddle si inutile
 
     //JWT
         // 3 parties:
@@ -44,6 +27,3 @@ https://jwt.io/introduction
             // Payload: contient les claims
                 // infos sur l'utilisateur
             // Signature
-
-
-bouton home a l page tournois
