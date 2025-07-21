@@ -171,7 +171,6 @@ export abstract class brick {
 	protected color: string;
 	protected x: number;
 	protected y: number;
-	protected hasPowerUp: boolean;
 
 	constructor(_hp: number, _id: number, _type: string, _color: string, _x: number, _y: number) {
 		this.hp = _hp;
@@ -180,7 +179,6 @@ export abstract class brick {
 		this.color = _color;
 		this.x = _x;
 		this.y = _y;
-		this.hasPowerUp = Math.random() < 0.5; // 50% de chance d'avoir un power-up
 	}
 
 	public beenHit(): void {
@@ -193,121 +191,10 @@ export abstract class brick {
 	public getColor(): string { return this.color; }
 	public getX(): number { return this.x; }
 	public getY(): number { return this.y; }
-	public getHasPowerUp(): boolean { return this.hasPowerUp; }
 }
 
-// Types de power-ups
-export enum PowerUpType {
-	EXPLOSION = "explosion",
-	MULTI_BALL = "multi_ball",
-	WIDE_PADDLE = "wide_paddle",
-	FAST_BALL = "fast_ball",
-	SLOW_BALL = "slow_ball"
-}
-
-export class PowerUp {
-	public x: number;
-	public y: number;
-	public width: number;
-	public height: number;
-	public type: PowerUpType;
-	public speed: number;
-	public active: boolean;
-
-	constructor(x: number, y: number, type: PowerUpType) {
-		this.x = x;
-		this.y = y;
-		this.width = 20;
-		this.height = 20;
-		this.type = type;
-		this.speed = 2;
-		this.active = true;
-	}
-
-	public move(): void {
-		this.y += this.speed;
-	}
-
-	public getColor(): string {
-		switch (this.type) {
-			case PowerUpType.EXPLOSION:
-				return '#FF4444'; // Rouge
-			case PowerUpType.MULTI_BALL:
-				return '#44FF44'; // Vert
-			case PowerUpType.WIDE_PADDLE:
-				return '#4444FF'; // Bleu
-			case PowerUpType.FAST_BALL:
-				return '#FFFF44'; // Jaune
-			case PowerUpType.SLOW_BALL:
-				return '#FF44FF'; // Magenta
-			default:
-				return '#FFFFFF';
-		}
-	}
-
-	public getSymbol(): string {
-		switch (this.type) {
-			case PowerUpType.EXPLOSION:
-				return '💥';
-			case PowerUpType.MULTI_BALL:
-				return '⚽';
-			case PowerUpType.WIDE_PADDLE:
-				return '↔️';
-			case PowerUpType.FAST_BALL:
-				return '⚡';
-			case PowerUpType.SLOW_BALL:
-				return '🐌';
-			default:
-				return '?';
-		}
-	}
-}
-
-class blue extends brick {
-	constructor(_id: number, _x: number, _y: number) {
-		super(1, _id, "blue", "#95ADB6", _x, _y);
-	}
-}
-
-class green extends brick {
-	constructor(_id: number, _x: number, _y: number) {
-		super(2, _id, "green", "#8DA1B9", _x, _y);
-	}
-}
-
-class red extends brick {
-	constructor(_id: number, _x: number, _y: number) {
-		super(3, _id, "red", "#CBB3BF", _x, _y);
-	}
-}
-
-export function createRandomBrick(it: number, _x: number, _y: number): brick {
-	const rand = Math.floor(Math.random() * 3);
-
-	if (rand === 0)
-		return new red(it, _x, _y);
-	if (rand === 1)
-		return new green(it, _x, _y);
-	return new blue(it, _x, _y);
-}
-
-// Créer un power-up aléatoire
-export function createRandomPowerUp(x: number, y: number): PowerUp {
-	const types = Object.values(PowerUpType);
-	const randomType = types[Math.floor(Math.random() * types.length)];
-	return new PowerUp(x, y, randomType);
-}
-
-// Obtenir un power-up depuis une brique (si elle en a un)
-export function getPowerUpFromBrick(brick: brick, brickWidth: number, brickHeight: number): PowerUp | null {
-	if (brick.getHasPowerUp() && brick.getHp() <= 0) {
-		const x = brick.getX() * brickWidth + brickWidth / 2;
-		const y = brick.getY() * brickHeight + brickHeight;
-		return createRandomPowerUp(x, y);
-	}
-	return null;
-}
-
+// Supprimer PowerUpType, PowerUp, createRandomPowerUp, getPowerUpFromBrick
+// Nettoyer la classe brick pour ne plus gérer de power-up
 
 
 // export async function updateStats(gameId:number)
