@@ -1,7 +1,9 @@
 import { sanitizeHtml } from '../../utils/sanitizer';
 import { fetchMe, fetchUserInfo, loadMe } from './utils';
 import { getAuthToken } from '../../utils/auth';
+import { addEvent } from '../../utils/eventManager';
 import { t } from '../../utils/translations';
+import { postGame } from '../../game/gameUtils';
 
 export interface UserChat {
 	username: string;
@@ -128,6 +130,15 @@ export class Chat {
 		console.log(`live chat ws event : ${data.type}`)
 		switch (data.type) {
 			case 'chat_message':
+				if (typeof data.content === 'string' && data.content.startsWith('[INVITE_GAME:')) {
+					const match = data.content.match(/^\[INVITE_GAME:([^:]+):([^\]]+)\]$/);
+					if (match) {
+						const gameType = match[1];
+						const link = match[2];
+						this.addGameInviteMessage(data.username, gameType, link);
+						break;
+					}
+				}
 				console.log(`les message ${data.content}`)
 				this.addChatMessage(data.username, data.content);
 				break;
@@ -155,21 +166,46 @@ export class Chat {
 		}
 	}
 
-	private setupClickEvents() {
-		this.sendBtn.addEventListener('click', () => this.sendChatMessage());
-		this.chatInput.addEventListener('keypress', (e) => {
+		private setupClickEvents() {
+		addEvent(this.sendBtn, 'click', () => this.sendChatMessage());
+		addEvent(this.chatInput, 'keypress', (e: any) => {
 			if (e.key === 'Enter') {
 				e.preventDefault();
 				this.sendChatMessage();
 			}
 		});
-		this.homeBtn.addEventListener('click', () => {
+		addEvent(this.homeBtn, 'click', () => {
 			window.history.pushState({}, '', '/main');
 			window.dispatchEvent(new Event('popstate'));
 		});
 
+		// Gestion du bouton d'invitation à un jeu
+		const inviteBtn = document.getElementById('inviteGameBtn');
+		const inviteMenu = document.getElementById('inviteGameMenu');
+		if (inviteBtn && inviteMenu) {
+			inviteBtn.addEventListener('mouseenter', () => {
+				inviteMenu.style.display = 'block';
+			});
+			inviteBtn.addEventListener('mouseleave', () => {
+				setTimeout(() => { if (!inviteMenu.matches(':hover')) inviteMenu.style.display = 'none'; }, 200);
+			});
+			inviteMenu.addEventListener('mouseleave', () => {
+				inviteMenu.style.display = 'none';
+			});
+			inviteMenu.addEventListener('mouseenter', () => {
+				inviteMenu.style.display = 'block';
+			});
+			inviteMenu.querySelectorAll('.invite-game-option').forEach(btn => {
+				btn.addEventListener('click', async (e) => {
+					const gameType = (e.target as HTMLElement).dataset.game;
+					inviteMenu.style.display = 'none';
+					await this.inviteToGame(gameType || 'pong');
+				});
+			});
+		}
+
 		this.tabs.forEach(tab => {
-			tab.addEventListener('click', () => {
+			addEvent(tab, 'click', () => {
 				const tabName = tab.dataset.tab;
 				if (!tabName) return;
 
@@ -186,7 +222,7 @@ export class Chat {
 			});
 		});
 
-		this.addFriendBtn.addEventListener('click', () => this.sendFriendRequest());
+		addEvent(this.addFriendBtn, 'click', () => this.sendFriendRequest());
 	}
 
 	private sendFriendRequest() {
@@ -344,6 +380,17 @@ export class Chat {
 		this.updateFriendAndRequest()
 	}
 
+	private async playGame(game_type: string) {
+		const game = {
+			game_type: game_type,
+			player1: this.me.username,
+			users_needed: 2
+		}
+		const uuid = await postGame(game);
+		window.history.pushState({}, '', `/room/${uuid}`);
+		window.dispatchEvent(new PopStateEvent('popstate'));
+	}
+
 	private startChatWith(relationId: number, user: UserChat) {
 		
 		this.receiver = user.username;
@@ -368,6 +415,7 @@ export class Chat {
 
 	private async loadChatHistoryFromAPI(friendUsername: string) {
 		try {
+			// TODO: protect sql injection
 			const response = await fetch(`/api/friend/history?user1=${this.me.username}&user2=${friendUsername}`, {
 				method: 'GET',
 				headers: {
@@ -379,11 +427,19 @@ export class Chat {
 			if (response.ok) {
 				const chatHistory = await response.json();
 				this.chatMessages.innerHTML = ''; // Vider les messages actuels
-				
 				// Vérifier que chatHistory est un tableau
 				if (Array.isArray(chatHistory)) {
 					// Afficher l'historique des messages
 					chatHistory.forEach((msg: any) => {
+						if (typeof msg.content === 'string' && msg.content.startsWith('[INVITE_GAME:')) {
+							const match = msg.content.match(/^\[INVITE_GAME:([^:]+):([^\]]+)\]$/);
+							if (match) {
+								const gameType = match[1];
+								const link = match[2];
+								this.addGameInviteMessage(msg.sender_username, gameType, link);
+								return;
+							}
+						}
 						this.addChatMessage(msg.sender_username, msg.content);
 					});
 				} else {
@@ -394,6 +450,96 @@ export class Chat {
 			}
 		} catch (error) {
 			console.error('Erreur lors du chargement de l\'historique du chat:', error);
+		}
+	}
+
+	private async inviteToGame(gameType: string) {
+		if (!this.receiver) {
+			alert('Sélectionnez un ami pour inviter à un jeu.');
+			return;
+		}
+		const game = {
+			game_type: gameType,
+			player1: this.me.username,
+			users_needed: 2
+		};
+		const uuid = await postGame(game);
+		const link = `/room/${uuid}`;
+		const inviteMsg = `[INVITE_GAME:${gameType}:${link}]`;
+		if (this.ws.readyState === WebSocket.OPEN) {
+			this.ws.send(JSON.stringify({
+				type: 'chat_message',
+				dest: this.receiver,
+				content: inviteMsg
+			}));
+			this.addGameInviteMessage(this.me.username, gameType, link);
+			// Vérifier l'existence de la room avant de rediriger
+			const exists = await this.checkRoomExists(uuid);
+			if (exists) {
+				window.history.pushState({}, '', link);
+				window.dispatchEvent(new PopStateEvent('popstate'));
+			} else {
+				this.showRoomError();
+			}
+		}
+	}
+
+	private async checkRoomExists(uuid: string): Promise<boolean> {
+		try {
+			const response = await fetch(`/room/existing/${uuid}`);
+			if (!response.ok) return false;
+			const data = await response.json();
+			return !!data.exists;
+		} catch {
+			return false;
+		}
+	}
+
+	private showRoomError() {
+		const messageElement = document.createElement('div');
+		messageElement.className = 'chat-message system';
+		messageElement.innerHTML = `<div class="chat-message-content" style="color:#EF4444;font-weight:bold;">Désolé, la room que vous cherchez n'existe plus.</div>`;
+		this.chatMessages.appendChild(messageElement);
+		this.chatMessages.scrollTop = this.chatMessages.scrollHeight;
+	}
+
+	private addGameInviteMessage(username: string, gameType: string, link: string) {
+		this.noChatSelected.style.display = 'none';
+		this.chatContainer.style.display = 'flex';
+		this.chatContainer.classList.remove('hidden');
+
+		const messageElement = document.createElement('div');
+		const isSent = username === this.me.username;
+		messageElement.className = `chat-message ${isSent ? 'sent' : 'received'}`;
+		const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+		const gameLabel = gameType === 'pong' ? 'Pong' : 'Block';
+		const gameIcon = gameType === 'pong'
+			? '<span style="background:linear-gradient(135deg,#3B82F6,#10B981);border-radius:50%;padding:8px 10px;display:inline-block;"><i class="fas fa-table-tennis-paddle-ball" style="color:white;font-size:1.3em;"></i></span>'
+			: '<span style="background:linear-gradient(135deg,#B5446E,#9D44B5);border-radius:50%;padding:8px 10px;display:inline-block;"><i class="fas fa-cube" style="color:white;font-size:1.3em;"></i></span>';
+		const uuid = link.split('/').pop() || '';
+		messageElement.innerHTML = `
+			<div class="game-invite-card" style="display:flex;align-items:center;gap:16px;background:rgba(59,130,246,0.10);border-radius:14px;padding:16px 18px 14px 14px;box-shadow:0 2px 8px rgba(59,130,246,0.08);margin:4px 0;">
+				${gameIcon}
+				<div style="flex:1;">
+					<div style="font-weight:bold;font-size:1.08em;color:#3B82F6;margin-bottom:2px;">Invitation à jouer à ${gameLabel}</div>
+					<div style="color:#64748b;font-size:0.98em;margin-bottom:8px;">${isSent ? 'Tu as invité' : username + ' t\'a invité'} à rejoindre une partie.</div>
+					<a href="${link}" class="game-invite-link" style="display:inline-block;padding:7px 18px;background:linear-gradient(135deg,#10B981,#3B82F6);color:white;border-radius:8px;font-weight:bold;text-decoration:none;transition:background 0.2s;box-shadow:0 2px 8px rgba(16,185,129,0.10);margin-top:2px;" onclick="event.preventDefault(); window.chatInstance && window.chatInstance.handleInviteLinkClick && window.chatInstance.handleInviteLinkClick('${uuid}','${link}');">Rejoindre la partie</a>
+				</div>
+			</div>
+			<div class="chat-message-time" style="align-self:flex-end;">${time}</div>
+		`;
+		this.chatMessages.appendChild(messageElement);
+		this.chatMessages.scrollTop = this.chatMessages.scrollHeight;
+	}
+
+	// Méthode globale pour gérer le clic sur le lien d'invitation
+	public async handleInviteLinkClick(uuid: string, link: string) {
+		const exists = await this.checkRoomExists(uuid);
+		if (exists) {
+			window.history.pushState({}, '', link);
+			window.dispatchEvent(new PopStateEvent('popstate'));
+		} else {
+			this.showRoomError();
 		}
 	}
 }

@@ -116,7 +116,7 @@ export async function renderMe() {
 	const tfaButtonText = userData.twoFactorEnabled ? `${t('social.deactivate2FA')}` : `${t('social.deactivate2FA')}`;
 	const tfaButtonIcon = userData.twoFactorEnabled ? 'fa-solid fa-lock-open' : 'fa-solid fa-lock';
 
-	const htmlContent = `
+	return `
 		<div class="profile-wrapper">
 			<div class="profile-stack">
 				<div class="profile-container">
@@ -216,11 +216,12 @@ export async function renderMe() {
 				justify-content: center;
 				align-items: flex-start;
 				padding: 20px;
+				box-sizing: border-box;
 			}
 
 			.profile-stack {
-				width: 90%;
-				max-width: 800px;
+				width: 100%;
+				max-width: 1200px;
 				display: flex;
 				flex-direction: column;
 				gap: 30px;
@@ -298,7 +299,8 @@ export async function renderMe() {
 				box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
 				border: 1px solid rgba(255, 255, 255, 0.18);
 				animation: fadeIn 0.5s ease-out;
-				overflow: auto;
+				overflow: hidden;
+				box-sizing: border-box;
 			}
 
 			.profile-header {
@@ -306,6 +308,7 @@ export async function renderMe() {
 				align-items: center;
 				gap: 30px;
 				margin-bottom: 40px;
+				flex-wrap: wrap;
 			}
 
 			.home-button {
@@ -387,7 +390,7 @@ export async function renderMe() {
 
 			.profile-stats {
 				display: grid;
-				grid-template-columns: repeat(3, 1fr);
+				grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
 				gap: 15px;
 				margin-bottom: 30px;
 			}
@@ -424,7 +427,7 @@ export async function renderMe() {
 
 			.profile-actions {
 				display: grid;
-				grid-template-columns: repeat(3, 1fr);
+				grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
 				gap: 15px;
 				margin-bottom: 30px;
 			}
@@ -481,6 +484,10 @@ export async function renderMe() {
 			}
 
 			@media (max-width: 768px) {
+				.profile-wrapper {
+					padding: 10px;
+				}
+
 				.profile-container {
 					padding: 20px;
 				}
@@ -512,9 +519,21 @@ export async function renderMe() {
 					width: 100px;
 					height: 100px;
 				}
+
+				.game-history-container {
+					padding: 20px;
+				}
+
+				.games-list {
+					max-height: 300px;
+				}
 			}
 
 			@media (max-width: 480px) {
+				.profile-wrapper {
+					padding: 5px;
+				}
+
 				.profile-container {
 					padding: 15px;
 				}
@@ -532,6 +551,18 @@ export async function renderMe() {
 					width: 30px;
 					height: 30px;
 				}
+
+				.game-history-container {
+					padding: 15px;
+				}
+
+				.games-list {
+					max-height: 250px;
+				}
+
+				.game-history-item {
+					padding: 15px;
+				}
 			}
 
 			/* Styles pour la section Historique des Parties */
@@ -547,6 +578,7 @@ export async function renderMe() {
 				box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
 				border: 1px solid rgba(255, 255, 255, 0.18);
 				color: white;
+				box-sizing: border-box;
 			}
 
 			.game-history-header {
@@ -554,6 +586,8 @@ export async function renderMe() {
 				justify-content: space-between;
 				align-items: center;
 				margin-bottom: 25px;
+				flex-wrap: wrap;
+				gap: 15px;
 			}
 
 			.game-history-header h2 {
@@ -585,6 +619,27 @@ export async function renderMe() {
 				display: flex;
 				flex-direction: column;
 				gap: 15px;
+				max-height: 400px;
+				overflow-y: auto;
+				padding-right: 10px;
+			}
+
+			.games-list::-webkit-scrollbar {
+				width: 8px;
+			}
+
+			.games-list::-webkit-scrollbar-track {
+				background: rgba(255, 255, 255, 0.1);
+				border-radius: 10px;
+			}
+
+			.games-list::-webkit-scrollbar-thumb {
+				background: rgba(255, 255, 255, 0.3);
+				border-radius: 10px;
+			}
+
+			.games-list::-webkit-scrollbar-thumb:hover {
+				background: rgba(255, 255, 255, 0.5);
 			}
 
 			.game-history-item {
@@ -595,6 +650,8 @@ export async function renderMe() {
 				justify-content: space-between;
 				align-items: center;
 				transition: all 0.3s ease;
+				flex-wrap: wrap;
+				gap: 15px;
 			}
 
 			.game-history-item:hover {
@@ -689,143 +746,145 @@ export async function renderMe() {
 					text-align: left;
 				}
 			}
-		</style>
-	`;
 
-	setTimeout(() => {
-		const logoutButton = document.querySelector('.action-button.logout');
-		const editProfileButton = document.querySelector('.action-button.edit-profile');
-		const changePasswordButton = document.querySelector('.action-button.change-password');
-		const changeAvatarBtn = document.getElementById('changeAvatarBtn');
-		const avatarInput = document.getElementById('avatarInput') as HTMLInputElement;
-		const TFABtn = document.getElementById('TFABtn');
-		const homeBtn = document.getElementById('homeBtn');
-	
-		if (homeBtn) {
-			homeBtn.addEventListener('click', () => {
-				window.history.pushState({}, '', '/main');
-				window.dispatchEvent(new PopStateEvent('popstate'));
-			});
-		}
-
-		if (logoutButton) {
-			logoutButton.addEventListener('click', () => {
-				removeAuthToken();
-				window.history.pushState({}, '', '/login');
-				window.dispatchEvent(new PopStateEvent('popstate'));
-			});
-		}
-
-		if (editProfileButton) {
-			editProfileButton.addEventListener('click', () => {
-				window.history.pushState({}, '', '/edit-profil');
-				window.dispatchEvent(new PopStateEvent('popstate'));
-			});
-		}
-
-		if (changePasswordButton) {
-			changePasswordButton.addEventListener('click', () => {
-				window.history.pushState({}, '', '/change-password');
-				window.dispatchEvent(new PopStateEvent('popstate'));
-			});
-		}
-
-		// Gestion bouton 2FA
-		if (TFABtn) {
-			TFABtn.addEventListener('click', async () => {
-			
-			console.log('iqubwiduqbwiudbqiwudbq')
-			const info = await userInfo();
-
-			if (info.user.two_fact_auth) {
-				// desactiver 2FA
-				const confirmation = confirm(t('social.confirmDisable2FA'));
-				
-				if (confirmation) {
-					const success = await update2FAState(0, info.user.id);
-
-					if (success) {
-						TFABtn.innerHTML = '<i class="fa-solid fa-lock"></i> ' + t('social.activate2FA');
-						alert('✅ 2FA désactivée avec succès');
-					}
-					else
-						alert('❌ Erreur lors de la désactivation 2FA');
+			@media (max-width: 1024px) {
+				.profile-stack {
+					max-width: 95%;
 				}
 			}
-			else {
-				// activer 2FA
-				window.history.pushState({}, '', '/2fa');
-				window.dispatchEvent(new PopStateEvent('popstate'));
-			}});
+
+			@media (min-width: 1200px) {
+				.profile-stack {
+					max-width: 1400px;
+				}
+			}
+		</style>
+	`;
+}
+
+export function initializeMeEvents() {
+	const logoutButton = document.querySelector('.action-button.logout') as HTMLElement;
+	const editProfileButton = document.querySelector('.action-button.edit-profile') as HTMLElement;
+	const changePasswordButton = document.querySelector('.action-button.change-password') as HTMLElement;
+	const changeAvatarBtn = document.getElementById('changeAvatarBtn') as HTMLElement;
+	const avatarInput = document.getElementById('avatarInput') as HTMLInputElement;
+	const homeBtn = document.getElementById('homeBtn') as HTMLElement;
+	const TFABtn = document.getElementById('TFABtn') as HTMLElement;
+
+	console.log("initializeMeEvents");
+	if (homeBtn) {
+		homeBtn.addEventListener('click', () => {
+			window.history.pushState({}, '', '/main');
+			window.dispatchEvent(new PopStateEvent('popstate'));
+		});
+	}
+
+	if (logoutButton) {
+		logoutButton.addEventListener('click', () => {
+			removeAuthToken();
+			window.history.pushState({}, '', '/login');
+			window.dispatchEvent(new PopStateEvent('popstate'));
+		});
+	}
+
+	if (editProfileButton) {
+		editProfileButton.addEventListener('click', () => {
+			window.history.pushState({}, '', '/edit-profil');
+			window.dispatchEvent(new PopStateEvent('popstate'));
+		});
+	}
+
+	if (changePasswordButton) {
+		changePasswordButton.addEventListener('click', () => {
+			window.history.pushState({}, '', '/change-password');
+			window.dispatchEvent(new PopStateEvent('popstate'));
+		});
+	}
+
+	// Gestion bouton 2FA
+	if (TFABtn) {
+		TFABtn.addEventListener('click', async () => {
+		
+		console.log('iqubwiduqbwiudbqiwudbq')
+		const info = await userInfo();
+
+		if (info.user.two_fact_auth) {
+			// desactiver 2FA
+			const confirmation = confirm('Êtes-vous sûr de vouloir désactiver l\'authentification à deux facteurs ?');
+			
+			if (confirmation) {
+				const success = await update2FAState(0, info.user.id);
+
+				if (success) {
+					TFABtn.innerHTML = '<i class="fa-solid fa-lock"></i> Activate 2FA';
+					alert('✅ 2FA désactivée avec succès');
+				}
+				else
+					alert('❌ Erreur lors de la désactivation 2FA');
+			}
 		}
+		else {
+			// activer 2FA
+			window.history.pushState({}, '', '/2fa');
+			window.dispatchEvent(new PopStateEvent('popstate'));
+		}});
+	}
 
-		// Gestion de l'upload d'avatar
-		if (changeAvatarBtn && avatarInput) {
-			changeAvatarBtn.addEventListener('click', () => {
-				avatarInput.click();
-			});
+	// Gestion de l'upload d'avatar
+	if (changeAvatarBtn && avatarInput) {
+		changeAvatarBtn.addEventListener('click', () => {
+			avatarInput.click();
+		});
 
-			avatarInput.addEventListener('change', async (e) => {
-				const file = (e.target as HTMLInputElement).files?.[0];
-				if (!file) return;
+		avatarInput.addEventListener('change', async (e) => {
+			const file = (e.target as HTMLInputElement).files?.[0];
+			if (!file) return;
 
-				// Vérifier le type de fichier
-				if (!file.type.startsWith('image/')) {
-					alert('❌ Veuillez sélectionner une image valide');
+			// Vérifier le type de fichier
+			if (!file.type.startsWith('image/')) {
+				alert('❌ Veuillez sélectionner une image valide');
+				return;
+			}
+
+			// Vérifier la taille (5MB max)
+			if (file.size > 5 * 1024 * 1024) {
+				alert('❌ L\'image est trop volumineuse. Taille maximum: 5MB');
+				return;
+			}
+
+			try {
+				const token = getAuthToken();
+				if (!token) {
+					alert('❌ Token d\'authentification manquant');
+					window.history.pushState({}, '', '/login');
+					window.dispatchEvent(new PopStateEvent('popstate'));
 					return;
 				}
 
-				// Vérifier la taille (5MB max)
-				if (file.size > 5 * 1024 * 1024) {
-					alert('❌ L\'image est trop volumineuse. Taille maximum: 5MB');
-					return;
+				const formData = new FormData();
+				formData.append('file', file);
+
+				const response = await fetch('/api/upload/avatar', {
+					method: 'POST',
+					headers: {
+						'x-access-token': token
+					},
+					body: formData
+				});
+
+				const result = await response.json();
+
+				if (response.ok) {
+					alert('✅ Avatar mis à jour avec succès');
+					// Recharger la page pour afficher le nouvel avatar
+					window.location.reload();
+				} else {
+					alert(`❌ Erreur: ${result.error || 'Erreur inconnue'}`);
 				}
-
-				try {
-					const token = getAuthToken();
-					if (!token) {
-						alert('❌ Token d\'authentification manquant');
-						window.history.pushState({}, '', '/login');
-						window.dispatchEvent(new PopStateEvent('popstate'));
-						return;
-					}
-
-					const formData = new FormData();
-					formData.append('file', file);
-
-					const response = await fetch('/api/upload/avatar', {
-						method: 'POST',
-						headers: {
-							'x-access-token': token
-						},
-						body: formData
-					});
-
-					const result = await response.json();
-
-					if (response.ok) {
-						alert('✅ Avatar mis à jour avec succès');
-						// Recharger la page pour afficher le nouvel avatar
-						window.location.reload();
-					} else {
-						alert(`❌ Erreur: ${result.error || t('social.unknownError')}`);
-					}
-				} catch (err) {
-					console.error('Erreur lors de l\'upload:', err);
-					alert('❌ Erreur lors de l\'upload de l\'avatar');
-				}
-			});
-		}
-
-		// Gestion du bouton "Voir tout l'historique"
-		if (viewAllGamesBtn) {
-			viewAllGamesBtn.addEventListener('click', () => {
-				// Rediriger vers la page d'historique complet
-				window.history.pushState({}, '', `/history/${userData.username}`);
-				window.dispatchEvent(new PopStateEvent('popstate'));
-			});
-		}
-	}, 0);
-
-	return htmlContent;
+			} catch (err) {
+				console.error('Erreur lors de l\'upload:', err);
+				alert('❌ Erreur lors de l\'upload de l\'avatar');
+			}
+		});
+	}
 }

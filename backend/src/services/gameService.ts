@@ -44,6 +44,7 @@ export class GameService {
 	async deleteGame(uuid: string) {
 
 		try {
+			console.log(`${uuid} game supprimé`)
 			await new Promise<void>((resolve, reject) => {
 				this.db.run(
 					'DELETE FROM games WHERE uuid = ?',
@@ -57,6 +58,50 @@ export class GameService {
 			console.log(`${uuid} game supprimé`)
 		}
 		return Promise.resolve(null); 
+	}
+
+	async moveToHistory(uuid: string, winner: string) {
+		try {
+			// Récupérer la partie depuis la table games
+			const game = await this.getGame(uuid);
+			if (!game) {
+				console.log(`Partie ${uuid} non trouvée pour déplacement vers history`);
+				return false;
+			}
+
+			// Insérer dans la table history
+			await new Promise<void>((resolve, reject) => {
+				this.db.run(
+					`INSERT INTO history (uuid, game_type, player1, player2, player3, player4, users_needed, ai, start_time, end_time, winner) 
+					 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+					[
+						game.uuid,
+						game.game_type,
+						game.player1,
+						game.player2,
+						game.player3,
+						game.player4,
+						game.users_needed,
+						game.ai,
+						game.start_time,
+						Date.now().toString(),
+						winner
+					],
+					(err: any) => {
+						err ? reject(err) : resolve();
+					}
+				);
+			});
+
+			// Supprimer de la table games
+			await this.deleteGame(uuid);
+			console.log(`Partie ${uuid} déplacée vers history avec winner: ${winner}`);
+			return true;
+		}
+		catch (err: any) {
+			console.error(`Erreur lors du déplacement de la partie ${uuid} vers history:`, err);
+			return false;
+		}
 	}
 
 

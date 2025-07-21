@@ -16,12 +16,34 @@ export function getAuthToken(): string | null {
   return null;
 }
 
+export function getAuthTokenFromCookie(): string | null {
+  const cookies = document.cookie.split(';');
+  for (const cookie of cookies) {
+    const [name, value] = cookie.trim().split('=');
+    if (name === 'x-access-token') {
+      return value;
+    }
+  }
+  return null;
+}
+
+export function getDomain(): string {
+  const hostname = window.location.hostname;
+  if (hostname.includes('localhost')) {
+    return 'localhost';
+  }
+  return hostname;
+}
+
 export function setAuthToken(token: string): void {
   sessionStorage.setItem('x-access-token', token);
+  document.cookie = `x-access-token=${token}; path=/; domain=${getDomain()}; SameSite=Strict; Secure`;
+
 }
 
 export function removeAuthToken(): void {
   sessionStorage.removeItem('x-access-token');
+  document.cookie = `x-access-token=; path=/; domain=${getDomain()}; SameSite=Strict; Secure`;
 }
 
 export function isAuthenticated(): boolean {

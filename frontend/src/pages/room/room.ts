@@ -1,6 +1,6 @@
-import { getAuthToken } from '../../utils/auth';
+import { getAuthToken, getAuthTokenFromCookie } from '../../utils/auth';
 import { sanitizeHtml } from '../../utils/sanitizer';
-import { t } from '../../utils/translations';
+import { addEvent } from '../../utils/eventManager';
 
 interface User {
 	username: string;
@@ -15,7 +15,6 @@ interface RoomData {
 	maxPlayers: number;
 	users: User[];
 	host: string;
-	isGameStarted: boolean;
 	ai: number;
 }
 
@@ -73,8 +72,8 @@ export class Room {
 		this.maxPlayersSelect = this.getElement('maxPlayersSelect') as HTMLSelectElement;
 
 		this.token = getAuthToken();
+		console.log('token:', this.token);
 		
-
 		this.chatInput.focus();
 		this.setupWsEvents();
 		this.setupClickEvents();
@@ -97,7 +96,7 @@ export class Room {
 		};
 
 		this.ws.onerror = (error) => console.error(`${this.username} onerror ${this.uuid}:`, error);
-		this.ws.onclose = (event) => console.log(`${this.username} ferme ${this.username}:`, event.code, event.reason);
+		this.ws.onclose = (event) => console.log(`close le socket ${this.username} car :`, event.code, event.reason);
 		
 		this.ws.onmessage = (event) => {
 			try {
@@ -111,19 +110,19 @@ export class Room {
 
 	private setupClickEvents() {
 
-		this.chatInput.addEventListener('keypress', (e) => {
+		addEvent(this.chatInput, 'keypress', (e) => {
 			if (e.key === 'Enter') this.sendChatMessage();
 		});
 
-		this.sendBtn.addEventListener('click', () => this.sendChatMessage());
-		this.readyBtn.addEventListener('click', () => this.toggleReadyState());
-		this.startBtn.addEventListener('click', () => this.startGame());
-		this.leaveBtn.addEventListener('click', () => this.leaveRoom());
-		this.homeBtn.addEventListener('click', () => this.goHome());
-		this.increaseAiBtn.addEventListener('click', () => this.increase());
-		this.decreaseAiBtn.addEventListener('click', () => this.decrease());
-		this.gameTypeSelect.addEventListener('change', () => this.gameTypeChanged());
-		this.maxPlayersSelect.addEventListener('change', () => this.maxPlayersChanged());
+		addEvent(this.sendBtn, 'click', () => this.sendChatMessage());
+		addEvent(this.readyBtn, 'click', () => this.toggleReadyState());
+		addEvent(this.startBtn, 'click', () => this.startGame());
+		addEvent(this.leaveBtn, 'click', () => this.leaveRoom());
+		addEvent(this.homeBtn, 'click', () => this.goHome());
+		addEvent(this.increaseAiBtn, 'click', () => this.increase());
+		addEvent(this.decreaseAiBtn, 'click', () => this.decrease());
+		addEvent(this.gameTypeSelect, 'change', () => this.gameTypeChanged());
+		addEvent(this.maxPlayersSelect, 'change', () => this.maxPlayersChanged());
     
 	}
 
@@ -149,14 +148,15 @@ export class Room {
 				break;
 
 			case 'notLog':
+				this.ws.close();
 				window.history.pushState({}, '', '/login');
 				window.dispatchEvent(new Event('popstate'));
-				this.ws.close();
 				break;
 			case 'error':
-				window.history.pushState({}, '', '/login');
-				window.dispatchEvent(new Event('popstate'));
 				this.ws.close();
+				window.history.pushState({}, '', '/matchmaking');
+				window.dispatchEvent(new Event('popstate'));
+
 				break;
 			default:
 				console.warn(`Unknown event type received: ${data.type}`);
@@ -299,13 +299,10 @@ export class Room {
 				else
 					this.decreaseAiBtn.disabled = false;
 
-				this.maxPlayersSelect.innerHTML = `<label class="text-white/80">Max Players</label>
-									<select class="setting-select" id="maxPlayersSelect">
-										<option value="1">1</option>
-										<option value="2">2</option>
-										<option value="3">3</option>
-										<option value="4">4</option>
-									</select>`;
+				this.maxPlayersSelect.innerHTML = `<option value="1">1</option>
+									<option value="2">2</option>
+									<option value="3">3</option>
+									<option value="4">4</option>`;
 				this.maxPlayersSelect.value = String(this.roomData.maxPlayers);
 			}
 			

@@ -1,6 +1,7 @@
 import { Game, fetchUsername, getUuid, postGame } from '../../game/gameUtils'
 import { getAuthToken } from '../../utils/auth';
 import { sanitizeHtml } from '../../utils/sanitizer';
+import { addEvent, cleanEvents } from '../../utils/eventManager';
 
 export interface Available {
 	gameId: number,
@@ -10,6 +11,8 @@ export interface Available {
 	player3?: string,
 	player4?: string,
 	users_needed: number,
+	averageWinrate?: number,
+	playersWithStats?: Array<{username: string, winrate: number}>,
 	divConverion(): string;
 };
 
@@ -23,14 +26,13 @@ export class matchmaking {
 	private pongBtn: HTMLElement;
 	private blockBtn: HTMLElement;
 	private launchBtn: HTMLElement;
-	private resetBtn: HTMLElement;
 	private options: HTMLElement;
 	private availableGames: HTMLElement;
 
 	private username: string;
 
 	private joinBtn: Map<number,HTMLElement> = new Map();
-
+	private gameId: number = 0;
 	constructor() {
 
 		this.ws = new WebSocket(`${window.location.protocol === "https:" ? "wss" : "ws"}://${window.location.host}/api/matchmaking`);
@@ -42,15 +44,12 @@ export class matchmaking {
 		this.pongBtn = this.getElement('pongBtn');
 		this.blockBtn = this.getElement('blockBtn');
 		this.launchBtn = this.getElement('launchBtn');
-		this.resetBtn = this.getElement('resetBtn');
 		this.options = this.getElement("game-options");
 		this.availableGames = this.getElement('available-games');
-
-		this.setupMutationObserver();
+		this.gameId = 0;
 
 		// Ajouter un listener pour nettoyer quand l'utilisateur quitte la page
-		window.addEventListener('beforeunload', () => {
-			this.stopPolling();
+		addEvent(window, 'beforeunload', () => {
 			if (this.ws.readyState === WebSocket.OPEN) {
 				this.ws.send(JSON.stringify({
 					type: 'leave'
@@ -62,13 +61,13 @@ export class matchmaking {
 		this.brick = false;
 
 		this.gameOptions();
-		this.setJoinBtns();
 		this.launchRoom();
+
+		this.setupMutationObserver();
 
 		this.ws.onopen = () => {
 			console.log(`${this.username} est arrive sur matchmaking`)
 			this.updateUI();
-			this.startPolling();
 		}
 
 		this.ws.onerror = (error) => {
@@ -76,7 +75,7 @@ export class matchmaking {
 
 		this.ws.onclose = (event) => {
 			console.log(`${this.username} part de la page matchmaking`);
-			this.stopPolling();
+			
 		}
 
 		this.ws.onmessage = (event) =>  {
@@ -85,29 +84,76 @@ export class matchmaking {
 		}
 
 	}
-	
+	private async joinIt() {
+		await this.joinRoom(this.gameId);
+	}
 	private setupMutationObserver() {
 		const observer = new MutationObserver((mutations) => {
 			mutations.forEach((mutation) => {
 			mutation.addedNodes.forEach((node) => {
 				if (node.nodeType === Node.ELEMENT_NODE) {
 				const element = node as Element;
-				const joinButtons = element.querySelectorAll('[id^="join"][id$="Btn"]');
 				
+				// Gérer les boutons Join
+				const joinButtons = element.querySelectorAll('[id^="join"][id$="Btn"]');
 				joinButtons.forEach((btn) => {
 					const gameId = btn.id.replace('join', '').replace('Btn', '');
-					btn.addEventListener('click', () => {
-					this.joinRoom(Number(gameId));
-					});
+					this.gameId = Number(gameId);
+
+					if (!this.joinBtn.has(Number(gameId))) {
+						this.joinBtn.set(Number(gameId), btn as HTMLElement);
+						addEvent(btn, 'click', () => {
+							this.joinIt();
+						});
+					}
+				});
+
+				// Gérer les clics sur les cartes de jeu
+				const gameCards = element.querySelectorAll('.game-card[data-game-id]');
+				gameCards.forEach((card) => {
+					const gameId = card.getAttribute('data-game-id');
+					if (gameId) {
+						addEvent(card, 'click', () => {
+							this.gameId = Number(gameId);
+							this.joinIt();
+						});
+					}
 				});
 				}
 			});
 			});
 		});
-		
 		observer.observe(document.body, { childList: true, subtree: true });
 	}
 
+	private initializeExistingButtons() {
+		// Initialiser les boutons qui existent déjà
+		const joinButtons = document.querySelectorAll('[id^="join"][id$="Btn"]');
+		joinButtons.forEach((btn) => {
+			const gameId = btn.id.replace('join', '').replace('Btn', '');
+			this.gameId = Number(gameId);
+
+			if (!this.joinBtn.has(Number(gameId))) {
+				this.joinBtn.set(Number(gameId), btn as HTMLElement);
+				addEvent(btn, 'click', () => {
+					this.joinIt();
+				});
+			}
+		});
+
+		// Initialiser les clics sur les cartes de jeu existantes
+		const gameCards = document.querySelectorAll('.game-card[data-game-id]');
+		gameCards.forEach((card) => {
+			const gameId = card.getAttribute('data-game-id');
+			if (gameId) {
+				addEvent(card, 'click', () => {
+					this.gameId = Number(gameId);
+					this.joinIt();
+				});
+			}
+		});
+	}
+	
 	private async loadUsername() {
 		try {
 			const name = await fetchUsername();
@@ -133,7 +179,7 @@ export class matchmaking {
 
 	private gameOptions(): void {
 
-		this.pongBtn.addEventListener('click', () => {
+		addEvent(this.pongBtn, 'click', () => {
 			if (this.pong)
 				return ;
 
@@ -150,7 +196,7 @@ export class matchmaking {
 			console.log("pongBtn classes:", this.pongBtn.classList);
 		});
 
-		this.blockBtn.addEventListener('click', () => {
+		addEvent(this.blockBtn, 'click', () => {
 			if (this.brick)
 				return ;
 
@@ -167,20 +213,8 @@ export class matchmaking {
 			console.log("blockBtn classes:", this.blockBtn.classList);
 		});
 
-		this.resetBtn.addEventListener('click', () => {
-			this.pong = false;
-			this.brick = false;
-
-			this.pongBtn.classList.remove("chosen-button");
-			this.blockBtn.classList.remove("chosen-button");
-			this.pongBtn.classList.add("pong-button");
-			this.blockBtn.classList.add("block-button");
-
-			console.log("Reset completed");
-		});
-
-		this.homeBtn.addEventListener('click', () => {
-			this.stopPolling();
+		addEvent(this.homeBtn, 'click', () => {
+			
 			window.history.pushState({}, '', `/main`);
 			window.dispatchEvent(new PopStateEvent('popstate'));
 			this.ws.send(JSON.stringify({
@@ -192,17 +226,11 @@ export class matchmaking {
 
 	private async launchRoom() {
 
-		this.launchBtn.addEventListener('click', async () => {
-			// Vérifier qu'un type de jeu est sélectionné
-			if (!this.pong && !this.brick) {
-				alert('Please select a game type first!');
-				return;
-			}
-
+		addEvent(this.launchBtn, 'click', async () => {
 			let tmp = {
 				game_type: this.pong ? "pong" : "block",
 				player1: this.username,
-				users_needed: 2 // Par défaut 2 joueurs, sera configuré dans la room
+				users_needed: 2
 			}
 
 			var uuid = await postGame(tmp);
@@ -232,12 +260,8 @@ export class matchmaking {
 	}
 
 	private setJoinBtns() {
-
-		for (let [id, btn] of this.joinBtn) {
-			btn.addEventListener('click', () => {
-				this.joinRoom(Number(id));
-			});
-		}
+		// Cette méthode n'est plus nécessaire car les boutons sont gérés par le MutationObserver
+		// Garder la méthode vide pour compatibilité
 	}
 
 	private handleEvents(data: any) {
@@ -253,7 +277,7 @@ export class matchmaking {
 				this.updateUI();
 				break;
 			case 'notLog':
-				this.stopPolling();
+				
 				window.history.pushState({}, '', '/login');
 				window.dispatchEvent(new Event('popstate'));
 				this.ws.close();
@@ -285,6 +309,10 @@ export class matchmaking {
 			if (container && typeof inject === 'string') {
 				this.availableGames.innerHTML = inject;
 				console.log(`Updated available games: ${gameList.length} games found`);
+				
+				setTimeout(() => {
+					this.initializeExistingButtons();
+				}, 0);
 			}
 		} catch (error) {
 			console.error('Error updating available games:', error);
@@ -300,25 +328,18 @@ export class matchmaking {
 		return tmp;
 	}
 
-	private pollingInterval: number | null = null;
 
-	private startPolling() {
-		if (this.pollingInterval) {
-			clearInterval(this.pollingInterval);
+	public destroy() {
+		// Fermer la WebSocket
+		if (this.ws && this.ws.readyState === WebSocket.OPEN) {
+			this.ws.send(JSON.stringify({
+				type: 'leave'
+			}));
+			this.ws.close();
 		}
 		
-		this.pollingInterval = setInterval(() => {
-			if (this.ws.readyState === WebSocket.OPEN) {
-				this.updateUI();
-			}
-		}, 3000);
-	}
-
-	private stopPolling() {
-		if (this.pollingInterval) {
-			clearInterval(this.pollingInterval);
-			this.pollingInterval = null;
-		}
+		// Nettoyer les événements spécifiques à cette instance
+		// Les autres événements seront nettoyés par cleanEvents() dans le router
 	}
 
 
@@ -352,6 +373,8 @@ export class matchmaking {
 					player3: sanitizeHtml(game?.player3),
 					player4: sanitizeHtml(game?.player4),
 					users_needed:(sanitizeHtml(game.users_needed)),
+					averageWinrate: game.averageWinrate || 0,
+					playersWithStats: game.playersWithStats || [],
 					divConverion(): string {
 						// Calculer le nombre de joueurs actuels
 						const currentPlayers = [this.player1, this.player2, this.player3, this.player4]
@@ -359,7 +382,6 @@ export class matchmaking {
 						
 						// Déterminer le statut
 						const totalSlots = parseInt(this.users_needed) || 2;
-						const isWaiting = currentPlayers < totalSlots;
 						const isFull = currentPlayers >= totalSlots;
 						
 						const statusClass = isFull ? 'status-full' : (currentPlayers > 1 ? 'status-playing' : 'status-waiting');
@@ -370,8 +392,13 @@ export class matchmaking {
 							.filter(player => player && player.trim() !== '')
 							.join(', ');
 						
+						// Générer la liste des joueurs avec leurs winrates
+						const playersWithWinrates = this.playersWithStats?.map((player: {username: string, winrate: number}) => 
+							`${player.username} (${player.winrate}%)`
+						).join(', ') || playersList;
+						
 						return `
-							<div class="game-card" ${!isFull ? `onclick="joinGame('${this.gameId}')"` : ''}>
+							<div class="game-card" ${!isFull ? `data-game-id="${this.gameId}"` : ''}>
 								<div class="game-header">
 									<h3 class="game-title">${this.game_type}</h3>
 									<span class="game-status ${statusClass}">${statusText}</span>
@@ -386,10 +413,16 @@ export class matchmaking {
 										<span>${currentPlayers}/${totalSlots}</span>
 									</div>
 								</div>
-								${playersList ? `
+								${this.averageWinrate !== undefined ? `
+									<div class="winrate-info">
+										<i class="fas fa-trophy"></i>
+										<span>Avg Winrate: ${this.averageWinrate}%</span>
+									</div>
+								` : ''}
+								${playersWithWinrates ? `
 									<div class="players-list">
 										<i class="fas fa-user"></i>
-										<span>${playersList}</span>
+										<span>${playersWithWinrates}</span>
 									</div>
 								` : ''}
 								${!isFull ? `

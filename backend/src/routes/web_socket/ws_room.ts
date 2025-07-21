@@ -1,6 +1,6 @@
 import { FastifyInstance, FastifyRequest } from 'fastify';
 import { WebSocket } from 'ws';
-import { matchmaking, broadcastMatchmaking } from './ws_matchmaking';
+import { matchmaking, broadcastMatchmaking, broadcastMatchmakingWithWinrates } from './ws_matchmaking';
 import { db } from '../../database';
 
 interface User {
@@ -22,14 +22,54 @@ interface Room {
 export const rooms = new Map<string, Room>();
 
 async function broadcastRoomUpdate(app: FastifyInstance, room: Room) {
+	let totalWinrate = 0;
+	let playerCount = 0;
+	const usersWithStats = [];
+
+	for (const user of room.users.values()) {
+		try {
+			const stats = await app.userService.getUserStats(user.username);
+			if (stats) {
+				const totalGames = (stats.pong_games || 0) + (stats.block_games || 0);
+				const totalWins = (stats.pong_wins || 0) + (stats.block_wins || 0);
+				const winrate = totalGames > 0 ? Math.round((totalWins / totalGames) * 100) : 0;
+				
+				totalWinrate += winrate;
+				playerCount++;
+				
+				usersWithStats.push({
+					username: user.username,
+					isReady: user.isReady,
+					winrate: winrate
+				});
+			} else {
+				usersWithStats.push({
+					username: user.username,
+					isReady: user.isReady,
+					winrate: 0
+				});
+			}
+		} catch (error) {
+			console.error(`Erreur lors de la récupération des stats pour ${user.username}:`, error);
+			usersWithStats.push({
+				username: user.username,
+				isReady: user.isReady,
+				winrate: 0
+			});
+		}
+	}
+
+	const averageWinrate = playerCount > 0 ? Math.round(totalWinrate / playerCount) : 0;
+
 	const stateToSend = {
 		id: room.id,
 		name: room.name,
 		gameType: room.gameType,
 		maxPlayers: room.maxPlayers,
-		users: Array.from(room.users.values()).map(u => ({ username: u.username, isReady: u.isReady })),
+		users: usersWithStats,
 		host: room.host,
 		ai: room.ai,
+		averageWinrate: averageWinrate
 	};
 
 	const message = JSON.stringify({
@@ -44,7 +84,7 @@ async function broadcastRoomUpdate(app: FastifyInstance, room: Room) {
 		type: 'updateUI'
 	};
 
-	broadcastMatchmaking(updateMessage);
+	await broadcastMatchmakingWithWinrates(app, updateMessage);
 
 	await app.roomService.updateGame(room);
 
@@ -64,7 +104,16 @@ function broadcastSystemMessage(room: Room, content: string) {
 export async function handleRoom(app: FastifyInstance, socket: WebSocket, req: FastifyRequest) {
 
 	try {
-		const token = req.headers['x-access-token'] ? req.headers['x-access-token'] : req.cookies['x-access-token']; 
+
+
+		// Error in handleRoom: TypeError: Cannot read properties of undefined (reading 'x-access-token')
+		// 	at handleRoom (/app/src/routes/web_socket/ws_room.ts:67:92)
+		// 	at Object.<anonymous> (/app/src/routes/web-socket.ts:15:13)
+
+
+		console.log("req.cookies", req.cookies);
+		const token =  req.cookies['x-access-token'];
+		console.log("token is ", token);
 			
 		if (!token) {
 			console.log('⚠️  Aucun token fourni. Détails de la requête :');
@@ -86,11 +135,6 @@ export async function handleRoom(app: FastifyInstance, socket: WebSocket, req: F
 		if (!game)
 			return;
 
-		const user: User = {
-			username: username,
-			isReady: false, 
-			socket: socket };
-
 		if (!room) {
 			room = {
 				id: uuid,
@@ -105,6 +149,13 @@ export async function handleRoom(app: FastifyInstance, socket: WebSocket, req: F
 			rooms.set(uuid!, room);
 		}
 
+		const user = {
+			username: username,
+			isReady: false,
+			socket: socket,
+		};
+
+		
 		// le bouton est déjà désactivé quand la room est pleine
 
 		// mettre en place de supprimer les ia si quelqu'un rejoint qu'il fallait 3 personnes et que yavait 2 pesonnes + une ia
@@ -244,4 +295,20 @@ export async function handleRoom(app: FastifyInstance, socket: WebSocket, req: F
 		console.error('Error in handleRoom:', error);
 		socket.close();
 	}
+}
+
+
+async function fetchMyUsername() {
+
+
+	try {
+
+
+
+	}
+	catch (err) {
+		console.error("non non dans le mauvais")
+	}
+
+
 }

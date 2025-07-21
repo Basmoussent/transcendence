@@ -1,22 +1,16 @@
 import { t } from '../../utils/translations';
-import { login } from './class/login'
+import { login } from './class/login';
 
-
-export function renderLogin() {
-
-	setTimeout(async () => {
-		console.log('Initializing login page');
-		try {
-			new login();
-		}
-		catch (err:any) {
-			console.log(err);
-		}
-	}, 0);
-	return getTemplate();
+export function initializeLoginEvents() {
+	console.log('Initializing login page events');
+	try {
+		new login();
+	} catch (err: any) {
+		console.log(err);
+	}
 }
 
-function getTemplate(): string {
+export function renderLogin(): string {
 	return `
 	<div class="login-container">
 		<main class="login-content">
@@ -39,7 +33,9 @@ function getTemplate(): string {
 				</form>
 				<div class="login-options">
 					<button id="forgot-password" class="link-button">${t('auth.login.forgotPassword')}</button>
-					<button id="create-account" class="link-button">${t('auth.login.createAccount')}</button>
+					<button id="create-account" class="link-button">
+						${t('auth.login.createAccount')}
+					</button>
 				</div>
 			</div>
 		</main>

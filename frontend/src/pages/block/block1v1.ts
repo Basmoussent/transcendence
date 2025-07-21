@@ -1,21 +1,19 @@
 import { Block1v1 } from '../../game/block/Block1v1';
 
 export function renderBlock1v1(uuid: string) {
-
-	setTimeout(() => {
-
-		const canvas = document.getElementById('blockGameCanvas') as HTMLCanvasElement;
-		if (!canvas) {
-			console.error('Canvas not found!');
-			return;
-		}
-		const game = new Block1v1(canvas, uuid);
-		game.init();
-	}, 0);
-
 	return getTemplate();
 } 
 
+export function initializeBlock1v1Events(uuid: string) {
+	console.log('Initializing block 1v1 game events');
+	const canvas = document.getElementById('blockGameCanvas') as HTMLCanvasElement;
+	if (!canvas) {
+		console.error('Canvas not found!');
+		return;
+	}
+	const game = new Block1v1(canvas, uuid);
+	game.init();
+}
 
 function getTemplate() {
 	return `

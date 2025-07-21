@@ -60,11 +60,19 @@ export class UserService {
 	}
 
 	async isOnline(id: number) {
-		const user = await this.findById(id);
-		if (user) {
-			return redis.get(`alive:${id}`);
+		try {
+			const user = await this.findById(id);
+			if (user) {
+				// Vérifier le statut par ID et par username
+				const isOnlineById = await redis.exists(`${id}:online`);
+				const isOnlineByUsername = await redis.exists(`${user.username}:online`);
+				return isOnlineById || isOnlineByUsername;
+			}
+			return false;
+		} catch (error) {
+			console.error('❌ Error checking online status:', error);
+			return false;
 		}
-		return false;
 	}
 
 	async generateQrcode(user: any) {
@@ -133,20 +141,65 @@ export class UserService {
 
 	async retrieveStats(username: string) {
 		try {
-			const user = await new Promise<UserData | null>((resolve, reject) => {
+			// Calculer les statistiques à partir de la table history
+			const stats = await new Promise<any>((resolve, reject) => {
 				this.db.get(
-					'SELECT * FROM statistics WHERE username = ?', // tu te basais sur le user_id mais le champs dans la db c'est username zignew
-					[ username ],
-					(err: any, row: UserData | undefined) => {
-					err ? reject(err) : resolve(row || null); }
+					`SELECT 
+						COUNT(CASE WHEN game_type = 'pong' THEN 1 END) as pong_games,
+						COUNT(CASE WHEN game_type = 'pong' AND winner = ? THEN 1 END) as pong_wins,
+						COUNT(CASE WHEN game_type = 'block' THEN 1 END) as block_games,
+						COUNT(CASE WHEN game_type = 'block' AND winner = ? THEN 1 END) as block_wins,
+						COUNT(*) as total_games,
+						COUNT(CASE WHEN winner = ? THEN 1 END) as total_wins
+					FROM history 
+					WHERE (player1 = ? OR player2 = ? OR player3 = ? OR player4 = ?)
+					AND end_time IS NOT NULL`,
+					[username, username, username, username, username, username, username],
+					(err: any, row: any | undefined) => {
+						err ? reject(err) : resolve(row || {
+							pong_games: 0,
+							pong_wins: 0,
+							block_games: 0,
+							block_wins: 0,
+							total_games: 0,
+							total_wins: 0
+						});
+					}
 				);
 			});
-			return user;
+
+			// Calculer le rating (MMR) basé sur les victoires
+			const totalGames = stats.total_games || 0;
+			const totalWins = stats.total_wins || 0;
+			const winrate = totalGames > 0 ? (totalWins / totalGames) * 100 : 0;
+			const rating = Math.round(winrate * 10); // Rating basé sur le winrate
+
+			return {
+				username: username,
+				pong_games: stats.pong_games || 0,
+				pong_wins: stats.pong_wins || 0,
+				block_games: stats.block_games || 0,
+				block_wins: stats.block_wins || 0,
+				total_games: totalGames,
+				total_wins: totalWins,
+				rating: rating,
+				mmr: rating // MMR identique au rating pour l'instant
+			};
 		}
 		catch (err: any) {
-			console.log(`le user ${username} n'existe pas`)
+			console.log(`Erreur lors du calcul des stats pour ${username}:`, err);
+			return {
+				username: username,
+				pong_games: 0,
+				pong_wins: 0,
+				block_games: 0,
+				block_wins: 0,
+				total_games: 0,
+				total_wins: 0,
+				rating: 0,
+				mmr: 0
+			};
 		}
-		return Promise.resolve(null); 
 	}
 }
 

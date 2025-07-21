@@ -1,19 +1,26 @@
+
+let matchmakingInstance: matchmaking | null = null;
 import { Available, matchmaking,  } from "./matchmaking";
 import { getAuthToken } from '../../utils/auth';
 import { sanitizeHtml } from '../../utils/sanitizer';
 import { t } from '../../utils/translations';
 
 export function renderMatchmaking() {
-
-	setTimeout(async () => {
-		try {
-			new matchmaking();
-		}
-		catch (err:any) {
-			console.log(err);
-		}
-	}, 0);
 	return getTemplate();
+}
+
+export function initializeMatchmakingEvents() {
+	console.log('Initializing matchmaking page events');
+	try {
+		// Nettoyer l'instance précédente si elle existe
+		if (matchmakingInstance) {
+			matchmakingInstance.destroy();
+		}
+		
+		matchmakingInstance = new matchmaking();
+	} catch (err: any) {
+		console.log(err);
+	}
 }
 
 const getTemplate = () => {
@@ -24,17 +31,14 @@ const getTemplate = () => {
 			${t('matchmaking.home')}
 		</button>
 
-		<!-- Game Options Section -->
 		<div class="glass-panel w-4/6 flex flex-col gap-10 justify-center items-center px-20 py-16 h-10/12">
 			<div id="game-options" class="flex flex-col gap-8 justify-center items-center w-full">
 				
-				<!-- Title -->
 				<div class="title-section">
 					<h1 class="main-title">${t('matchmaking.createGame')}</h1>
 					<p class="subtitle">${t('matchmaking.chooseGameType')}</p>
 				</div>
 
-				<!-- Game Type Selection -->
 				<div class="game-type-section">
 					<h2 class="section-title">${t('matchmaking.gameType')}</h2>
 					<div class="game-type-buttons">
@@ -49,7 +53,6 @@ const getTemplate = () => {
 					</div>
 				</div>
 
-				<!-- Action Buttons -->
 				<div class="action-buttons">
 					<button class="action-button launch-button" id="launchBtn">
 						<i class="fas fa-rocket"></i>
@@ -61,9 +64,9 @@ const getTemplate = () => {
 					</button>
 				</div>
 			</div>
+			
 		</div>
 
-		<!-- Join Game Section -->
 		<div class="glass-panel w-2/6 flex flex-col gap-5 justify-start items-center py-8 px-6 h-10/12">
 			<div class="join-header">
 				<h1 class="join-title">${t('matchmaking.joinGame')}</h1>
@@ -115,6 +118,44 @@ const getTemplate = () => {
 		font-size: 1.1rem;
 		font-weight: 400;
 	}
+
+	#oui {
+		font-size: clamp(2rem, 5vw, 4rem);
+		font-weight: 800;
+		color: #B49CB6;
+		margin-bottom: 36px;
+		text-align: center;
+		text-transform: uppercase;
+		position: relative;
+		transition: all 0.3s ease;
+		letter-spacing: 2px;
+		text-shadow: 0 2px 6px #D5CAD6;
+		cursor: default;
+	}
+
+	#oui::after {
+		content: '';
+		position: absolute;
+		bottom: -10px;
+		left: 50%;
+		width: 190px;
+		height: 4px;
+		background: #D5CAD6;
+		border-radius: 2px;
+		transform: translateX(-50%);
+		transition: width 0.4s;
+	}
+
+	#oui:hover {
+		color: #B35857;
+		transform: scale(1.05);
+		text-shadow: 0 4px 12px #DC605E;
+	}
+
+	#oui:hover::after {
+		width: 100px;
+	}
+
 
 	/* Game Type Section */
 	.game-type-section {
@@ -224,20 +265,37 @@ const getTemplate = () => {
 		box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
 	}
 
-	.launch-button {
-		background: linear-gradient(135deg, #AFC97E, #5A8573);
+	#launchBtn {
+		font-size: clamp(1rem, 2.5vw, 1.4rem); /* taille adaptative */
+		padding: 14px 30px;
+		letter-spacing: 1px;
+		position: relative;
+		overflow: hidden;
+		transition: transform 0.3s ease, box-shadow 0.3s ease, filter 0.3s ease;
 	}
 
-	.launch-button:hover {
-		background: linear-gradient(135deg, #5A8573, #AFC97E);
+	#launchBtn::after {
+		content: '';
+		position: absolute;
+		bottom: 0;
+		left: 50%;
+		transform: translateX(-50%);
+		width: 0;
+		height: 4px;
+		background: #DFD9E2;
+		border-radius: 2px;
+		transition: width 0.4s ease;
 	}
 
-	.reset-button {
-		background: linear-gradient(135deg, #89B0AE, #272635);
+	#launchBtn:hover::after {
+		width: 80%;
+		opacity: 1
 	}
 
-	.reset-button:hover {
-		background: linear-gradient(135deg, #272635, #89B0AE);
+	#launchBtn:hover {
+		transform: scale(1.12);
+		box-shadow: 0 15px 40px #C3ACCE;
+		filter: brightness(1.2);
 	}
 
 	.home-button {
@@ -421,6 +479,26 @@ const getTemplate = () => {
 		color: #AFC97E;
 	}
 
+	/* Winrate Info */
+	.winrate-info {
+		display: flex;
+		align-items: center;
+		gap: 8px;
+		margin-top: 8px;
+		padding: 6px 10px;
+		background: rgba(255, 193, 7, 0.1);
+		border-radius: 8px;
+		border: 1px solid rgba(255, 193, 7, 0.2);
+		color: #ffc107;
+		font-size: 0.85rem;
+		font-weight: 600;
+	}
+
+	.winrate-info i {
+		color: #ffc107;
+		opacity: 0.9;
+	}
+
 	/* Players List */
 	.players-list {
 		display: flex;
@@ -443,7 +521,7 @@ const getTemplate = () => {
 		width: 100%;
 		margin-top: 12px;
 		padding: 10px 16px;
-		background: linear-gradient(135deg, #AFC97E, #5A8573);
+		background: linear-gradient(135deg, #D5CAD6, #011C27);
 		border: none;
 		border-radius: 8px;
 		color: white;
@@ -458,7 +536,8 @@ const getTemplate = () => {
 	}
 
 	.join-button:hover {
-		background: linear-gradient(135deg, #5A8573, #AFC97E);
+
+		background: linear-gradient(135deg, #ED6A5A, #392B58);
 		transform: translateY(-2px);
 		box-shadow: 0 4px 12px rgba(175, 201, 126, 0.3);
 	}
@@ -539,16 +618,3 @@ const getTemplate = () => {
 	`;
 	return html;
 }
-
-function initializeMatchmakingEvents() {
-	const button = document.getElementById('homeBtn');
-	if (button) {
-		button.addEventListener('click', () => {
-		window.history.pushState({}, '', '/main');
-		window.dispatchEvent(new PopStateEvent('popstate'));
-		});
-	}
-	return;
-}
-
-export { initializeMatchmakingEvents };

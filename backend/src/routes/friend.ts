@@ -1,6 +1,4 @@
-import { db } from '../database';
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
-
 
 interface Relation {
 	user_1: string;
@@ -14,7 +12,6 @@ async function friendRoutes(app: FastifyInstance) {
 	app.get('/:username', async function (request: FastifyRequest, reply: FastifyReply) {
 
 		try {
-			const database = db.getDatabase();
 
 			const { username } = request.query as { username?: string};
 
@@ -23,7 +20,7 @@ async function friendRoutes(app: FastifyInstance) {
 			if (!username)
 				throw new Error ("missing username in the request body");
 
-			const friends = app.friendService.getFriends(username);
+			const friends = await app.friendService.getFriends(username);
 
 			return friends;
 		}
@@ -37,28 +34,12 @@ async function friendRoutes(app: FastifyInstance) {
 	app.get('/relations/:username', async function (request: FastifyRequest, reply: FastifyReply) {
 
 		try {
-			const database = db.getDatabase();
-
 			const { username } = request.query as { username?: string };
-
-			console.log('🔍 Debug - Requested relations for username:', username);
 
 			if (!username)
 				throw new Error ("missing username in the request body");
 
-			const relations = await new Promise<Relation[] | null>((resolve, reject) => {
-
-				database.all(
-					'SELECT * FROM friends WHERE user_1 = ? OR user_2 = ?',
-					[ username, username ],
-					(err: any, row: Relation[] | undefined) => {
-						err ? reject(err) : resolve(row || null); }
-				);
-			});
-
-			// const relations = app.friendService.getRelations();
-
-			console.log('🔍 Debug - Found relations:', relations);
+			const relations = await app.friendService.getRelations(username);
 
 			return reply.send({
 				message: `friends du user ${username}`,
@@ -76,25 +57,13 @@ async function friendRoutes(app: FastifyInstance) {
 	app.post('/', async function (request: FastifyRequest<{ Body: Relation }>, reply: FastifyReply) {
 
 		try {
-			const database = db.getDatabase();
-
 			const { user_1, user_2, user1_state, user2_state } = request.body;
 
 			if (!user_1 || !user_2 || !user1_state || !user2_state)
 				throw new Error("missing fields for a new friendship");
 
-			await new Promise<void>((resolve, reject) => {
+			await app.friendService.createRelation(user_1, user_2, user1_state, user2_state)
 
-				database.run(
-					'INSERT INTO friends (user_1, user_2, user1_state, user2_state) VALUES (?, ?, ?, ?)',
-					[ user_1, user_2, user1_state, user2_state ],
-					(err: any) => {
-						err ? reject(err) : resolve(); }
-				);
-			});
-			return reply.send({
-				message: `nouvelle realtion entre ${user_1} et ${user_2}`,
-			});
 		}
 		catch (err: any) {
 			return reply.status(500).send({
@@ -103,16 +72,46 @@ async function friendRoutes(app: FastifyInstance) {
 		}
 	})
 
+	app.post('/relation', async function (request: FastifyRequest, reply: FastifyReply) {
+
+		try {
+			const { user1, user2,} = request.body as { user1?: string, user2?: string };
+
+			if (!user1 || !user2)
+				throw new Error("missing fields pour rechercher la relation");
+
+			const relation = await app.friendService.searchRelation(user1, user2);
+			
+			return reply.send(relation);
+
+		}
+		catch (err: any) {
+			return reply.status(500).send({
+				error: 'erreur chercher relation',
+				details: err.message });
+		}
+
+	})
+
 	app.get('/history', async function (request: FastifyRequest, reply: FastifyReply) {
 
-		const { user1, user2 } = request.query as { user1?: string, user2?: string };
+		try {
+			const { user1, user2 } = request.query as { user1?: string, user2?: string };
 
-		if (!user1 || !user2)
-			return reply.status(400).send({ error: 'user1 and user2 are required' });
+			if (!user1 || !user2)
+				return reply.status(400).send({ error: 'user1 and user2 are required' });
 
-		const history = await app.chatService.retrieveChatHistory(user1, user2);
-		return reply.send(history);
+			const history = await app.chatService.retrieveChatHistory(user1, user2);
+			return reply.send(history);
+		}
+		catch (err: any) {
+			return reply.status(500).send({
+				error: 'erreur get /history',
+				details: err.message });
+		}
 	});
+
+	
 }
 
 export default friendRoutes;

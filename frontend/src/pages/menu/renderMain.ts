@@ -1,19 +1,18 @@
 import { t } from '../../utils/translations';
 import { removeAuthToken } from '../../utils/auth';
-import { main } from './main'
+import { main } from './main';
 
 export function renderMain(): string {
-
-	setTimeout(async () => {
-		console.log('Initializing main page');
-		try {
-			new main();
-		}
-		catch (err:any) {
-			console.log(err);
-		}
-	}, 0);
 	return getTemplate();
+}
+
+export function initializeMainEvents() {
+	console.log('Initializing main page events');
+	try {
+		new main();
+	} catch (err: any) {
+		console.log(err);
+	}
 }
 
 function getTemplate() {

@@ -9,7 +9,7 @@ export function validateToken(request: FastifyRequest, app: FastifyInstance) {
 	
 	try {
 		const payload = app.jwt.verify(token) as { user: string };
-		const email = payload.user;
+		const email = payload.user; //TALAN et va bene ?
 		return token;
 	}
 	catch {

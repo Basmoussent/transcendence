@@ -11,7 +11,6 @@ interface RoomData {
 	maxPlayers: number;
 	users: User[];
 	host: string;
-	isGameStarted: boolean;
 	ai: number;
 }
 
@@ -23,18 +22,17 @@ export class RoomService {
 		this.db = database;
 	}
 
+
 	async updateGame(data: RoomData) {
 		try {
 			const fieldsToUpdate: string[] = [];
 			const values: any[] = [];
 
-			// Game type
 			fieldsToUpdate.push("game_type = ?");
 			values.push(data.gameType);
 
-			// Players
 			const users = Array.from((data.users as any).values());
-   2 
+			
 			for (let i = 0; i < 4; i++) {
 				if (users[i]) {
 					fieldsToUpdate.push(`player${i + 1} = ?`);
@@ -46,17 +44,14 @@ export class RoomService {
 				}
 			}
 
-			// Users needed (from maxPlayers)
 			fieldsToUpdate.push("users_needed = ?");
 			values.push(data.maxPlayers);
 
-			// AI setting
 			fieldsToUpdate.push("ai = ?");
 			values.push(data.ai);
 
-			// Finalize SQL
 			const sql = `UPDATE games SET ${fieldsToUpdate.join(", ")} WHERE uuid = ?`;
-			values.push(data.id);  // UUID is used in WHERE clause
+			values.push(data.id);
 
 			await new Promise<void>((resolve, reject) => {
 				this.db.run(sql, values, (err: any) => {
@@ -69,5 +64,24 @@ export class RoomService {
 		}
 	}
 
-
+	async existingRoom(uuid: string) {
+		try {
+			const sql = `SELECT * FROM games WHERE uuid = ?`;
+			const room = await new Promise<any>((resolve, reject) => {
+				this.db.get(sql, uuid, (err: any, room: any) => {
+					err ? reject(err) : resolve(room);
+				});
+			});
+			if (room) {
+				return room;
+			}
+			else {
+				return null;
+			}
+		}
+		catch (err: any) {
+			console.error("Erreur dans existingRoom:", err);
+		}
+	}
 }
+

@@ -1,5 +1,5 @@
 import { getAuthToken } from '../../utils/auth';
-import { t } from '../../utils/translations';
+import { getUserGameHistory } from '../../game/gameUtils';
 
 export class profil {
 
@@ -7,6 +7,8 @@ export class profil {
 	private user: any;
 	private stats: any;
 	private friends: any;
+	private relation: any;
+	private recentGames: any[];
 
 	private homeBtn: HTMLElement;
 	private username: HTMLElement;
@@ -15,8 +17,13 @@ export class profil {
 	private winrate: HTMLElement;
 	private mmr: HTMLElement;
 	private rank: HTMLElement;
+	
 	private gameHistory: HTMLElement;
 	private friendsGrid: HTMLElement;
+	private online: HTMLElement;
+	private statusDot: HTMLElement;
+
+	private isMyFriend: boolean;
 
 	constructor (data: any) {
 
@@ -24,7 +31,8 @@ export class profil {
 		this.user = data.user;
 		this.stats = data.stats;
 		this.friends = data.friends;
-
+		this.relation = data.relation;
+		this.recentGames = [];
 
 		this.homeBtn = this.getElement('homeBtn');
 		this.username = this.getElement('username');
@@ -35,11 +43,19 @@ export class profil {
 		this.rank = this.getElement('rank');
 		this.gameHistory = this.getElement('gameHistory');
 		this.friendsGrid = this.getElement('friends');
+		this.online = this.getElement('online');
+		this.statusDot = this.getElement('statusDot');
+
+		// recup les relations de /me voir si ya user, 
+		this.isMyFriend = false;
+
+		// si this.me.username === this.user.username --> pas possible, on redirige vers /me
 
 		this.setupEvents();
-
-		this.updateInfo();
-		this.loadMatchHistory();
+		console.log("setupEvents")
+		setTimeout(() => {
+			this.updateInfo();
+		}, 0);
 	}
 
 	private getElement(id: string): HTMLElement {
@@ -66,25 +82,214 @@ export class profil {
 
 	}
 
-	private updateInfo() {
-
-		this.username.textContent = this.user.username;
-		this.gamePlayed.textContent = this.stats.pong_games + this.stats.block_games;
-		this.mmr.textContent = this.stats.mmr;
-		this.winrate.textContent = this.stats.pong_games + this.stats.block_games ? `${(this.stats.pong_wins + this.stats.block_wins + this.stats.block_games) * 100}%` : 'N/A';
-		this.rank.textContent = "rank tt le monde via mmr";
-
-		// this.friendsGrid.textContent = '';
-
-
-		for (const friend of this.friends) {
-			const tmp = {
-				username : friend.user_1 !== this.user.username ? friend.user_1: friend.user_2,
-				
-			}
-			console.log(JSON.stringify(friend, null, 8))
-			this.friendsGrid.innerHTML += this.friendCard(tmp);
+	private async updateInfo() {
+		console.log("🔍 updateInfo - stats:", this.stats);
+		console.log("🔍 updateInfo - user:", this.user);
+		console.log("🔍 updateInfo - friends:", this.friends);
+		
+		// Vérifier que les éléments existent
+		if (!this.username) {
+			console.error("❌ Element username non trouvé");
+			return;
 		}
+		if (!this.gamePlayed) {
+			console.error("❌ Element gamePlayed non trouvé");
+			return;
+		}
+		if (!this.mmr) {
+			console.error("❌ Element mmr non trouvé");
+			return;
+		}
+		if (!this.winrate) {
+			console.error("❌ Element winrate non trouvé");
+			return;
+		}
+		if (!this.rank) {
+			console.error("❌ Element rank non trouvé");
+			return;
+		}
+		if (!this.friendsGrid) {
+			console.error("❌ Element friendsGrid non trouvé");
+			return;
+		}
+		if (!this.gameHistory) {
+			console.error("❌ Element gameHistory non trouvé");
+			return;
+		}
+		if (!this.online) {
+			console.error("❌ Element online non trouvé");
+			return;
+		}
+		if (!this.statusDot) {
+			console.error("❌ Element statusDot non trouvé");
+			return;
+		}
+
+		this.username.textContent = this.user.username || 'Utilisateur inconnu';
+		
+		// Mettre à jour le statut en ligne/hors ligne
+		this.updateOnlineStatus();
+		
+		// Mettre à jour les statistiques
+		const totalGames = (this.stats.pong_games || 0) + (this.stats.block_games || 0);
+		this.gamePlayed.textContent = totalGames.toString();
+		
+		this.mmr.textContent = this.stats.mmr || '0';
+		
+		const totalWins = (this.stats.pong_wins || 0) + (this.stats.block_wins || 0);
+		const winrateValue = totalGames > 0 ? Math.round((totalWins / totalGames) * 100) : 0;
+		this.winrate.textContent = `${winrateValue}%`;
+		
+		this.rank.textContent = "1st";
+
+		// Charger les parties récentes
+		await this.loadRecentGames();
+
+		// Vider la grille des amis
+		this.friendsGrid.innerHTML = '';
+
+		// Ajouter les amis
+		if (this.friends && Array.isArray(this.friends)) {
+			console.log(`👥 Ajout de ${this.friends.length} amis`);
+			for (const friend of this.friends) {
+				const tmp = {
+					username: friend.user_1 !== this.user.username ? friend.user_1 : friend.user_2,
+				};
+				console.log("👤 Ajout ami:", tmp);
+				this.friendsGrid.innerHTML += this.friendCard(tmp);
+			}
+		} else {
+			console.log("👥 Aucun ami à afficher");
+			this.friendsGrid.innerHTML = '<div class="no-friends">Aucun ami pour le moment</div>';
+		}
+	}
+
+	private updateOnlineStatus() {
+		// Pour l'instant, on suppose que l'utilisateur est en ligne
+		// Dans une vraie application, on récupérerait cette info depuis une API
+		const isOnline = this.user.online;
+		
+		if (isOnline) {
+			this.online.textContent = 'En ligne';
+			this.online.className = 'online-status';
+			this.statusDot.className = 'status-dot online';
+			// Mettre à jour le conteneur du statut
+			const statusContainer = this.online.parentElement;
+			if (statusContainer) {
+				statusContainer.className = 'profile-status';
+			}
+		} else {
+			this.online.textContent = 'Hors ligne';
+			this.online.className = 'offline-status';
+			this.statusDot.className = 'status-dot offline';
+			// Mettre à jour le conteneur du statut
+			const statusContainer = this.online.parentElement;
+			if (statusContainer) {
+				statusContainer.className = 'profile-status offline';
+			}
+		}
+	}
+
+	// Méthode pour tester différents statuts (à supprimer en production)
+	public setOnlineStatus(isOnline: boolean) {
+		if (isOnline) {
+			this.online.textContent = 'En ligne';
+			this.online.className = 'online-status';
+			this.statusDot.className = 'status-dot online';
+			// Mettre à jour le conteneur du statut
+			const statusContainer = this.online.parentElement;
+			if (statusContainer) {
+				statusContainer.className = 'profile-status';
+			}
+		} else {
+			this.online.textContent = 'Hors ligne';
+			this.online.className = 'offline-status';
+			this.statusDot.className = 'status-dot offline';
+			// Mettre à jour le conteneur du statut
+			const statusContainer = this.online.parentElement;
+			if (statusContainer) {
+				statusContainer.className = 'profile-status offline';
+			}
+		}
+	}
+
+	private async loadRecentGames() {
+		try {
+			console.log("🎮 Chargement des parties récentes pour:", this.user.username);
+			this.recentGames = await getUserGameHistory(this.user.username);
+			console.log("📊 Parties récupérées:", this.recentGames.length);
+			console.log("🎮 Détail des parties:", this.recentGames);
+			this.displayRecentGames();
+		} catch (error) {
+			console.error("❌ Erreur lors du chargement des parties récentes:", error);
+			this.recentGames = [];
+			this.displayRecentGames();
+		}
+	}
+
+	private displayRecentGames() {
+		if (!this.gameHistory) {
+			console.error("❌ Element gameHistory non trouvé");
+			return;
+		}
+
+		const formatDate = (timestamp: string | undefined) => {
+			if (!timestamp) return 'N/A';
+			const date = new Date(parseInt(timestamp));
+			return date.toLocaleString();
+		};
+
+		const getGameResult = (game: any, username: string) => {
+			if (!game.winner) return 'En cours';
+			if (game.winner === username) return 'Victoire';
+			return 'Défaite';
+		};
+
+		const getGameTypeLabel = (gameType: string) => {
+			switch (gameType) {
+				case 'pong':
+					return 'Pong';
+				case 'block':
+					return 'Block';
+				default:
+					return gameType;
+			}
+		};
+
+		const gamesHtml = this.recentGames.length > 0 
+			? this.recentGames.slice(0, 5).map((game, index) => {
+				console.log(`🎮 Partie ${index + 1}:`, game);
+				return `
+				<div class="game-history-item">
+					<div class="game-info">
+						<div class="game-type">${getGameTypeLabel(game.game_type)}</div>
+						<div class="game-players">
+							<span class="player">${game.player1}</span>
+							${game.player2 ? `<span class="vs">vs</span><span class="player">${game.player2}</span>` : ''}
+							${game.player3 ? `<span class="vs">vs</span><span class="player">${game.player3}</span>` : ''}
+							${game.player4 ? `<span class="vs">vs</span><span class="player">${game.player4}</span>` : ''}
+						</div>
+						<div class="game-result ${getGameResult(game, this.user.username).toLowerCase()}">
+							${getGameResult(game, this.user.username)}
+						</div>
+					</div>
+					<div class="game-date">
+						${formatDate(game.end_time)}
+					</div>
+				</div>
+			`}).join('')
+			: '<div class="no-games">Aucune partie récente</div>';
+
+		// Mettre à jour le contenu de la section gameHistory
+		this.gameHistory.innerHTML = `
+			<div class="section-header">
+				<i class="fas fa-history"></i>
+				<h2>Activité récente</h2>
+			</div>
+			<div class="recent-activity">
+				${gamesHtml}
+			</div>
+		`;
 	}
 
 	private friendCard(friend: any) { // modifier status absent | en ligne avec redis
@@ -98,7 +303,16 @@ export class profil {
         }
 
 	private async addFriend() {
+		
+		//pas possible de s'ajouter soit meme car pas possible d'arriver sur cette page, on redirige vers /me
 
+		console.log(`🔍 Debug - addFriend called: ${this.me.username} wants to add ${this.user.username}`);
+
+		// 2 - check si une relation n'existe pas déjà
+		// via  this.relation
+		
+	/*
+		/// on fais vraiment la request
 		try {
 			const token = getAuthToken();
 			if (!token) {
@@ -141,6 +355,7 @@ export class profil {
 		catch (err) {
 			console.error(`nn nn c'est pas bon mgl`)
 		}
+			*/
 
 	}
 
@@ -150,127 +365,6 @@ export class profil {
         //     alert(`Interaction avec ${friendName}`);
         //     // Ici vous pouvez ajouter votre logique : ouvrir un chat, voir le profil, etc.
         // }
-
-	private loadMatchHistory() {
-		// Données factices pour l'historique des parties
-		const fakeHistory = [
-			{
-				gameType: 'pong',
-				result: 'victory',
-				opponent: 'Player123',
-				score: '11-8',
-				date: new Date(Date.now() - 2 * 60 * 60 * 1000) // 2 heures ago
-			},
-			{
-				gameType: 'block',
-				result: 'defeat',
-				opponent: 'GamerPro',
-				score: '5-11',
-				date: new Date(Date.now() - 4 * 60 * 60 * 1000) // 4 heures ago
-			},
-			{
-				gameType: 'pong',
-				result: 'victory',
-				opponent: 'Newbie99',
-				score: '11-3',
-				date: new Date(Date.now() - 6 * 60 * 60 * 1000) // 6 heures ago
-			},
-			{
-				gameType: 'block',
-				result: 'draw',
-				opponent: 'EqualPlayer',
-				score: '10-10',
-				date: new Date(Date.now() - 8 * 60 * 60 * 1000) // 8 heures ago
-			},
-			{
-				gameType: 'pong',
-				result: 'defeat',
-				opponent: 'Champion2024',
-				score: '7-11',
-				date: new Date(Date.now() - 12 * 60 * 60 * 1000) // 12 heures ago
-			},
-			{
-				gameType: 'block',
-				result: 'victory',
-				opponent: 'BlockMaster',
-				score: '11-6',
-				date: new Date(Date.now() - 24 * 60 * 60 * 1000) // 1 jour ago
-			},
-			{
-				gameType: 'pong',
-				result: 'victory',
-				opponent: 'PongKing',
-				score: '11-9',
-				date: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000) // 2 jours ago
-			},
-			{
-				gameType: 'block',
-				result: 'defeat',
-				opponent: 'CubeDestroyer',
-				score: '4-11',
-				date: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000) // 3 jours ago
-			},
-			{
-				gameType: 'pong',
-				result: 'victory',
-				opponent: 'SpeedDemon',
-				score: '11-7',
-				date: new Date(Date.now() - 4 * 24 * 60 * 60 * 1000) // 4 jours ago
-			},
-			{
-				gameType: 'block',
-				result: 'victory',
-				opponent: 'BlockNinja',
-				score: '11-5',
-				date: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000) // 5 jours ago
-			}
-		];
-
-		const matchHistoryList = document.getElementById('match-history-list');
-		if (matchHistoryList) {
-			matchHistoryList.innerHTML = fakeHistory.map(match => this.createMatchItem(match)).join('');
-		}
-	}
-
-	private createMatchItem(match: any): string {
-		const gameIcon = match.gameType === 'pong' ? 'fa-table-tennis' : 'fa-cubes';
-		const gameTypeClass = match.gameType === 'pong' ? 'pong' : 'block';
-		const resultText = match.result === 'victory' ? t('social.victory') : match.result === 'defeat' ? t('social.defeat') : t('social.draw');
-		const dateText = this.formatDate(match.date);
-
-		return `
-			<div class="match-item ${match.result}">
-				<div class="match-icon ${gameTypeClass}">
-					<i class="fas ${gameIcon}"></i>
-				</div>
-				<div class="match-content">
-					<div class="match-result">${resultText}</div>
-					<div class="match-details">
-						<span class="match-opponent">vs ${match.opponent}</span>
-						<span class="match-score">${match.score}</span>
-					</div>
-				</div>
-				<div class="match-date">${dateText}</div>
-			</div>
-		`;
-	}
-
-	private formatDate(date: Date): string {
-		const now = new Date();
-		const diffMs = now.getTime() - date.getTime();
-		const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
-		const diffDays = Math.floor(diffHours / 24);
-
-		if (diffHours < 1) {
-			return t('social.justNow');
-		} else if (diffHours < 24) {
-			return `${diffHours}h ago`;
-		} else if (diffDays === 1) {
-			return t('social.yesterday');
-		} else {
-			return `${diffDays}d ago`;
-		}
-	}
 
 	// private async addFriend() {
 	// 	const token = getAuthToken();

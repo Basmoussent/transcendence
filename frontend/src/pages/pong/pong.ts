@@ -1,18 +1,18 @@
 import { Pong } from '../../game/pong/pong';
 
 export function renderPong(uuid: string) {
-
-	setTimeout(() => {
-		const canvas = document.getElementById('pongGameCanvas') as HTMLCanvasElement;
-		if (!canvas) {
-			console.error('Canvas not found!');
-			return;
-		}
-		const game = new Pong(canvas, uuid);
-		game.init();
-	}, 0);
-
 	return getTemplate();
+}
+
+export function initializePongEvents(uuid: string) {
+	console.log('Initializing pong game events');
+	const canvas = document.getElementById('pongGameCanvas') as HTMLCanvasElement;
+	if (!canvas) {
+		console.error('Canvas not found!');
+		return;
+	}
+	const game = new Pong(canvas, uuid);
+	game.init();
 }
 
 function getTemplate() {

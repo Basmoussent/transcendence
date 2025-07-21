@@ -3,25 +3,80 @@ import { sanitizeHtml } from '../../utils/sanitizer';
 import { t } from '../../utils/translations';
 import { profil } from './profil'
 
-export function renderProfil(uuid: string) {
+export async function renderProfil(uuid: string) {
+	return getTemplate(); // => retourne une string HTML
+}
 
-	setTimeout(async () => {
-		try {
+export async function initializeProfilEvents(uuid:string) {
+	try {
+		const me = await loadMe();
+		const user = await loadUserInfo(uuid);
 
-			const data = {
-				me: await loadMe(),
-				user: await loadUserInfo(uuid),
-				stats: await loadUserStats(uuid),
-				friends: await loadUserFriends(uuid)
-			}
-
-			new profil(data);
+		if (!me || !user) {
+			console.error("ya pas les infos");
+			return;
 		}
-		catch (err:any) {
-			console.log(err);
+
+		const [ stats, friends, relation ] = await Promise.all([
+			loadUserStats(uuid),
+			loadUserFriends(uuid),
+			loadRelation(me.username, user.username)
+		]);
+
+		if (!stats || !friends) {
+			console.error("Données manquantes pour afficher le profil");
 		}
-	}, 0);
-	return getTemplate();
+
+		const data = { me, user, stats, friends, relation };
+
+		await new Promise(resolve => requestAnimationFrame(resolve));
+ 
+		new profil(data);
+	}
+	catch (err) {
+		console.log(err);
+	}
+}
+
+
+async function loadRelation(user1: string, user2: string) {
+
+	try {
+		const token = getAuthToken();
+		if (!token) {
+			alert('❌ Token d\'authentification manquant');
+			window.history.pushState({}, '', '/login');
+			window.dispatchEvent(new PopStateEvent('popstate'));
+			return null;
+		}
+		console.log(JSON.stringify({
+			user1: user1,
+			user2: user2,
+		}, null, 12))
+		const response = await fetch('/api/friend/relation', {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+				'x-access-token': token
+			},
+			body: JSON.stringify({
+				user1: user1,
+				user2: user2,
+			})
+		});
+		console.log(response)
+		if (response.ok) {
+			const result = await response.json();
+			return result;
+		} else {
+			console.error('Erreur lors de la récupération des données utilisateur');
+			return null;
+		}
+	} catch (err) {
+		console.error(`fail de recup me dans loadme renderFriends`, err);
+		return null;
+	}
+
 }
 
 async function loadMe() {
@@ -32,7 +87,7 @@ async function loadMe() {
 			alert('❌ Token d\'authentification manquant');
 			window.history.pushState({}, '', '/login');
 			window.dispatchEvent(new PopStateEvent('popstate'));
-			return '';
+			return null;
 		}
 
 		const response = await fetch('/api/me', {
@@ -49,13 +104,15 @@ async function loadMe() {
 				username: sanitizeHtml(result.user?.username),
 				email: sanitizeHtml(result.user?.email),
 			};
-			return (userData);
+			return userData;
 		} else {
 			console.error('Erreur lors de la récupération des données utilisateur');
+			return null;
 		}
 	}
 	catch (err) {
-		console.error(`fail de recup me dans loadme renderFriends`);
+		console.error(`fail de recup me dans loadme renderFriends`, err);
+		return null;
 	}
 
 }
@@ -68,7 +125,7 @@ async function loadUserInfo(username: string) {
 			alert('❌ Token d\'authentification manquant');
 			window.history.pushState({}, '', '/login');
 			window.dispatchEvent(new PopStateEvent('popstate'));
-			return '';
+			return null;
 		}
 
 		const response = await fetch(`/api/user/username/?username=${username}`, {
@@ -85,14 +142,19 @@ async function loadUserInfo(username: string) {
 				username: sanitizeHtml(result.data?.username),
 				email: sanitizeHtml(result.data?.email),
 				avatar: sanitizeHtml(result.data?.avatar_url) || 'avatar.png',
+				online: result.online
 			};
-			return (userData);
+			console.log("userData", userData)
+			return userData;
 		}
-		else 
+		else {
 			console.error('Erreur lors de la récupération des données utilisateur');
+			return null;
+		}
 	}
 	catch (err) {
 		console.error(`error retreve info du user pour render son profil  ${err}`);
+		return null;
 	}
 }
 
@@ -104,7 +166,7 @@ async function loadUserStats(username: string) {
 			alert('❌ Token d\'authentification manquant');
 			window.history.pushState({}, '', '/login');
 			window.dispatchEvent(new PopStateEvent('popstate'));
-			return '';
+			return null;
 		}
 
 		const response = await fetch(`/api/user/stats/?username=${username}`, {
@@ -125,13 +187,16 @@ async function loadUserStats(username: string) {
 				rating: result.stats?.rating,
 				id: result.stats?.id,
 			};
-			return (userStats);
+			return userStats;
 		}
-		else 
+		else {
 			console.error('pblm recuperer les stats du user dont on veut render le profil');
+			return null;
+		}
 	}
 	catch (err) {
 		console.error(`pblm recuperer les stats du user dont on veut render le profil${err}`);
+		return null;
 	}
 
 }
@@ -143,7 +208,7 @@ async function loadUserFriends(username: string) {
 			alert('❌ Token d\'authentification manquant');
 			window.history.pushState({}, '', '/login');
 			window.dispatchEvent(new PopStateEvent('popstate'));
-			return '';
+			return null;
 		}
 
 		const response = await fetch(`/api/friend/?username=${username}`, {
@@ -153,14 +218,17 @@ async function loadUserFriends(username: string) {
 				'x-access-token': token }
 		});
 	
-		if (response.ok)
+		if (response.ok) {
 			return await response.json();
-		else 
+		} else {
 			console.error('gros gros zig');
+			return null;
+		}
 
 	}
 	catch (err) {
-		console.error(`pas réussi a récup les amis de cette personnes zignew que tu es`)
+		console.error(`pas réussi a récup les amis de cette personnes zignew que tu es`, err);
+		return null;
 	}
 }
 
@@ -168,14 +236,9 @@ function getTemplate() {
 	return `
 		<button class="home-button" id="homeBtn">
 			<i class="fas fa-home"></i>
-			${t('social.home')}
+			Home
 		</button>
 		
-		<button class="home-button" onclick="goHome()">
-        <i class="fas fa-home"></i>
-        ${t('social.home')}
-		</button>
-
 		<div class="container">
 			<div class="profile-header">
 			<div class="profile-banner">
@@ -187,18 +250,14 @@ function getTemplate() {
 				<div class="profile-details">
 				<h1 id="username"> talan</h1>
 				<div class="profile-status">
-					<div class="status-dot"></div>
-					<span>${t('social.online')}</span>
+					<div class="status-dot" id="statusDot"></div>
+					<span id="online">En ligne</span>
 				</div>
 				</div>
 				<div class="profile-actions">
-					<button id="addFriend" "class="action-btn btn-primary">
+					<button id="addFriend" class="action-btn btn-primary">
 						<i class="fas fa-user-plus"></i>
-						${t('social.addFriend')}
-					</button>
-					<button id="sendMsg" class="action-btn btn-secondary">
-						<i class="fas fa-envelope"></i>
-						${t('social.message')}
+						Ajouter ami
 					</button>
 				</div>
 			</div>
@@ -208,23 +267,23 @@ function getTemplate() {
 			<div class="profile-section">
 				<div class="section-header">
 				<i class="fas fa-chart-bar"></i>
-				<h2>${t('social.statistics')}</h2>
+				<h2>Statistiques</h2>
 				</div>
 					<div class="stats-grid">
 						<div class="stat-card">
-							<div id="gamePlayed" class="stat-number">1,247</div>
-													<div class="stat-label">${t('social.gamePlayed')}</div>
-					</div>
-					<div class="stat-card">
-						<div id="winrate" class="stat-number">68%</div>
-						<div class="stat-label">${t('social.winrate')}</div>
-					</div>
-					<div class="stat-card">
-						<div id="victory" class="stat-number">42</div>
-						<div class="stat-label">${t('social.victory')}</div>
+							<div id="gamePlayed" class="stat-number"></div>
+							<div class="stat-label">Game played</div>
 						</div>
 						<div class="stat-card">
-							<div id="rank" class="stat-number">42</div>
+							<div id="winrate" class="stat-number"></div>
+							<div class="stat-label">Winrate</div>
+						</div>
+						<div class="stat-card">
+							<div id="mmr" class="stat-number"></div>
+							<div class="stat-label">MMR</div>
+						</div>
+						<div class="stat-card">
+							<div id="rank" class="stat-number"></div>
 							<div class="stat-label">Rank</div>
 					</div>
 				</div>
@@ -235,10 +294,49 @@ function getTemplate() {
 			<div id="gameHistory" class="profile-section">
 				<div class="section-header">
 				<i class="fas fa-history"></i>
-				<h2>Historique des parties</h2>
+				<h2>Activité récente</h2>
 				</div>
-				<div class="match-history-container" id="match-history-list">
-					<!-- Les parties seront générées par JavaScript -->
+				<div class="recent-activity">
+				<div class="activity-item">
+					<div class="activity-icon">
+					<i class="fas fa-gamepad"></i>
+					</div>
+					<div class="activity-content">
+					<h4>Partie de Pong remportée</h4>
+					<p>Victoire contre Marie_G dans une partie serrée</p>
+					</div>
+					<div class="activity-time">Il y a 2h</div>
+				</div>
+				<div class="activity-item">
+					<div class="activity-icon">
+					<i class="fas fa-trophy"></i>
+					</div>
+					<div class="activity-content">
+					<h4>Nouveau succès débloqué</h4>
+					<p>Succès "Série de feu" obtenu</p>
+					</div>
+					<div class="activity-time">Il y a 1 jour</div>
+				</div>
+				<div class="activity-item">
+					<div class="activity-icon">
+					<i class="fas fa-users"></i>
+					</div>
+					<div class="activity-content">
+					<h4>Nouvel ami ajouté</h4>
+					<p>Thomas_42 a accepté votre demande d'ami</p>
+					</div>
+					<div class="activity-time">Il y a 3 jours</div>
+				</div>
+				<div class="activity-item">
+					<div class="activity-icon">
+					<i class="fas fa-users"></i>
+					</div>
+					<div class="activity-content">
+					<h4>Nouvel ami ajouté</h4>
+					<p>Thomas_42 a accepté votre demande d'ami</p>
+					</div>
+					<div class="activity-time">Il y a 3 jours</div>
+				</div>
 				</div>
 			</div>
 
@@ -246,30 +344,10 @@ function getTemplate() {
 				<div class="section-header">
 				<i class="fas fa-users"></i>
 				<h2>Amis</h2>
+					</div>
+					<div id="friends" class="friends-grid">
+					</div>
 				</div>
-				<div class="friends-grid">
-				<div class="friend-card">
-					<div class="friend-avatar">M</div>
-					<div class="friend-name">Marie_G</div>
-					<div class="friend-status">En partie</div>
-				</div>
-				<div class="friend-card">
-					<div class="friend-avatar">T</div>
-					<div class="friend-name">Thomas_42</div>
-					<div class="friend-status">${t('social.online')}</div>
-				</div>
-				<div class="friend-card">
-					<div class="friend-avatar">S</div>
-					<div class="friend-name">Sophie_K</div>
-					<div class="friend-status">${t('social.online')}</div>
-				</div>
-				<div class="friend-card">
-					<div class="friend-avatar">L</div>
-					<div class="friend-name">Lucas_Dev</div>
-					<div class="friend-status">Absent</div>
-				</div>
-				</div>
-			</div>
 			</div>
 		</div>
 			
@@ -367,6 +445,109 @@ function getTemplate() {
 		padding-right: 10px; /* Pour éviter que la scrollbar ne cache du contenu */
 	}
 
+	/* Styles pour les éléments d'historique des parties */
+	.game-history-item {
+		background: rgba(255, 255, 255, 0.05);
+		border-radius: 15px;
+		padding: 20px;
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		transition: all 0.3s ease;
+		flex-wrap: wrap;
+		gap: 15px;
+		margin-bottom: 15px;
+	}
+
+	.game-history-item:hover {
+		background: rgba(255, 255, 255, 0.1);
+		transform: translateY(-2px);
+	}
+
+	.game-info {
+		display: flex;
+		flex-direction: column;
+		gap: 8px;
+	}
+
+	.game-type {
+		font-weight: bold;
+		color: #4a90e2;
+		font-size: 1.1em;
+	}
+
+	.game-players {
+		display: flex;
+		align-items: center;
+		gap: 8px;
+		flex-wrap: wrap;
+	}
+
+	.player {
+		font-weight: 500;
+	}
+
+	.vs {
+		color: #ccc;
+		font-size: 0.9em;
+	}
+
+	.game-result {
+		font-weight: bold;
+		padding: 4px 12px;
+		border-radius: 20px;
+		font-size: 0.9em;
+		text-align: center;
+		display: inline-block;
+		width: fit-content;
+	}
+
+	.game-result.victoire {
+		background: rgba(46, 204, 113, 0.2);
+		color: #2ecc71;
+	}
+
+	.game-result.défaite {
+		background: rgba(231, 76, 60, 0.2);
+		color: #e74c3c;
+	}
+
+	.game-result.en cours {
+		background: rgba(241, 196, 15, 0.2);
+		color: #f1c40f;
+	}
+
+	.game-date {
+		color: #ccc;
+		font-size: 0.9em;
+		text-align: right;
+	}
+
+	.no-games {
+		text-align: center;
+		color: #ccc;
+		font-style: italic;
+		padding: 40px;
+	}
+
+	.recent-activity {
+		display: flex;
+		flex-direction: column;
+		gap: 15px;
+	}
+
+	@media (max-width: 768px) {
+		.game-history-item {
+			flex-direction: column;
+			align-items: flex-start;
+			gap: 15px;
+		}
+
+		.game-date {
+			text-align: left;
+		}
+	}
+
 
         .profile-avatar {
 		position: absolute;
@@ -420,7 +601,7 @@ function getTemplate() {
 		color: rgba(255, 255, 255, 0.8);
         }
 
-        .profile-status {
+        		.profile-status {
 		display: flex;
 		align-items: center;
 		gap: 8px;
@@ -428,15 +609,51 @@ function getTemplate() {
 		background: rgba(16, 185, 129, 0.2);
 		border-radius: 20px;
 		border: 1px solid rgba(16, 185, 129, 0.3);
+		transition: all 0.3s ease;
         }
 
-        .status-dot {
-		width: 12px;
-		height: 12px;
-		border-radius: 50%;
-		background: #10B981;
-		animation: pulse 2s infinite;
-        }
+		.profile-status.offline {
+			background: rgba(107, 114, 128, 0.2);
+			border: 1px solid rgba(107, 114, 128, 0.3);
+		}
+
+		/* Styles pour le statut en ligne/hors ligne */
+		.online-status {
+			color: #10B981;
+			font-weight: 600;
+		}
+
+		.offline-status {
+			color: #6B7280;
+			font-weight: 600;
+		}
+
+		.status-dot {
+			width: 12px;
+			height: 12px;
+			border-radius: 50%;
+			animation: pulse 2s infinite;
+		}
+
+		.status-dot.online {
+			background: #10B981;
+		}
+
+		.status-dot.offline {
+			background: #6B7280;
+		}
+
+		@keyframes pulse {
+			0% {
+				opacity: 1;
+			}
+			50% {
+				opacity: 0.5;
+			}
+			100% {
+				opacity: 1;
+			}
+		}
 
         .profile-actions {
 		display: flex;
@@ -579,149 +796,6 @@ function getTemplate() {
         .achievement-info p {
 		color: rgba(255, 255, 255, 0.7);
 		font-size: 0.9em;
-        }
-
-        .match-history-container {
-		display: flex;
-		flex-direction: column;
-		gap: 12px;
-		max-height: 400px;
-		overflow-y: auto;
-        }
-
-        .match-history-container::-webkit-scrollbar {
-		width: 6px;
-        }
-
-        .match-history-container::-webkit-scrollbar-track {
-		background: rgba(255, 255, 255, 0.05);
-		border-radius: 3px;
-        }
-
-        .match-history-container::-webkit-scrollbar-thumb {
-		background: rgba(255, 255, 255, 0.2);
-		border-radius: 3px;
-        }
-
-        .match-history-container::-webkit-scrollbar-thumb:hover {
-		background: rgba(255, 255, 255, 0.3);
-        }
-
-        .match-item {
-		display: flex;
-		align-items: center;
-		gap: 15px;
-		padding: 15px;
-		background: rgba(255, 255, 255, 0.1);
-		border-radius: 12px;
-		border-left: 4px solid;
-		transition: all 0.3s ease;
-		position: relative;
-		overflow: hidden;
-        }
-
-        .match-item::before {
-		content: '';
-		position: absolute;
-		top: 0;
-		left: 0;
-		right: 0;
-		height: 2px;
-		background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
-		opacity: 0;
-		transition: opacity 0.3s ease;
-        }
-
-        .match-item:hover::before {
-		opacity: 1;
-        }
-
-        .match-item:hover {
-		transform: translateX(5px);
-		background: rgba(255, 255, 255, 0.15);
-        }
-
-        .match-item.victory {
-		border-left-color: #10B981;
-        }
-
-        .match-item.defeat {
-		border-left-color: #EF4444;
-        }
-
-        .match-item.draw {
-		border-left-color: #6B7280;
-        }
-
-        .match-icon {
-		width: 45px;
-		height: 45px;
-		border-radius: 50%;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		font-size: 1.2em;
-		color: white;
-		flex-shrink: 0;
-        }
-
-        .match-icon.pong {
-		background: linear-gradient(135deg, #3B82F6, #1D4ED8);
-        }
-
-        .match-icon.block {
-		background: linear-gradient(135deg, #8B5CF6, #7C3AED);
-        }
-
-        .match-content {
-		flex: 1;
-		min-width: 0;
-        }
-
-        .match-result {
-		font-size: 1.1rem;
-		font-weight: 700;
-		margin-bottom: 4px;
-        }
-
-        .match-item.victory .match-result {
-		color: #10B981;
-        }
-
-        .match-item.defeat .match-result {
-		color: #EF4444;
-        }
-
-        .match-item.draw .match-result {
-		color: #6B7280;
-        }
-
-        .match-details {
-		display: flex;
-		align-items: center;
-		gap: 15px;
-		font-size: 0.9rem;
-		color: rgba(255, 255, 255, 0.8);
-        }
-
-        .match-opponent {
-		font-weight: 600;
-		color: rgba(255, 255, 255, 0.9);
-        }
-
-        .match-score {
-		background: rgba(255, 255, 255, 0.1);
-		padding: 4px 8px;
-		border-radius: 6px;
-		font-weight: 600;
-		font-size: 0.85rem;
-        }
-
-        .match-date {
-		color: rgba(255, 255, 255, 0.6);
-		font-size: 0.8rem;
-		margin-left: auto;
-		flex-shrink: 0;
         }
 
         .recent-activity {

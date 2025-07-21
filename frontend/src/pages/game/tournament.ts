@@ -1,6 +1,7 @@
 import { Pong } from '../../game/pong/pong';
 import { sanitizeHtml } from '../../utils/sanitizer';
 import { t } from '../../utils/translations';
+import { addEvent } from '../../utils/eventManager';
 
 export function renderTournaments() {
   const html =  `
