@@ -22,7 +22,6 @@ export function handleAlive(connection: WebSocket, req: FastifyRequest, app: Fas
 						username = decoded.name;
 						authenticated = true;
 						
-						// Premier signal de présence - statut online pendant 15 secondes
 						await redis.set(`${userId}:online`, '1', { EX: 15 });
 						await redis.set(`${username}:online`, '1', { EX: 15 });
 						console.log(`✅ User ${username} (ID: ${userId}) connected to /alive - Status: ONLINE`);

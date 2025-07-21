@@ -22,18 +22,20 @@ export class ChatService {
 		this.db = database;
 	}
 
-	async getChatId(user1: string, user2: string) {
+	async getChatId(user1Id: number, user2Id: number) {
 		try {
+			console.log("user1Id :", user1Id);
+			console.log("user2Id :", user2Id);
 			const chatId = await new Promise<any>((resolve, reject) => {
 				this.db.get(
 					'SELECT id FROM friends WHERE (user_1 = ? AND user_2 = ?) OR (user_1 = ? AND user_2 = ?)',
-					[user1, user2, user2, user1],
+					[user1Id, user2Id, user2Id, user1Id],
 					(err: any, row: any) => {
 						err ? reject(err) : resolve(row);
 					}
 				);
 			});
-			console.log(`SELECT id FROM friends WHERE (user_1 = ? AND user_2 = ?) OR (user_1 = ? AND user_2 = ?)`, [user1, user2, user2, user1])
+			console.log(`SELECT id FROM friends WHERE (user_1 = ? AND user_2 = ?) OR (user_1 = ? AND user_2 = ?)`, [user1Id, user2Id, user2Id, user1Id])
 			console.log('chatId', chatId);
 			return chatId?.id;
 		} catch (error) {
@@ -42,9 +44,9 @@ export class ChatService {
 		}
 	}
 
-	async retrieveChatHistory(user1: string, user2: string) {
+	async retrieveChatHistory(user1Id: number, user2Id: number) {
 		try {
-			const chatId = await this.getChatId(user1, user2);
+			const chatId = await this.getChatId(user1Id, user2Id);
 			if (!chatId) {
 				return [];
 			}
@@ -66,17 +68,31 @@ export class ChatService {
 		}
 	}
 
-	async logChatMessage(user1: string, user2: string, message: string) {
+	async logChatMessage(senderId: number, receiverId: number, message: string) {
 		try {
-			const chatId = await this.getChatId(user1, user2);
+			console.log("senderId :", senderId);
+			console.log("receiverId :", receiverId);
+			console.log("message :", message);
+			const chatId = await this.getChatId(senderId, receiverId);
 
 			if (!chatId)
 				throw new Error('Chat not found - users must be friends');
 
+			// On récupère le username du sender pour l'affichage
+			const senderUsername = await new Promise<string | null>((resolve, reject) => {
+				this.db.get(
+					'SELECT username FROM users WHERE id = ?',
+					[senderId],
+					(err: any, row: any) => {
+						err ? reject(err) : resolve(row ? row.username : null);
+					}
+				);
+			});
+
 			const result = await new Promise<any>((resolve, reject) => {
 				this.db.run(
 					'INSERT INTO messages (chat_id, sender_username, content) VALUES (?, ?, ?)',
-					[chatId, user1, message],
+					[chatId, senderUsername, message],
 					function(this: any, err: any) {
 						err ? reject(err) : resolve(this);
 					}

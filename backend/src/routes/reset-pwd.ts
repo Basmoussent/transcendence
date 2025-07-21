@@ -121,6 +121,10 @@ async function editRoutes(app: FastifyInstance) {
 					);
 				});
 			}
+			const cookie = app.jwt.sign({ user: email, name: username });
+			reply.header(
+				"x-access-token", cookie
+			)
 			return reply.send({ message: 'Profil mis à jour avec succès' });
 		}
 		catch (err: any) {

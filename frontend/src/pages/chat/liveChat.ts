@@ -286,7 +286,7 @@ export class Chat {
 		var	request = 0;
 
 		const relations: Relation[] | null = await fetchUserRelations(this.me.username);
-
+		
 
 		console.log(JSON.stringify(relations, null, 8))
 
@@ -301,7 +301,7 @@ export class Chat {
 		for (const relation of relations) {
 			console.log("relation", relation)
 
-			const friendUsername = relation.user_1 === this.me.username ? relation.user_2 : relation.user_1;
+			const friendUsername = relation.user_1 === this.me.userId.toString() ? relation.user_2 : relation.user_1;
 
 			const friend: UserChat | void = await fetchUserInfo(friendUsername);
 
@@ -363,6 +363,7 @@ export class Chat {
 				this.requestsList.appendChild(requestElement);
 
 				requestElement.querySelector('.accept-btn')?.addEventListener('click', () => {
+					console.log("friend :", friend.username);
 					this.ws.send(JSON.stringify({ type: 'accept_friend_request', dest: friend.username }));
 				});
 
@@ -541,6 +542,7 @@ export class Chat {
 async function fetchUserRelations(username: string): Promise<Relation[]|null> {
 
 	try {
+		console.log("username laallllal :", username);
 		const response = await fetch(`/api/friend/relations/?username=${username}`);
 		
 		if (!response.ok) {

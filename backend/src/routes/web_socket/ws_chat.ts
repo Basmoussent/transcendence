@@ -85,7 +85,10 @@ async function handleMessage(message: string, username: string, app: FastifyInst
 				sendChatMessage(username, data)
 
 				try {
-					await app.chatService.logChatMessage(sender.username, data.dest, data.content);
+					console.log("sender :", sender);
+					console.log("data :", data);
+					const user = await app.userService.findByUsername(data.dest);
+					await app.chatService.logChatMessage(sender.userId, user.id, data.content);
 				} catch (error) {
 					console.error('Error logging chat message:', error);
 					// Envoyer un message d'erreur au client sans fermer le WebSocket
@@ -166,7 +169,7 @@ async function addFriend(app: FastifyInstance, user: UserChat, friendName: strin
 	
 		
 	// 2 - check si une relation n'existe pas déjà
-	const relations: Relation[] = await app.friendService.getRelations(user.username);
+	const relations: Relation[] = await app.friendService.getRelations(user.userId);
 	console.log(`🔍 Debug - Existing relations for ${user.username}:`, relations);
 
 	relations.forEach((rel, index) => {
@@ -193,7 +196,7 @@ async function addFriend(app: FastifyInstance, user: UserChat, friendName: strin
 	// 5 - envoyer une demande + creer l'instance dans db friends avec username des deux personnes
 	//	 |__ update l'état, qui a ajouté qui
 	console.log(`🔍 Debug - Creating relation: ${user.username} -> ${friend.username}`);
-	await app.friendService.createRelation(user.username, friend.username, 'waiting', 'requested');
+	await app.friendService.createRelation(user.userId, friend.id, 'waiting', 'requested');
 
 	
 	console.log(`${user.username} requested ${friendName} to be friends`)
@@ -212,8 +215,8 @@ async function addFriend(app: FastifyInstance, user: UserChat, friendName: strin
 async function acceptFriend(app: FastifyInstance, user: UserChat, friendName: string) {
 
 	const friend = await app.userService.findByUsername(friendName);
-	const relations: Relation[] = await app.friendService.getRelations(user.username);
-	const relation = relations.find(rel => rel.user_1 === friend.username || rel.user_2 === friend.username);
+	const relations: Relation[] = await app.friendService.getRelations(user.userId);
+	const relation = relations.find(rel => rel.user_1 === friend.id.toString() || rel.user_2 === friend.id.toString());
 
 	if (!relation || relation.id === -1) {
 		console.error(`couldnt find the relation to accept friendship`);
@@ -234,7 +237,7 @@ async function denyFriend(app: FastifyInstance, user: UserChat, friendName: stri
 	console.log("oaindozaindoaizndoaizndoianz")
 
 	const friend = await app.userService.findByUsername(friendName);
-	const relations: Relation[] = await app.friendService.getRelations(user.username);
+	const relations: Relation[] = await app.friendService.getRelations(user.userId);
 	const relation = relations.find(rel => rel.user_1 === friend.username || rel.user_2 === friend.username);
 
 	if (!relation || relation.id === -1) {

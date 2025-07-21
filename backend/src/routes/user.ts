@@ -318,15 +318,8 @@ async function userRoutes(app: FastifyInstance) {
 			if (!username)
 				throw new Error("missing username in the request body");
 
-			const user = await new Promise<UserData | null>((resolve, reject) => {
-				database.get(
-					'SELECT * FROM users WHERE username = ?',
-					[username],
-					(err: any, row: UserData | undefined) => {
-						err ? reject(err) : resolve(row || null);
-					}
-				);
-			});
+			const user = await app.userService.findById(username);
+			console.log("user :", user);
 			const isOnline = await app.userService.isOnline(user.id);
 
 			return reply.send({
