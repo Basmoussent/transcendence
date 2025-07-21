@@ -737,15 +737,7 @@ export function renderTournaments() {
 `;
 
   setTimeout(() => {
-    const homeBtn = document.getElementById('homeBtn');
-	
-		if (homeBtn) {
-			homeBtn.addEventListener('click', () => {
-				window.history.pushState({}, '', '/main');
-				window.dispatchEvent(new PopStateEvent('popstate'));
-			});
-		}
-    
+   
     console.log('Initializing Pong game...');
     const canvas = document.getElementById('gameCanvas') as HTMLCanvasElement;
     if (!canvas) {
@@ -1310,7 +1302,6 @@ document.addEventListener('input', function(event: Event) {
       const p1 = game.paddles[0];
       const p2 = game.paddles[1];
       const winner = p1.score > p2.score ? p1.name : p2.name;
-      const loser = p1.score < p2.score ? p1.name : p2.name;
       // Trouver le bon élément gagnant
       const match = document.querySelector('[data-match="' + matchId + '"]');
       if (match) {
@@ -1343,11 +1334,6 @@ document.addEventListener('input', function(event: Event) {
           if (scoreElement) {
             console.log("scoreElement found", scoreElement.textContent, Math.max(p1.score, p2.score));
             scoreElement.textContent = Math.min(p1.score, p2.score).toString();
-          }
-          
-          const loserNameElement = loserElement.querySelector('.player-name');
-          if (loserNameElement && loser) {
-            advanceWinner(matchId, loser);
           }
         }
         
@@ -1386,6 +1372,15 @@ export function initializeTournamentEvents() {
   console.log("test");
   generateQuarterFinals();
   updateLobbyDisplay();
+
+  const homeBtn = document.getElementById('homeBtn');
+
+  if (homeBtn) {
+    homeBtn.addEventListener('click', () => {
+      window.history.pushState({}, '', '/main');
+      window.dispatchEvent(new PopStateEvent('popstate'));
+    });
+  }
 
 }
 
