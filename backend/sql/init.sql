@@ -49,8 +49,8 @@ CREATE TABLE IF NOT EXISTS chats (
 
 CREATE TABLE IF NOT EXISTS friends (
 	id INTEGER PRIMARY KEY AUTOINCREMENT,
-	user_1 VARCHAR REFERENCES users(username),
-	user_2 VARCHAR REFERENCES users(username),
+	user_1 VARCHAR ,
+	user_2 VARCHAR,
 	user1_state VARCHAR(36) NOT NULL,
 	user2_state VARCHAR(36) NOT NULL
 );
