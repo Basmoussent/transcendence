@@ -32,7 +32,7 @@ export async function router() {
 	const app = document.getElementById('app');
 	if (!app) return;
 
-	const publicRoutes = ['/', '/lang','/login', '/create-account', '/forgot-password'];
+	const publicRoutes = ['/', '/login', '/create-account', '/forgot-password'];
 	const token = getAuthToken();
 
 	//TODO recuperer le username grace au token 
@@ -107,22 +107,6 @@ export async function router() {
 	const renderView: { [key: string]: (uuid?: string) => Promise<string> | string } = {
 		'/': () => renderHome(),
 		'/login': () => renderLogin(),
-		'/lang': async () => {
-			const lastPath = localStorage.getItem('lastPath');
-			if (lastPath && lastPath !== '/lang') {
-				console.log('log', lastPath);
-				setTimeout(() => {
-					window.history.pushState({}, '', lastPath);
-					router();
-					localStorage.removeItem('lastPath');
-				}, 100);
-				return ''; // Aucun rendu immédiat, car redirection
-			} else {
-				console.log('log', lastPath);
-				window.history.pushState({}, '', '/');
-				return renderHome();
-			}
-		},
 		'/create-account': () => renderCreateAccount(),
 		'/forgot-password': () => renderForgotPassword(),
 		'/main': () => renderMain(),
@@ -172,7 +156,6 @@ export async function router() {
 	// Initialiser les événements après le rendu pour les pages qui en ont besoin
 	const initEvents: { [key: string]: (uuid?: string) => void } = {
 		'/': initializeHomeEvents,
-		'/lang': initializeHomeEvents,
 		'/login': initializeLoginEvents,
 		'/create-account': initializeCreateAccountEvents,
 		'/forgot-password': initializeForgotPasswordEvents,

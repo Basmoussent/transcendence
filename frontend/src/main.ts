@@ -17,6 +17,9 @@ function init() {
 			router();
 		}
 	});
+	
+	// Appeler le router au chargement initial de la page
+	router();
 }
 
 init();

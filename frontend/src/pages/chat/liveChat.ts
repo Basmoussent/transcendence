@@ -321,7 +321,7 @@ export class Chat {
 						</div>
 						<div class="friend-info">
 							<div class="friend-name">${sanitizeHtml(friend.username)}</div>
-							<div class="friend-status">${t('chat.online')}</div>
+							<div class="friend-status">${t('chat.online' as any)}</div>
 						</div>
 						<div class="friend-actions">
 							<button class="action-btn chat-btn">
@@ -349,7 +349,7 @@ export class Chat {
 						</div>
 						<div class="friend-info">
 							<div class="friend-name">${sanitizeHtml(friend.username)}</div>
-							<div class="friend-status">${t('chat.requests')}</div>
+							<div class="friend-status">${t('chat.requests' as any)}</div>
 						</div>
 						<div class="friend-actions">
 							<button class="action-btn accept-btn">
@@ -406,7 +406,7 @@ export class Chat {
 		</div>
 		<div class="chat-header-info">
 			<h3>${sanitizeHtml(user.username)}</h3>
-			<p>${t('chat.online')}</p>
+			<p>${t('chat.online' as any)}</p>
 		</div>
 		`;
 

@@ -5,7 +5,7 @@
     <link rel="icon" type="image/svg+xml" href="/logo.webp" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Transgender</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
       .language-selector {
         position: fixed;
@@ -134,7 +134,8 @@
           
           sessionStorage.setItem('lang', lang);
           sessionStorage.setItem('lastPath', window.location.pathname);
-          window.history.pushState({}, '', '/lang');
+          const lastPath = sessionStorage.getItem('lastPath') || window.location.pathname;
+          window.history.pushState({}, '', lastPath);
           
           const buttons = document.querySelectorAll('.language-btn');
           buttons.forEach(btn => btn.classList.remove('active'));
@@ -157,11 +158,15 @@
       
       async function getPreferedLanguage() {
         try {
+          const authToken = window.getAuthToken();
+          if (!authToken) {
+            return sessionStorage.getItem('lang') || 'en';
+          }
           const response = await fetch('/api/me', {
             method: 'GET',
             headers: {
               'Content-Type': 'application/json',
-              'x-access-token': window.getAuthToken()
+              'x-access-token': authToken
             }
           });
           if (!response) {
@@ -177,34 +182,96 @@
       }
 
       async function ensureSubdomain() {
-        const lang = sessionStorage.getItem('lang') || 'en';
-        const hostname = window.location.hostname;
-        const currentLang = hostname.split('.')[0];
-        
-        // Ne rediriger que si on n'est pas déjà sur le bon sous-domaine
-        if (currentLang !== lang) {
-          const currentPath = window.location.pathname;
-          window.history.pushState({}, '', currentPath);
-          window.dispatchEvent(new CustomEvent('languageChanged', { detail: { language: lang } }));
+        try {
+          // Récupérer la langue préférée de l'utilisateur
+          const preferredLang = await getPreferedLanguage();
+          const currentLang = sessionStorage.getItem('lang') || 'en';
+          
+          // Si la langue préférée est différente de la langue actuelle, l'appliquer
+          if (currentLang !== preferredLang) {
+            console.log(`Changement de langue automatique: ${currentLang} -> ${preferredLang}`);
+            sessionStorage.setItem('lang', preferredLang);
+            
+            // Mettre à jour le bouton actif
+            const buttons = document.querySelectorAll('.language-btn');
+            buttons.forEach(btn => btn.classList.remove('active'));
+            const activeBtn = document.querySelector(`.${preferredLang}-flag`);
+            if (activeBtn) activeBtn.classList.add('active');
+            
+            // Ne pas déclencher de navigation automatique au chargement initial
+            // La navigation sera déclenchée seulement si on est déjà sur une page
+            if (document.readyState === 'complete') {
+              const currentPath = window.location.pathname;
+              window.history.pushState({}, '', currentPath);
+              window.dispatchEvent(new PopStateEvent('popstate'));
+            }
+          }
+          
+          return preferredLang;
+        } catch (error) {
+          console.error('Erreur dans ensureSubdomain:', error);
+          return sessionStorage.getItem('lang') || 'en';
         }
       }
 
       document.addEventListener('DOMContentLoaded', async () => {
-        const hostname = window.location.hostname;
-        const lang = hostname.split('.')[0];
+        // Version simplifiée pour éviter les blocages
         const buttons = document.querySelectorAll('.language-btn');
+        const currentLang = sessionStorage.getItem('lang') || 'en';
         
-        await ensureSubdomain();
-        
+        // Mettre à jour le bouton actif avec la langue actuelle
         buttons.forEach(btn => {
-          if (btn.classList.contains(`${lang}-flag`)) {
+          if (btn.classList.contains(`${currentLang}-flag`)) {
             btn.classList.add('active');
           }
         });
         
         // Appel initial de initAlive si déjà loggé
         window.initAlive && window.initAlive();
-          
+        
+        // Appliquer la langue préférée en arrière-plan (sans bloquer le chargement)
+        setTimeout(async () => {
+          try {
+            const preferredLang = await getPreferedLanguage();
+            if (currentLang !== preferredLang) {
+              console.log(`Changement de langue automatique: ${currentLang} -> ${preferredLang}`);
+              sessionStorage.setItem('lang', preferredLang);
+              
+              // Mettre à jour le bouton actif
+              buttons.forEach(btn => btn.classList.remove('active'));
+              const activeBtn = document.querySelector(`.${preferredLang}-flag`);
+              if (activeBtn) activeBtn.classList.add('active');
+              
+              // Recharger la page avec la nouvelle langue
+              window.history.pushState({}, '', window.location.pathname);
+              window.dispatchEvent(new PopStateEvent('popstate'));
+            }
+          } catch (error) {
+            console.error('Erreur lors de la récupération de la langue préférée:', error);
+          }
+        }, 100);
+      });
+      
+      // S'assurer que le router se charge même si DOMContentLoaded échoue
+      window.addEventListener('load', () => {
+        // Vérifier que l'app a bien du contenu
+        const app = document.getElementById('app');
+        if (app && !app.innerHTML.trim()) {
+          console.log('App vide détectée, rechargement du router...');
+          // Déclencher le router manuellement
+          window.dispatchEvent(new PopStateEvent('popstate'));
+        }
+      });
+      
+      // S'assurer que le router se charge même si DOMContentLoaded échoue
+      window.addEventListener('load', () => {
+        // Vérifier que l'app a bien du contenu
+        const app = document.getElementById('app');
+        if (app && !app.innerHTML.trim()) {
+          console.log('App vide détectée, rechargement du router...');
+          // Déclencher le router manuellement
+          window.dispatchEvent(new PopStateEvent('popstate'));
+        }
       });
     </script>
   </body>
