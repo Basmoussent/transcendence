@@ -22,6 +22,7 @@ import { initAlive } from './auth';
 import { renderProfil, initializeProfilEvents } from '../pages/social/renderProfil';
 import { render2FA, initialize2FAEvents } from '../pages/auth/activate-2fa';
 import { render2FALogin } from '../pages/auth/2fa-login';
+import { cleanEvents } from './eventManager';
 
 export async function router() {
 
@@ -182,6 +183,8 @@ export async function router() {
 	setTimeout(() => {
 		const init = initEvents[path];
 		const initUuid = initEventsUuid[path];
+		
+		cleanEvents();
 
 		var el = document.getElementById('app'),
 		elClone = el!.cloneNode(true);
