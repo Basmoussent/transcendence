@@ -8,3 +8,4 @@ export const PADDLE2_COLOR = '#4a90e2'
 export const PADDLE3_COLOR = '#A4AF69'
 export const PADDLE4_COLOR = '#F991CC'
 export const BALL_BASE_SPEED = 8
+export const MULTI_BALL_BASE_SPEED = 6

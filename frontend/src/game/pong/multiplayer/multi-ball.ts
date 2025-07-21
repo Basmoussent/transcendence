@@ -1,4 +1,4 @@
-import { BALL_BASE_SPEED } from "../const";
+import { MULTI_BALL_BASE_SPEED } from "../const";
 import { Paddle } from "./multi-paddle";
 import { PaddleAI } from "./multi-paddle-ai";
 
@@ -13,7 +13,7 @@ export class Ball {
     this.radius = 10;
     this.x = canvasWidth / 2;
     this.y = canvasHeight / 2;
-    this.speedX = BALL_BASE_SPEED;
+    this.speedX = MULTI_BALL_BASE_SPEED;
     this.speedY = 0;
   }
 
@@ -69,32 +69,32 @@ export class Ball {
     {
         switch (lastWinner) {
             case 0: // gauche
-                this.speedX = -BALL_BASE_SPEED;
+                this.speedX = -MULTI_BALL_BASE_SPEED;
                 this.speedY = 0;
                 break;
             case 1: // droite
-                this.speedX = BALL_BASE_SPEED;
+                this.speedX = MULTI_BALL_BASE_SPEED;
                 this.speedY = 0;
                 break;
             case 2: // haut
                 this.speedX = 0;
-                this.speedY = -BALL_BASE_SPEED;
+                this.speedY = -MULTI_BALL_BASE_SPEED;
                 break;
             case 3: // bas
                 this.speedX = 0;
-                this.speedY = BALL_BASE_SPEED;
+                this.speedY = MULTI_BALL_BASE_SPEED;
                 break;
             default:
-                this.speedX = BALL_BASE_SPEED;
+                this.speedX = MULTI_BALL_BASE_SPEED;
                 this.speedY = 0;
         }
     }
     else
     {
         if (this.speedX > 0)
-            this.speedX = BALL_BASE_SPEED;
+            this.speedX = MULTI_BALL_BASE_SPEED;
         else
-            this.speedX = -BALL_BASE_SPEED;
+            this.speedX = -MULTI_BALL_BASE_SPEED;
         this.speedY = 0;
     }
   }

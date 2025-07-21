@@ -61,8 +61,8 @@ function initializeChangePasswordEvents() {
 
 	// Gestion du bouton retour au profil
 	if (backToProfileBtn) {
-		addEvent(backToProfileBtn, 'click', () => {
-			window.history.pushState({}, '', '/profil');
+		backToProfileBtn.addEventListener('click', () => {
+			window.history.pushState({}, '', '/me');
 			window.dispatchEvent(new PopStateEvent('popstate'));
 		});
 	}
@@ -98,7 +98,7 @@ function initializeChangePasswordEvents() {
 				alert(`❌ Erreur: ${result.error || 'Erreur inconnue'}`);
 			else {
 				alert('✅ Mot de passe modifié avec succès');
-				window.history.pushState({}, '', '/profil');
+				window.history.pushState({}, '', '/me');
 				window.dispatchEvent(new PopStateEvent('popstate'));
 			}
 		} catch (err) {

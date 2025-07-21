@@ -8,15 +8,15 @@ export function render2FALogin() {
     <div class="tfa-wrapper">
       <div class="tfa-container">
         <div class="tfa-header">
-          <h1>${t('twoFactorAuth.title')}</h1>
+          <h1>${t('auth.twoFactorAuth.title')}</h1>
         </div>
           
           <div class="verification-section">
-            <label for="verificationCode">Entrez le code de vérification :</label>
+            <label for="verificationCode">${t('auth.twoFactorAuth.verificationCode')}</label>
             <input type="text" id="verificationCode" maxlength="6">
             <button class="activate-btn" id="activateBtn">
               <i class="fa-solid fa-lock"></i>
-              Vérifier le code
+              ${t('auth.twoFactorAuth.verify')}
             </button>
           </div>
         </div>

@@ -36,36 +36,6 @@ https://jwt.io/introduction
         // tej name des classes paddle si inutile
         // trouver pq dans la branche de talan les titres sont pas gras
 
-    // page match history
-    // page dashboard et stats
-
-
-
-    // 2FA
-        // user peut l'activer dans sa page de profile
-        // pour l'activer:
-            // redirection sur page avec un qr code a scanner + code a entrer
-                // verif que le code est bon
-                    // s'il est bon c'est OK et on met le bool de l'user a true + on cree sa secret key
-                    // sinon erreur
-            // prochaine fois qu'il va vouloir se co
-                // il entre son username et password comme d'hab
-                    // si c'est bon redirection vers page qr code + code
-                        // si c'est bon acces au site
-                        // sinon il est bloque et a acces que aux pagesde login et 2fa
-        // pour desactiver:
-            // bouton sur page de profile
-
-        // TOTP: time based one time password
-            // ca genere un truc valide que pendant 30sec
-        // comment differencier JWT temporaire du final
-            // si la 2fa est activee faut pas que le JWT du user le laisse aller ailleurs que sur la page qr code
-        // generer une cle secrete liee au user
-        // generer qr code a scanner
-        // comparer code a ce que l'user a entre
-
-
-
     //JWT
         // 3 parties:
             // Header: 2 parties
@@ -76,11 +46,4 @@ https://jwt.io/introduction
             // Signature
 
 
-on peut aller sur la page /tfa pour deux raison:
-    - activer la 2fa
-        // on entre le code, two_fact_auth devient true et c'est tt
-    - se co a son compte
-        // on entre le code, on obtient son JWT definitif
-
-
-voir si otplib ou speakeasy
+bouton home a l page tournois

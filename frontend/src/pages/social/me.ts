@@ -1,6 +1,6 @@
 import { getAuthToken, removeAuthToken } from '../../utils/auth';
 import { sanitizeHtml } from '../../utils/sanitizer';
-import { t, TranslationKeys } from '../../utils/translations';
+import { t } from '../../utils/translations';
 import { userInfo, update2FAState } from './utils';
 import { getUserGameHistory } from '../../game/gameUtils';
 
@@ -72,9 +72,9 @@ export async function renderMe() {
 	};
 
 	const getGameResult = (game: any, username: string) => {
-		if (!game.winner) return 'En cours';
-		if (game.winner === username) return 'Victoire';
-		return 'Défaite';
+		if (!game.winner) return `${t('game.matchInProgress')}`;
+		if (game.winner === username) return `${t('social.victory')}`;
+		return `${t('social.defeat')}`;
 	};
 
 	const getGameTypeLabel = (gameType: string) => {
@@ -113,7 +113,7 @@ export async function renderMe() {
 		: '<div class="no-games">Aucune partie récente</div>';
 	
 
-	const tfaButtonText = userData.twoFactorEnabled ? 'Désactiver 2FA' : 'Activer 2FA';
+	const tfaButtonText = userData.twoFactorEnabled ? `${t('social.deactivate2FA')}` : `${t('social.activate2FA')}`;
 	const tfaButtonIcon = userData.twoFactorEnabled ? 'fa-solid fa-lock-open' : 'fa-solid fa-lock';
 
 	return `
@@ -123,7 +123,7 @@ export async function renderMe() {
 					<div class="profile-header">
 						<button class="home-button" id="homeBtn">
 								<i class="fas fa-home"></i>
-								Accueil
+								${t('social.home')}
 						</button>
 						<div class="profile-avatar">
 							<img src="${avatarUrl}" alt="Profile Avatar" class="avatar-image" onerror="this.src='../../public/avatar.png'">
@@ -136,12 +136,12 @@ export async function renderMe() {
 							<h1 class="username">${userData.username}</h1>
 							<p class="email">${userData.email}</p>
 							<div class="status online">
-								<i class="fas fa-circle"></i> En ligne
+								<i class="fas fa-circle"></i> ${t('friends.online')}
 							</div>
 						</div>
 						<button class="action-button logout">
 							<i class="fas fa-sign-out-alt"></i>
-							Déconnexion
+							${t('profile.logout')}
 						</button>
 					</div>
 
@@ -150,21 +150,21 @@ export async function renderMe() {
 							<i class="fas fa-trophy"></i>
 							<div class="stat-info">
 								<span class="stat-value">${userData.wins}</span>
-								<span class="stat-label">Victoires</span>
+								<span class="stat-label">${t('profile.stats.wins')}</span>
 							</div>
 						</div>
 						<div class="stat-card">
 							<i class="fas fa-gamepad"></i>
 							<div class="stat-info">
 								<span class="stat-value">${userData.games}</span>
-								<span class="stat-label">Parties</span>
+								<span class="stat-label">${t('profile.stats.games')}</span>
 							</div>
 						</div>
 						<div class="stat-card">
 							<i class="fas fa-star"></i>
 							<div class="stat-info">
 								<span class="stat-value">${userData.rating}</span>
-								<span class="stat-label">Classement</span>
+								<span class="stat-label">${t('profile.stats.rating')}</span>
 							</div>
 						</div>
 					</div>

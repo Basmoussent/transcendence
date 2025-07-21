@@ -30,7 +30,6 @@ export class Ball {
       this.speedX += 0.25;
     else if (this.speedX < 0 && this.speedX > -12)
       this.speedX -= 0.25;
-    console.log('ball speed = ', this.speedX)
   }
 
   adjustBallDir(paddle: Paddle | PaddleAI): void {

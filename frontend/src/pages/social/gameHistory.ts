@@ -11,9 +11,9 @@ export async function renderGameHistory(username: string) {
 	};
 
 	const getGameResult = (game: any, username: string) => {
-		if (!game.winner) return 'En cours';
-		if (game.winner === username) return 'Victoire';
-		return 'Défaite';
+		if (!game.winner) return `${t('game.matchInProgress')}`;
+		if (game.winner === username) return `${t('social.victory')}`;
+		return `${t('social.defeat')}`;
 	};
 
 	const getGameTypeLabel = (gameType: string) => {
