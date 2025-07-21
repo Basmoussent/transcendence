@@ -17,7 +17,6 @@ import { getAuthToken } from './auth';
 import { clearTranslationCache } from './translations';
 
 import { renderMultiPong, initializeMultiPongEvents } from '../pages/pong/multiplayer-pong';
-import { renderPong, initializePongEvents } from '../pages/pong/pong';
 import { initAlive } from './auth';
 import { renderProfil, initializeProfilEvents } from '../pages/social/renderProfil';
 import { render2FA, initialize2FAEvents } from '../pages/auth/activate-2fa';
@@ -40,31 +39,50 @@ export async function router() {
 
 	let uuid: string = '';
 	
-	if (path.startsWith('/multipong') || path.startsWith('/pong') || path.startsWith('/block') || path.startsWith('/block1v1') ||
-			path.startsWith('/room') || path.startsWith('/profil') || path.startsWith('/multipong')
-		|| path.startsWith('/pong') || path.startsWith('/block') || path.startsWith('/block1v1') || path.startsWith('/room') || path.startsWith('/profil')) {
+	if (path.startsWith('/multipong') || path.startsWith('/block') || path.startsWith('/block1v1') ||
+		path.startsWith('/room') || path.startsWith('/profil')) {
 
 		const it = path.indexOf('/', 1);
 
-		if (!it) { // ya pas de deuxieme slash alors qu'il faut une suite donc erreur
-
-		}
 
 		uuid = path.substring(it + 1);
 		path = path.substring(0, it);
 
 		if (!uuid) {
 			console.error("pblm ya pas le uuid ou bien le username pour une page qui en a besoin")
+			window.history.pushState({}, '', '/main');
+			window.dispatchEvent(new PopStateEvent('popstate'));
 			return;
 		}
 
-		// si /pong faut passer ici et voir 
+		if (path.startsWith('/profil')) {
 
-		// { '/multipong/','/pong/', '/block/', '/block1v1/', '/room/' }
-		// verifier que la game existe dans la db et qu'elle n'a pas de starting time encore
+			const flag = await userExists(uuid, token);
 
-		// '/profil/' verifier que le user existe dans la db et que celui qui appel cette route n'est pas bloque par le user
-		//  si le username renseigne est celui trouvé via le token changer pour le path pour /me
+			if (!flag) {
+				window.history.pushState({}, '', '/main');
+				window.dispatchEvent(new PopStateEvent('popstate'));
+				return; 
+			}
+
+			const me = await notMe(uuid, token);
+
+			if (me) {
+				window.history.pushState({}, '', '/me');
+				window.dispatchEvent(new PopStateEvent('popstate'));
+				return; 
+			}
+		}
+		else {
+
+			const flag = await gameExists(uuid, token);
+
+			if (!flag) {
+				window.history.pushState({}, '', '/main');
+				window.dispatchEvent(new PopStateEvent('popstate'));
+				return; 
+			}
+		}
 
 	}
 
@@ -136,7 +154,6 @@ export async function router() {
 		'/2fa': () => render2FA(),
 		'/block': (uuid?: string) => renderBlock(uuid!),
 		'/block1v1': (uuid?: string) => renderBlock1v1(uuid!),
-		'/pong': (uuid?: string) => renderPong(uuid!),
 		'/multipong': (uuid?: string) => renderMultiPong(uuid!),
 		'/tournament': () => renderTournaments(),
 	};
@@ -192,7 +209,6 @@ export async function router() {
 		'/room': initializeRoomEvents,
 		'/block': initializeBlockEvents,
 		'/block1v1': initializeBlock1v1Events,
-		'/pong': initializePongEvents,
 		'/multipong': initializeMultiPongEvents,
 	}
 
@@ -217,3 +233,83 @@ export async function router() {
 
 
 
+async function userExists(username: string, token: any) {
+
+	try {
+		const response = await fetch(`/api/user/?username=${username}`, {
+			method: 'GET',
+			headers: {
+				'Content-Type': 'application/json',
+				'x-access-token': token }
+		})
+
+		if (response.ok) {
+			const result = await response.json();
+
+			if (result.data === null)
+				return false
+			return true
+		}
+	}
+	catch (err) {
+		console.error("atttention a l'erreur dans userExists");
+	}
+
+}
+
+async function notMe(username: string, token: any) {
+
+	try {
+		const response = await fetch(`/api/me`, {
+			method: 'GET',
+			headers: {
+				'Content-Type': 'application/json',
+				'x-access-token': token }
+		})
+
+		if (response.ok) {
+			const result = await response.json();
+
+			console.log(JSON.stringify(result, null, 8))
+
+
+
+			console.log("oazndoinazodnao ", result.user.username)
+			
+			if (result.user.username == username) {
+				
+				console.log("debugggggg   ", result.user.username)
+				return true
+			}
+			return false
+		}
+	}
+	catch (err) {
+		console.error("atttention a l'erreur dans userExists");
+	}
+
+}
+
+async function gameExists(uuid: string, token: any) {
+
+	try {
+		const response = await fetch(`/api/games/room/?uuid=${uuid}`, {
+			method: 'GET',
+			headers: {
+				'Content-Type': 'application/json',
+				'x-access-token': token }
+		})
+
+		if (response.ok) {
+			const result = await response.json();
+
+			if (result.game === null)
+				return false
+			return true
+		}
+	}
+	catch (err) {
+		console.error("atttention a l'erreur dans userExists");
+	}
+
+}

@@ -28,6 +28,8 @@ export async function initializeProfilEvents(uuid:string) {
 
 		const data = { me, user, stats, friends, relation };
 
+		console.log(JSON.stringify(data, null, 8))
+
 		await new Promise(resolve => requestAnimationFrame(resolve));
  
 		new profil(data);
