@@ -299,6 +299,20 @@ async function gameRoutes(app: FastifyInstance) {
 
 	})
 
+	app.get('/room/existing/:uuid', async function (request: FastifyRequest, reply: FastifyReply) {
+		const { uuid } = request.params as { uuid: string };
+		const room = await app.roomService.existingRoom(uuid);
+		if (room) {
+		return reply.send({
+				message: 'room existante',
+				room: room,
+			});
+		}
+		else {
+			return reply.status(404).send({ error: 'room non trouvée' });
+		}
+	});
+
 	app.get('/user/:username/history', async function (request: FastifyRequest, reply: FastifyReply) {
 		try {
 			const database = db.getDatabase();

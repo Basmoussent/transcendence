@@ -63,5 +63,21 @@ export class RoomService {
 			console.error("Erreur dans updateGame:", err);
 		}
 	}
+
+	async existingRoom(uuid: string) {
+		try {
+			const sql = `SELECT * FROM games WHERE uuid = ?`;
+			const result = await this.db.get(sql, [uuid]);
+			if (result) {
+				return result;
+			}
+			else {
+				return null;
+			}
+		}
+		catch (err: any) {
+			console.error("Erreur dans existingRoom:", err);
+		}
+	}
 }
 

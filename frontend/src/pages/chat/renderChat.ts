@@ -12,7 +12,8 @@ export function renderChat() {
 export function initializeChatEvents() {
 	console.log('Initializing chat page events');
 	try {
-		new Chat();
+		const chat = new Chat();
+		(window as any).chatInstance = chat; // Expose l'instance pour la console
 	} catch (err: any) {
 		console.log(`erreur initializeChatEvents ${err}`);
 	}
@@ -105,6 +106,16 @@ const getTemplate = () => {
 
 		<!-- Zone de saisie -->
 		<div class="chat-input-container sticky bottom-0 bg-transparent mt-2">
+			<!-- Bouton d'invitation à un jeu -->
+			<div class="invite-game-dropdown" style="position: relative;">
+				<button class="invite-game-btn" id="inviteGameBtn" title="Inviter à un jeu">
+					<i class="fas fa-gamepad"></i>
+				</button>
+				<div class="invite-game-menu" id="inviteGameMenu" style="display: none; position: absolute; left: 0; bottom: 110%; background: rgba(30,30,30,0.95); border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.2); min-width: 120px; z-index: 10;">
+					<button class="invite-game-option" data-game="pong" style="display: block; width: 100%; padding: 10px; background: none; border: none; color: white; text-align: left; cursor: pointer;">Pong</button>
+					<button class="invite-game-option" data-game="block" style="display: block; width: 100%; padding: 10px; background: none; border: none; color: white; text-align: left; cursor: pointer;">Block</button>
+				</div>
+			</div>
 			<input type="text" class="chat-input" id="chatInput" placeholder="${t('chat.typeMessage')}" maxlength="200">
 			<button class="send-btn" id="sendBtn">
 			<i class="fas fa-paper-plane"></i>
@@ -657,6 +668,28 @@ const getTemplate = () => {
         .send-btn:hover {
             transform: translateY(-2px);
             box-shadow: 0 8px 20px rgba(16, 185, 129, 0.3);
+        }
+        .invite-game-btn {
+            background: linear-gradient(135deg, #3B82F6 0%, #1D4ED8 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            padding: 12px 15px;
+            margin-right: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1.1em;
+            display: flex;
+            align-items: center;
+        }
+        .invite-game-btn:hover {
+            background: linear-gradient(135deg, #6366F1 0%, #3B82F6 100%);
+        }
+        .invite-game-menu {
+            animation: fadeIn 0.2s;
+        }
+        .invite-game-option:hover {
+            background: rgba(59, 130, 246, 0.2);
         }
     </style>
 	`;
