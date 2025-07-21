@@ -136,28 +136,26 @@ export async function logEndGameHistory(uuid: string, winner:string) {
 			return '';
 		}
 
-		const response = await fetch('/api/games', {
+		const response = await fetch(`/api/games/finish/${uuid}`, {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',
 				'x-access-token': token,
 			},
 			body: JSON.stringify({
-				uuid: uuid,
 				winner: winner,
-				end_time: Date.now().toString()
 			})
 		});
 	
 		if (response.ok) {
 			const result = await response.json();
-			console.log("endgame bien log", result);
+			console.log("endgame bien log dans l'history", result);
 		}
 		else 
-			console.error("Erreur lors de log une game");
+			console.error("Erreur lors de log une game pour history");
 	}
 	catch (error) {
-		console.error("Error saving a game: ", error); }
+		console.error("Error saving a game dans l'history: ", error); }
 }
 
 let userData = {
