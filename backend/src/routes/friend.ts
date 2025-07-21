@@ -72,6 +72,46 @@ async function friendRoutes(app: FastifyInstance) {
 		}
 	})
 
+	app.put('/:id', async function (request: FastifyRequest, reply: FastifyReply) {
+
+		try {
+			const { id } = request.params as { id?: number };
+
+			if (!id)
+				throw new Error("missing id for updating a relation");
+
+			await app.friendService.acceptRelation(id);
+
+			return reply.send({ message: `relation ${id} updated` });
+		}
+		catch (err: any) {
+			return reply.status(500).send({
+				error: 'erreur PUT /friend/:id',
+				details: err.message });
+		}
+
+	})
+
+	app.delete('/:id', async function (request: FastifyRequest, reply: FastifyReply) {
+
+		try {
+			const { id } = request.params as { id?: number };
+
+			if (!id)
+				throw new Error("missing id for deleting a relation");
+
+			await app.friendService.denyRelation(id);
+
+			return reply.send({ message: `relation ${id} deleted` });
+		}
+		catch (err: any) {
+			return reply.status(500).send({
+				error: 'erreur DELETE /friend/:id',
+				details: err.message });
+		}
+
+	})
+
 	app.post('/relation', async function (request: FastifyRequest, reply: FastifyReply) {
 
 		try {
