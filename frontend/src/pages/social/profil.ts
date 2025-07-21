@@ -131,15 +131,19 @@ export class profil {
 
 		this.relation = await loadRelation(this.me.username, this.user.username)
 
-		const myState = this.relation.user_1 == this.me.username ? this.relation.user1_state : this.relation.user2_state;
-		const userState = this.relation.user_1 == this.user.username ? this.relation.user1_state : this.relation.user2_state;
+		if (this.relation) {
+			const myState = this.relation.user_1 == this.me.username ? this.relation.user1_state : this.relation.user2_state;
+			const userState = this.relation.user_1 == this.user.username ? this.relation.user1_state : this.relation.user2_state;
+	
+			// if myState == waiting --> cancel
+			// if myState == requested --> accept friend request
+			// if myState == normal --> remove friend
+	
+			// if userState == normal --> bloquer
+			// if userState == blocked --> débloquer
 
-		// if myState == waiting --> cancel
-		// if myState == requested --> accept friend request
-		// if myState == normal --> remove friend
+		}
 
-		// if userState == normal --> bloquer
-		// if userState == blocked --> débloquer
 
 		this.username.textContent = this.user.username || 'Utilisateur inconnu';
 		
