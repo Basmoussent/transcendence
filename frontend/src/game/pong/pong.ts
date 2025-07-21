@@ -223,13 +223,13 @@ export class Pong {
 		this.paddles[1].displayScore(this.ctx, (this.width / 4) * 3, this.height / 2);
 	}
 
-	private displayResult(): void {
-		this.ctx.globalAlpha = 0.2;
-		this.ctx.fillStyle = 'white';
-		this.ctx.font = '48px gaming'; // changer police
-
-		this.ctx.globalAlpha = 1;
-	}
+	private displayEndMsg(): void {
+        this.ctx.globalAlpha = 0.2;
+        this.ctx.fillStyle = 'white';
+        this.ctx.font = '48px gaming'; // changer police
+        this.ctx.fillText("GAME OVER", this.width / 2 - 150, this.height / 2 - 30);
+        this.ctx.globalAlpha = 1;
+    }
 
 	private startPoint(): void {
 		const paddle = this.paddles[this.lastPlayerColl];
@@ -333,7 +333,7 @@ export class Pong {
 		}
 		else {
 			if (this.end)
-				this.displayResult();
+				this.displayEndMsg();
 			else
 				this.displayStartMsg();
 		}
