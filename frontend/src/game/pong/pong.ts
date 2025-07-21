@@ -34,11 +34,13 @@ export class Pong {
 	private paddles: [Paddle, Paddle | PaddleAI];
 	private ball: Ball;
 	private keys: { [key: string]: boolean };
+	private winner: string;
+	private start_time: string;
 
 	private data: any;
 
 	// constructor(canvas: HTMLCanvasElement, player1ID: number, player2ID: number) {
-	constructor(canvas: HTMLCanvasElement, uuid: string) {
+	constructor(canvas: HTMLCanvasElement) {
 		this.canvas = canvas;
 		const context = canvas.getContext('2d');
 		if (!context) {
@@ -51,6 +53,7 @@ export class Pong {
 		this.start = false;
 		this.end = false;
 		this.lastPlayerColl = -1;
+		this.start_time = Date.now().toString();
 
 		// this.paddles = this.initPlayers();
 		this.paddles = [
@@ -60,11 +63,12 @@ export class Pong {
 
 		this.ball = new Ball(this.height, this.width);
 		this.keys = {};
+		this.winner = "";
 
 		// this.retrieveGameInfo(uuid);
 	}
 
-	public init(): { player1: player1, player2: player1 } {
+	public init(p1: string, p2: string): { player1: player1, player2: player1 } {
 		console.log('Initializing paddle game...');
 		this.setupCanvas();
 		this.setupEventListeners();
@@ -74,9 +78,12 @@ export class Pong {
 		window.addEventListener('resize', () => {
 			this.setupCanvas();
 		});
+		
+		this.paddles[0].name = p1;
+		this.paddles[1].name = p2;
+		const player1 = {name: p1, score: this.paddles[0].score} as player1;
+		const player2 = {name: p2, score: this.paddles[1].score} as player1;
 
-		const player1 = {name: this.paddles[0].name, score: this.paddles[0].score} as player1;
-		const player2 = {name: this.paddles[1].name, score: this.paddles[1].score} as player1;
 		return {player1, player2};
 	};
 
@@ -178,6 +185,10 @@ export class Pong {
 				this.update();
 			}
 			this.render();
+			if (this.end) {
+				this.logTournamentGame();
+				return ;
+			}
 			requestAnimationFrame(gameLoop);
 		};
 		gameLoop();
@@ -229,8 +240,9 @@ export class Pong {
 		for (let i = 0; i < 4; i++) {
 			const paddle = this.paddles[i];
 			if (paddle && paddle?.winsGame() === true) {
-			this.end = true;
-			return;
+				this.end = true;
+				this.winner = paddle.name;
+				return;
 			}
 		}
 
@@ -326,4 +338,42 @@ export class Pong {
 				this.displayStartMsg();
 		}
 	}
+
+	private async logTournamentGame() {
+
+		try {
+			const token = getAuthToken();
+			if (!token) {
+				alert('❌ Token d\'authentification manquant');
+				window.history.pushState({}, '', '/login');
+				window.dispatchEvent(new PopStateEvent('popstate'));
+				return -1;
+			}
+
+			const response = await fetch(`/api/games/tournament`, {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+					'x-access-token': token,
+				},
+				body: JSON.stringify({
+					player1: this.paddles[0].name,
+					player2: this.paddles[1].name,
+					winner: this.winner,
+					start_time: this.start_time,
+				})
+			});
+		
+			if (response.ok) {
+				const result = await response.json();
+				console.log("la game de tournoi est log", result);
+			}
+			else 
+				console.error("erreur pour log la game du tounoir");
+		}
+		catch (err) {
+			console.error("pblm dans pong.ts pour log la game")
+		}
+	}
 }
+
