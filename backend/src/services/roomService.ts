@@ -7,7 +7,7 @@ interface User {
 interface RoomData {
 	id: string;
 	name: string;
-	gameType: 'pong' | 'block';
+	gameType: string;
 	maxPlayers: number;
 	users: User[];
 	host: string;
@@ -23,6 +23,8 @@ export class RoomService {
 	}
 
 
+
+	// update l'interface pour prendre la meme que dans ws_room avec une map au lieu d'un array
 	async updateGame(data: RoomData) {
 		try {
 			const fieldsToUpdate: string[] = [];

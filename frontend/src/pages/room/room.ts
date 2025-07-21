@@ -30,6 +30,7 @@ export class Room {
 	private startBtn: HTMLButtonElement;
 	private leaveBtn: HTMLButtonElement;
 	private sendBtn: HTMLButtonElement;
+	private inviteBtn: HTMLButtonElement;
 	private increaseAiBtn: HTMLButtonElement;
 	private decreaseAiBtn: HTMLButtonElement;
 
@@ -60,6 +61,7 @@ export class Room {
 		this.sendBtn = this.getElement('sendBtn') as HTMLButtonElement;
 		this.increaseAiBtn = this.getElement('increaseAI') as HTMLButtonElement;
 		this.decreaseAiBtn = this.getElement('decreaseAI') as HTMLButtonElement;
+		this.inviteBtn = this.getElement('inviteBtn') as HTMLButtonElement;
 		this.chatInput = this.getElement('chatInput') as HTMLInputElement;
 		this.playersContainer = this.getElement('playersContainer');
 		this.roomSettings = this.getElement('roomSettings');
@@ -119,6 +121,7 @@ export class Room {
 		addEvent(this.startBtn, 'click', () => this.startGame());
 		addEvent(this.leaveBtn, 'click', () => this.leaveRoom());
 		addEvent(this.homeBtn, 'click', () => this.goHome());
+		addEvent(this.inviteBtn, 'click', () => this.invite());
 		addEvent(this.increaseAiBtn, 'click', () => this.increase());
 		addEvent(this.decreaseAiBtn, 'click', () => this.decrease());
 		addEvent(this.gameTypeSelect, 'change', () => this.gameTypeChanged());
@@ -184,8 +187,9 @@ export class Room {
 	
 	private increase() {
 
-		if (this.roomData?.users?.length && (this.roomData?.maxPlayers === this.roomData?.users?.length + this.roomData?.ai))
+		if (this.roomData?.maxPlayers == (this.roomData!.users.length + this.roomData!.ai))
 			return;
+
 		this.ws.send(JSON.stringify({
 			type: 'increase',
 			token: this.token,
@@ -194,8 +198,9 @@ export class Room {
 
 	private decrease() {
 
-		if (this.roomData?.users?.length && this.roomData?.users?.length === 0)
+		if (this.roomData!.ai <= 0)
 			return;
+
 		this.ws.send(JSON.stringify({
 			type: 'decrease',
 			token: this.token,
@@ -235,6 +240,11 @@ export class Room {
 		this.ws.close();
 		window.history.pushState({}, '', '/main');
 		window.dispatchEvent(new Event('popstate'));
+	}
+
+	private invite() {
+		console.log('doanzdoinazoidnao')
+		// 
 	}
 
 	private updateUI() {
@@ -383,6 +393,7 @@ export class Room {
 				message: 'je launch une game',
 				token: this.token
 			}));
+
 			// faire le new block ou pong avec info de la game dans le constructeur
 			if (this.roomData?.host === this.username) {
 				if (gameType === 'pong' && this.roomData.users.length > 2)

@@ -32,8 +32,8 @@ export function renderLogin(): string {
 					<button type="submit" class="login-btn">${t('auth.login.submit')}</button>
 				</form>
 				<div class="login-options">
-					<button id="forgot-password" class="link-button">${t('auth.login.forgotPassword')}</button>
-					<button id="create-account" class="link-button">
+					<!-- <button id="forgot-password" class="link-button">${t('auth.login.forgotPassword')}</button> -->
+					<button id="create-account" class="create-account-btn">
 						${t('auth.login.createAccount')}
 					</button>
 				</div>
@@ -88,6 +88,26 @@ export function renderLogin(): string {
 
 		.link-button:hover {
 			color: #357abd;
+		}
+
+		.create-account-btn {
+			display: block;
+			margin: 24px auto 0 auto;
+			padding: 12px 32px;
+			background: linear-gradient(135deg, #3B82F6 0%, #10B981 100%);
+			color: white;
+			border: none;
+			border-radius: 8px;
+			font-size: 1.1em;
+			font-weight: bold;
+			box-shadow: 0 4px 16px rgba(59,130,246,0.10);
+			transition: background 0.2s, transform 0.2s, box-shadow 0.2s;
+			cursor: pointer;
+		}
+		.create-account-btn:hover {
+			background: linear-gradient(135deg, #10B981 0%, #3B82F6 100%);
+			transform: translateY(-2px) scale(1.04);
+			box-shadow: 0 8px 24px rgba(16,185,129,0.15);
 		}
 	</style>
 	`;

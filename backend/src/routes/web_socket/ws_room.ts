@@ -155,28 +155,14 @@ export async function handleRoom(app: FastifyInstance, socket: WebSocket, req: F
 			socket: socket,
 		};
 
-		
-		// le bouton est déjà désactivé quand la room est pleine
-
-		// mettre en place de supprimer les ia si quelqu'un rejoint qu'il fallait 3 personnes et que yavait 2 pesonnes + une ia
-		// if (room.maxPlayers === room.users.size + room.ai) {
-
-		// 	console.log(JSON.stringify({
-		// 		room_users_size : room.users.size,
-		// 		room_ai : room.ai,
-		// 		maxplayer: room.maxPlayers,
-		// 		taille_actuelle: room.users.size + room.ai
-		// 	}))
-		// 	socket.send(JSON.stringify({
-		// 		type: 'error',
-		// 		message: 'Room is full' }));
-		// 		console.log('je vais close le socket')
-		// 	return;
-		// }
+		if ((room.users.size + room.ai >= room.maxPlayers) && room.ai >= 1)
+			room.ai -= 1;
 
 		room.users.set(username, user);
 
 		broadcastSystemMessage(room, `${username} has joined the room.`);
+
+		
 		await broadcastRoomUpdate(app, room);
 		await app.roomService.updateGame(room)
 		socket.on('message', async (message: string) => {
@@ -187,8 +173,6 @@ export async function handleRoom(app: FastifyInstance, socket: WebSocket, req: F
 				
 				const currentRoom = rooms.get(uuid!)!;
 				const currentUser = currentRoom.users.get(username)!;
-
-				console.log()
 
 				switch (data.type) {
 					case 'toggle_ready':
@@ -218,7 +202,12 @@ export async function handleRoom(app: FastifyInstance, socket: WebSocket, req: F
 						break;
 						
 					case 'maxPlayer':
+
+						//mettre a la bonne valeur:
+						// si le host mais que user needed est a 2 alors qu'il y a 3 personnes plus une ia dans la room 
+						// |____ supprimer l'ia et mettre userneeded a 3
 						currentRoom.maxPlayers = data.players
+						currentRoom.ai = 0;
 						await broadcastRoomUpdate(app, currentRoom);
 						await app.roomService.updateGame(room)
 						break;
@@ -248,6 +237,12 @@ export async function handleRoom(app: FastifyInstance, socket: WebSocket, req: F
 
 						if (!allReady)
 							return;
+
+						//ajuster le bon nombre de user dans la game
+						if (currentRoom.users.size !== currentRoom.maxPlayers)
+							currentRoom.maxPlayers= currentRoom.users.size;
+
+						await broadcastRoomUpdate(app, currentRoom);
 
 						const gameStartMessage = JSON.stringify({ 
 							type: 'game_starting',
