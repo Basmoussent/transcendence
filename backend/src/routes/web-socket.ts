@@ -7,7 +7,7 @@ import { handleAlive, handleAliveStatus } from './web_socket/ws_alive';
 
 async function webSocketRoutes(app: FastifyInstance) {
 
-	app.get('/matchmaking', { websocket: true }, (socket: any, req: FastifyRequest) => {
+	app.get('/matchmaking/', { websocket: true }, (socket: any, req: FastifyRequest) => {
 		handleMatchmaking(socket, req);
 	});
 

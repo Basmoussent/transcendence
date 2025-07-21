@@ -473,14 +473,8 @@ export class Chat {
 				content: inviteMsg
 			}));
 			this.addGameInviteMessage(this.me.username, gameType, link);
-			// Vérifier l'existence de la room avant de rediriger
-			const exists = await this.checkRoomExists(uuid);
-			if (exists) {
-				window.history.pushState({}, '', link);
-				window.dispatchEvent(new PopStateEvent('popstate'));
-			} else {
-				this.showRoomError();
-			}
+			window.history.pushState({}, '', link);
+			window.dispatchEvent(new PopStateEvent('popstate'));
 		}
 	}
 
@@ -535,12 +529,8 @@ export class Chat {
 	// Méthode globale pour gérer le clic sur le lien d'invitation
 	public async handleInviteLinkClick(uuid: string, link: string) {
 		const exists = await this.checkRoomExists(uuid);
-		if (exists) {
 			window.history.pushState({}, '', link);
 			window.dispatchEvent(new PopStateEvent('popstate'));
-		} else {
-			this.showRoomError();
-		}
 	}
 }
 
