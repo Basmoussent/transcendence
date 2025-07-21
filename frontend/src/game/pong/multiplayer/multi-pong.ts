@@ -40,7 +40,7 @@ export class MultiPong {
             throw new Error('Could not get 2D context');
         }
 
-		this.retrieveGameInfo(uuid);
+        this.data = this.loadInfo(uuid);
 
         this.ctx = context;
         this.height = canvas.height;
@@ -49,11 +49,18 @@ export class MultiPong {
         this.end = false;
         this.lastPlayerColl = -1;
 
+        console.log("data dans init", this.data)
         // !!! modifier ca avec les infos de la partie
         this.paddles = this.initPlayers();
 
         this.ball = new Ball(this.height, this.width);
         this.keys = {};
+    }
+
+    private async loadInfo(uuid: string): Promise<any> {
+            let tmp = await this.retrieveGameInfo(uuid)
+            // console.log("this data", this.data)
+            return tmp;
     }
 
 	private async retrieveGameInfo(uuid: string) {
@@ -81,9 +88,8 @@ export class MultiPong {
 
 		const result = await response.json();
 
-        // console.log("Résultat brut de l'API :", result);
 
-		this.data = {
+		const data = {
 			id: result.game.id,
 			uuid: result.game.uuid,
 			game_type: result.game.game_type,
@@ -95,12 +101,18 @@ export class MultiPong {
 			ai: result.game.ai
 		}
 
-        // console.log(`les infos de la game => ${JSON.stringify(this.data, null, 12)}`)
+        console.log(`les infos de la game => ${JSON.stringify(data, null, 12)}`)
+        return (data)
 	}
 
     private initPlayers(): [Paddle, Paddle | PaddleAI, Player?, Player?] {
+
+        console.log(`les infos de la game => ${JSON.stringify(this.data, null, 12)}`)
+
         let players: number = this.data.users_needed - 1;
         let ai_players: number = this.data.ai;
+
+
 
         const paddles: Player[] = [];
 

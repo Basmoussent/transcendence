@@ -13,7 +13,7 @@ export function initializeMultiPongEvents(uuid: string) {
 	}
 	console.log('Canvas found, creating game instance...');
 	const game = new MultiPong(canvas, uuid);
-	game.init();
+	await game.init();
 }
 
 function getTemplate(): string {
