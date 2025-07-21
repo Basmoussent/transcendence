@@ -232,18 +232,22 @@ export class MultiPong {
     private async startGameLoop(): Promise<void> {
         console.log('Starting game loop...');
 
-        // fleche au lieu de function() pour que this fasse ref a Pong
-        const gameLoop = () => {
+        const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+
+        const gameLoop = async () => {
             if (this.keys['enter'])
                 this.start = true;
-            if (this.start && !this.end) {
+            if (this.start && !this.end)
                 this.update();
-            }
             this.render();
             if (this.end) {
-				this.logGame();
-				return ;
-			}
+                await this.logGame();
+                await sleep(2500);
+
+                window.history.pushState({}, '', '/main');
+                window.dispatchEvent(new PopStateEvent('popstate'));
+                return;
+            }
             requestAnimationFrame(gameLoop);
         };
         gameLoop();
@@ -255,6 +259,14 @@ export class MultiPong {
         this.ctx.font = '48px gaming'; // changer police
         this.ctx.fillText(t('pong.pressEnterToStart'), this.width / 2 - 150, this.height / 2 - 30);
         this.ctx.fillText(t('pong.toStart'), this.width / 2 - 100, this.height / 2 + 50);
+        this.ctx.globalAlpha = 1;
+    }
+
+    private displayEndMsg(): void {
+        this.ctx.globalAlpha = 0.2;
+        this.ctx.fillStyle = 'white';
+        this.ctx.font = '48px gaming'; // changer police
+        this.ctx.fillText("GAME OVER", this.width / 2 - 150, this.height / 2 - 30);
         this.ctx.globalAlpha = 1;
     }
 
@@ -315,14 +327,6 @@ export class MultiPong {
         }
     }
 
-    private displayResult(): void {
-        this.ctx.globalAlpha = 0.2;
-        this.ctx.fillStyle = 'white';
-        this.ctx.font = '48px gaming'; // changer police
-
-        this.ctx.globalAlpha = 1;
-    }
-
     private startPoint(): void {
         const paddle = this.paddles[this.lastPlayerColl];
         if (paddle)
@@ -359,16 +363,14 @@ export class MultiPong {
         const paddleCenter = paddle.x + paddle.width / 2;
         const edgeZone = paddle.width * 0.2;
 
-        const multiplier = 1.5;
-
         if (hitX <= paddleLeft + edgeZone) // bord gauche
-            ball.speedX -= 4 * multiplier;
+            ball.speedX -= 4;
         else if (hitX >= paddleRight - edgeZone) // bord droit
-            ball.speedX += 4 * multiplier;
+            ball.speedX += 4;
         else if (hitX <= paddleCenter) // cote gauche
-            ball.speedX -= 2 * multiplier;
+            ball.speedX -= 2;
         else if (hitX > paddleCenter) // cote droit
-            ball.speedX += 2 * multiplier;
+            ball.speedX += 2;
     }
 
     private ballPaddleCollision(): void {
@@ -377,7 +379,7 @@ export class MultiPong {
             if (this.getNbrOfPlayers() < 3)
                 this.ball.addBallSpeed();
             this.ball.speedX *= -1;
-            this.ball.adjustBallDir(this.paddles[0], this.getNbrOfPlayers());
+            this.ball.adjustBallDir(this.paddles[0]);
 
             if (this.getNbrOfPlayers() > 2)
                 this.addBallDeviation();
@@ -390,7 +392,7 @@ export class MultiPong {
             if (this.getNbrOfPlayers() < 3)
                 this.ball.addBallSpeed();
             this.ball.speedX *= -1;
-            this.ball.adjustBallDir(this.paddles[1], this.getNbrOfPlayers());
+            this.ball.adjustBallDir(this.paddles[1]);
 
             if (this.getNbrOfPlayers() > 2)
                 this.addBallDeviation();
@@ -546,7 +548,7 @@ export class MultiPong {
         }
         else {
             if (this.end)
-                this.displayResult();
+                this.displayEndMsg();
             else
                 this.displayStartMsg();
         }

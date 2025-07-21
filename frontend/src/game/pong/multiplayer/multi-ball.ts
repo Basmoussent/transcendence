@@ -39,7 +39,7 @@ export class Ball {
       this.speedY -= 0.20;
   }
 
-  adjustBallDir(paddle: Paddle | PaddleAI, nbrOfPlayers: number): void {
+  adjustBallDir(paddle: Paddle | PaddleAI): void {
     const hitY = this.y;
 
     const paddleTop = paddle.y;
@@ -47,16 +47,14 @@ export class Ball {
     const paddleCenter = paddle.y + paddle.height / 2;
     const edgeZone = paddle.height * 0.2;
 
-    const multiplier = nbrOfPlayers > 2 ? 1.5 : 1;
-
     if (hitY <= paddleTop + edgeZone) // bord haut
-      this.speedY -= 3 * multiplier;
+      this.speedY -= 3;
     else if (hitY >= paddleBottom - edgeZone) // bord bas
-      this.speedY += 3 * multiplier;
+      this.speedY += 3;
     else if (hitY <= paddleCenter) // cote haut
-      this.speedY -= 1 * multiplier;
+      this.speedY -= 1;
     else if (hitY > paddleCenter) // cote bas
-      this.speedY += 1 * multiplier;
+      this.speedY += 1;
   }
 
   resetBallInfo(canvasWidth: number, canvasHeight: number, lastWinner: number): void {
