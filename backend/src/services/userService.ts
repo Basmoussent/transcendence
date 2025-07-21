@@ -168,11 +168,11 @@ export class UserService {
 				);
 			});
 
-			// Calculer le rating (MMR) basé sur les victoires
-			const totalGames = stats.total_games || 0;
-			const totalWins = stats.total_wins || 0;
+			const totalGames = stats.pong_games + stats.block_games || 0;
+			const totalWins = stats.pong_wins + stats.block_wins || 0;
 			const winrate = totalGames > 0 ? (totalWins / totalGames) * 100 : 0;
-			const rating = Math.round(winrate * 10); // Rating basé sur le winrate
+			console.log("winrate :", winrate);
+			const rating = Math.round(winrate * 10); 
 
 			return {
 				username: username,

@@ -19,7 +19,7 @@ export interface Game {
 export class Block {
 	private canvas: HTMLCanvasElement;
 	private ctx: CanvasRenderingContext2D;
-	private gameId: number;
+	private uuid: number;
 	private width: number;
 	private height: number;
 	private status: boolean;
@@ -55,7 +55,7 @@ export class Block {
 		this.width = canvas.width;
 		this.height = canvas.height;
 		this.winner = 'nil';
-		this.gameId = -1;
+		this.uuid = -1;
 		this.win = false;
 		this.lost = false;
 		this.username = "ko";
@@ -197,7 +197,7 @@ export class Block {
 			this.ball.reset(this.width / 2, this.height - 100, 4, -4);
 			this.status = true;
 
-			this.gameId = await postGame({
+			this.uuid = await postGame({
 				game_type: "block",
 				player1: this.username,
 				users_needed: 1
@@ -254,7 +254,7 @@ export class Block {
 		// Fin de partie
 		if (this.win || this.lost) {
 			this.status = false;
-			await logEndGame(this.gameId, this.winner);
+			await logEndGame(this.uuid, this.winner);
 			this.win = false;
 			this.lost = false;
 		}

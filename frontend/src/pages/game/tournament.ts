@@ -1302,7 +1302,7 @@ document.addEventListener('input', function(event: Event) {
     canvas.classList.add('active');
   }
   game.init(p1!, p2!);
-  canvas.focus();
+  document?.activeElement?.blur();
   console.log("game.paddles[0].name :", p1, "game.paddles[1].name :", p2);
   
   const checkGameEnd = () => {
@@ -1316,7 +1316,9 @@ document.addEventListener('input', function(event: Event) {
         console.log("match found");
         const players = match.querySelectorAll('.player');
         const winnerIndex = p1.score > p2.score ? 0 : 1;
+        const loserIndex = p1.score < p2.score ? 0 : 1;
         const winnerElement = players[winnerIndex] as HTMLElement;
+        const loserElement = players[loserIndex] as HTMLElement;
         
         if (winnerElement) {
           console.log("winnerElement found");
@@ -1331,6 +1333,17 @@ document.addEventListener('input', function(event: Event) {
           if (winnerNameElement && winner) {
             advanceWinner(matchId, winner);
           }
+        }
+
+        if (loserElement) {
+          console.log("loserElement found");
+          loserElement.classList.add('loser');
+          const scoreElement = loserElement.querySelector('.player-score');
+          if (scoreElement) {
+            console.log("scoreElement found", scoreElement.textContent, Math.max(p1.score, p2.score));
+            scoreElement.textContent = Math.min(p1.score, p2.score).toString();
+          }
+          
         }
         
         const button = match.querySelector('.play-match-btn') as HTMLButtonElement;

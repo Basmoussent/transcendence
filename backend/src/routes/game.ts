@@ -379,6 +379,41 @@ async function gameRoutes(app: FastifyInstance) {
 		}
 	});
 
+	app.post('/tournament', async function (request: FastifyRequest, reply: FastifyReply) {
+
+		try {
+
+			const uuid = uuidv4();
+			const { player1, player2, winner, start_time } = request.body as { player1: string, player2: string, winner: string, start_time: string};
+
+
+			if (!uuid || !uuidValidate(uuid))
+				throw new Error("missing uuid OR invalid uuid");
+
+			if (!player1 ||  !player2 ||  !winner || !start_time )
+				throw new Error("un des 5 manquants !player1 ||  !player2 ||  !winner || !start_time || !end_time");
+
+			const success = await app.gameService.logTournamentGame(uuid, player1, player2, winner, start_time);
+			
+			if (success) {
+				return reply.send({
+					message: 'partie de tournoi terminee et log dans la table history',
+					uuid: uuid,
+					winner: winner
+				});
+			}
+			else
+				return reply.status(500).send({ error: 'Erreur lors de la finalisation de la partie DES TOURNOIS' });
+		}
+		catch (err: any) {
+			console.error('erreur POST /games/finish/:uuid :', err);
+			if (err.name === 'JsonWebTokenError')
+				return reply.status(401).send({ error: 'Token invalide ou expiré' });
+			return reply.status(500).send({ error: 'erreur POST /games/finish/:uuid', details: err.message });
+		}
+
+	}) 
+
 }
 
 

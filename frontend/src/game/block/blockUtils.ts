@@ -193,6 +193,29 @@ export abstract class brick {
 	public getY(): number { return this.y; }
 }
 
+class BlueBrick extends brick {
+	constructor(_id: number, _x: number, _y: number) {
+		super(1, _id, "blue", "#95ADB6", _x, _y);
+	}
+}
+class GreenBrick extends brick {
+	constructor(_id: number, _x: number, _y: number) {
+		super(2, _id, "green", "#8DA1B9", _x, _y);
+	}
+}
+class RedBrick extends brick {
+	constructor(_id: number, _x: number, _y: number) {
+		super(3, _id, "red", "#CBB3BF", _x, _y);
+	}
+}
+
+export function createRandomBrick(it: number, _x: number, _y: number): brick {
+	const rand = Math.floor(Math.random() * 3);
+	if (rand === 0) return new RedBrick(it, _x, _y);
+	if (rand === 1) return new GreenBrick(it, _x, _y);
+	return new BlueBrick(it, _x, _y);
+}
+
 // Supprimer PowerUpType, PowerUp, createRandomPowerUp, getPowerUpFromBrick
 // Nettoyer la classe brick pour ne plus gérer de power-up
 

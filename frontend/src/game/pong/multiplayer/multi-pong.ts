@@ -30,6 +30,8 @@ export class MultiPong {
     private paddles: [Paddle, Paddle | PaddleAI, Player?, Player?];
     private ball: Ball;
     private keys: { [key: string]: boolean };
+    private uuid: string;
+    private winner: string;
 
 	private data: any;
 
@@ -39,21 +41,42 @@ export class MultiPong {
         if (!context) {
             throw new Error('Could not get 2D context');
         }
-
-		this.retrieveGameInfo(uuid);
-
+        this.uuid = uuid;
         this.ctx = context;
         this.height = canvas.height;
         this.width = canvas.width;
         this.start = false;
         this.end = false;
         this.lastPlayerColl = -1;
+        this.data = null; // sera rempli dans asyncInit
+        this.paddles = [undefined, undefined, undefined, undefined] as unknown as [Paddle, Paddle | PaddleAI, Player?, Player?]; // sera rempli dans asyncInit
+        this.ball = null as any; // sera rempli dans asyncInit
+        this.keys = {};
+        this.winner = "";
+    }
 
-        // !!! modifier ca avec les infos de la partie
+    public async asyncInit(): Promise<void> {
+        this.data = await this.loadInfo(this.uuid);
+        console.log("data dans asyncInit", this.data);
+
         this.paddles = this.initPlayers();
 
         this.ball = new Ball(this.height, this.width);
-        this.keys = {};
+
+        this.setupCanvas();
+        this.setupEventListeners();
+        this.startGameLoop();
+
+        // on resize si la taille de la fenetre change
+        window.addEventListener('resize', () => {
+            this.setupCanvas();
+        });
+    }
+
+    private async loadInfo(uuid: string): Promise<any> {
+            let tmp = await this.retrieveGameInfo(uuid)
+            // console.log("this data", this.data)
+            return tmp;
     }
 
 	private async retrieveGameInfo(uuid: string) {
@@ -81,9 +104,8 @@ export class MultiPong {
 
 		const result = await response.json();
 
-        // console.log("Résultat brut de l'API :", result);
 
-		this.data = {
+		const data = {
 			id: result.game.id,
 			uuid: result.game.uuid,
 			game_type: result.game.game_type,
@@ -95,12 +117,18 @@ export class MultiPong {
 			ai: result.game.ai
 		}
 
-        // console.log(`les infos de la game => ${JSON.stringify(this.data, null, 12)}`)
+        console.log(`les infos de la game => ${JSON.stringify(data, null, 12)}`)
+        return (data)
 	}
 
     private initPlayers(): [Paddle, Paddle | PaddleAI, Player?, Player?] {
+
+        console.log(`les infos de ladqwdqwdqwdqwdq game => ${JSON.stringify(this.data, null, 12)}`)
+
         let players: number = this.data.users_needed - 1;
         let ai_players: number = this.data.ai;
+
+
 
         const paddles: Player[] = [];
 
@@ -204,14 +232,22 @@ export class MultiPong {
     private async startGameLoop(): Promise<void> {
         console.log('Starting game loop...');
 
-        // fleche au lieu de function() pour que this fasse ref a Pong
-        const gameLoop = () => {
+        const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+
+        const gameLoop = async () => {
             if (this.keys['enter'])
                 this.start = true;
-            if (this.start && !this.end) {
+            if (this.start && !this.end)
                 this.update();
-            }
             this.render();
+            if (this.end) {
+                await this.logGame();
+                await sleep(2500);
+
+                window.history.pushState({}, '', '/main');
+                window.dispatchEvent(new PopStateEvent('popstate'));
+                return;
+            }
             requestAnimationFrame(gameLoop);
         };
         gameLoop();
@@ -223,6 +259,14 @@ export class MultiPong {
         this.ctx.font = '48px gaming'; // changer police
         this.ctx.fillText(t('pong.pressEnterToStart'), this.width / 2 - 150, this.height / 2 - 30);
         this.ctx.fillText(t('pong.toStart'), this.width / 2 - 100, this.height / 2 + 50);
+        this.ctx.globalAlpha = 1;
+    }
+
+    private displayEndMsg(): void {
+        this.ctx.globalAlpha = 0.2;
+        this.ctx.fillStyle = 'white';
+        this.ctx.font = '48px gaming'; // changer police
+        this.ctx.fillText("GAME OVER", this.width / 2 - 150, this.height / 2 - 30);
         this.ctx.globalAlpha = 1;
     }
 
@@ -283,14 +327,6 @@ export class MultiPong {
         }
     }
 
-    private displayResult(): void {
-        this.ctx.globalAlpha = 0.2;
-        this.ctx.fillStyle = 'white';
-        this.ctx.font = '48px gaming'; // changer police
-
-        this.ctx.globalAlpha = 1;
-    }
-
     private startPoint(): void {
         const paddle = this.paddles[this.lastPlayerColl];
         if (paddle)
@@ -301,6 +337,7 @@ export class MultiPong {
             const paddle = this.paddles[i];
             if (paddle && paddle?.winsGame() === true) {
                 this.end = true;
+                this.winner = paddle.name;
                 return;
             }
         }
@@ -326,16 +363,14 @@ export class MultiPong {
         const paddleCenter = paddle.x + paddle.width / 2;
         const edgeZone = paddle.width * 0.2;
 
-        const multiplier = 1.5;
-
         if (hitX <= paddleLeft + edgeZone) // bord gauche
-            ball.speedX -= 4 * multiplier;
+            ball.speedX -= 4;
         else if (hitX >= paddleRight - edgeZone) // bord droit
-            ball.speedX += 4 * multiplier;
+            ball.speedX += 4;
         else if (hitX <= paddleCenter) // cote gauche
-            ball.speedX -= 2 * multiplier;
+            ball.speedX -= 2;
         else if (hitX > paddleCenter) // cote droit
-            ball.speedX += 2 * multiplier;
+            ball.speedX += 2;
     }
 
     private ballPaddleCollision(): void {
@@ -344,7 +379,7 @@ export class MultiPong {
             if (this.getNbrOfPlayers() < 3)
                 this.ball.addBallSpeed();
             this.ball.speedX *= -1;
-            this.ball.adjustBallDir(this.paddles[0], this.getNbrOfPlayers());
+            this.ball.adjustBallDir(this.paddles[0]);
 
             if (this.getNbrOfPlayers() > 2)
                 this.addBallDeviation();
@@ -357,7 +392,7 @@ export class MultiPong {
             if (this.getNbrOfPlayers() < 3)
                 this.ball.addBallSpeed();
             this.ball.speedX *= -1;
-            this.ball.adjustBallDir(this.paddles[1], this.getNbrOfPlayers());
+            this.ball.adjustBallDir(this.paddles[1]);
 
             if (this.getNbrOfPlayers() > 2)
                 this.addBallDeviation();
@@ -513,9 +548,43 @@ export class MultiPong {
         }
         else {
             if (this.end)
-                this.displayResult();
+                this.displayEndMsg();
             else
                 this.displayStartMsg();
         }
     }
+
+    private async logGame() {
+
+		try {
+			const token = getAuthToken();
+			if (!token) {
+				alert('❌ Token d\'authentification manquant');
+				window.history.pushState({}, '', '/login');
+				window.dispatchEvent(new PopStateEvent('popstate'));
+				return -1;
+			}
+
+			const response = await fetch(`/api/games/finish/${this.uuid}`, {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+					'x-access-token': token,
+				},
+				body: JSON.stringify({
+					winner: this.winner
+				})
+			});
+		
+			if (response.ok) {
+				const result = await response.json();
+				console.log("la game de room est log", result);
+			}
+			else 
+				console.error("erreur pour log la game de room");
+		}
+		catch (err) {
+			console.error("pblm dans multipong.ts pour log la game")
+		}
+	}
 }
