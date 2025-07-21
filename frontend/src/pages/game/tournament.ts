@@ -3,6 +3,7 @@ import { sanitizeHtml } from '../../utils/sanitizer';
 import { t } from '../../utils/translations';
 import { addEvent } from '../../utils/eventManager';
 
+
 export function renderTournaments() {
   const html =  `
 
@@ -751,9 +752,6 @@ export function renderTournaments() {
       console.error('Canvas not found!');
       return;
     }
-    console.log('Canvas found, creating game instance...');
-    const game = new Pong(canvas);
-    game.init();
   }, 0);
   return html;
 
@@ -1294,25 +1292,34 @@ document.addEventListener('input', function(event: Event) {
     console.error('Canvas not found!');
     return;
   }
-  console.log('Canvas found, creating game instance...');
+
+  const match = document.querySelector('[data-match="' + matchId + '"]');
+  const players = match!.querySelectorAll('.player');
+  const p1 = players[0].querySelector('.player-name')?.textContent;
+  const p2 = players[1].querySelector('.player-name')?.textContent;
   const game = new Pong(canvas);
   if (canvas) {
     canvas.classList.add('active');
   }
-  const result = game.init();
+  const result = game.init(p1!, p2!);
+
+  
   
   const checkGameEnd = () => {
     if (game.end) {
       const p1 = game.paddles[0];
       const p2 = game.paddles[1];
       const winner = p1.score > p2.score ? p1.name : p2.name;
+      const loser = p1.score < p2.score ? p1.name : p2.name;
       // Trouver le bon élément gagnant
       const match = document.querySelector('[data-match="' + matchId + '"]');
       if (match) {
         console.log("match found");
         const players = match.querySelectorAll('.player');
         const winnerIndex = p1.score > p2.score ? 0 : 1;
+        const loserIndex = p1.score < p2.score ? 0 : 1;
         const winnerElement = players[winnerIndex] as HTMLElement;
+        const loserElement = players[loserIndex] as HTMLElement;
         
         if (winnerElement) {
           console.log("winnerElement found");
@@ -1326,6 +1333,21 @@ document.addEventListener('input', function(event: Event) {
           const winnerNameElement = winnerElement.querySelector('.player-name');
           if (winnerNameElement && winner) {
             advanceWinner(matchId, winner);
+          }
+        }
+
+        if (loserElement) {
+          console.log("loserElement found");
+          loserElement.classList.add('loser');
+          const scoreElement = loserElement.querySelector('.player-score');
+          if (scoreElement) {
+            console.log("scoreElement found", scoreElement.textContent, Math.max(p1.score, p2.score));
+            scoreElement.textContent = Math.min(p1.score, p2.score).toString();
+          }
+          
+          const loserNameElement = loserElement.querySelector('.player-name');
+          if (loserNameElement && loser) {
+            advanceWinner(matchId, loser);
           }
         }
         

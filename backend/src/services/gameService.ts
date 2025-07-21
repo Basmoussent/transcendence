@@ -104,5 +104,30 @@ export class GameService {
 		}
 	}
 
+	async logTournamentGame(uuid: string, player1: string, player2: string, winner: string, start_time: string) {
+
+		try {
+			await new Promise<void>((resolve, reject) => {
+				this.db.run(
+					`INSERT INTO history (uuid, game_type, player1, player2, start_time, end_time, winner) 
+					 VALUES (?, ?, ?, ?, ?, ?, ?)`,
+					[ uuid, 'pong', player1, player2, start_time, Date.now().toString(), winner],
+					(err: any) => {
+						err ? reject(err) : resolve();
+					}
+				);
+			});
+
+			await this.deleteGame(uuid);
+			console.log(`TOURNOI      Partie ${uuid} déplacée vers history avec winner: ${winner}`);
+			return true;
+
+		}
+		catch (err) {
+			console.error(`pblm log la game tounoi dans le service, ::-->>>>>     ${err}`)
+			return false;
+		}
+	}
+
 
 }

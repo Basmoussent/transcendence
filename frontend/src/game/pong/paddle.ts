@@ -48,7 +48,7 @@ export class Paddle {
     }
 
     winsGame(): boolean {
-        return this.score === 5;
+        return this.score === 3;
     }
 
     displayScore(ctx: CanvasRenderingContext2D, x: number, y: number): void {
