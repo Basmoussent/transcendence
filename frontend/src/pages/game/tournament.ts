@@ -10,7 +10,7 @@ export function renderTournaments() {
   <canvas id="gameCanvas" width="800" height="600"></canvas>
 
   <div class="tournaments-header">
-    <button class="home-button" id="homeBtn">
+    <button class="home-button" id="homeBtn" onclick="returnHome()">
         <i class="fas fa-home"></i>
          ${t('social.home')}
     </button>
@@ -172,6 +172,7 @@ export function renderTournaments() {
     </div>
     <div class="modal-body">
       <input type="text" id="playerNameInput" placeholder="Enter player username..." maxlength="20">
+      <input type="text" id="displayNameInput" placeholder="Choose a display name..." maxlength="20" style="display:none;margin-top:10px;">
       <div id="errorMessage" class="error-message" style="display: none;">
         ❌ Utilisateur non trouvé
       </div>
@@ -757,8 +758,9 @@ export function renderTournaments() {
 }
 
 // Tournament state
+type TournamentPlayer = { username: string, displayName: string };
 let tournamentData = {
-  players: [] as string[],
+  players: [] as TournamentPlayer[],
   matches: {},
   currentRound: 'qf',
   inLobby: true
@@ -769,9 +771,20 @@ let tournamentData = {
   if (tournamentData.players.length < 8) {
     const modal = document.getElementById('addPlayerModal');
     const input = document.getElementById('playerNameInput') as HTMLInputElement;
+    const displayInput = document.getElementById('displayNameInput') as HTMLInputElement;
     if (modal) modal.style.display = 'block';
     if (input) input.focus();
+    if (displayInput) displayInput.value = '';
+    if (displayInput) displayInput.style.display = 'none';
+    if (input) input.style.display = '';
+    const addBtn = document.querySelector('#addPlayerModal .btn-primary') as HTMLButtonElement;
+    if (addBtn) addBtn.textContent = 'Add Player';
   }
+};
+
+(window as any).returnHome = function() {
+  window.history.pushState({}, '', '/main');
+  window.dispatchEvent(new PopStateEvent('popstate'));
 };
 
 (window as any).closeModal = function() {
@@ -785,33 +798,47 @@ let tournamentData = {
 
 (window as any).confirmAddPlayer = async function() {
   const input = document.getElementById('playerNameInput') as HTMLInputElement;
+  const displayInput = document.getElementById('displayNameInput') as HTMLInputElement;
+  const addBtn = document.querySelector('#addPlayerModal .btn-primary') as HTMLButtonElement;
   const playerName = input?.value.trim();
-  if (playerName && tournamentData.players.length < 8) {
+  if (playerName && tournamentData.players.length < 8 && (!displayInput || displayInput.style.display === 'none')) {
+    // Première étape : valider le username
     const response = await fetch(`/api/user/${playerName}`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json'
       }
     });
-    console.log("response:", response);
     if (response.ok) {
       const data = await response.json();
       if (data.data.username) {
-        tournamentData.players.push(data.data.username);
-        updateLobbyDisplay();
-        (window as any).closeModal();
-        return 1; 
-      }
-      else {
-        const errorMessage = document.getElementById('errorMessage');
-        if (errorMessage) {
-          errorMessage.style.display = 'block';
+        if (displayInput) {
+          displayInput.style.display = '';
+          displayInput.focus();
         }
+        if (input) input.style.display = 'none';
+        if (addBtn) addBtn.textContent = 'Confirm';
+        return;
+      } else {
+        const errorMessage = document.getElementById('errorMessage');
+        if (errorMessage) errorMessage.style.display = 'block';
       }
     }
-      
+    return 0;
+  } else if (displayInput && displayInput.style.display !== 'none') {
+    const displayName = sanitizeHtml(displayInput.value.trim());
+    if (displayName) {
+      // On retrouve le username caché dans le champ input (il a été validé juste avant)
+      const username = sanitizeHtml(input.value.trim());
+      tournamentData.players.push({ username, displayName });
+      updateLobbyDisplay();
+      (window as any).closeModal();
+      return 1;
+    }
+    // Si displayName vide, on ne fait rien
+    return 0;
   }
-  return 0; 
+  return 0;
 };
 
 (window as any).removePlayer = function(index: any) {
@@ -868,10 +895,10 @@ function updateLobbyDisplay() {
         playerCard.className = 'player-card';
         playerCard.innerHTML = `
           <div class="player-avatar">
-            ${(player as string).charAt(0).toUpperCase()}
+            ${player.displayName.charAt(0).toUpperCase()}
           </div>
           <div class="player-info">
-            <div class="player-name">${player}</div>
+            <div class="player-name">${player.displayName}</div>
             <div class="player-number">Player ${index + 1}</div>
           </div>
           <button class="remove-player" onclick="removePlayer(${index})">
@@ -995,7 +1022,7 @@ function updateTournamentDisplay() {
     const playerElement = document.querySelector('[data-player="' + (i + 1) + '"] .player-name');
     if (playerElement) {
       if (tournamentData.players[i]) {
-        playerElement.textContent = tournamentData.players[i];
+        playerElement.textContent = tournamentData.players[i].displayName;
         playerElement.parentElement?.classList.remove('empty');
       } else {
         playerElement.textContent = 'Player ' + (i + 1);
@@ -1276,6 +1303,7 @@ document.addEventListener('input', function(event: Event) {
     canvas.classList.add('active');
   }
   game.init(p1!, p2!);
+  canvas.focus();
   console.log("game.paddles[0].name :", p1, "game.paddles[1].name :", p2);
   
   const checkGameEnd = () => {
