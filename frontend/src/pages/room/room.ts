@@ -30,7 +30,6 @@ export class Room {
 	private startBtn: HTMLButtonElement;
 	private leaveBtn: HTMLButtonElement;
 	private sendBtn: HTMLButtonElement;
-	private inviteBtn: HTMLButtonElement;
 	private increaseAiBtn: HTMLButtonElement;
 	private decreaseAiBtn: HTMLButtonElement;
 
@@ -61,7 +60,6 @@ export class Room {
 		this.sendBtn = this.getElement('sendBtn') as HTMLButtonElement;
 		this.increaseAiBtn = this.getElement('increaseAI') as HTMLButtonElement;
 		this.decreaseAiBtn = this.getElement('decreaseAI') as HTMLButtonElement;
-		this.inviteBtn = this.getElement('inviteBtn') as HTMLButtonElement;
 		this.chatInput = this.getElement('chatInput') as HTMLInputElement;
 		this.playersContainer = this.getElement('playersContainer');
 		this.roomSettings = this.getElement('roomSettings');
@@ -121,7 +119,6 @@ export class Room {
 		addEvent(this.startBtn, 'click', () => this.startGame());
 		addEvent(this.leaveBtn, 'click', () => this.leaveRoom());
 		addEvent(this.homeBtn, 'click', () => this.goHome());
-		addEvent(this.inviteBtn, 'click', () => this.invite());
 		addEvent(this.increaseAiBtn, 'click', () => this.increase());
 		addEvent(this.decreaseAiBtn, 'click', () => this.decrease());
 		addEvent(this.gameTypeSelect, 'change', () => this.gameTypeChanged());
@@ -267,17 +264,17 @@ export class Room {
 		}
 
 		for (let i = this.roomData.users.length + this.roomData.ai; i < this.roomData.maxPlayers; i++)
-			this.playersContainer.innerHTML += `<div class="empty-slot">${t('room.waitingForPlayers')}</div>`;
+			this.playersContainer.innerHTML += `<div class="empty-slot">Waiting for players...</div>`;
 
 		const currentUser = this.roomData.users.find(u => u.username === this.username);
 
 		if (currentUser?.isReady) {
 			this.readyBtn.classList.add('active');
-			this.readyBtn.innerHTML = `<i class="fas fa-times"></i> ${t('room.notReady')}`;
+			this.readyBtn.innerHTML = `<i class="fas fa-times"></i> Not ready`;
 		}
 		else {
 			this.readyBtn.classList.remove('active');
-			this.readyBtn.innerHTML = `<i class="fas fa-check"></i> ${t('room.ready')}`;
+			this.readyBtn.innerHTML = `<i class="fas fa-check"></i> Ready`;
 		}
 
 		const allReady = this.roomData.users.every(u => u.isReady);
@@ -291,7 +288,7 @@ export class Room {
 
 			if (this.roomData.gameType === 'block') {
 				this.getElement('ai-setting').style.display = 'none';
-				this.maxPlayersSelect.innerHTML = `<label class="text-white/80">${t('room.maxPlayers')}</label>
+				this.maxPlayersSelect.innerHTML = `<label class="text-white/80">Max Players</label>
 									<select class="setting-select" id="maxPlayersSelect">
 										<option value="1">1</option>
 										<option value="2">2</option>
@@ -323,7 +320,7 @@ export class Room {
 		if (allReady)
 			this.gameStatusEl.innerHTML = `<span class="status-dot ready"></span><span class="text-white/80">Ready to start!</span>`;
 		else
-			this.gameStatusEl.innerHTML = `<span class="status-dot waiting"></span><span class="text-white/80">${t('room.waitingForPlayers')}</span>`;
+			this.gameStatusEl.innerHTML = `<span class="status-dot waiting"></span><span class="text-white/80">Waiting for players...</span>`;
 	}
 
 	private playerCard(user: User): string {
@@ -336,7 +333,7 @@ export class Room {
 			<div class="player-card ${readyClass} ${hostClass}">
 				<div class="player-avatar">${avatarInitial}</div>
 				<div class="player-name">${sanitizeHtml(user.username)}</div>
-				<div class="player-status">${user.isReady ? `${t('room.ready')}` : `${t('room.notReady')}`}</div>
+				<div class="player-status">${user.isReady ? `Ready` : `Not ready`}</div>
 			</div>
 		`;
 	}

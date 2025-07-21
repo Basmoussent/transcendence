@@ -69,10 +69,6 @@ const getTemplate = () => {
 						<i class="fas fa-check"></i>
 						${t('room.ready')}
 					</button>
-					<button class="control-btn invite-btn" id="inviteBtn">
-						<i class="fas fa-user-plus"></i>
-						Inviter des joueurs
-					</button>
 					<button class="control-btn leave-btn" id="leaveBtn">
 						<i class="fas fa-sign-out-alt"></i>
 						${t('room.leaveRoom')}
