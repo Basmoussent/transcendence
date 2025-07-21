@@ -758,10 +758,11 @@ let tournamentData = {
         'Content-Type': 'application/json'
       }
     });
+    console.log("response:", response);
     if (response.ok) {
       const data = await response.json();
-      if (data.username) {
-        tournamentData.players.push(sanitizeHtml(playerName));
+      if (data.data.username) {
+        tournamentData.players.push(data.data.username);
         updateLobbyDisplay();
         (window as any).closeModal();
         return 1; 
@@ -1237,7 +1238,7 @@ document.addEventListener('keydown', function(event: KeyboardEvent) {
   if (event.key === 'Enter' && modal?.style.display === 'block') {
     (window as any).confirmAddPlayer();
   }
-});
+}, { once: true });
 
 // Hide error message when user types
 document.addEventListener('input', function(event: Event) {

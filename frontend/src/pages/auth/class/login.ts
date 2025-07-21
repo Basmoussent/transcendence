@@ -16,7 +16,6 @@ export class login {
 		this.loginForm = this.getElement('loginForm');
 		this.messageContainer = this.getElement('messageContainer');
 		this.messageContent = this.getElement('messageContent');
-		this.forgotPassword = this.getElement('forgot-password');
 		this.createAccount = this.getElement('create-account');
 		this.username = this.getElement('username') as HTMLInputElement;
 		this.password = this.getElement('password') as HTMLInputElement;
@@ -33,20 +32,12 @@ export class login {
 
 	private setupEvents() {
 
-		addEvent(this.loginForm, 'submit', async (e) => {
-			console.log("idauzbdoiauzbndoiauzbdoaizubdaoziudbaoziudbazoiudbazoidubai")
+		this.loginForm.addEventListener('submit', async (e) => {
 			e.preventDefault();
 			await this.submitLogin();
 		});
 
-		addEvent(this.forgotPassword, 'click', () => {
-			console.log("idauzbdoiauzbndoiauzbdoaizubdaoziudbaoziudbazoiudbazoidubai")
-			window.history.pushState({}, '', '/forgot-password');
-			window.dispatchEvent(new PopStateEvent('popstate'));
-		});
-
-		addEvent(this.createAccount, 'click', () => {
-			console.log("idauzbdoiauzbndoiauzbdoaizubdaoziudbaoziudbazoiudbazoidubai")
+		this.createAccount.addEventListener('click', () => {
 			window.history.pushState({}, '', '/create-account');
 			window.dispatchEvent(new PopStateEvent('popstate'));
 		});

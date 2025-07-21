@@ -37,12 +37,18 @@ export async function router() {
 	let uuid: string = '';
 	
 	if (path.startsWith('/multipong/') || path.startsWith('/pong/') || path.startsWith('/block/') || path.startsWith('/block1v1/') ||
-			path.startsWith('/room/') || path.startsWith('/profil/')) {
+			path.startsWith('/room/') || path.startsWith('/profil/') || path.startsWith('/multipong')
+		|| path.startsWith('/pong') || path.startsWith('/block') || path.startsWith('/block1v1') || path.startsWith('/room') || path.startsWith('/profil')) {
 
 		const it = path.indexOf('/', 1);
 
 		uuid = path.substring(it + 1);
 		path = path.substring(0, it);
+		console.log("uuid:", uuid);
+		if (uuid.length !== 36) {
+			app.innerHTML = render404();
+			return;
+		}
 	}
 
 	if (!publicRoutes.includes(path) && !token) {
