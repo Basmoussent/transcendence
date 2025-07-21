@@ -139,7 +139,7 @@ function initializeEditProfileEvents() {
 	const backToProfileBtn = document.getElementById('backToProfileBtn');
 
 	if (backToProfileBtn) {
-		addEvent(backToProfileBtn, 'click', () => {
+		backToProfileBtn.addEventListener('click', () => {
 			window.history.pushState({}, '', '/me');
 			window.dispatchEvent(new PopStateEvent('popstate'));
 		});
@@ -188,7 +188,7 @@ function initializeEditProfileEvents() {
 				if (response.ok) {
 					alert('✅ ' + t('social.avatarUploadSuccess'));
 					// Rediriger vers la page de profil avec le router SPA
-					window.history.pushState({}, '', '/profil');
+					window.history.pushState({}, '', '/me');
 					window.dispatchEvent(new PopStateEvent('popstate'));
 				} else {
 					alert(`❌ Erreur: ${result.error || 'Erreur inconnue'}`);

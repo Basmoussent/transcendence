@@ -22,7 +22,6 @@ import { initAlive } from './auth';
 import { renderProfil, initializeProfilEvents } from '../pages/social/renderProfil';
 import { render2FA, initialize2FAEvents } from '../pages/auth/activate-2fa';
 import { render2FALogin } from '../pages/auth/2fa-login';
-
 import { cleanEvents } from './eventManager';
 
 export async function router() {
@@ -41,10 +40,15 @@ export async function router() {
 
 	let uuid: string = '';
 	
-	if (path.startsWith('/multipong/') || path.startsWith('/pong/') || path.startsWith('/block/') || path.startsWith('/block1v1/') ||
-			path.startsWith('/room/') || path.startsWith('/profil/')) {
+	if (path.startsWith('/multipong') || path.startsWith('/pong') || path.startsWith('/block') || path.startsWith('/block1v1') ||
+			path.startsWith('/room') || path.startsWith('/profil') || path.startsWith('/multipong')
+		|| path.startsWith('/pong') || path.startsWith('/block') || path.startsWith('/block1v1') || path.startsWith('/room') || path.startsWith('/profil')) {
 
 		const it = path.indexOf('/', 1);
+
+		if (!it) { // ya pas de deuxieme slash alors qu'il faut une suite donc erreur
+
+		}
 
 		uuid = path.substring(it + 1);
 		path = path.substring(0, it);
@@ -53,6 +57,8 @@ export async function router() {
 			console.error("pblm ya pas le uuid ou bien le username pour une page qui en a besoin")
 			return;
 		}
+
+		// si /pong faut passer ici et voir 
 
 		// { '/multipong/','/pong/', '/block/', '/block1v1/', '/room/' }
 		// verifier que la game existe dans la db et qu'elle n'a pas de starting time encore
@@ -193,6 +199,8 @@ export async function router() {
 	setTimeout(() => {
 		const init = initEvents[path];
 		const initUuid = initEventsUuid[path];
+		
+		cleanEvents();
 
 		var el = document.getElementById('app'),
 		elClone = el!.cloneNode(true);

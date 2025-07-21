@@ -21,7 +21,6 @@ interface UserData {
 	avatar_url?: string;
 	language: string;
 	two_fact_auth: boolean;
-	secret_key?: string;
 }
 
 async function userRoutes(app: FastifyInstance) {
@@ -57,8 +56,6 @@ async function userRoutes(app: FastifyInstance) {
 
 			console.log('user', user);
 
-			// Récupération des statistiques (pour l'instant des valeurs par défaut)
-			// TODO: Implémenter la vraie logique des statistiques
 			const userStats = await app.userService.retrieveStats(user.username);
 			console.log('userStats', userStats);
 			const win = userStats.pong_wins + userStats.block_wins;
@@ -70,6 +67,8 @@ async function userRoutes(app: FastifyInstance) {
 				rating: rating
 			};
 
+			const isOnline = await app.userService.isOnline(user.id);
+
 			return reply.send({
 				user: {
 					id: user.id,
@@ -78,6 +77,7 @@ async function userRoutes(app: FastifyInstance) {
 					avatar_url: user.avatar_url || 'avatar.png',
 					language: user.language,
 					two_fact_auth: user.two_fact_auth || 0,
+					online: isOnline
 				},
 				stats: stats
 			});
@@ -86,6 +86,29 @@ async function userRoutes(app: FastifyInstance) {
 			if (err.name === 'JsonWebTokenError') {
 				return reply.status(401).send({ error: 'Token invalide ou expiré' });
 			}
+			return reply.status(500).send({ error: 'Erreur serveur interne' });
+		}
+	});
+
+	// Route pour vérifier le statut online d'un utilisateur
+	app.get('/user/:username/status', async (request: FastifyRequest, reply: FastifyReply) => {
+		const { username } = request.params as { username: string };
+		
+		try {
+			const user = await app.userService.findByUsername(username);
+			if (!user) {
+				return reply.status(404).send({ error: 'Utilisateur non trouvé' });
+			}
+			
+			const isOnline = await app.userService.isOnline(user.id);
+			
+			return reply.send({
+				username: user.username,
+				online: isOnline,
+				timestamp: Date.now()
+			});
+		} catch (error) {
+			console.error('❌ Error checking user status:', error);
 			return reply.status(500).send({ error: 'Erreur serveur interne' });
 		}
 	});
@@ -122,8 +145,6 @@ async function userRoutes(app: FastifyInstance) {
 
 			console.log('user', user);
 
-			// Récupération des statistiques (pour l'instant des valeurs par défaut)
-			// TODO: Implémenter la vraie logique des statistiques
 			const userStats = await app.userService.retrieveStats(user.username);
 			console.log('userStats', userStats);
 			const win = userStats.pong_wins + userStats.block_wins;
@@ -261,29 +282,21 @@ async function userRoutes(app: FastifyInstance) {
 
 	});
 
-	app.get('/user/:userid', async function (request: FastifyRequest, reply: FastifyReply) {
+	app.get('/user/:username', async function (request: FastifyRequest, reply: FastifyReply) {
 
 		try {
 			const database = db.getDatabase();
 
-			console.log('apodnaozindoainzdoianzodinazodinazoidn')
+			const { username } = request.params as { username?: string };
+			console.log("username:", username);
+			console.log("request.params:", request.params);
+			if (!username)
+				throw new Error("missing username in the request body");
 
-			const { userid } = request.query as { userid?: number };
-
-			if (!userid)
-				throw new Error("missing userid in the request body");
-
-			const user = await new Promise<UserData | null>((resolve, reject) => {
-				database.get(
-					'SELECT * FROM users WHERE id = ?',
-					[userid],
-					(err: any, row: UserData | undefined) => {
-						err ? reject(err) : resolve(row || null);
-					}
-				);
-			});
+			const user = await app.userService.findByUsername(username);
+			console.log("user:", user);
 			return reply.send({
-				message: `info du user ${userid}`,
+				message: `info du user ${username}`,
 				data: user,
 			});
 		}
@@ -314,9 +327,12 @@ async function userRoutes(app: FastifyInstance) {
 					}
 				);
 			});
+			const isOnline = await app.userService.isOnline(user.id);
+
 			return reply.send({
 				message: `info du user ${username}`,
 				data: user,
+				online: isOnline
 			});
 		}
 		catch (err: any) {

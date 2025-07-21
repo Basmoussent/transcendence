@@ -119,15 +119,10 @@ async function setup() {
 
 	console.log('🛣️ Registering routes...');
 	await fastify.register(authRoutes, { prefix: "/auth" });
-	console.log('✅ Auth routes registered');
 	await fastify.register(editRoutes, { prefix: "/edit" });
-	console.log('✅ Edit routes registered');
 	await fastify.register(userRoutes);
-	console.log('✅ User routes registered');
 	await fastify.register(gameRoutes, { prefix: "/games" });
-	console.log('✅ Games routes registered');
 	await fastify.register(friendRoutes, { prefix: "/friend" });
-	console.log('✅ Friend routes registered');
 
 	console.log('📡 Registering WebSocket routes...');
 	await fastify.register(require('@fastify/websocket'));//TALAN

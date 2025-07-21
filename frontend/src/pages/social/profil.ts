@@ -1,5 +1,6 @@
 import { getAuthToken } from '../../utils/auth';
 import { loadRelation } from './renderProfil'
+import { getUserGameHistory } from '../../game/gameUtils';
 
 export class profil {
 
@@ -8,6 +9,7 @@ export class profil {
 	private stats: any;
 	private friends: any;
 	private relation: any;
+	private recentGames: any[];
 
 	private homeBtn: HTMLElement;
 	private username: HTMLElement;
@@ -20,6 +22,8 @@ export class profil {
 	
 	private gameHistory: HTMLElement;
 	private friendsGrid: HTMLElement;
+	private online: HTMLElement;
+	private statusDot: HTMLElement;
 
 	constructor (data: any) {
 
@@ -28,7 +32,7 @@ export class profil {
 		this.stats = data.stats;
 		this.friends = data.friends;
 		this.relation = data.relation;
-
+		this.recentGames = [];
 
 		this.homeBtn = this.getElement('homeBtn');
 		this.username = this.getElement('username');
@@ -40,6 +44,12 @@ export class profil {
 		this.rank = this.getElement('rank');
 		this.gameHistory = this.getElement('gameHistory');
 		this.friendsGrid = this.getElement('friends');
+		this.online = this.getElement('online');
+		this.statusDot = this.getElement('statusDot');
+
+		// recup les relations de /me voir si ya user, 
+
+		// si this.me.username === this.user.username --> pas possible, on redirige vers /me
 
 		this.setupEvents();
 		console.log("setupEvents")
@@ -106,6 +116,18 @@ export class profil {
 			console.error("❌ Element friendsGrid non trouvé");
 			return;
 		}
+		if (!this.gameHistory) {
+			console.error("❌ Element gameHistory non trouvé");
+			return;
+		}
+		if (!this.online) {
+			console.error("❌ Element online non trouvé");
+			return;
+		}
+		if (!this.statusDot) {
+			console.error("❌ Element statusDot non trouvé");
+			return;
+		}
 
 		this.relation = await loadRelation(this.me.username, this.user.username)
 
@@ -121,6 +143,9 @@ export class profil {
 
 		this.username.textContent = this.user.username || 'Utilisateur inconnu';
 		
+		// Mettre à jour le statut en ligne/hors ligne
+		this.updateOnlineStatus();
+		
 		// Mettre à jour les statistiques
 		const totalGames = (this.stats.pong_games || 0) + (this.stats.block_games || 0);
 		this.gamePlayed.textContent = totalGames.toString();
@@ -131,7 +156,10 @@ export class profil {
 		const winrateValue = totalGames > 0 ? Math.round((totalWins / totalGames) * 100) : 0;
 		this.winrate.textContent = `${winrateValue}%`;
 		
-		this.rank.textContent = "1st"; // TODO: Calculer le vrai rank
+		this.rank.textContent = "1st";
+
+		// Charger les parties récentes
+		await this.loadRecentGames();
 
 		// Vider la grille des amis
 		this.friendsGrid.innerHTML = '';
@@ -150,6 +178,134 @@ export class profil {
 			console.log("👥 Aucun ami à afficher");
 			this.friendsGrid.innerHTML = '<div class="no-friends">Aucun ami pour le moment</div>';
 		}
+	}
+
+	private updateOnlineStatus() {
+		// Pour l'instant, on suppose que l'utilisateur est en ligne
+		// Dans une vraie application, on récupérerait cette info depuis une API
+		const isOnline = this.user.online;
+		
+		if (isOnline) {
+			this.online.textContent = 'En ligne';
+			this.online.className = 'online-status';
+			this.statusDot.className = 'status-dot online';
+			// Mettre à jour le conteneur du statut
+			const statusContainer = this.online.parentElement;
+			if (statusContainer) {
+				statusContainer.className = 'profile-status';
+			}
+		} else {
+			this.online.textContent = 'Hors ligne';
+			this.online.className = 'offline-status';
+			this.statusDot.className = 'status-dot offline';
+			// Mettre à jour le conteneur du statut
+			const statusContainer = this.online.parentElement;
+			if (statusContainer) {
+				statusContainer.className = 'profile-status offline';
+			}
+		}
+	}
+
+	// Méthode pour tester différents statuts (à supprimer en production)
+	public setOnlineStatus(isOnline: boolean) {
+		if (isOnline) {
+			this.online.textContent = 'En ligne';
+			this.online.className = 'online-status';
+			this.statusDot.className = 'status-dot online';
+			// Mettre à jour le conteneur du statut
+			const statusContainer = this.online.parentElement;
+			if (statusContainer) {
+				statusContainer.className = 'profile-status';
+			}
+		} else {
+			this.online.textContent = 'Hors ligne';
+			this.online.className = 'offline-status';
+			this.statusDot.className = 'status-dot offline';
+			// Mettre à jour le conteneur du statut
+			const statusContainer = this.online.parentElement;
+			if (statusContainer) {
+				statusContainer.className = 'profile-status offline';
+			}
+		}
+	}
+
+	private async loadRecentGames() {
+		try {
+			console.log("🎮 Chargement des parties récentes pour:", this.user.username);
+			this.recentGames = await getUserGameHistory(this.user.username);
+			console.log("📊 Parties récupérées:", this.recentGames.length);
+			console.log("🎮 Détail des parties:", this.recentGames);
+			this.displayRecentGames();
+		} catch (error) {
+			console.error("❌ Erreur lors du chargement des parties récentes:", error);
+			this.recentGames = [];
+			this.displayRecentGames();
+		}
+	}
+
+	private displayRecentGames() {
+		if (!this.gameHistory) {
+			console.error("❌ Element gameHistory non trouvé");
+			return;
+		}
+
+		const formatDate = (timestamp: string | undefined) => {
+			if (!timestamp) return 'N/A';
+			const date = new Date(parseInt(timestamp));
+			return date.toLocaleString();
+		};
+
+		const getGameResult = (game: any, username: string) => {
+			if (!game.winner) return 'En cours';
+			if (game.winner === username) return 'Victoire';
+			return 'Défaite';
+		};
+
+		const getGameTypeLabel = (gameType: string) => {
+			switch (gameType) {
+				case 'pong':
+					return 'Pong';
+				case 'block':
+					return 'Block';
+				default:
+					return gameType;
+			}
+		};
+
+		const gamesHtml = this.recentGames.length > 0 
+			? this.recentGames.slice(0, 5).map((game, index) => {
+				console.log(`🎮 Partie ${index + 1}:`, game);
+				return `
+				<div class="game-history-item">
+					<div class="game-info">
+						<div class="game-type">${getGameTypeLabel(game.game_type)}</div>
+						<div class="game-players">
+							<span class="player">${game.player1}</span>
+							${game.player2 ? `<span class="vs">vs</span><span class="player">${game.player2}</span>` : ''}
+							${game.player3 ? `<span class="vs">vs</span><span class="player">${game.player3}</span>` : ''}
+							${game.player4 ? `<span class="vs">vs</span><span class="player">${game.player4}</span>` : ''}
+						</div>
+						<div class="game-result ${getGameResult(game, this.user.username).toLowerCase()}">
+							${getGameResult(game, this.user.username)}
+						</div>
+					</div>
+					<div class="game-date">
+						${formatDate(game.end_time)}
+					</div>
+				</div>
+			`}).join('')
+			: '<div class="no-games">Aucune partie récente</div>';
+
+		// Mettre à jour le contenu de la section gameHistory
+		this.gameHistory.innerHTML = `
+			<div class="section-header">
+				<i class="fas fa-history"></i>
+				<h2>Activité récente</h2>
+			</div>
+			<div class="recent-activity">
+				${gamesHtml}
+			</div>
+		`;
 	}
 
 	private friendCard(friend: any) { // modifier status absent | en ligne avec redis

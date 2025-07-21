@@ -52,16 +52,16 @@ export class Pong {
 		this.end = false;
 		this.lastPlayerColl = -1;
 
-		// !!! modifier ca avec les infos de la partie
+		// this.paddles = this.initPlayers();
 		this.paddles = [
 			new Paddle(20, 100, PADDLE1_COLOR),
-			new Paddle(20, 100, PADDLE2_COLOR),
-		];
+			new Paddle(20, 100, PADDLE2_COLOR)
+		]
 
 		this.ball = new Ball(this.height, this.width);
 		this.keys = {};
 
-		this.retrieveGameInfo(uuid);
+		// this.retrieveGameInfo(uuid);
 	}
 
 	public init(): { player1: player1, player2: player1 } {
@@ -80,49 +80,62 @@ export class Pong {
 		return {player1, player2};
 	};
 
-	private async retrieveGameInfo(uuid: string) {
+	// private async retrieveGameInfo(uuid: string) {
 		
-		const authToken = getAuthToken()
-		if (!authToken) {
-			alert('❌ Token d\'authentification manquant');
-			window.history.pushState({}, '', '/login');
-			window.dispatchEvent(new PopStateEvent('popstate'));
-			return;
-		}
+	// 	const authToken = getAuthToken()
+	// 	if (!authToken) {
+	// 		alert('❌ Token d\'authentification manquant');
+	// 		window.history.pushState({}, '', '/login');
+	// 		window.dispatchEvent(new PopStateEvent('popstate'));
+	// 		return;
+	// 	}
 
-		const response = await fetch(`/api/games/?uuid=${uuid}`, {
-			method: 'GET',
-			headers: {
-				'Content-Type': 'application/json',
-				'x-access-token': authToken
-				},
-		});
+	// 	const response = await fetch(`/api/games/?uuid=${uuid}`, {
+	// 		method: 'GET',
+	// 		headers: {
+	// 			'Content-Type': 'application/json',
+	// 			'x-access-token': authToken
+	// 			},
+	// 	});
 
-		if (!response.ok) {
-			const errorData = await response.json();
-			throw new Error(errorData.details || "pblm recuperer les infos de la game le multipong");
-		}
+	// 	if (!response.ok) {
+	// 		const errorData = await response.json();
+	// 		throw new Error(errorData.details || "pblm recuperer les infos de la game le multipong");
+	// 	}
 
-		const result = await response.json();
+	// 	const result = await response.json();
 
-		this.data = {
-			id: result.game.id,
-			uuid: result.game.uuid,
-			game_type: result.game.game_type,
-			player1: result.game.player1,
-			player2: result.game.player2,
-			player3: result.game.player3,
-			player4: result.game.player4,
-			users_needed: result.game.users_needed,
-			ai: result.game.ai,
-		}
+	// 	this.data = {
+	// 		id: result.game.id,
+	// 		uuid: result.game.uuid,
+	// 		game_type: result.game.game_type,
+	// 		player1: result.game.player1,
+	// 		player2: result.game.player2,
+	// 		player3: result.game.player3,
+	// 		player4: result.game.player4,
+	// 		users_needed: result.game.users_needed,
+	// 		ai: result.game.ai,
+	// 	}
 
-		console.log(`les infos de la game => ${JSON.stringify(this.data, null, 12)}`)
-	}
+	// 	// console.log(`les infos de la game => ${JSON.stringify(this.data, null, 12)}`)
+	// }
+
+	// private initPlayers(): [Paddle, Paddle | PaddleAI] {
+	// 	let ai_player = this.data.ai;
+
+	// 	const paddle1 = new Paddle(20, 100, PADDLE1_COLOR); // player1 toujours un player
+	// 	let paddle2: Paddle | PaddleAI;
+
+	// 	if (ai_player > 0)
+	// 		paddle2 = new PaddleAI(20, 100, PADDLE2_COLOR);
+	// 	else
+	// 		paddle2 = new Paddle(20, 100, PADDLE2_COLOR);
+
+	// 	return [paddle1, paddle2];
+	// }
 
 	// positions et tailles de base en fonction de la taille du canvas
 	private setupPaddles(): void {
-		console.log('Setting up paddles...');
 		this.paddles[0].x = PADDLE_OFFSET;
 		this.paddles[0].y = (this.height - this.paddles[0].height) / 2;
 
@@ -131,9 +144,6 @@ export class Pong {
 	}
 
 	private setupCanvas(): void {
-		console.log('Setting up canvas...');
-		console.log('this.width = ', this.width)
-		console.log('this.height = ', this.height)
 		this.canvas.width = this.canvas.clientWidth || 800;
 		this.canvas.height = this.canvas.clientHeight || 600;
 		this.width = this.canvas.width;
@@ -176,7 +186,7 @@ export class Pong {
 	private displayStartMsg(): void {
 		this.ctx.globalAlpha = 0.2;
 		this.ctx.fillStyle = 'white';
-		this.ctx.font = '48px sans-serif'; // changer police
+		this.ctx.font = '48px gaming'; // changer police
 		this.ctx.fillText(t('pong.pressEnterToStart'), this.width / 2 - 150, this.height / 2 - 30);
 		this.ctx.fillText(t('pong.toStart'), this.width / 2 - 100, this.height / 2 + 50);
 		this.ctx.globalAlpha = 1;
@@ -205,7 +215,7 @@ export class Pong {
 	private displayResult(): void {
 		this.ctx.globalAlpha = 0.2;
 		this.ctx.fillStyle = 'white';
-		this.ctx.font = '48px sans-serif'; // changer police
+		this.ctx.font = '48px gaming'; // changer police
 
 		this.ctx.globalAlpha = 1;
 	}

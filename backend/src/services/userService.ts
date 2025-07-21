@@ -60,11 +60,19 @@ export class UserService {
 	}
 
 	async isOnline(id: number) {
-		const user = await this.findById(id);
-		if (user) {
-			return redis.get(`alive:${id}`);
+		try {
+			const user = await this.findById(id);
+			if (user) {
+				// Vérifier le statut par ID et par username
+				const isOnlineById = await redis.exists(`${id}:online`);
+				const isOnlineByUsername = await redis.exists(`${user.username}:online`);
+				return isOnlineById || isOnlineByUsername;
+			}
+			return false;
+		} catch (error) {
+			console.error('❌ Error checking online status:', error);
+			return false;
 		}
-		return false;
 	}
 
 	async generateQrcode(user: any) {

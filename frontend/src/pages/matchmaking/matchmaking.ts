@@ -31,7 +31,7 @@ export class matchmaking {
 
 	private username: string;
 
-	private joinBtn: Map<number,HTMLElement> = new Map();
+	private static joinBtn: Map<number,HTMLElement> = new Map();
 	private gameId: number = 0;
 	constructor() {
 
@@ -84,6 +84,8 @@ export class matchmaking {
 		}
 
 	}
+
+
 	private async joinIt() {
 		await this.joinRoom(this.gameId);
 	}
@@ -100,25 +102,15 @@ export class matchmaking {
 					const gameId = btn.id.replace('join', '').replace('Btn', '');
 					this.gameId = Number(gameId);
 
-					if (!this.joinBtn.has(Number(gameId))) {
-						this.joinBtn.set(Number(gameId), btn as HTMLElement);
+					if (!matchmaking.joinBtn.has(Number(gameId))) {
+						console.log("joinBtn before:", matchmaking.joinBtn)
+						matchmaking.joinBtn.set(Number(gameId), btn as HTMLElement);
 						addEvent(btn, 'click', () => {
 							this.joinIt();
 						});
 					}
 				});
 
-				// Gérer les clics sur les cartes de jeu
-				const gameCards = element.querySelectorAll('.game-card[data-game-id]');
-				gameCards.forEach((card) => {
-					const gameId = card.getAttribute('data-game-id');
-					if (gameId) {
-						addEvent(card, 'click', () => {
-							this.gameId = Number(gameId);
-							this.joinIt();
-						});
-					}
-				});
 				}
 			});
 			});
@@ -133,8 +125,8 @@ export class matchmaking {
 			const gameId = btn.id.replace('join', '').replace('Btn', '');
 			this.gameId = Number(gameId);
 
-			if (!this.joinBtn.has(Number(gameId))) {
-				this.joinBtn.set(Number(gameId), btn as HTMLElement);
+			if (!matchmaking.joinBtn.has(Number(gameId))) {
+				matchmaking.joinBtn.set(Number(gameId), btn as HTMLElement);
 				addEvent(btn, 'click', () => {
 					this.joinIt();
 				});

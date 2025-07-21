@@ -50,12 +50,7 @@ export class MultiPong {
         this.lastPlayerColl = -1;
 
         // !!! modifier ca avec les infos de la partie
-        this.paddles = [
-            new Paddle(20, 100, PADDLE1_COLOR),
-            new PaddleAI(20, 100, PADDLE2_COLOR),
-            new PaddleAI(100, 20, PADDLE3_COLOR),
-            new PaddleAI(100, 20, PADDLE4_COLOR)
-        ];
+        this.paddles = this.initPlayers();
 
         this.ball = new Ball(this.height, this.width);
         this.keys = {};
@@ -86,8 +81,7 @@ export class MultiPong {
 
 		const result = await response.json();
 
-        console.log("Résultat brut de l'API :", result);
-
+        // console.log("Résultat brut de l'API :", result);
 
 		this.data = {
 			id: result.game.id,
@@ -98,11 +92,57 @@ export class MultiPong {
 			player3: result.game.player3,
 			player4: result.game.player4,
 			users_needed: result.game.users_needed,
-			ai: result.game.ai,
+			ai: result.game.ai
 		}
 
-        console.log(`les infos de la game => ${JSON.stringify(this.data, null, 12)}`)
+        // console.log(`les infos de la game => ${JSON.stringify(this.data, null, 12)}`)
 	}
+
+    private initPlayers(): [Paddle, Paddle | PaddleAI, Player?, Player?] {
+        let players: number = this.data.users_needed - 1;
+        let ai_players: number = this.data.ai;
+
+        const paddles: Player[] = [];
+
+        // player1 toujours un player
+        paddles.push(new Paddle(20, 100, PADDLE1_COLOR));
+
+        // player2 soit un player soit une ia
+        if (players > 0) {
+            paddles.push(new Paddle(20, 100, PADDLE2_COLOR));
+            players -= 1;
+        }
+        else {
+            paddles.push(new PaddleAI(20, 100, PADDLE2_COLOR));
+            ai_players -= 1;
+        }
+
+        // player3 soit player soit ia soit aucun des deux
+        if (players > 0) {
+            paddles.push(new Paddle(100, 20, PADDLE3_COLOR));
+            players -= 1;
+        }
+        else if (ai_players > 0) {
+            paddles.push(new PaddleAI(100, 20, PADDLE3_COLOR));
+            ai_players -= 1;
+        }
+        else
+            paddles.push(null);
+
+        // player4 soit player soit ia soit aucun des deux
+        if (players > 0) {
+            paddles.push(new Paddle(100, 20, PADDLE3_COLOR));
+            players -= 1;
+        }
+        else if (ai_players > 0) {
+            paddles.push(new PaddleAI(100, 20, PADDLE4_COLOR));
+            ai_players -= 1;
+        }
+        else
+            paddles.push(null);
+
+        return paddles as [Paddle, Paddle | PaddleAI, Player?, Player?];
+    }
 
     public init(): void {
         console.log('Initializing paddle game...');
@@ -118,7 +158,6 @@ export class MultiPong {
 
     // positions et tailles de base en fonction de la taille du canvas
     private setupPaddles(): void {
-        console.log('Setting up paddles...');
         this.paddles[0].x = PADDLE_OFFSET;
         this.paddles[0].y = (this.height - this.paddles[0].height) / 2;
 
@@ -139,9 +178,6 @@ export class MultiPong {
     }
 
     private setupCanvas(): void {
-        console.log('Setting up canvas...');
-        console.log('this.width = ', this.width)
-        console.log('this.height = ', this.height)
         this.canvas.width = this.canvas.clientWidth || 600;
         this.canvas.height = this.canvas.clientHeight || 600;
         this.width = this.canvas.width;
@@ -184,7 +220,7 @@ export class MultiPong {
     private displayStartMsg(): void {
         this.ctx.globalAlpha = 0.2;
         this.ctx.fillStyle = 'white';
-        this.ctx.font = '48px sans-serif'; // changer police
+        this.ctx.font = '48px gaming'; // changer police
         this.ctx.fillText(t('pong.pressEnterToStart'), this.width / 2 - 150, this.height / 2 - 30);
         this.ctx.fillText(t('pong.toStart'), this.width / 2 - 100, this.height / 2 + 50);
         this.ctx.globalAlpha = 1;
@@ -250,7 +286,7 @@ export class MultiPong {
     private displayResult(): void {
         this.ctx.globalAlpha = 0.2;
         this.ctx.fillStyle = 'white';
-        this.ctx.font = '48px sans-serif'; // changer police
+        this.ctx.font = '48px gaming'; // changer police
 
         this.ctx.globalAlpha = 1;
     }
@@ -305,7 +341,8 @@ export class MultiPong {
     private ballPaddleCollision(): void {
         if (this.ball.x - this.ball.radius <= this.paddles[0].x + this.paddles[0].width && this.ball.y + this.ball.radius >= this.paddles[0].y && this.ball.y - this.ball.radius <= this.paddles[0].y + this.paddles[0].height && this.ball.x > this.paddles[0].x) {
 
-            this.ball.addBallSpeed();
+            if (this.getNbrOfPlayers() < 3)
+                this.ball.addBallSpeed();
             this.ball.speedX *= -1;
             this.ball.adjustBallDir(this.paddles[0], this.getNbrOfPlayers());
 
@@ -317,7 +354,8 @@ export class MultiPong {
             this.lastPlayerColl = 0;
         }
         if (this.ball.x + this.ball.radius >= this.paddles[1].x && this.ball.y + this.ball.radius >= this.paddles[1].y && this.ball.y - this.ball.radius <= this.paddles[1].y + this.paddles[1].height && this.ball.x < this.paddles[1].x + this.paddles[1].width) {
-            this.ball.addBallSpeed();
+            if (this.getNbrOfPlayers() < 3)
+                this.ball.addBallSpeed();
             this.ball.speedX *= -1;
             this.ball.adjustBallDir(this.paddles[1], this.getNbrOfPlayers());
 
@@ -340,7 +378,6 @@ export class MultiPong {
             this.ball.y > player3.y) {
 
             this.ball.speedY *= -1;
-            this.ball.addBallSpeedMulti();
             this.adjustBallDirMultiplayer(this.ball, player3);
             this.addBallDeviation();
             // repositionner balle pour eviter comportement bizarre
@@ -358,7 +395,6 @@ export class MultiPong {
             this.ball.y < player4.y + player4.height) {
 
             this.ball.speedY *= -1;
-            this.ball.addBallSpeedMulti();
             this.adjustBallDirMultiplayer(this.ball, player4);
             this.addBallDeviation();
 
