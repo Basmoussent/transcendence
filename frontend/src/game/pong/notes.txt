@@ -27,3 +27,9 @@ https://jwt.io/introduction
             // Payload: contient les claims
                 // infos sur l'utilisateur
             // Signature
+
+
+
+check que la balle augmente pas en vitesse pendant le multipong
+faire le pushstate en fin de parties
+petit msg de game over
