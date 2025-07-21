@@ -23,9 +23,8 @@ export async function initializeProfilEvents(uuid:string) {
 			loadRelation(me.username, user.username)
 		]);
 
-		if (!stats || !friends) {
+		if (!stats || !friends)
 			console.error("Données manquantes pour afficher le profil");
-		}
 
 		const data = { me, user, stats, friends, relation };
 
@@ -38,199 +37,6 @@ export async function initializeProfilEvents(uuid:string) {
 	}
 }
 
-
-async function loadRelation(user1: string, user2: string) {
-
-	try {
-		const token = getAuthToken();
-		if (!token) {
-			alert('❌ Token d\'authentification manquant');
-			window.history.pushState({}, '', '/login');
-			window.dispatchEvent(new PopStateEvent('popstate'));
-			return null;
-		}
-		console.log(JSON.stringify({
-			user1: user1,
-			user2: user2,
-		}, null, 12))
-		const response = await fetch('/api/friend/relation', {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json',
-				'x-access-token': token
-			},
-			body: JSON.stringify({
-				user1: user1,
-				user2: user2,
-			})
-		});
-		console.log(response)
-		if (response.ok) {
-			const result = await response.json();
-			return result;
-		} else {
-			console.error('Erreur lors de la récupération des données utilisateur');
-			return null;
-		}
-	} catch (err) {
-		console.error(`fail de recup me dans loadme renderFriends`, err);
-		return null;
-	}
-
-}
-
-async function loadMe() {
-
-	try {
-		const token = getAuthToken();
-		if (!token) {
-			alert('❌ Token d\'authentification manquant');
-			window.history.pushState({}, '', '/login');
-			window.dispatchEvent(new PopStateEvent('popstate'));
-			return null;
-		}
-
-		const response = await fetch('/api/me', {
-			method: 'GET',
-			headers: {
-				'Content-Type': 'application/json',
-				'x-access-token': token
-			}
-		});
-
-		if (response.ok) {
-			const result = await response.json();
-			const userData = {
-				username: sanitizeHtml(result.user?.username),
-				email: sanitizeHtml(result.user?.email),
-			};
-			return userData;
-		} else {
-			console.error('Erreur lors de la récupération des données utilisateur');
-			return null;
-		}
-	}
-	catch (err) {
-		console.error(`fail de recup me dans loadme renderFriends`, err);
-		return null;
-	}
-
-}
-
-async function loadUserInfo(username: string) {
-
-	try {
-		const token = getAuthToken();
-		if (!token) {
-			alert('❌ Token d\'authentification manquant');
-			window.history.pushState({}, '', '/login');
-			window.dispatchEvent(new PopStateEvent('popstate'));
-			return null;
-		}
-
-		const response = await fetch(`/api/user/username/?username=${username}`, {
-			method: 'GET',
-			headers: {
-				'Content-Type': 'application/json',
-				'x-access-token': token }
-		});
-	
-		if (response.ok) {
-			const result = await response.json();
-			const userData = {
-				id: result.data?.id,
-				username: sanitizeHtml(result.data?.username),
-				email: sanitizeHtml(result.data?.email),
-				avatar: sanitizeHtml(result.data?.avatar_url) || 'avatar.png',
-				online: result.online
-			};
-			console.log("userData", userData)
-			return userData;
-		}
-		else {
-			console.error('Erreur lors de la récupération des données utilisateur');
-			return null;
-		}
-	}
-	catch (err) {
-		console.error(`error retreve info du user pour render son profil  ${err}`);
-		return null;
-	}
-}
-
-async function loadUserStats(username: string) {
-
-	try {
-		const token = getAuthToken();
-		if (!token) {
-			alert('❌ Token d\'authentification manquant');
-			window.history.pushState({}, '', '/login');
-			window.dispatchEvent(new PopStateEvent('popstate'));
-			return null;
-		}
-
-		const response = await fetch(`/api/user/stats/?username=${username}`, {
-			method: 'GET',
-			headers: {
-				'Content-Type': 'application/json',
-				'x-access-token': token }
-		});
-	
-		if (response.ok) {
-			const result = await response.json();
-			const userStats = {
-				mmr: result.stats?.mmr,
-				pong_games: result.stats?.pong_games,
-				pong_wins: result.stats?.pong_wins,
-				block_games: result.stats?.block_games,
-				block_wins: result.stats?.block_wins,
-				rating: result.stats?.rating,
-				id: result.stats?.id,
-			};
-			return userStats;
-		}
-		else {
-			console.error('pblm recuperer les stats du user dont on veut render le profil');
-			return null;
-		}
-	}
-	catch (err) {
-		console.error(`pblm recuperer les stats du user dont on veut render le profil${err}`);
-		return null;
-	}
-
-}
-
-async function loadUserFriends(username: string) {
-	try {
-		const token = getAuthToken();
-		if (!token) {
-			alert('❌ Token d\'authentification manquant');
-			window.history.pushState({}, '', '/login');
-			window.dispatchEvent(new PopStateEvent('popstate'));
-			return null;
-		}
-
-		const response = await fetch(`/api/friend/?username=${username}`, {
-			method: 'GET',
-			headers: {
-				'Content-Type': 'application/json',
-				'x-access-token': token }
-		});
-	
-		if (response.ok) {
-			return await response.json();
-		} else {
-			console.error('gros gros zig');
-			return null;
-		}
-
-	}
-	catch (err) {
-		console.error(`pas réussi a récup les amis de cette personnes zignew que tu es`, err);
-		return null;
-	}
-}
 
 function getTemplate() {
 	return `
@@ -257,7 +63,11 @@ function getTemplate() {
 				<div class="profile-actions">
 					<button id="addFriend" class="action-btn btn-primary">
 						<i class="fas fa-user-plus"></i>
-						Ajouter ami
+						Ajouter ami 
+					</button>
+					<button id="blockBtn" class="action-btn btn-primary">
+						<i class="fas fa-ban"></i>
+						Bloquer
 					</button>
 				</div>
 			</div>
@@ -955,4 +765,191 @@ function getTemplate() {
 
 
     	</style>`;
+}
+
+export async function loadRelation(user1: string, user2: string) {
+
+	try {
+		const token = getAuthToken();
+		if (!token) {
+			alert('❌ Token d\'authentification manquant');
+			window.history.pushState({}, '', '/login');
+			window.dispatchEvent(new PopStateEvent('popstate'));
+			return null;
+		}
+		const response = await fetch('/api/friend/relation', {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+				'x-access-token': token
+			},
+			body: JSON.stringify({
+				user1: user1,
+				user2: user2,
+			})
+		});
+		console.log(response)
+		if (response.ok) {
+			const result = await response.json();
+			return result;
+		} else {
+			console.error('Erreur lors de la récupération des données utilisateur');
+			return null;
+		}
+	} catch (err) {
+		console.error(`fail de recup me dans loadme renderFriends`, err);
+		return null;
+	}
+
+}
+
+async function loadMe() {
+
+	try {
+		const token = getAuthToken();
+		if (!token) {
+			alert('❌ Token d\'authentification manquant');
+			window.history.pushState({}, '', '/login');
+			window.dispatchEvent(new PopStateEvent('popstate'));
+			return null;
+		}
+
+		const response = await fetch('/api/me', {
+			method: 'GET',
+			headers: {
+				'Content-Type': 'application/json',
+				'x-access-token': token
+			}
+		});
+
+		if (response.ok) {
+			const result = await response.json();
+			const userData = {
+				username: sanitizeHtml(result.user?.username),
+				email: sanitizeHtml(result.user?.email),
+			};
+			return userData;
+		} else {
+			console.error('Erreur lors de la récupération des données utilisateur');
+			return null;
+		}
+	}
+	catch (err) {
+		console.error(`fail de recup me dans loadme renderFriends`, err);
+		return null;
+	}
+
+}
+
+async function loadUserInfo(username: string) {
+
+	try {
+		const token = getAuthToken();
+		if (!token) {
+			alert('❌ Token d\'authentification manquant');
+			window.history.pushState({}, '', '/login');
+			window.dispatchEvent(new PopStateEvent('popstate'));
+			return null;
+		}
+
+		const response = await fetch(`/api/user/username/?username=${username}`, {
+			method: 'GET',
+			headers: {
+				'Content-Type': 'application/json',
+				'x-access-token': token }
+		});
+	
+		if (response.ok) {
+			const result = await response.json();
+			const userData = {
+				id: result.data?.id,
+				username: sanitizeHtml(result.data?.username),
+				email: sanitizeHtml(result.data?.email),
+				avatar: sanitizeHtml(result.data?.avatar_url) || 'avatar.png',
+			};
+			return userData;
+		}
+		else {
+			console.error('Erreur lors de la récupération des données utilisateur');
+			return null;
+		}
+	}
+	catch (err) {
+		console.error(`error retreve info du user pour render son profil  ${err}`);
+		return null;
+	}
+}
+
+async function loadUserStats(username: string) {
+
+	try {
+		const token = getAuthToken();
+		if (!token) {
+			alert('❌ Token d\'authentification manquant');
+			window.history.pushState({}, '', '/login');
+			window.dispatchEvent(new PopStateEvent('popstate'));
+			return null;
+		}
+
+		const response = await fetch(`/api/user/stats/?username=${username}`, {
+			method: 'GET',
+			headers: {
+				'Content-Type': 'application/json',
+				'x-access-token': token }
+		});
+	
+		if (response.ok) {
+			const result = await response.json();
+			const userStats = {
+				mmr: result.stats?.mmr,
+				pong_games: result.stats?.pong_games,
+				pong_wins: result.stats?.pong_wins,
+				block_games: result.stats?.block_games,
+				block_wins: result.stats?.block_wins,
+				rating: result.stats?.rating,
+				id: result.stats?.id,
+			};
+			return userStats;
+		}
+		else {
+			console.error('pblm recuperer les stats du user dont on veut render le profil');
+			return null;
+		}
+	}
+	catch (err) {
+		console.error(`pblm recuperer les stats du user dont on veut render le profil${err}`);
+		return null;
+	}
+
+}
+
+async function loadUserFriends(username: string) {
+	try {
+		const token = getAuthToken();
+		if (!token) {
+			alert('❌ Token d\'authentification manquant');
+			window.history.pushState({}, '', '/login');
+			window.dispatchEvent(new PopStateEvent('popstate'));
+			return null;
+		}
+
+		const response = await fetch(`/api/friend/?username=${username}`, {
+			method: 'GET',
+			headers: {
+				'Content-Type': 'application/json',
+				'x-access-token': token }
+		});
+	
+		if (response.ok) {
+			return await response.json();
+		} else {
+			console.error('gros gros zig');
+			return null;
+		}
+
+	}
+	catch (err) {
+		console.error(`pas réussi a récup les amis de cette personnes zignew que tu es`, err);
+		return null;
+	}
 }

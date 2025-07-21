@@ -184,8 +184,9 @@ export class Room {
 	
 	private increase() {
 
-		if (this.roomData?.users?.length && (this.roomData?.maxPlayers === this.roomData?.users?.length + this.roomData?.ai))
+		if (this.roomData?.maxPlayers == (this.roomData!.users.length + this.roomData!.ai))
 			return;
+
 		this.ws.send(JSON.stringify({
 			type: 'increase',
 			token: this.token,
@@ -194,8 +195,9 @@ export class Room {
 
 	private decrease() {
 
-		if (this.roomData?.users?.length && this.roomData?.users?.length === 0)
+		if (this.roomData!.ai <= 0)
 			return;
+
 		this.ws.send(JSON.stringify({
 			type: 'decrease',
 			token: this.token,
@@ -237,6 +239,11 @@ export class Room {
 		window.dispatchEvent(new Event('popstate'));
 	}
 
+	private invite() {
+		console.log('doanzdoinazoidnao')
+		// 
+	}
+
 	private updateUI() {
 
 		if (!this.roomData)
@@ -257,17 +264,17 @@ export class Room {
 		}
 
 		for (let i = this.roomData.users.length + this.roomData.ai; i < this.roomData.maxPlayers; i++)
-			this.playersContainer.innerHTML += `<div class="empty-slot">${t('room.waitingForPlayers')}</div>`;
+			this.playersContainer.innerHTML += `<div class="empty-slot">Waiting for players...</div>`;
 
 		const currentUser = this.roomData.users.find(u => u.username === this.username);
 
 		if (currentUser?.isReady) {
 			this.readyBtn.classList.add('active');
-			this.readyBtn.innerHTML = `<i class="fas fa-times"></i> ${t('room.notReady')}`;
+			this.readyBtn.innerHTML = `<i class="fas fa-times"></i> Not ready`;
 		}
 		else {
 			this.readyBtn.classList.remove('active');
-			this.readyBtn.innerHTML = `<i class="fas fa-check"></i> ${t('room.ready')}`;
+			this.readyBtn.innerHTML = `<i class="fas fa-check"></i> Ready`;
 		}
 
 		const allReady = this.roomData.users.every(u => u.isReady);
@@ -281,7 +288,7 @@ export class Room {
 
 			if (this.roomData.gameType === 'block') {
 				this.getElement('ai-setting').style.display = 'none';
-				this.maxPlayersSelect.innerHTML = `<label class="text-white/80">${t('room.maxPlayers')}</label>
+				this.maxPlayersSelect.innerHTML = `<label class="text-white/80">Max Players</label>
 									<select class="setting-select" id="maxPlayersSelect">
 										<option value="1">1</option>
 										<option value="2">2</option>
@@ -313,7 +320,7 @@ export class Room {
 		if (allReady)
 			this.gameStatusEl.innerHTML = `<span class="status-dot ready"></span><span class="text-white/80">Ready to start!</span>`;
 		else
-			this.gameStatusEl.innerHTML = `<span class="status-dot waiting"></span><span class="text-white/80">${t('room.waitingForPlayers')}</span>`;
+			this.gameStatusEl.innerHTML = `<span class="status-dot waiting"></span><span class="text-white/80">Waiting for players...</span>`;
 	}
 
 	private playerCard(user: User): string {
@@ -326,7 +333,7 @@ export class Room {
 			<div class="player-card ${readyClass} ${hostClass}">
 				<div class="player-avatar">${avatarInitial}</div>
 				<div class="player-name">${sanitizeHtml(user.username)}</div>
-				<div class="player-status">${user.isReady ? `${t('room.ready')}` : `${t('room.notReady')}`}</div>
+				<div class="player-status">${user.isReady ? `Ready` : `Not ready`}</div>
 			</div>
 		`;
 	}
@@ -383,6 +390,7 @@ export class Room {
 				message: 'je launch une game',
 				token: this.token
 			}));
+
 			// faire le new block ou pong avec info de la game dans le constructeur
 			if (this.roomData?.host === this.username) {
 				if (gameType === 'pong' && this.roomData.users.length > 2)

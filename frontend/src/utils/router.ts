@@ -35,21 +35,37 @@ export async function router() {
 	const publicRoutes = ['/', '/lang','/login', '/create-account', '/forgot-password'];
 	const token = getAuthToken();
 
+	//TODO recuperer le username grace au token 
+	
+
 	let uuid: string = '';
 	
-	if (path.startsWith('/multipong/') || path.startsWith('/pong/') || path.startsWith('/block/') || path.startsWith('/block1v1/') ||
-			path.startsWith('/room/') || path.startsWith('/profil/') || path.startsWith('/multipong')
+	if (path.startsWith('/multipong') || path.startsWith('/pong') || path.startsWith('/block') || path.startsWith('/block1v1') ||
+			path.startsWith('/room') || path.startsWith('/profil') || path.startsWith('/multipong')
 		|| path.startsWith('/pong') || path.startsWith('/block') || path.startsWith('/block1v1') || path.startsWith('/room') || path.startsWith('/profil')) {
 
 		const it = path.indexOf('/', 1);
 
+		if (!it) { // ya pas de deuxieme slash alors qu'il faut une suite donc erreur
+
+		}
+
 		uuid = path.substring(it + 1);
 		path = path.substring(0, it);
-		console.log("uuid:", uuid);
-		if (uuid.length !== 36) {
-			app.innerHTML = render404();
+
+		if (!uuid) {
+			console.error("pblm ya pas le uuid ou bien le username pour une page qui en a besoin")
 			return;
 		}
+
+		// si /pong faut passer ici et voir 
+
+		// { '/multipong/','/pong/', '/block/', '/block1v1/', '/room/' }
+		// verifier que la game existe dans la db et qu'elle n'a pas de starting time encore
+
+		// '/profil/' verifier que le user existe dans la db et que celui qui appel cette route n'est pas bloque par le user
+		//  si le username renseigne est celui trouvé via le token changer pour le path pour /me
+
 	}
 
 	if (!publicRoutes.includes(path) && !token) {
