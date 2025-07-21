@@ -21,7 +21,6 @@ interface UserData {
 	avatar_url?: string;
 	language: string;
 	two_fact_auth: boolean;
-	secret_key?: string;
 }
 
 async function userRoutes(app: FastifyInstance) {

@@ -257,17 +257,17 @@ export class Room {
 		}
 
 		for (let i = this.roomData.users.length + this.roomData.ai; i < this.roomData.maxPlayers; i++)
-			this.playersContainer.innerHTML += '<div class="empty-slot">Waiting for player...</div>';
+			this.playersContainer.innerHTML += `<div class="empty-slot">${t('room.waitingForPlayers')}</div>`;
 
 		const currentUser = this.roomData.users.find(u => u.username === this.username);
 
 		if (currentUser?.isReady) {
 			this.readyBtn.classList.add('active');
-			this.readyBtn.innerHTML = '<i class="fas fa-times"></i> Not Ready';
+			this.readyBtn.innerHTML = `<i class="fas fa-times"></i> ${t('room.notReady')}`;
 		}
 		else {
 			this.readyBtn.classList.remove('active');
-			this.readyBtn.innerHTML = '<i class="fas fa-check"></i> Ready';
+			this.readyBtn.innerHTML = `<i class="fas fa-check"></i> ${t('room.ready')}`;
 		}
 
 		const allReady = this.roomData.users.every(u => u.isReady);
@@ -281,7 +281,7 @@ export class Room {
 
 			if (this.roomData.gameType === 'block') {
 				this.getElement('ai-setting').style.display = 'none';
-				this.maxPlayersSelect.innerHTML = `<label class="text-white/80">Max Players</label>
+				this.maxPlayersSelect.innerHTML = `<label class="text-white/80">${t('room.maxPlayers')}</label>
 									<select class="setting-select" id="maxPlayersSelect">
 										<option value="1">1</option>
 										<option value="2">2</option>
@@ -313,7 +313,7 @@ export class Room {
 		if (allReady)
 			this.gameStatusEl.innerHTML = `<span class="status-dot ready"></span><span class="text-white/80">Ready to start!</span>`;
 		else
-			this.gameStatusEl.innerHTML = `<span class="status-dot waiting"></span><span class="text-white/80">Waiting for players...</span>`;
+			this.gameStatusEl.innerHTML = `<span class="status-dot waiting"></span><span class="text-white/80">${t('room.waitingForPlayers')}</span>`;
 	}
 
 	private playerCard(user: User): string {
@@ -326,7 +326,7 @@ export class Room {
 			<div class="player-card ${readyClass} ${hostClass}">
 				<div class="player-avatar">${avatarInitial}</div>
 				<div class="player-name">${sanitizeHtml(user.username)}</div>
-				<div class="player-status">${user.isReady ? 'Ready' : 'Not Ready'}</div>
+				<div class="player-status">${user.isReady ? `${t('room.ready')}` : `${t('room.notReady')}`}</div>
 			</div>
 		`;
 	}
@@ -345,7 +345,7 @@ export class Room {
 			<div class="player-card ai">
 				<img class="player-avatar-img" src="${pp}" alt="Avatar">
 				<div class="player-name">AI</div>
-				<div class="player-status">Automatique</div>
+				<div class="player-status">Auto</div>
 			</div>
 		`;
 	}

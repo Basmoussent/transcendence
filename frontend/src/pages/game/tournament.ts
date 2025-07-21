@@ -1,5 +1,6 @@
 import { Pong } from '../../game/pong/pong';
 import { sanitizeHtml } from '../../utils/sanitizer';
+import { t } from '../../utils/translations';
 import { addEvent } from '../../utils/eventManager';
 
 export function renderTournaments() {
@@ -9,6 +10,10 @@ export function renderTournaments() {
   <canvas id="gameCanvas" width="800" height="600"></canvas>
 
   <div class="tournaments-header">
+    <button class="home-button" id="homeBtn">
+        <i class="fas fa-home"></i>
+         ${t('social.home')}
+    </button>
     <h1 class="tournaments-title">
       <i class="fas fa-trophy"></i>
       Tournament Lobby
@@ -215,6 +220,24 @@ export function renderTournaments() {
     border-radius: 15px;
     backdrop-filter: blur(10px);
     border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .home-button {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+
+  .home-button:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: translateY(-2px);
   }
 
   #gameCanvas {
@@ -689,6 +712,12 @@ export function renderTournaments() {
       gap: 15px;
       padding: 8px 8px;
     }
+
+    .home-button {
+      width: 100%;
+      justify-content: center;
+    }
+
     .tournaments-container {
       margin-top: 16px;
     }
@@ -707,6 +736,15 @@ export function renderTournaments() {
 `;
 
   setTimeout(() => {
+    const homeBtn = document.getElementById('homeBtn');
+	
+		if (homeBtn) {
+			homeBtn.addEventListener('click', () => {
+				window.history.pushState({}, '', '/main');
+				window.dispatchEvent(new PopStateEvent('popstate'));
+			});
+		}
+    
     console.log('Initializing Pong game...');
     const canvas = document.getElementById('gameCanvas') as HTMLCanvasElement;
     if (!canvas) {
