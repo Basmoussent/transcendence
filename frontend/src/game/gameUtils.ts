@@ -125,6 +125,41 @@ export async function logEndGame(gameId: number, winner:string) {
 		console.error("Error saving a game: ", error); }
 }
 
+export async function logEndGameHistory(uuid: string, winner:string) {
+	
+	try {
+		const token = getAuthToken();
+		if (!token) {
+			alert('❌ Token d\'authentification manquant');
+			window.history.pushState({}, '', '/login');
+			window.dispatchEvent(new PopStateEvent('popstate'));
+			return '';
+		}
+
+		const response = await fetch('/api/games', {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+				'x-access-token': token,
+			},
+			body: JSON.stringify({
+				uuid: uuid,
+				winner: winner,
+				end_time: Date.now().toString()
+			})
+		});
+	
+		if (response.ok) {
+			const result = await response.json();
+			console.log("endgame bien log", result);
+		}
+		else 
+			console.error("Erreur lors de log une game");
+	}
+	catch (error) {
+		console.error("Error saving a game: ", error); }
+}
+
 let userData = {
 	username: 'Username',
 	email: 'email@example.com',
