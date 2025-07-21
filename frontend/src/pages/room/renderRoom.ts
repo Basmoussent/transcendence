@@ -38,10 +38,8 @@ async function checkRoomExists(uuid: string): Promise<boolean> {
 
 function showRoomError() {
 	const appdiv = document.getElementById('app');
-	if (appdiv) {
+	if (appdiv) 
 		appdiv.innerHTML = `<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);color:white;"><div style='font-size:3em;margin-bottom:20px;'>😢</div><div style='font-size:1.5em;font-weight:bold;margin-bottom:10px;'>Désolé, la room que vous cherchez n'existe plus.</div><button id='backHomeBtn' style='margin-top:20px;padding:12px 24px;background:#3B82F6;color:white;border-radius:8px;text-decoration:none;font-weight:bold;cursor:pointer;'>Retour à l'accueil</button></div>`;
-	}
-	// TODO: ca ne refresh pas la page vas comprends mais change bien l'url
 	const btn = document.getElementById('backHomeBtn');
 	if (btn) {
 		btn.addEventListener('click', () => {

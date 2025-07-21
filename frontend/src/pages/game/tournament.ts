@@ -1041,28 +1041,6 @@ function updatePlayButtons() {
   });
 }
 
-function simulateMatch(matchId: any) {
-  const match = document.querySelector('[data-match="' + matchId + '"]');
-  if (!match) return;
-    const players = match.querySelectorAll('.player');
-  
-  const winner = Math.random() < 0.5 ? 0 : 1;
-  const winnerElement = players[winner] as HTMLElement;
-  winnerElement.classList.add('winner');
-  
-  const scoreElement = winnerElement.querySelector('.player-score');
-  if (scoreElement) scoreElement.textContent = '1';
-  
-  const winnerNameElement = winnerElement.querySelector('.player-name');
-  if (winnerNameElement) {
-    const winnerName = winnerNameElement.textContent;
-    if (winnerName) advanceWinner(matchId, winnerName);
-  }
-  
-  const button = match.querySelector('.play-match-btn') as HTMLButtonElement;
-  if (button) button.disabled = true;
-}
-
 function advanceWinner(matchId: any, winnerName: string) {
   console.log('Advancing winner:', winnerName, 'from match:', matchId);
   
@@ -1260,7 +1238,6 @@ function checkAndEnableNextMatch(matchId: any) {
   updateLobbyDisplay();
 };
 
-// Close modal when clicking outside
 (window as any).onclick = function(event: Event) {
   const modal = document.getElementById('addPlayerModal');
   if (event.target === modal) {
@@ -1268,7 +1245,6 @@ function checkAndEnableNextMatch(matchId: any) {
   }
 };
 
-// Enter key to add player
 document.addEventListener('keydown', function(event: KeyboardEvent) {
   const modal = document.getElementById('addPlayerModal');
   if (event.key === 'Enter' && modal?.style.display === 'block') {
@@ -1276,7 +1252,6 @@ document.addEventListener('keydown', function(event: KeyboardEvent) {
   }
 }, { once: true });
 
-// Hide error message when user types
 document.addEventListener('input', function(event: Event) {
   const target = event.target as HTMLInputElement;
   if (target && target.id === 'playerNameInput') {
