@@ -252,6 +252,12 @@ export async function handleRoom(app: FastifyInstance, socket: WebSocket, req: F
 						currentRoom.users.forEach(u => u.socket.send(gameStartMessage));
 						rooms.delete(uuid!);
 						break;
+
+					case 'ping':
+						socket.send(JSON.stringify({
+							type: 'pong'
+						}));
+						break;
 					
 				}
 			}

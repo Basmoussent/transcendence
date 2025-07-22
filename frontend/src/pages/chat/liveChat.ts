@@ -87,6 +87,7 @@ export class Chat {
 		this.chatInput.focus();
 		this.setupWsEvents();
 		this.setupClickEvents();
+		setupPing(this.ws);
 	}
 
 	private async loadMe() {
@@ -160,6 +161,9 @@ export class Chat {
 				window.history.pushState({}, '', '/login');
 				window.dispatchEvent(new Event('popstate'));
 				this.ws.close();
+				break;
+			case 'pong':
+				console.log(" livechat pong");
 				break;
 			default:
 				console.log(`Unknown event type: ${data.type}   ${data.message}`);
@@ -562,4 +566,12 @@ async function fetchUserRelations(username: string): Promise<Relation[]|null> {
 		console.error("error retrieve relations of a user", error.message);
 	}
 	return null;
+}
+
+function setupPing(ws: WebSocket) {
+	setInterval(() => {
+		ws.send(JSON.stringify({
+			type: 'ping'
+		}));
+	}, 10000);	
 }

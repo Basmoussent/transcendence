@@ -116,6 +116,11 @@ async function handleMessage(message: string, username: string, app: FastifyInst
 				live.delete(sender.username);
 				console.log('je disconnect le user')
 				break;
+			case 'ping':
+				sender.socket.send(JSON.stringify({
+					type: 'pong'
+				}));
+				break;
 			default:
 				console.warn(`recoit un event inconnu`)
 		}
