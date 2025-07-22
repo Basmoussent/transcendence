@@ -301,9 +301,9 @@ export class Chat {
 		for (const relation of relations) {
 			console.log("relation", relation)
 
-			const friendUsername = relation.user_1 === this.me.userId.toString() ? relation.user_2 : relation.user_1;
+			const friendid = relation.user_1 === this.me.userId.toString() ? relation.user_2 : relation.user_1;
 
-			const friend: UserChat | void = await fetchUserInfo(friendUsername);
+			const friend: UserChat | void = await fetchUserInfo(friendid);
 
 			if (!friend)
 				continue;

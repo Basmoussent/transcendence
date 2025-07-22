@@ -155,6 +155,10 @@ async function addFriend(app: FastifyInstance, user: UserChat, friendName: strin
 	}
 
 	// 1 - check que le user exist
+
+	console.log("doazndoianozdinaz  ", user);
+
+
 	const friend = await app.userService.findByUsername(friendName);
 	console.log(`🔍 Debug - Friend found:`, friend);
 	
