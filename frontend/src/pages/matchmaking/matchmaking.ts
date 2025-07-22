@@ -85,9 +85,17 @@ export class matchmaking {
 			this.handleEvents(data);
 		}
 
+		this.setupPing();
+
 	}
 
-
+	private setupPing() {
+		setInterval(() => {
+			this.ws.send(JSON.stringify({
+				type: 'ping'
+			}));
+		}, 10000);
+	}
 	private async joinIt() {
 		await this.joinRoom(this.gameId);
 	}
@@ -281,6 +289,9 @@ export class matchmaking {
 				window.history.pushState({}, '', '/login');
 				window.dispatchEvent(new Event('popstate'));
 				this.ws.close();
+				break;
+			case 'pong':
+				console.log("matchmaking pong");
 				break;
 			
 			default:

@@ -73,12 +73,21 @@ export class Room {
 
 		this.token = getAuthToken();
 		console.log('token:', this.token);
-		
+		this.setupPing();
 		this.chatInput.focus();
 		this.setupWsEvents();
 		this.setupClickEvents();
+
 	}
 
+	private setupPing() {
+		setInterval(() => {
+			this.ws.send(JSON.stringify({
+				type: 'ping'
+			}));
+		}, 10000);
+	}
+	
 	private getElement(id: string): HTMLElement {
 		const el = document.getElementById(id);
 		if (!el)

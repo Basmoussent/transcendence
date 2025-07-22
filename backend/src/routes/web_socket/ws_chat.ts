@@ -99,6 +99,11 @@ async function handleMessage(message: string, user: UserChat, app: FastifyInstan
 				live.delete(user.id);
 				console.log('je disconnect le user')
 				break;
+			case 'ping':
+				sender.socket.send(JSON.stringify({
+					type: 'pong'
+				}));
+				break;
 			default:
 				console.warn(`recoit un event inconnu`)
 		}

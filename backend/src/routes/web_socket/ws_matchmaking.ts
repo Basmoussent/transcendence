@@ -49,6 +49,11 @@ export function handleMatchmaking(socket: WebSocket, req: FastifyRequest) {
 					const id = matchmaking.indexOf(socket);
 					if (id !== -1)
 						matchmaking.splice(id, 1);
+				case 'ping':
+					socket.send(JSON.stringify({
+						type: 'pong'
+					}));
+					break;
 				default:
 					console.log(`l'event existe pas`)
 			}
