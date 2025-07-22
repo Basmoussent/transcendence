@@ -283,9 +283,8 @@ export class MultiPong {
     private displayEndMsg(): void {
         this.ctx.globalAlpha = 0.2;
         this.ctx.fillStyle = 'white';
-        this.ctx.font = '48px gaming'; // changer police
-        this.ctx.fillText(this.winner, this.width / 2 - 150, this.height / 2 - 60);
-        this.ctx.fillText("WINS", this.width / 2 - 150, this.height / 2);
+        this.ctx.font = '48px gaming';
+        this.ctx.fillText(`${this.winner} WINS`, this.width / 2, this.height / 2);
         this.ctx.globalAlpha = 1;
     }
 

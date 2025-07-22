@@ -70,7 +70,7 @@ export class PaddleAI {
 
     displayScore(ctx: CanvasRenderingContext2D, x: number, y: number): void {
         ctx.fillStyle = this.color;
-        ctx.font = '48px sans-serif'; // changer police
+        ctx.font = '48px gaming'; 
         ctx.fillText(this.score.toString(), x, y);
     }
 
