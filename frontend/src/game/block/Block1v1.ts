@@ -46,8 +46,6 @@ export class Block1v1 {
 		if (!context)
 			throw new Error('Could not get 2D context');
 
-		// this.retrieveGameInfo(uuid);
-
 		this.ctx = context;
 		this.width = canvas.width;
 		this.height = canvas.height;
@@ -68,12 +66,6 @@ export class Block1v1 {
 
 		this.uuid = uuid;
 	}
-
-	// public init(): void {
-	// 	this.setupCanvas();
-	// 	this.setupEventListeners();
-	// 	this.startGameLoop();
-	// }
 
 	public async asyncInit(): Promise<void> {
 		this.data = await this.loadInfo(this.uuid);
@@ -168,7 +160,7 @@ export class Block1v1 {
 		this.ball2.x = this.width / 2;
 		this.ball2.y = 100;
 	}
-  
+	
 	private async startGameLoop(): Promise<void> {
 		const gameLoop = async () => {
 			this.update();
