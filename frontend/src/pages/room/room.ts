@@ -249,6 +249,8 @@ export class Room {
 		if (!this.roomData)
 			return;
 
+		this.gameTypeSelect.value = String(this.roomData.gameType);
+
 		this.roomNameEl.textContent = this.roomData.name;
 		this.gameTypeEl.textContent = this.roomData.gameType;
 		this.aiCountSpan.textContent = String(this.roomData.ai);
