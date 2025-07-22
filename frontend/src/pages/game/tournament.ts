@@ -1382,5 +1382,14 @@ export function initializeTournamentEvents() {
   generateQuarterFinals();
   updateLobbyDisplay();
 
+  const homeBtn = document.getElementById('homeBtn');
+
+  if (homeBtn) {
+    homeBtn.addEventListener('click', () => {
+      window.history.pushState({}, '', '/main');
+      window.dispatchEvent(new PopStateEvent('popstate'));
+    });
+  }
+
 }
 

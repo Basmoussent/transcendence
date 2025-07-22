@@ -285,13 +285,10 @@ async function userRoutes(app: FastifyInstance) {
 	app.get('/user/:username', async function (request: FastifyRequest, reply: FastifyReply) {
 
 		try {
-			const database = db.getDatabase();
+			const { username } = request.query as { username?: string };
 
-			const { username } = request.params as { username?: string };
-			console.log("username:", username);
-			console.log("request.params:", request.params);
 			if (!username)
-				throw new Error("missing username in the request body");
+				throw new Error("missing username in the request query");
 
 			const user = await app.userService.findByUsername(username);
 			console.log("user:", user);

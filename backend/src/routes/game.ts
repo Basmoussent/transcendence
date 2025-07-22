@@ -303,7 +303,7 @@ async function gameRoutes(app: FastifyInstance) {
 		const { uuid } = request.params as { uuid: string };
 		const room = await app.roomService.existingRoom(uuid);
 		if (room) {
-		return reply.send({
+			return reply.send({
 				message: 'room existante',
 				room: room,
 			});
