@@ -78,6 +78,8 @@ async function gameRoutes(app: FastifyInstance) {
 			let uuid = uuidv4(); // id de la room
 			const { game_type, player1, users_needed } = request.body;
 
+			console.log(game_type, "    ", player1, "    ", users_needed)
+
 			if (!uuidValidate(uuid) || !game_type || !player1 || !users_needed)
 				throw new Error("Mandatory info needed to prelog game");
 

@@ -5,6 +5,7 @@ import { db } from '../../database';
 
 interface User {
 	username: string;
+	userid: number;
 	isReady: boolean;
 	socket: WebSocket;
 }
@@ -126,6 +127,11 @@ export async function handleRoom(app: FastifyInstance, socket: WebSocket, req: F
 		const decoded = app.jwt.verify(token as string) as { user: string; name: string };
 		const username = decoded.name;
 
+		const tmp = await app.userService.findByUsername(username);
+
+		const userid = tmp.id;
+
+
 		const { uuid } = req.params as { uuid: string };
 
 		let room = rooms.get(uuid);
@@ -151,6 +157,7 @@ export async function handleRoom(app: FastifyInstance, socket: WebSocket, req: F
 
 		const user = {
 			username: username,
+			userid: userid,
 			isReady: false,
 			socket: socket,
 		};

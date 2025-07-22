@@ -1,5 +1,6 @@
 interface User {
 	username: string;
+	userid: number;
 	isReady: boolean;
 	avatar?: string;
 }
@@ -22,8 +23,6 @@ export class RoomService {
 		this.db = database;
 	}
 
-
-
 	// update l'interface pour prendre la meme que dans ws_room avec une map au lieu d'un array
 	async updateGame(data: RoomData) {
 		try {
@@ -38,7 +37,7 @@ export class RoomService {
 			for (let i = 0; i < 4; i++) {
 				if (users[i]) {
 					fieldsToUpdate.push(`player${i + 1} = ?`);
-					values.push((users[i] as any).username);
+					values.push((users[i] as any).userid);
 				}
 				else {
 					fieldsToUpdate.push(`player${i + 1} = ?`);

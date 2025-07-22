@@ -16,7 +16,7 @@ export interface Game {
 	end_time?: string
 }
 
-export async function postGame(input:Game): Promise<number> {
+export async function postGame(input: any): Promise<number> {
 	
 	try {
 		const token = getAuthToken();
@@ -162,6 +162,7 @@ let userData = {
 	username: 'Username',
 	email: 'email@example.com',
 	avatar: 'avatar.png',
+	id: 0,
 	wins: 0,
 	games: 0,
 	rating: 0,
@@ -190,6 +191,7 @@ export async function fetchUsername() {
 			const result = await response.json();
 			userData = {
 				username: sanitizeHtml(result.user?.username) || 'Username',
+				id: result.user?.id || 0,
 				email: sanitizeHtml(result.user?.email) || 'email@example.com',
 				avatar: sanitizeHtml(result.user?.avatar_url) || 'avatar.png',
 				wins: (result.stats?.wins) || 0,
@@ -200,6 +202,37 @@ export async function fetchUsername() {
 			};
 			console.log(userData);
 			return (userData.username);
+		}
+		else 
+			console.error('Erreur lors de la récupération des données utilisateur');
+	}
+	catch (error) {
+		console.error("Error rendering profile page:", error); }
+}
+
+
+export async function fetchUserId() {
+	
+	try {
+		const token = getAuthToken();
+		if (!token) {
+			alert('❌ Token d\'authentification manquant');
+			window.history.pushState({}, '', '/login');
+			window.dispatchEvent(new PopStateEvent('popstate'));
+			return '';
+		}
+
+		const response = await fetch('/api/me', {
+			method: 'GET',
+			headers: {
+				'Content-Type': 'application/json',
+				'x-access-token': token }
+		});
+	
+		if (response.ok) {
+
+			const result = await response.json();
+			return (result.user?.id || 0);
 		}
 		else 
 			console.error('Erreur lors de la récupération des données utilisateur');

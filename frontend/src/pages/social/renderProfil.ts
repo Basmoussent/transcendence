@@ -11,6 +11,7 @@ export async function initializeProfilEvents(uuid:string) {
 	try {
 		const me = await loadMe();
 		const user = await loadUserInfo(uuid);
+		console.log("online lq voir ", user)
 
 		if (!me || !user) {
 			console.error("ya pas les infos");
@@ -854,6 +855,8 @@ async function loadUserInfo(username: string) {
 			return null;
 		}
 
+		console.log("usernam essssttttttttttttt ", username)
+
 		const response = await fetch(`/api/user/username/?username=${username}`, {
 			method: 'GET',
 			headers: {
@@ -868,6 +871,7 @@ async function loadUserInfo(username: string) {
 				username: sanitizeHtml(result.data?.username),
 				email: sanitizeHtml(result.data?.email),
 				avatar: sanitizeHtml(result.data?.avatar_url) || 'avatar.png',
+				online: result.online
 			};
 			return userData;
 		}

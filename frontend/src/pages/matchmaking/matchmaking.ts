@@ -1,4 +1,4 @@
-import { Game, fetchUsername, getUuid, postGame } from '../../game/gameUtils'
+import { Game, fetchUsername, fetchUserId, getUuid, postGame } from '../../game/gameUtils'
 import { getAuthToken } from '../../utils/auth';
 import { sanitizeHtml } from '../../utils/sanitizer';
 import { addEvent, cleanEvents } from '../../utils/eventManager';
@@ -30,6 +30,7 @@ export class matchmaking {
 	private availableGames: HTMLElement;
 
 	private username: string;
+	private userid: number;
 
 	private static joinBtn: Map<number,HTMLElement> = new Map();
 	private gameId: number = 0;
@@ -38,7 +39,8 @@ export class matchmaking {
 		this.ws = new WebSocket(`${window.location.protocol === "https:" ? "wss" : "ws"}://${window.location.host}/api/matchmaking`);
 
 		this.username = "tmp";
-		this.loadUsername();
+		this.userid = 0;
+		this.loadUserInfo();
 
 		this.homeBtn = this.getElement('homeBtn');
 		this.pongBtn = this.getElement('pongBtn');
@@ -146,10 +148,12 @@ export class matchmaking {
 		});
 	}
 	
-	private async loadUsername() {
+	private async loadUserInfo() {
 		try {
 			const name = await fetchUsername();
+			const userid = await fetchUserId();
 			this.username = name || 'fetch username pas marché';
+			this.userid = userid;
 		}
 		catch (err) {
 			console.error("Erreur fetchUsername :", err); }
@@ -221,9 +225,13 @@ export class matchmaking {
 		addEvent(this.launchBtn, 'click', async () => {
 			let tmp = {
 				game_type: this.pong ? "pong" : "block",
-				player1: this.username,
+				player1: this.userid,
 				users_needed: 2
 			}
+
+			console.log("daoizndoaizndoaizndoaindoaizndoianzdoiazndoaznodiazn")
+
+			console.log(JSON.stringify(tmp, null, 8))
 
 			var uuid = await postGame(tmp);
 

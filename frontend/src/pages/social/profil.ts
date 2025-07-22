@@ -50,7 +50,7 @@ export class profil {
 		// recup les relations de /me voir si ya user, 
 
 		// si this.me.username === this.user.username --> pas possible, on redirige vers /me
-
+		console.log("user ici lqlqlq qlqlq ", this.user)
 		this.setupEvents();
 		setTimeout(async () => {
 			await this.updateInfo();
@@ -161,7 +161,7 @@ export class profil {
 		// Pour l'instant, on suppose que l'utilisateur est en ligne
 		// Dans une vraie application, on récupérerait cette info depuis une API
 		const isOnline = this.user.online;
-		
+		console.log("online stqtus ", this.user)
 		if (isOnline) {
 			this.online.textContent = 'En ligne';
 			this.online.className = 'online-status';

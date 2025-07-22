@@ -42,3 +42,10 @@ supprimer une ia si quelqu'un rejoint ou quoi revoir la logique
 
 	// '/profil/' verifier que le user existe dans la db et que celui qui appel cette route n'est pas bloque par le user
 	//  si le username renseigne est celui trouvé via le token changer pour le path pour /me
+
+
+
+
+
+
+corriger pouvoir s'ajouter deux fois dans tournament

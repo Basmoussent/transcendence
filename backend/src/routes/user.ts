@@ -285,7 +285,9 @@ async function userRoutes(app: FastifyInstance) {
 	app.get('/user/:username', async function (request: FastifyRequest, reply: FastifyReply) {
 
 		try {
-			const { username } = request.query as { username?: string };
+			const { username } = request.query as { username: string};
+
+			console.log(`le username    ${username}`)
 
 			if (!username)
 				throw new Error("missing username in the request query");
@@ -315,9 +317,9 @@ async function userRoutes(app: FastifyInstance) {
 			if (!username)
 				throw new Error("missing username in the request body");
 
-			const user = await app.userService.findById(username);
-			console.log("user :", user);
+			const user = await app.userService.findByUsername(username);
 			const isOnline = await app.userService.isOnline(user.id);
+			console.log("userççççççççç :", user);
 
 			return reply.send({
 				message: `info du user ${username}`,
