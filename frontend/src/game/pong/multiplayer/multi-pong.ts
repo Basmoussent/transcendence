@@ -5,6 +5,7 @@ import { getAuthToken } from '../../../utils/auth';
 import { PADDLE_OFFSET, Player, PADDLE1_COLOR, PADDLE2_COLOR, PADDLE3_COLOR, PADDLE4_COLOR } from "../const";
 import { addEvent } from '../../../utils/eventManager';
 import { t } from '../../../utils/translations';
+import { logStartGame } from "../../../game/gameUtils";
 
 export interface Game {
 	id: number,
@@ -235,8 +236,10 @@ export class MultiPong {
         const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
         const gameLoop = async () => {
-            if (this.keys['enter'])
+            if (this.keys['enter']) {
                 this.start = true;
+                 logStartGame(this.data.id);
+            }
             if (this.start && !this.end)
                 this.update();
             this.render();
