@@ -243,6 +243,9 @@ export function render2FALogin() {
             alert(`❌ Code incorrect`);
 
           if (checkCode.checkCode) {
+            const token = responseCode.headers.get("x-access-token");
+
+            sessionStorage.setItem("x-access-token", token!);
             window.history.pushState({}, '', '/main');
             window.dispatchEvent(new PopStateEvent('popstate'));
           }
