@@ -293,12 +293,12 @@ export class Block1v1 {
 	private checkGameEnd(): boolean {
 		// Joueur 1 perd si balle 1 touche le bas
 		if (this.ball1.y + this.ball1.radius >= this.height) {
-			this.winner = "Player 1";
+			this.winner = "Player 2";
 			return true;
 		}
 		// Joueur 2 perd si balle 2 touche le haut
 		if (this.ball2.y - this.ball2.radius <= 0) {
-			this.winner = "Player 2";
+			this.winner = "Player 3";
 			return true;
 		}
 		return false;
