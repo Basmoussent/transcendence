@@ -138,7 +138,7 @@ export async function router() {
 		'/2fa': () => render2FA(),
 		'/block': (uuid?: string) => renderBlock(uuid!),
 		'/block1v1': (uuid?: string) => renderBlock1v1(uuid!),
-		'/multipong': (uuid?: string) => renderMultiPong(uuid!),
+		'/multipong': async (uuid?: string) => await renderMultiPong(uuid!),
 		'/tournament': () => renderTournaments(),
 	};
 
