@@ -28,7 +28,7 @@ export async function fetchMe(): Promise<UserChat | void> {
 				username: sanitizeHtml(result.user?.username),
 				email: sanitizeHtml(result.user?.email),
 				avatar_url: sanitizeHtml(result.user?.avatar_url) || 'avatar.png',
-				userId: Number(sanitizeHtml(result.user?.id)),
+				id: Number(sanitizeHtml(result.user?.id)),
 				receiver: 'null'
 			};
 			// console.log(`dans le bueno for real voici mes infos ${tmp.userId}, ${tmp.username}`)
@@ -40,11 +40,9 @@ export async function fetchMe(): Promise<UserChat | void> {
 	catch (error) {
 		console.error('fetchMe failed: ', error);
 	}
-
 }
 
-
-export async function fetchUserInfo(username: string): Promise<UserChat | void> {
+export async function fetchUserInfo(userid: string): Promise<UserChat | void> {
 
 	try {
 		const token = getAuthToken();
@@ -55,7 +53,7 @@ export async function fetchUserInfo(username: string): Promise<UserChat | void> 
 			return;
 		}
 
-		const response = await fetch(`/api/user/id/?userid=${username}`, {
+		const response = await fetch(`/api/user/id/?userid=${userid}`, {
 			method: 'GET',
 			headers: {
 				'Content-Type': 'application/json',

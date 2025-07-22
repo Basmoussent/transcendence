@@ -31,20 +31,18 @@ async function friendRoutes(app: FastifyInstance) {
 		}
 	})
 	
-	app.get('/relations/:username', async function (request: FastifyRequest, reply: FastifyReply) {
+	app.get('/relations/:userid', async function (request: FastifyRequest, reply: FastifyReply) {
 
 		try {
-			const { username } = request.query as { username?: string };
+			const { userid } = request.query as { userid?: number };
 
-			if (!username)
-				throw new Error ("missing username in the request body");
+			if (!userid)
+				throw new Error ("missing userid in the request body");
 
-			const user = await app.userService.findByUsername(username);
-
-			const relations = await app.friendService.getRelations(user.id);
+			const relations = await app.friendService.getRelations(userid);
 
 			return reply.send({
-				message: `friends du user ${username}`,
+				message: `friends du user ${userid}`,
 				relations: relations,
 			});
 		}

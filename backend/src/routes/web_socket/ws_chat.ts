@@ -41,7 +41,6 @@ export async function handleChat(app: FastifyInstance, socket: WebSocket, req: F
 		const decoded = app.jwt.verify(token as string) as { user: string, name: string };
 		const username = decoded.name;
 
-
 		const tmp = await app.userService.findByUsername(username);
 
 		const user: UserChat = {
@@ -60,9 +59,14 @@ export async function handleChat(app: FastifyInstance, socket: WebSocket, req: F
 			handleMessage(message, user, app);
 		});
 
+		window.addEventListener("load", (event) => {
+			console.log("pro pro pro");
+		});
+
 		socket.on('close', () => {
 			live.delete(user.id);
 		});
+
 	} catch (error) {
 		console.error('Error in handleChat:', error);
 		socket.close();
@@ -80,19 +84,19 @@ async function handleMessage(message: string, user: UserChat, app: FastifyInstan
 				break;
 			
 			case 'friend_request':
-				addFriend(app, sender, data.dest);
+				addFriend(app, user, data.dest);
 				break;
 			
 			case 'accept_friend_request':
-				acceptFriend(app, sender, data.dest)
+				acceptFriend(app, user, data.dest)
 				break;
 
 			case 'deny_friend_request':
-				denyFriend(app, sender, data.dest)
+				denyFriend(app, user, data.dest)
 				break;
 
 			case 'disconnection':
-				live.delete(sender.username);
+				live.delete(user.id);
 				console.log('je disconnect le user')
 				break;
 			default:
@@ -116,7 +120,15 @@ async function sendChatMessage(app: FastifyInstance, user: UserChat, data: any) 
 		content: data.content,
 	});
 	// envoie au destinataire
-	live.get(data.dest)?.socket.send(message);
+
+	const friend = await app.userService.findByUsername(data.dest);
+
+	if (!friend) {
+		console.log("message pour quelqu'un qui n'existe pas");
+		return;
+	}
+
+	live.get(friend.id)?.socket.send(message);
 
 	try {
 		console.log("sender :", user);
@@ -145,6 +157,11 @@ async function addFriend(app: FastifyInstance, user: UserChat, friendUsername: s
 		console.log("le user n'existe pas");
 		return ;
 	}
+
+	if (user.id == friend.id) {
+		console.log("pourquoi tu t'ajouterais toi meme zig new");
+		return ;
+	}
 		
 	// 2 - check si une relation n'existe pas déjà
 	//	|____ check que je ne suis pas bloque --> juste return
@@ -152,10 +169,10 @@ async function addFriend(app: FastifyInstance, user: UserChat, friendUsername: s
 	//	|____ check qu'il ne m'a pas deja demande --> accepter la demande d'ami
 
 
-	const relation = await app.friendService.searchRelation(user.userId, friend.id);
+	const relation = await app.friendService.searchRelation(user.id, friend.id);
 
 	if (relation) {
-		const myState = relation.user_1 == String(user.userId) ? relation.user1_state : relation.user2_state;
+		const myState = relation.user_1 == String(user.id) ? relation.user1_state : relation.user2_state;
 		const userState = relation.user_1 == String(friend.id) ? relation.user1_state : relation.user2_state;
 
 		if (myState == 'normal' && userState == 'normal') {
@@ -180,12 +197,12 @@ async function addFriend(app: FastifyInstance, user: UserChat, friendUsername: s
 	// 5 - envoyer une demande + creer l'instance dans db friends avec id des deux personnes
 	//	 |__ update l'état, qui a ajouté qui
 
-	await app.friendService.createRelation(String(user.userId), String(friend.id), 'waiting', 'requested');
+	await app.friendService.createRelation(String(user.id), String(friend.id), 'waiting', 'requested');
 	const message = JSON.stringify({
 		type: 'updateUI'
 	});
 	user.socket.send(message)
-	live.get(friend.username)?.socket.send(message);
+	live.get(friend.id)?.socket.send(message);
 }
 
 async function acceptFriend(app: FastifyInstance, user: UserChat, friendName: string) {
@@ -196,7 +213,7 @@ async function acceptFriend(app: FastifyInstance, user: UserChat, friendName: st
 		return ;
 	}
 
-	const relation = await app.friendService.searchRelation(user.userId, friend.id);
+	const relation = await app.friendService.searchRelation(user.id, friend.id);
 	if (!relation || relation.id === -1) {
 		console.error(`couldnt find the relation to accept friendship`);
 		return;
@@ -206,7 +223,7 @@ async function acceptFriend(app: FastifyInstance, user: UserChat, friendName: st
 		type: 'updateUI'
 	});
 	user.socket.send(message)
-	live.get(friend.username)?.socket.send(message);
+	live.get(friend.id)?.socket.send(message);
 }
 
 async function denyFriend(app: FastifyInstance, user: UserChat, friendName: string) {
@@ -216,7 +233,7 @@ async function denyFriend(app: FastifyInstance, user: UserChat, friendName: stri
 		console.log("le user n'existe pas")
 		return ;
 	}
-	const relation = await app.friendService.searchRelation(user.userId, friend.id);
+	const relation = await app.friendService.searchRelation(user.id, friend.id);
 	if (!relation || relation.id === -1) {
 		console.error(`couldnt find the relation to accept friendship`);
 		return;
@@ -227,5 +244,5 @@ async function denyFriend(app: FastifyInstance, user: UserChat, friendName: stri
 		type: 'updateUI'
 	});
 	user.socket.send(message)
-	live.get(friend.username)?.socket.send(message);
+	live.get(friend.id)?.socket.send(message);
 }

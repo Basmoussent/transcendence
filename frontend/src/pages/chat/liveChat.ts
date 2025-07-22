@@ -7,7 +7,7 @@ import { postGame } from '../../game/gameUtils';
 
 export interface UserChat {
 	username: string;
-	userId: number;
+	id: number;
 	email: string;
 	avatar_url: string;
 	receiver?: string;
@@ -49,7 +49,7 @@ export class Chat {
 		username: "",
 		email: "",
 		avatar_url: "",
-		userId: 0
+		id: 0
 	};
 
 	private receiver?: string;
@@ -87,6 +87,7 @@ export class Chat {
 		this.chatInput.focus();
 		this.setupWsEvents();
 		this.setupClickEvents();
+		this.updateUI();
 	}
 
 	private async loadMe() {
@@ -104,7 +105,8 @@ export class Chat {
 
 		this.ws.onopen = () => {
 			console.log(`${this.me.username} est connecte au live chat`)
-			this.updateUI();
+			console.log("non pite pas ca je veux plus je veux plus");
+			// this.updateUI(); // s'appelle plusieurs fois trop bizarre
 		};
 
 		this.ws.onerror = (error) => {
@@ -182,6 +184,10 @@ export class Chat {
 			window.dispatchEvent(new Event('popstate'));
 		});
 
+		window.addEventListener("load", (event) => {
+			console.log("pro pro pro");
+		});
+
 		// Gestion du bouton d'invitation à un jeu
 		const inviteBtn = document.getElementById('inviteGameBtn');
 		const inviteMenu = document.getElementById('inviteGameMenu');
@@ -205,6 +211,9 @@ export class Chat {
 					await this.inviteToGame(gameType || 'pong');
 				});
 			});
+
+		
+
 		}
 
 		this.tabs.forEach(tab => {
@@ -288,8 +297,7 @@ export class Chat {
 		var	friends = 0;
 		var	request = 0;
 
-		const relations: Relation[] | null = await fetchUserRelations(this.me.username);
-		
+		const relations: Relation[] | null = await fetchUserRelations(this.me.id);
 
 		console.log(JSON.stringify(relations, null, 8))
 
@@ -304,7 +312,7 @@ export class Chat {
 		for (const relation of relations) {
 			console.log("relation", relation)
 
-			const friendid = relation.user_1 === this.me.userId.toString() ? relation.user_2 : relation.user_1;
+			const friendid = relation.user_1 === this.me.id.toString() ? relation.user_2 : relation.user_1;
 
 			const friend: UserChat | void = await fetchUserInfo(friendid);
 
@@ -335,10 +343,9 @@ export class Chat {
 				this.friendsList.appendChild(conversationElement);
 				conversationElement.addEventListener('click', () => this.startChatWith(relation.id, friend));
 			}
-			else if ((relation.user_1 === this.me.username && relation.user2_state === 'waiting') ||
-				(relation.user_2 === this.me.username && relation.user1_state === 'waiting')) {
+			else if ((relation.user_1 == String(this.me.id) && relation.user2_state === 'waiting') ||
+				(relation.user_2 == String(this.me.id) && relation.user1_state === 'waiting')) {
 				request++;
-
 
 				console.log(`t'as une amis en attente zig`)
 
@@ -492,6 +499,8 @@ export class Chat {
 			return false;
 		}
 	}
+
+	// se baser sur l'id ?
 	private addGameInviteMessage(username: string, gameType: string, link: string) {
 		this.noChatSelected.style.display = 'none';
 		this.chatContainer.style.display = 'flex';
@@ -542,11 +551,10 @@ export class Chat {
 	}
 }
 
-async function fetchUserRelations(username: string): Promise<Relation[]|null> {
+async function fetchUserRelations(userid: number): Promise<Relation[]|null> {
 
 	try {
-		console.log("username laallllal :", username);
-		const response = await fetch(`/api/friend/relations/?username=${username}`);
+		const response = await fetch(`/api/friend/relations/?userid=${userid}`);
 		
 		if (!response.ok) {
 			const errorData = await response.json();
