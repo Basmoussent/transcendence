@@ -802,7 +802,7 @@ let tournamentData = {
   const playerName = input?.value.trim();
   if (playerName && tournamentData.players.length < 8 && (!displayInput || displayInput.style.display === 'none')) {
     // Première étape : valider le username
-    const response = await fetch(`/api/user/?username=${playerName}`, {
+    const response = await fetch(`/api/user/username/?username=${playerName}`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json'

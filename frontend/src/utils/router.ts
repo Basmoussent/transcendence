@@ -219,7 +219,7 @@ export async function router() {
 async function userExists(username: string, token: any) {
 
 	try {
-		const response = await fetch(`/api/user/?username=${username}`, {
+		const response = await fetch(`/api/user/username/?username=${username}`, {
 			method: 'GET',
 			headers: {
 				'Content-Type': 'application/json',
