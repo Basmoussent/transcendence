@@ -70,7 +70,7 @@ async function editRoutes(app: FastifyInstance) {
 			const decoded = app.jwt.verify(token) as { user: string };
 			const email = decoded.user;
 
-			const { username, avatar_url } = request.body as { username?: string; avatar_url?: string };
+			let { username, avatar_url } = request.body as { username?: string; avatar_url?: string };
 
 			const database = db.getDatabase();
 			if (!database)
@@ -121,6 +121,10 @@ async function editRoutes(app: FastifyInstance) {
 					);
 				});
 			}
+			const cookie = app.jwt.sign({ user: email, name: username });
+			reply.header(
+				"x-access-token", cookie
+			)
 			return reply.send({ message: 'Profil mis à jour avec succès' });
 		}
 		catch (err: any) {

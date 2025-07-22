@@ -32,7 +32,6 @@ export class Block {
 	private ball: Ball;
 	private paddle: Paddle;
 	private bricks: brick[] = [];
-	private powerUps: PowerUp[] = [];
 	private keys: { [key: string]: boolean };
 	
 	// Effets de power-ups
@@ -192,163 +191,6 @@ export class Block {
 		}
 	}
 
-	private updatePowerUps(): void {
-		// Mettre à jour les power-ups
-		for (let i = this.powerUps.length - 1; i >= 0; i--) {
-			const powerUp = this.powerUps[i];
-			
-			if (!powerUp.active) {
-				this.powerUps.splice(i, 1);
-				continue;
-			}
-			
-			// Déplacer le power-up
-			powerUp.move();
-			
-			// Vérifier si le power-up sort de l'écran
-			if (powerUp.y > this.height) {
-				powerUp.active = false;
-				continue;
-			}
-			
-			// Vérifier collision avec la paddle
-			if (this.checkPowerUpCollision(powerUp)) {
-				this.applyPowerUp(powerUp);
-				powerUp.active = false;
-			}
-		}
-		
-		// Mettre à jour les timers des effets
-		this.updatePowerUpTimers();
-	}
-
-	private checkPowerUpCollision(powerUp: PowerUp): boolean {
-		return powerUp.x + powerUp.width >= this.paddle.x &&
-			   powerUp.x <= this.paddle.x + this.paddle.width &&
-			   powerUp.y + powerUp.height >= this.paddle.y &&
-			   powerUp.y <= this.paddle.y + this.paddle.height;
-	}
-
-	private applyPowerUp(powerUp: PowerUp): void {
-		switch (powerUp.type) {
-			case PowerUpType.EXPLOSION:
-				this.applyExplosion();
-				break;
-			case PowerUpType.MULTI_BALL:
-				this.applyMultiBall();
-				break;
-			case PowerUpType.WIDE_PADDLE:
-				this.applyWidePaddle();
-				break;
-			case PowerUpType.FAST_BALL:
-				this.applyFastBall();
-				break;
-			case PowerUpType.SLOW_BALL:
-				this.applySlowBall();
-				break;
-		}
-	}
-
-	private applyExplosion(): void {
-		// Détruire toutes les briques dans un rayon
-		const explosionRadius = 100;
-		for (const brick of this.bricks) {
-			if (brick.getHp() <= 0) continue;
-			
-			const brickCenterX = brick.getX() * this.brickWidth + this.brickWidth / 2;
-			const brickCenterY = brick.getY() * this.brickHeight + this.brickHeight / 2;
-			const distance = Math.sqrt(
-				Math.pow(this.ball.x - brickCenterX, 2) + 
-				Math.pow(this.ball.y - brickCenterY, 2)
-			);
-			
-			if (distance <= explosionRadius) {
-				brick.beenHit();
-				// Vérifier si la brique a un power-up
-				const powerUp = getPowerUpFromBrick(brick, this.brickWidth, this.brickHeight);
-				if (powerUp) {
-					this.powerUps.push(powerUp);
-				}
-			}
-		}
-	}
-
-	private applyMultiBall(): void {
-		// Créer 2 balles supplémentaires
-		const currentSpeed = Math.sqrt(this.ball.speedx * this.ball.speedx + this.ball.speedy * this.ball.speedy);
-		
-		// Balle 2
-		const ball2 = new Ball(this.ball.x, this.ball.y);
-		ball2.speedx = -this.ball.speedx;
-		ball2.speedy = this.ball.speedy;
-		// TODO: Ajouter la gestion des balles multiples
-		
-		// Balle 3
-		const ball3 = new Ball(this.ball.x, this.ball.y);
-		ball3.speedx = this.ball.speedx;
-		ball3.speedy = -this.ball.speedy;
-		// TODO: Ajouter la gestion des balles multiples
-	}
-
-	private applyWidePaddle(): void {
-		this.widePaddleActive = true;
-		this.widePaddleTimer = 300; // 5 secondes à 60 FPS
-		this.paddle.width = 150; // Agrandir la paddle
-	}
-
-	private applyFastBall(): void {
-		this.fastBallActive = true;
-		this.fastBallTimer = 300; // 5 secondes
-		this.ball.speedx *= 1.5;
-		this.ball.speedy *= 1.5;
-	}
-
-	private applySlowBall(): void {
-		this.slowBallActive = true;
-		this.slowBallTimer = 300; // 5 secondes
-		this.ball.speedx *= 0.7;
-		this.ball.speedy *= 0.7;
-	}
-
-	private updatePowerUpTimers(): void {
-		// Timer pour wide paddle
-		if (this.widePaddleActive) {
-			this.widePaddleTimer--;
-			if (this.widePaddleTimer <= 0) {
-				this.widePaddleActive = false;
-				this.paddle.width = 100; // Retour à la taille normale
-			}
-		}
-		
-		// Timer pour fast ball
-		if (this.fastBallActive) {
-			this.fastBallTimer--;
-			if (this.fastBallTimer <= 0) {
-				this.fastBallActive = false;
-				// Normaliser la vitesse
-				const speed = Math.sqrt(this.ball.speedx * this.ball.speedx + this.ball.speedy * this.ball.speedy);
-				if (speed > 6) {
-					this.ball.speedx = (this.ball.speedx / speed) * 6;
-					this.ball.speedy = (this.ball.speedy / speed) * 6;
-				}
-			}
-		}
-		
-		// Timer pour slow ball
-		if (this.slowBallActive) {
-			this.slowBallTimer--;
-			if (this.slowBallTimer <= 0) {
-				this.slowBallActive = false;
-				// Normaliser la vitesse
-				const speed = Math.sqrt(this.ball.speedx * this.ball.speedx + this.ball.speedy * this.ball.speedy);
-				if (speed < 6) {
-					this.ball.speedx = (this.ball.speedx / speed) * 6;
-					this.ball.speedy = (this.ball.speedy / speed) * 6;
-				}
-			}
-		}
-	}
-
 	private async update(): Promise<void> {
 		// Démarrer le jeu
 		if (this.keys['enter'] && !this.status) {
@@ -398,19 +240,10 @@ export class Block {
 				brick.beenHit();
 				this.ball.bounceOnBrick(brickLeft, brickRight, brickTop, brickBottom);
 				
-				// Vérifier si la brique a un power-up
-				const powerUp = getPowerUpFromBrick(brick, this.brickWidth, this.brickHeight);
-				if (powerUp) {
-					this.powerUps.push(powerUp);
-				}
-				
 				this.updateWin();
 				break; // Une seule collision par frame
 			}
 		}
-
-		// Gestion des power-ups
-		this.updatePowerUps();
 
 		// Collision avec les bords de l'écran
 		this.ball.collisionWindow(this.width, this.height);
@@ -468,41 +301,6 @@ export class Block {
 		);
 	}
 
-	private drawPowerUps(): void {
-		for (const powerUp of this.powerUps) {
-			if (!powerUp.active) continue;
-			
-			// Dessiner le fond du power-up
-			this.ctx.fillStyle = powerUp.getColor();
-			this.ctx.fillRect(
-				powerUp.x,
-				powerUp.y,
-				powerUp.width,
-				powerUp.height
-			);
-			
-			// Dessiner le symbole
-			this.ctx.fillStyle = '#ffffff';
-			this.ctx.font = '16px Arial';
-			this.ctx.textAlign = 'center';
-			this.ctx.fillText(
-				powerUp.getSymbol(),
-				powerUp.x + powerUp.width / 2,
-				powerUp.y + powerUp.height / 2 + 5
-			);
-			
-			// Contour
-			this.ctx.strokeStyle = '#ffffff';
-			this.ctx.lineWidth = 2;
-			this.ctx.strokeRect(
-				powerUp.x,
-				powerUp.y,
-				powerUp.width,
-				powerUp.height
-			);
-		}
-	}
-
 	private drawBall(): void {
 		// Couleur de la balle selon les effets actifs
 		let ballColor = '#FF8600';
@@ -534,9 +332,5 @@ export class Block {
 		this.renderBricks();
 		this.drawPaddle();
 		this.drawBall();
-		this.drawPowerUps();
-		
-		// Message de début
-		this.displayStartMsg();
 	}
 }

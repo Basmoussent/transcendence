@@ -5,6 +5,7 @@ import { PADDLE_OFFSET, PADDLE1_COLOR, PADDLE2_COLOR } from "./const";
 import { getAuthToken } from '../../utils/auth';
 import { addEvent } from '../../utils/eventManager';
 import { t } from '../../utils/translations';
+import { sanitizeHtml } from '../../utils/sanitizer';
 
 export interface Game {
 	id: number,
@@ -78,12 +79,10 @@ export class Pong {
 		window.addEventListener('resize', () => {
 			this.setupCanvas();
 		});
-		
-		this.paddles[0].name = p1;
-		this.paddles[1].name = p2;
-		const player1 = {name: p1, score: this.paddles[0].score} as player1;
-		const player2 = {name: p2, score: this.paddles[1].score} as player1;
-
+		this.paddles[0].name = sanitizeHtml(p1);
+		this.paddles[1].name = sanitizeHtml(p2);
+		const player1 = {name: sanitizeHtml(p1), score: this.paddles[0].score} as player1;
+		const player2 = {name: sanitizeHtml(p2), score: this.paddles[1].score} as player1;
 		return {player1, player2};
 	};
 

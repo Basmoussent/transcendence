@@ -39,7 +39,9 @@ async function friendRoutes(app: FastifyInstance) {
 			if (!username)
 				throw new Error ("missing username in the request body");
 
-			const relations = await app.friendService.getRelations(username);
+			const user = await app.userService.findByUsername(username);
+
+			const relations = await app.friendService.getRelations(user.id);
 
 			return reply.send({
 				message: `friends du user ${username}`,
@@ -142,7 +144,8 @@ async function friendRoutes(app: FastifyInstance) {
 			if (!user1 || !user2)
 				return reply.status(400).send({ error: 'user1 and user2 are required' });
 
-			const history = await app.chatService.retrieveChatHistory(user1, user2);
+			const user = await app.userService.findByUsername(user2);
+			const history = await app.chatService.retrieveChatHistory(user1, user.id);
 			return reply.send(history);
 		}
 		catch (err: any) {

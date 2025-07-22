@@ -309,14 +309,16 @@ async function gameRoutes(app: FastifyInstance) {
 			});
 		}
 		else {
-			return reply.status(404).send({ error: 'room non trouvée' });
+			return reply.status(200).send({ error: 'room non trouvée', room: false });
 		}
 	});
 
 	app.get('/user/:username/history', async function (request: FastifyRequest, reply: FastifyReply) {
 		try {
 			const database = db.getDatabase();
-			const { username } = request.params as { username: string };
+			let { username } = request.params as { username: string };
+			const user = await app.userService.findByUsername(username);
+			username = user.id;
 
 			if (!username) {
 				throw new Error("missing username in the request params");
@@ -334,10 +336,30 @@ async function gameRoutes(app: FastifyInstance) {
 					}
 				);
 			});
+			console.log("games :", games);
 
+			await Promise.all(games.map(async (game) => {
+				if (game.player1) {
+					const user = await app.userService.findById(game.player1);
+					console.log("user :", user);
+					if (user) {
+						game.player1 = user.username;
+					}
+				}
+				if (game.player2) {
+					game.player2 = (await app.userService.findById(game.player2)).username || game.player2;
+				}
+				if (game.player3) {
+					game.player3 = (await app.userService.findById(game.player3)).username || game.player3;
+				}
+				if (game.player4) {
+					game.player4 = (await app.userService.findById(game.player4)).username || game.player4;
+				}
+			}));
+			
 			return reply.send({
 				message: 'success',
-				username: username,
+				username: user.username,
 				games: games,
 				total: games.length
 			});
@@ -393,7 +415,9 @@ async function gameRoutes(app: FastifyInstance) {
 			if (!player1 ||  !player2 ||  !winner || !start_time )
 				throw new Error("un des 5 manquants !player1 ||  !player2 ||  !winner || !start_time || !end_time");
 
-			const success = await app.gameService.logTournamentGame(uuid, player1, player2, winner, start_time);
+			const user1 = await app.userService.findByUsername(player1);
+			const user2 = await app.userService.findByUsername(player2);
+			const success = await app.gameService.logTournamentGame(uuid, user1.id, user2.id, winner, start_time);
 			
 			if (success) {
 				return reply.send({

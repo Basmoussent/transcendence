@@ -31,6 +31,9 @@ export class DatabaseService {
 				}
 
 				console.log('📦 Connected to SQLite database (unencrypted)');
+
+				// Activer les foreign keys pour ON UPDATE CASCADE
+
 				this.initializeDatabase().catch(console.error);
 			});
 		}

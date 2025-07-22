@@ -286,7 +286,7 @@ export class Chat {
 		var	request = 0;
 
 		const relations: Relation[] | null = await fetchUserRelations(this.me.username);
-
+		
 
 		console.log(JSON.stringify(relations, null, 8))
 
@@ -301,7 +301,7 @@ export class Chat {
 		for (const relation of relations) {
 			console.log("relation", relation)
 
-			const friendUsername = relation.user_1 === this.me.username ? relation.user_2 : relation.user_1;
+			const friendUsername = relation.user_1 === this.me.userId.toString() ? relation.user_2 : relation.user_1;
 
 			const friend: UserChat | void = await fetchUserInfo(friendUsername);
 
@@ -321,7 +321,7 @@ export class Chat {
 						</div>
 						<div class="friend-info">
 							<div class="friend-name">${sanitizeHtml(friend.username)}</div>
-							<div class="friend-status">${t('chat.online')}</div>
+							<div class="friend-status">${t('chat.online' as any)}</div>
 						</div>
 						<div class="friend-actions">
 							<button class="action-btn chat-btn">
@@ -349,7 +349,7 @@ export class Chat {
 						</div>
 						<div class="friend-info">
 							<div class="friend-name">${sanitizeHtml(friend.username)}</div>
-							<div class="friend-status">${t('chat.requests')}</div>
+							<div class="friend-status">${t('chat.requests' as any)}</div>
 						</div>
 						<div class="friend-actions">
 							<button class="action-btn accept-btn">
@@ -363,6 +363,7 @@ export class Chat {
 				this.requestsList.appendChild(requestElement);
 
 				requestElement.querySelector('.accept-btn')?.addEventListener('click', () => {
+					console.log("friend :", friend.username);
 					this.ws.send(JSON.stringify({ type: 'accept_friend_request', dest: friend.username }));
 				});
 
@@ -405,7 +406,7 @@ export class Chat {
 		</div>
 		<div class="chat-header-info">
 			<h3>${sanitizeHtml(user.username)}</h3>
-			<p>${t('chat.online')}</p>
+			<p>${t('chat.online' as any)}</p>
 		</div>
 		`;
 
@@ -480,7 +481,7 @@ export class Chat {
 
 	private async checkRoomExists(uuid: string): Promise<boolean> {
 		try {
-			const response = await fetch(`/room/existing/${uuid}`);
+			const response = await fetch(`/api/games/room/existing/${uuid}`);
 			if (!response.ok) return false;
 			const data = await response.json();
 			return !!data.exists;
@@ -488,15 +489,6 @@ export class Chat {
 			return false;
 		}
 	}
-
-	private showRoomError() {
-		const messageElement = document.createElement('div');
-		messageElement.className = 'chat-message system';
-		messageElement.innerHTML = `<div class="chat-message-content" style="color:#EF4444;font-weight:bold;">Désolé, la room que vous cherchez n'existe plus.</div>`;
-		this.chatMessages.appendChild(messageElement);
-		this.chatMessages.scrollTop = this.chatMessages.scrollHeight;
-	}
-
 	private addGameInviteMessage(username: string, gameType: string, link: string) {
 		this.noChatSelected.style.display = 'none';
 		this.chatContainer.style.display = 'flex';
@@ -517,13 +509,26 @@ export class Chat {
 				<div style="flex:1;">
 					<div style="font-weight:bold;font-size:1.08em;color:#3B82F6;margin-bottom:2px;">Invitation à jouer à ${gameLabel}</div>
 					<div style="color:#64748b;font-size:0.98em;margin-bottom:8px;">${isSent ? 'Tu as invité' : username + ' t\'a invité'} à rejoindre une partie.</div>
-					<a href="${link}" class="game-invite-link" style="display:inline-block;padding:7px 18px;background:linear-gradient(135deg,#10B981,#3B82F6);color:white;border-radius:8px;font-weight:bold;text-decoration:none;transition:background 0.2s;box-shadow:0 2px 8px rgba(16,185,129,0.10);margin-top:2px;" onclick="event.preventDefault(); window.chatInstance && window.chatInstance.handleInviteLinkClick && window.chatInstance.handleInviteLinkClick('${uuid}','${link}');">Rejoindre la partie</a>
+					<button class="game-invite-link" style="display:inline-block;padding:7px 18px;background:linear-gradient(135deg,#10B981,#3B82F6);color:white;border-radius:8px;font-weight:bold;text-decoration:none;transition:background 0.2s;box-shadow:0 2px 8px rgba(16,185,129,0.10);margin-top:2px;cursor:pointer;" data-uuid="${uuid}" data-link="${link}">Rejoindre la partie</button>
 				</div>
 			</div>
 			<div class="chat-message-time" style="align-self:flex-end;">${time}</div>
 		`;
 		this.chatMessages.appendChild(messageElement);
 		this.chatMessages.scrollTop = this.chatMessages.scrollHeight;
+
+		// Ajout de l'event listener pour navigation SPA
+		const joinBtn = messageElement.querySelector('.game-invite-link') as HTMLButtonElement;
+		if (joinBtn) {
+			joinBtn.addEventListener('click', async (e) => {
+				e.preventDefault();
+				const uuid = joinBtn.getAttribute('data-uuid') || '';
+				const link = joinBtn.getAttribute('data-link') || '';
+				console.log("uuid :", uuid, "link :", link)
+				window.history.pushState({}, '', link);
+				window.dispatchEvent(new PopStateEvent('popstate'));
+			});
+		}
 	}
 
 	// Méthode globale pour gérer le clic sur le lien d'invitation
@@ -537,6 +542,7 @@ export class Chat {
 async function fetchUserRelations(username: string): Promise<Relation[]|null> {
 
 	try {
+		console.log("username laallllal :", username);
 		const response = await fetch(`/api/friend/relations/?username=${username}`);
 		
 		if (!response.ok) {

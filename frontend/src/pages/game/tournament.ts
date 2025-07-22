@@ -1,8 +1,6 @@
 import { Pong } from '../../game/pong/pong';
 import { sanitizeHtml } from '../../utils/sanitizer';
 import { t } from '../../utils/translations';
-import { addEvent } from '../../utils/eventManager';
-
 
 export function renderTournaments() {
   const html =  `
@@ -11,7 +9,7 @@ export function renderTournaments() {
   <canvas id="gameCanvas" width="800" height="600"></canvas>
 
   <div class="tournaments-header">
-    <button class="home-button" id="homeBtn">
+    <button class="home-button" id="homeBtn" onclick="returnHome()">
         <i class="fas fa-home"></i>
          ${t('social.home')}
     </button>
@@ -173,6 +171,7 @@ export function renderTournaments() {
     </div>
     <div class="modal-body">
       <input type="text" id="playerNameInput" placeholder="Enter player username..." maxlength="20">
+      <input type="text" id="displayNameInput" placeholder="Choose a display name..." maxlength="20" style="display:none;margin-top:10px;">
       <div id="errorMessage" class="error-message" style="display: none;">
         ❌ Utilisateur non trouvé
       </div>
@@ -746,20 +745,21 @@ export function renderTournaments() {
 			});
 		}
     
-    console.log('Initializing Pong game...');
     const canvas = document.getElementById('gameCanvas') as HTMLCanvasElement;
     if (!canvas) {
       console.error('Canvas not found!');
       return;
     }
+    console.log('Canvas found, creating game instance...');
   }, 0);
   return html;
 
 }
 
 // Tournament state
+type TournamentPlayer = { username: string, displayName: string };
 let tournamentData = {
-  players: [] as string[],
+  players: [] as TournamentPlayer[],
   matches: {},
   currentRound: 'qf',
   inLobby: true
@@ -770,9 +770,20 @@ let tournamentData = {
   if (tournamentData.players.length < 8) {
     const modal = document.getElementById('addPlayerModal');
     const input = document.getElementById('playerNameInput') as HTMLInputElement;
+    const displayInput = document.getElementById('displayNameInput') as HTMLInputElement;
     if (modal) modal.style.display = 'block';
     if (input) input.focus();
+    if (displayInput) displayInput.value = '';
+    if (displayInput) displayInput.style.display = 'none';
+    if (input) input.style.display = '';
+    const addBtn = document.querySelector('#addPlayerModal .btn-primary') as HTMLButtonElement;
+    if (addBtn) addBtn.textContent = 'Add Player';
   }
+};
+
+(window as any).returnHome = function() {
+  window.history.pushState({}, '', '/main');
+  window.dispatchEvent(new PopStateEvent('popstate'));
 };
 
 (window as any).closeModal = function() {
@@ -786,33 +797,47 @@ let tournamentData = {
 
 (window as any).confirmAddPlayer = async function() {
   const input = document.getElementById('playerNameInput') as HTMLInputElement;
+  const displayInput = document.getElementById('displayNameInput') as HTMLInputElement;
+  const addBtn = document.querySelector('#addPlayerModal .btn-primary') as HTMLButtonElement;
   const playerName = input?.value.trim();
-  if (playerName && tournamentData.players.length < 8) {
+  if (playerName && tournamentData.players.length < 8 && (!displayInput || displayInput.style.display === 'none')) {
+    // Première étape : valider le username
     const response = await fetch(`/api/user/${playerName}`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json'
       }
     });
-    console.log("response:", response);
     if (response.ok) {
       const data = await response.json();
       if (data.data.username) {
-        tournamentData.players.push(data.data.username);
-        updateLobbyDisplay();
-        (window as any).closeModal();
-        return 1; 
-      }
-      else {
-        const errorMessage = document.getElementById('errorMessage');
-        if (errorMessage) {
-          errorMessage.style.display = 'block';
+        if (displayInput) {
+          displayInput.style.display = '';
+          displayInput.focus();
         }
+        if (input) input.style.display = 'none';
+        if (addBtn) addBtn.textContent = 'Confirm';
+        return;
+      } else {
+        const errorMessage = document.getElementById('errorMessage');
+        if (errorMessage) errorMessage.style.display = 'block';
       }
     }
-      
+    return 0;
+  } else if (displayInput && displayInput.style.display !== 'none') {
+    const displayName = sanitizeHtml(displayInput.value.trim());
+    if (displayName) {
+      // On retrouve le username caché dans le champ input (il a été validé juste avant)
+      const username = sanitizeHtml(input.value.trim());
+      tournamentData.players.push({ username, displayName });
+      updateLobbyDisplay();
+      (window as any).closeModal();
+      return 1;
+    }
+    // Si displayName vide, on ne fait rien
+    return 0;
   }
-  return 0; 
+  return 0;
 };
 
 (window as any).removePlayer = function(index: any) {
@@ -825,6 +850,7 @@ let tournamentData = {
 (window as any).startTournament = function() {
   if (tournamentData.players.length >= 2) {
     tournamentData.inLobby = false;
+    console.log("tournamentData.players:", tournamentData.players);
     generateQuarterFinals();
     updateTournamentDisplay();
   }
@@ -868,10 +894,10 @@ function updateLobbyDisplay() {
         playerCard.className = 'player-card';
         playerCard.innerHTML = `
           <div class="player-avatar">
-            ${(player as string).charAt(0).toUpperCase()}
+            ${player.displayName.charAt(0).toUpperCase()}
           </div>
           <div class="player-info">
-            <div class="player-name">${player}</div>
+            <div class="player-name">${player.displayName}</div>
             <div class="player-number">Player ${index + 1}</div>
           </div>
           <button class="remove-player" onclick="removePlayer(${index})">
@@ -995,7 +1021,7 @@ function updateTournamentDisplay() {
     const playerElement = document.querySelector('[data-player="' + (i + 1) + '"] .player-name');
     if (playerElement) {
       if (tournamentData.players[i]) {
-        playerElement.textContent = tournamentData.players[i];
+        playerElement.textContent = tournamentData.players[i].displayName;
         playerElement.parentElement?.classList.remove('empty');
       } else {
         playerElement.textContent = 'Player ' + (i + 1);
@@ -1039,28 +1065,6 @@ function updatePlayButtons() {
       }
     }
   });
-}
-
-function simulateMatch(matchId: any) {
-  const match = document.querySelector('[data-match="' + matchId + '"]');
-  if (!match) return;
-    const players = match.querySelectorAll('.player');
-  
-  const winner = Math.random() < 0.5 ? 0 : 1;
-  const winnerElement = players[winner] as HTMLElement;
-  winnerElement.classList.add('winner');
-  
-  const scoreElement = winnerElement.querySelector('.player-score');
-  if (scoreElement) scoreElement.textContent = '1';
-  
-  const winnerNameElement = winnerElement.querySelector('.player-name');
-  if (winnerNameElement) {
-    const winnerName = winnerNameElement.textContent;
-    if (winnerName) advanceWinner(matchId, winnerName);
-  }
-  
-  const button = match.querySelector('.play-match-btn') as HTMLButtonElement;
-  if (button) button.disabled = true;
 }
 
 function advanceWinner(matchId: any, winnerName: string) {
@@ -1260,7 +1264,6 @@ function checkAndEnableNextMatch(matchId: any) {
   updateLobbyDisplay();
 };
 
-// Close modal when clicking outside
 (window as any).onclick = function(event: Event) {
   const modal = document.getElementById('addPlayerModal');
   if (event.target === modal) {
@@ -1268,7 +1271,6 @@ function checkAndEnableNextMatch(matchId: any) {
   }
 };
 
-// Enter key to add player
 document.addEventListener('keydown', function(event: KeyboardEvent) {
   const modal = document.getElementById('addPlayerModal');
   if (event.key === 'Enter' && modal?.style.display === 'block') {
@@ -1276,7 +1278,6 @@ document.addEventListener('keydown', function(event: KeyboardEvent) {
   }
 }, { once: true });
 
-// Hide error message when user types
 document.addEventListener('input', function(event: Event) {
   const target = event.target as HTMLInputElement;
   if (target && target.id === 'playerNameInput') {
@@ -1292,7 +1293,6 @@ document.addEventListener('input', function(event: Event) {
     console.error('Canvas not found!');
     return;
   }
-
   const match = document.querySelector('[data-match="' + matchId + '"]');
   const players = match!.querySelectorAll('.player');
   const p1 = players[0].querySelector('.player-name')?.textContent;
@@ -1301,17 +1301,16 @@ document.addEventListener('input', function(event: Event) {
   if (canvas) {
     canvas.classList.add('active');
   }
-  const result = game.init(p1!, p2!);
-
-  
+  game.init(p1!, p2!);
+  document?.activeElement?.blur();
+  console.log("game.paddles[0].name :", p1, "game.paddles[1].name :", p2);
   
   const checkGameEnd = () => {
     if (game.end) {
       const p1 = game.paddles[0];
       const p2 = game.paddles[1];
       const winner = p1.score > p2.score ? p1.name : p2.name;
-      const loser = p1.score < p2.score ? p1.name : p2.name;
-      // Trouver le bon élément gagnant
+      console.log("p1 :", p1.name, "p2 :", p2.name, "winner :", winner);
       const match = document.querySelector('[data-match="' + matchId + '"]');
       if (match) {
         console.log("match found");
@@ -1345,10 +1344,6 @@ document.addEventListener('input', function(event: Event) {
             scoreElement.textContent = Math.min(p1.score, p2.score).toString();
           }
           
-          const loserNameElement = loserElement.querySelector('.player-name');
-          if (loserNameElement && loser) {
-            advanceWinner(matchId, loser);
-          }
         }
         
         const button = match.querySelector('.play-match-btn') as HTMLButtonElement;
@@ -1386,6 +1381,15 @@ export function initializeTournamentEvents() {
   console.log("test");
   generateQuarterFinals();
   updateLobbyDisplay();
+
+  const homeBtn = document.getElementById('homeBtn');
+
+  if (homeBtn) {
+    homeBtn.addEventListener('click', () => {
+      window.history.pushState({}, '', '/main');
+      window.dispatchEvent(new PopStateEvent('popstate'));
+    });
+  }
 
 }
 
