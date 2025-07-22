@@ -245,7 +245,7 @@ export class Room {
 		// 
 	}
 
-	private setMaxPlayerSelect(max: number) {
+	private setMaxPlayersSelect(max: number) {
 		let currentUsers;
 
 		if (!this.roomData)
@@ -300,9 +300,11 @@ export class Room {
 
 		const allReady = this.roomData.users.every(u => u.isReady);
 
+		const canStart = this.roomData.users.length == this.roomData.maxPlayers && allReady;
+
 		if (this.roomData.host === this.username) {
 
-			this.startBtn.disabled = !allReady;
+			this.startBtn.disabled = !canStart;
 
 			this.roomSettings.classList.remove('hidden')
 			this.getElement('gameActions').classList.remove('hidden');
@@ -310,7 +312,7 @@ export class Room {
 			if (this.roomData.gameType === 'block') {
 				this.getElement('ai-setting').style.display = 'none';
 
-				this.setMaxPlayerSelect(2);
+				this.setMaxPlayersSelect(2);
 
 				this.maxPlayersSelect.value = String(this.roomData.maxPlayers);
 			}
@@ -325,7 +327,7 @@ export class Room {
 				else
 					this.decreaseAiBtn.disabled = false;
 
-				this.setMaxPlayerSelect(4);
+				this.setMaxPlayersSelect(4);
 				
 				this.maxPlayersSelect.value = String(this.roomData.maxPlayers);
 			}
