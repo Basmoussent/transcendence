@@ -13,6 +13,7 @@ export class profil {
 
 	private homeBtn: HTMLElement;
 	private username: HTMLElement;
+	private avatar: HTMLElement;
 	private addFriendBtn: HTMLElement;
 	private blockBtn: HTMLElement;
 	private gamePlayed: HTMLElement;
@@ -37,6 +38,7 @@ export class profil {
 		this.homeBtn = this.getElement('homeBtn');
 		this.username = this.getElement('username');
 		this.addFriendBtn = this.getElement('addFriend');
+		this.avatar = this.getElement('avatar');
 		this.blockBtn = this.getElement('blockBtn');
 		this.gamePlayed = this.getElement('gamePlayed');
 		this.winrate = this.getElement('winrate');
@@ -119,7 +121,7 @@ export class profil {
 			this.addFriendBtn.textContent = 'ajouter en ami'
 
 		this.username.textContent = this.user.username;
-		
+		this.avatar.src = "/api/uploads/" + this.user.avatar || '../../public/avatar2.png';
 		// Mettre à jour le statut en ligne/hors ligne
 		this.updateOnlineStatus();
 		

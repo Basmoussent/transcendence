@@ -36,16 +36,16 @@ export function renderCreateAccount(): string {
 				
 				<form id="createAccountForm" class="login-form">
 					<div class="form-group">
-						<input type="text" id="username" name="username" placeholder="${t('auth.createAccount.username')}" required>
+						<input type="text" id="username" name="username" placeholder="${t('auth.createAccount.username')}" required autocomplete="username">
 					</div>
 					<div class="form-group">
-						<input type="email" id="email" name="email" placeholder="${t('auth.createAccount.email')}" required>
+						<input type="email" id="email" name="email" placeholder="${t('auth.createAccount.email')}" required autocomplete="email">
 					</div>
 					<div class="form-group">
-						<input type="password" id="password" name="password" placeholder="${t('auth.createAccount.password')}" required>
+						<input type="password" id="password" name="password" placeholder="${t('auth.createAccount.password')}"  required autocomplete="new-password">
 					</div>
 					<div class="form-group">
-						<input type="password" id="confirmPassword" name="confirmPassword" placeholder="${t('auth.createAccount.confirmPassword')}" required>
+						<input type="password" id="confirmPassword" name="confirmPassword" placeholder="${t('auth.createAccount.confirmPassword')}" required autocomplete="new-password">
 					</div>
 					<button type="submit" class="login-btn">${t('auth.createAccount.submit')}</button>
 				</form>

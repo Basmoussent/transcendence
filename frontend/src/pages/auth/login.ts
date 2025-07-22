@@ -24,10 +24,10 @@ export function renderLogin(): string {
 				
 				<form id="loginForm" class="login-form">
 					<div class="form-group">
-						<input type="text" id="username" name="username" placeholder="${t('auth.login.username')}" required>
+						<input type="text" id="username" name="username" placeholder="${t('auth.login.username')}" required autocomplete="username">
 					</div>
 					<div class="form-group">
-						<input type="password" id="password" name="password" placeholder="${t('auth.login.password')}" required>
+						<input type="password" id="password" name="password" placeholder="${t('auth.login.password')}" required autocomplete="current-password">
 					</div>
 					<button type="submit" class="login-btn">${t('auth.login.submit')}</button>
 				</form>

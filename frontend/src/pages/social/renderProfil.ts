@@ -52,7 +52,7 @@ function getTemplate() {
 			<div class="profile-header">
 			<div class="profile-banner">
 				<div class="profile-avatar">
-				<i class="fas fa-user"></i>
+				<img src="" id="avatar">
 				</div>
 			</div>
 			<div class="profile-info">
@@ -378,6 +378,15 @@ function getTemplate() {
 		font-weight: bold;
 		box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
 		transition: all 0.3s ease;
+        }
+
+        /* Ajout pour arrondir l'image avatar et la faire remplir le cadre */
+        .profile-avatar img#avatar {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+            display: block;
         }
 
         .profile-avatar:hover {
@@ -870,7 +879,7 @@ async function loadUserInfo(username: string) {
 				id: result.data?.id,
 				username: sanitizeHtml(result.data?.username),
 				email: sanitizeHtml(result.data?.email),
-				avatar: sanitizeHtml(result.data?.avatar_url) || 'avatar.png',
+				avatar: sanitizeHtml(result.data?.avatar_url) || '../../public/avatar.png',
 				online: result.online
 			};
 			return userData;

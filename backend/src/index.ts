@@ -130,9 +130,6 @@ async function setup() {
 	console.log('✅ WebSocket routes registered');
 	await fastify.register(require('@fastify/cookie'));
 
-	console.log('=== TOUTES LES PROPRIÉTÉS DE FASTIFY ===');
-	console.log(Object.getOwnPropertyNames(fastify));
-
 	console.log('🏠 Setting up basic routes...');
 	fastify.get('/', async () => {
 		return { message: 'API is up', database: 'connected' };
