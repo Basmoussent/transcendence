@@ -69,6 +69,8 @@ export class GameService {
 				return false;
 			}
 
+			const winnerId = winner;
+
 			// Insérer dans la table history
 			await new Promise<void>((resolve, reject) => {
 				this.db.run(
@@ -85,7 +87,7 @@ export class GameService {
 						game.ai,
 						game.start_time,
 						Date.now().toString(),
-						winner
+						winnerId
 					],
 					(err: any) => {
 						err ? reject(err) : resolve();
@@ -95,7 +97,7 @@ export class GameService {
 
 			// Supprimer de la table games
 			await this.deleteGame(uuid);
-			console.log(`Partie ${uuid} déplacée vers history avec winner: ${winner}`);
+			console.log(`Partie ${uuid} déplacée vers history avec winner ID: ${winnerId}`);
 			return true;
 		}
 		catch (err: any) {
@@ -107,11 +109,27 @@ export class GameService {
 	async logTournamentGame(uuid: string, player1: string, player2: string, winner: string, start_time: string) {
 
 		try {
+			// Convertir le username du gagnant en ID si nécessaire
+			let winnerId = winner;
+			try {
+				// Vérifier si winner est déjà un ID (nombre)
+				if (!isNaN(Number(winner))) {
+					winnerId = winner;
+				} else {
+					// Si c'est un username, on le garde tel quel pour l'instant
+					// La conversion sera faite dans la route qui appelle cette fonction
+					winnerId = winner;
+				}
+			} catch (error) {
+				console.error(`Erreur lors de la conversion du winner ${winner} en ID:`, error);
+				winnerId = winner;
+			}
+
 			await new Promise<void>((resolve, reject) => {
 				this.db.run(
 					`INSERT INTO history (uuid, game_type, player1, player2, start_time, end_time, winner) 
 					 VALUES (?, ?, ?, ?, ?, ?, ?)`,
-					[ uuid, 'pong', player1, player2, start_time, Date.now().toString(), winner],
+					[ uuid, 'pong', player1, player2, start_time, Date.now().toString(), winnerId],
 					(err: any) => {
 						err ? reject(err) : resolve();
 					}
@@ -119,7 +137,7 @@ export class GameService {
 			});
 
 			await this.deleteGame(uuid);
-			console.log(`TOURNOI      Partie ${uuid} déplacée vers history avec winner: ${winner}`);
+			console.log(`TOURNOI      Partie ${uuid} déplacée vers history avec winner ID: ${winnerId}`);
 			return true;
 
 		}

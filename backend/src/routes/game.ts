@@ -357,6 +357,13 @@ async function gameRoutes(app: FastifyInstance) {
 				if (game.player4) {
 					game.player4 = (await app.userService.findById(game.player4)).username || game.player4;
 				}
+				// Convertir le winner ID en username
+				if (game.winner) {
+					const winnerUser = await app.userService.findById(game.winner);
+					if (winnerUser) {
+						game.winner = winnerUser.username;
+					}
+				}
 			}));
 			
 			return reply.send({
@@ -383,7 +390,26 @@ async function gameRoutes(app: FastifyInstance) {
 				throw new Error("missing uuid or winner in the request");
 			}
 
-			const success = await app.gameService.moveToHistory(uuid, winner);
+			// Convertir le username du gagnant en ID
+			let winnerId = winner;
+			try {
+				// Vérifier si winner est déjà un ID (nombre)
+				if (!isNaN(Number(winner))) {
+					winnerId = winner;
+				} else {
+					// Si c'est un username, le convertir en ID
+					const winnerUser = await app.userService.findByUsername(winner);
+					if (winnerUser) {
+						winnerId = winnerUser.id.toString();
+					}
+				}
+			} catch (error) {
+				console.error(`Erreur lors de la conversion du winner ${winner} en ID:`, error);
+				// En cas d'erreur, garder le username original
+				winnerId = winner;
+			}
+
+			const success = await app.gameService.moveToHistory(uuid, winnerId);
 			
 			if (success) {
 				return reply.send({
@@ -419,7 +445,19 @@ async function gameRoutes(app: FastifyInstance) {
 
 			const user1 = await app.userService.findByUsername(player1);
 			const user2 = await app.userService.findByUsername(player2);
-			const success = await app.gameService.logTournamentGame(uuid, user1.id, user2.id, winner, start_time);
+			
+			let winnerId = winner;
+			try {
+				const winnerUser = await app.userService.findByUsername(winner);
+				if (winnerUser) {
+					winnerId = winnerUser.id.toString();
+				}
+			} catch (error) {
+				console.error(`Erreur lors de la conversion du winner ${winner} en ID:`, error);
+				winnerId = winner;
+			}
+			
+			const success = await app.gameService.logTournamentGame(uuid, user1.id, user2.id, winnerId, start_time);
 			
 			if (success) {
 				return reply.send({

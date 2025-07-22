@@ -10,13 +10,13 @@ export function renderChangePassword(): string {
 				<h2>${t('auth.changePassword.title') || 'Changer le mot de passe'}</h2>
 				<form id="changePasswordForm" class="login-form">
 					<div class="form-group">
-						<input type="password" id="currentPassword" name="currentPassword" placeholder="${t('auth.changePassword.currentPassword') || 'Mot de passe actuel'}" required>
+						<input type="password" id="currentPassword" name="currentPassword" placeholder="${t('auth.changePassword.currentPassword') || 'Mot de passe actuel'}" required autocomplete="current-password">
 					</div>
 					<div class="form-group">
-						<input type="password" id="newPassword" name="newPassword" placeholder="${t('auth.changePassword.newPassword') || 'Nouveau mot de passe'}" required>
+						<input type="password" id="newPassword" name="newPassword" placeholder="${t('auth.changePassword.newPassword') || 'Nouveau mot de passe'}" required autocomplete="new-password">
 					</div>
 					<div class="form-group">
-						<input type="password" id="confirmNewPassword" name="confirmNewPassword" placeholder="${t('auth.changePassword.confirmNewPassword') || 'Confirmer le nouveau mot de passe'}" required>
+						<input type="password" id="confirmNewPassword" name="confirmNewPassword" placeholder="${t('auth.changePassword.confirmNewPassword') || 'Confirmer le nouveau mot de passe'}" required autocomplete="new-password">
 					</div>
 					<button type="submit" class="login-btn">${t('auth.changePassword.submit') || 'Modifier le mot de passe'}</button>
 				</form>

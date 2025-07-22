@@ -102,7 +102,6 @@ async function authRoutes(app: FastifyInstance) {
 
 		try {
 
-			console.log(`DQIiiWUIWQWIDBBIWQBIBI       j'insert dans la db`)
 			// Préparation et exécution de la requête SQL d'insertion
 			const stmt = datab.prepare(
 				`INSERT INTO users (username, email, password_hash, secret_key)
