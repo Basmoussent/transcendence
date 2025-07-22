@@ -5,7 +5,7 @@ import { db } from '../../database';
 
 interface User {
 	username: string;
-	userid: number;
+	id: number;
 	isReady: boolean;
 	socket: WebSocket;
 }
@@ -15,7 +15,7 @@ interface Room {
 	name: string;
 	gameType: string;
 	maxPlayers: number;
-	users: Map<string, User>;
+	users: Map<number, User>;
 	host: string;
 	ai: number;
 }
@@ -157,7 +157,7 @@ export async function handleRoom(app: FastifyInstance, socket: WebSocket, req: F
 
 		const user = {
 			username: username,
-			userid: userid,
+			id: userid,
 			isReady: false,
 			socket: socket,
 		};
@@ -165,7 +165,7 @@ export async function handleRoom(app: FastifyInstance, socket: WebSocket, req: F
 		if ((room.users.size + room.ai >= room.maxPlayers) && room.ai >= 1)
 			room.ai -= 1;
 
-		room.users.set(username, user);
+		room.users.set(user.id, user);
 
 		broadcastSystemMessage(room, `${username} has joined the room.`);
 
@@ -179,7 +179,7 @@ export async function handleRoom(app: FastifyInstance, socket: WebSocket, req: F
 				app.jwt.verify(data.token);
 				
 				const currentRoom = rooms.get(uuid!)!;
-				const currentUser = currentRoom.users.get(username)!;
+				const currentUser = currentRoom.users.get(user.id)!;
 
 				switch (data.type) {
 					case 'toggle_ready':
@@ -274,7 +274,7 @@ export async function handleRoom(app: FastifyInstance, socket: WebSocket, req: F
 			if (!roomToLeave)
 				return;
 
-			roomToLeave.users?.delete(username);
+			roomToLeave.users?.delete(user.id);
 			console.log(`${username} disconnected from room ${uuid!}`);
 
 			if (roomToLeave.users.size === 0) {
@@ -283,9 +283,15 @@ export async function handleRoom(app: FastifyInstance, socket: WebSocket, req: F
 				app.gameService.deleteGame(uuid);
 			}
 			else {
-				if (roomToLeave.host === username)
-					roomToLeave.host = roomToLeave.users.keys().next().value!;
+				if (roomToLeave.host === username) {
 
+					console.log("console log des familles :   ", roomToLeave.users.keys().next().value)
+
+
+					///////TODO Erreur sqlite player 1 peut pas être nul mais l'est quand même bizarre.
+					roomToLeave.host = roomToLeave.users.keys().next().value;
+					
+				}
 				broadcastSystemMessage(roomToLeave, `${username} has left the room.`);
 				await broadcastRoomUpdate(app, roomToLeave);
 				await app.roomService.updateGame(roomToLeave);
