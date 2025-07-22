@@ -109,15 +109,11 @@ export class GameService {
 	async logTournamentGame(uuid: string, player1: string, player2: string, winner: string, start_time: string) {
 
 		try {
-			// Convertir le username du gagnant en ID si nécessaire
 			let winnerId = winner;
 			try {
-				// Vérifier si winner est déjà un ID (nombre)
 				if (!isNaN(Number(winner))) {
 					winnerId = winner;
 				} else {
-					// Si c'est un username, on le garde tel quel pour l'instant
-					// La conversion sera faite dans la route qui appelle cette fonction
 					winnerId = winner;
 				}
 			} catch (error) {

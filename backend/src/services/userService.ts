@@ -141,7 +141,6 @@ export class UserService {
 
 	async retrieveStats(username: string) {
 		try {
-			// Récupérer l'ID de l'utilisateur
 			const user = await this.findByUsername(username);
 			if (!user) {
 				return {
@@ -157,7 +156,6 @@ export class UserService {
 				};
 			}
 
-			// Calculer les statistiques à partir de la table history
 			const stats = await new Promise<any>((resolve, reject) => {
 				this.db.get(
 					`SELECT 
