@@ -47,9 +47,9 @@ export class Chat {
 
 	private me: UserChat = {
 		username: "",
+		userId: 0,
 		email: "",
 		avatar_url: "",
-		userId: 0
 	};
 
 	private receiver?: string;
@@ -332,8 +332,8 @@ export class Chat {
 				this.friendsList.appendChild(conversationElement);
 				conversationElement.addEventListener('click', () => this.startChatWith(relation.id, friend));
 			}
-			else if ((relation.user_1 === this.me.username && relation.user2_state === 'waiting') ||
-				(relation.user_2 === this.me.username && relation.user1_state === 'waiting')) {
+			else if ((relation.user_1 == this.me.userId && relation.user2_state === 'waiting') ||
+				(relation.user_2 == this.me.userId && relation.user1_state === 'waiting')) {
 				request++;
 
 
@@ -552,8 +552,13 @@ async function fetchUserRelations(username: string): Promise<Relation[]|null> {
 
 		const result = await response.json();
 
-		if (response.ok)
+		if (response.ok) {
+
+			console.log("debug")
+			console.log(JSON.stringify(result.relations, null, 8))
+			console.log("debug")
 			return result.relations;
+		}
 		
 		console.error("error retrieve relations of a user");
 		return null;
