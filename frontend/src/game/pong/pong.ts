@@ -196,15 +196,13 @@ export class Pong {
 	private displayStartMsg(): void {
 		this.ctx.globalAlpha = 0.2;
         this.ctx.fillStyle = 'white';
-        this.ctx.font = '48px gaming';
-
-        this.ctx.fillText(t('pong.pressEnterToStart'), this.width / 2 - 150, this.height / 2 - 100);
-        this.ctx.fillText(t('pong.toStart'), this.width / 2 - 100, this.height / 2 - 50);
-
+        this.ctx.font = '48px gaming'; // changer police
+        this.ctx.fillText(t('pong.pressEnterToStart'), this.width / 2 - 190, this.height / 2 - 100);
+        this.ctx.fillText(t('pong.toStart'), this.width / 2 - 140, this.height / 2 - 50);
         this.ctx.fillStyle = PADDLE1_COLOR;
-        this.ctx.fillText("PLAYER 1: W/S KEYS", this.width / 2 - 120, this.height / 2 + 20);
+        this.ctx.fillText("PLAYER 1: W/S KEYS", this.width / 2 - 280, this.height / 2 + 20);
         this.ctx.fillStyle = PADDLE2_COLOR;
-        this.ctx.fillText("PLAYER 2: ARROW KEYS", this.width / 2 - 140, this.height / 2 + 70);
+        this.ctx.fillText("PLAYER 2: ARROW KEYS", this.width / 2 - 330, this.height / 2 + 70);
 		this.ctx.globalAlpha = 1;
 	}
 
