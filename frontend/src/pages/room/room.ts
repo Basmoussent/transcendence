@@ -300,8 +300,7 @@ export class Room {
 
 		const allReady = this.roomData.users.every(u => u.isReady);
 
-		const canStart = this.roomData.users.length == this.roomData.maxPlayers && allReady;
-
+		const canStart = this.roomData.users.length + this.roomData.ai == this.roomData.maxPlayers && allReady;
 		if (this.roomData.host === this.username) {
 
 			this.startBtn.disabled = !canStart;

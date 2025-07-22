@@ -278,7 +278,7 @@ export class MultiPong {
         }
 
         this.ctx.globalAlpha = 1;
-}
+    }
 
     private displayEndMsg(): void {
         this.ctx.globalAlpha = 0.2;
