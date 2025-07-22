@@ -72,7 +72,7 @@ async function friendRoutes(app: FastifyInstance) {
 		}
 	})
 
-	app.put('/:id', async function (request: FastifyRequest, reply: FastifyReply) {
+	app.post('/accept/:id', async function (request: FastifyRequest, reply: FastifyReply) {
 
 		try {
 			const { id } = request.params as { id?: number };
@@ -112,6 +112,7 @@ async function friendRoutes(app: FastifyInstance) {
 
 	})
 
+
 	app.post('/relation', async function (request: FastifyRequest, reply: FastifyReply) {
 
 		try {
@@ -150,6 +151,41 @@ async function friendRoutes(app: FastifyInstance) {
 				details: err.message });
 		}
 	});
+
+	app.post('/block/:relationid', async function (request: FastifyRequest, reply: FastifyReply) {
+
+		try {
+			const { relationid } = request.query as { relationid?: number };
+			const { userState } = request.body as { userState?: number };
+
+			if (!relationid || ! userState)
+				return reply.status(400).send({ error: 'relationid et userState needed' });
+
+			await app.friendService.blockRelation(userState, relationid);
+		}
+		catch (err: any) {
+			return reply.status(500).send({
+				error: `erreur changer une relation déjà existante pour bloquer quelqu'un`,
+				details: err.message });
+		}
+	})
+
+	app.post('/blockUser', async function (request: FastifyRequest, reply: FastifyReply) {
+
+		try {
+			const { angry, blocked } = request.query as { angry?: string; blocked?: string };
+
+			if (!angry || !blocked)
+				return reply.status(400).send({ error: 'blocked et angry needed' });
+
+			await app.friendService.blockUser(angry, blocked);
+		}
+		catch (err: any) {
+			return reply.status(500).send({
+				error: `erreur changer une relation déjà existante pour bloquer quelqu'un`,
+				details: err.message });
+		}
+	})
 
 	
 }

@@ -52,7 +52,6 @@ export class profil {
 		// si this.me.username === this.user.username --> pas possible, on redirige vers /me
 
 		this.setupEvents();
-		console.log("setupEvents")
 		setTimeout(async () => {
 			await this.updateInfo();
 		}, 0);
@@ -79,7 +78,7 @@ export class profil {
 
 		this.blockBtn.addEventListener('click', async () => {
 
-			await this.blockUser();
+			await this.handleBlock();
 			this.updateInfo();
 		})
 
@@ -87,65 +86,38 @@ export class profil {
 	}
 
 	private async updateInfo() {
-		console.log("🔍 updateInfo - stats:", this.stats);
-		console.log("🔍 updateInfo - user:", this.user);
-		console.log("🔍 updateInfo - friends:", this.friends);
-		
-		// Vérifier que les éléments existent
-		if (!this.username) {
-			console.error("❌ Element username non trouvé");
-			return;
-		}
-		if (!this.gamePlayed) {
-			console.error("❌ Element gamePlayed non trouvé");
-			return;
-		}
-		if (!this.mmr) {
-			console.error("❌ Element mmr non trouvé");
-			return;
-		}
-		if (!this.winrate) {
-			console.error("❌ Element winrate non trouvé");
-			return;
-		}
-		if (!this.rank) {
-			console.error("❌ Element rank non trouvé");
-			return;
-		}
-		if (!this.friendsGrid) {
-			console.error("❌ Element friendsGrid non trouvé");
-			return;
-		}
-		if (!this.gameHistory) {
-			console.error("❌ Element gameHistory non trouvé");
-			return;
-		}
-		if (!this.online) {
-			console.error("❌ Element online non trouvé");
-			return;
-		}
-		if (!this.statusDot) {
-			console.error("❌ Element statusDot non trouvé");
-			return;
-		}
+		// console.log("🔍 updateInfo - stats:", this.stats);
+		// console.log("🔍 updateInfo - user:", this.user);
+		// console.log("🔍 updateInfo - friends:", this.friends);
+
+		console.log("on update les infos")
+
+		if (!this.username || !this.gamePlayed || !this.mmr || !this.winrate || !this.rank || !this.friendsGrid || !this.gameHistory || !this.online || !this.statusDot)
+			console.error("❌ il manque un element");
 
 		this.relation = await loadRelation(this.me.username, this.user.username)
 
 		if (this.relation) {
 			const myState = this.relation.user_1 == this.me.username ? this.relation.user1_state : this.relation.user2_state;
 			const userState = this.relation.user_1 == this.user.username ? this.relation.user1_state : this.relation.user2_state;
-	
-			// if myState == waiting --> cancel
-			// if myState == requested --> accept friend request
-			// if myState == normal --> remove friend
-	
-			// if userState == normal --> bloquer
-			// if userState == blocked --> débloquer
+
+			if (myState == 'waiting')
+				this.addFriendBtn.textContent = 'cancel'
+
+			else if (myState == 'requested')
+				this.addFriendBtn.textContent = 'accept'
+
+			else if (myState == 'normal')
+				this.addFriendBtn.textContent = 'remove Friend'
+
+			else if (myState == 'angry')
+				this.addFriendBtn.classList.add('hidden');
 
 		}
+		else
+			this.addFriendBtn.textContent = 'ajouter en ami'
 
-
-		this.username.textContent = this.user.username || 'Utilisateur inconnu';
+		this.username.textContent = this.user.username;
 		
 		// Mettre à jour le statut en ligne/hors ligne
 		this.updateOnlineStatus();
@@ -178,7 +150,8 @@ export class profil {
 				console.log("👤 Ajout ami:", tmp);
 				this.friendsGrid.innerHTML += this.friendCard(tmp);
 			}
-		} else {
+		}
+		else {
 			console.log("👥 Aucun ami à afficher");
 			this.friendsGrid.innerHTML = '<div class="no-friends">Aucun ami pour le moment</div>';
 		}
@@ -329,19 +302,16 @@ export class profil {
 			const myState = this.relation.user_1 == this.me.username ? this.relation.user1_state : this.relation.user2_state;
 			const userState = this.relation.user_1 == this.user.username ? this.relation.user1_state : this.relation.user2_state;
 
-			// si on est amis on supprime la relation
-			// si je lui avais envoyé une invite on supprime aussi
 			if ((myState == 'normal' && userState == 'normal') || (myState == 'waiting' && userState == 'requested'))
-				await this.deleteFriend();
+				await this.deleteRelation();
 			else if (myState == 'requested' && userState == 'waiting')
 				await this.acceptFriend();
-			// s'il m'avait demandé j'accept
 		}
 		else
 			await this.createFriendRequest();
 	}
 
-	private async deleteFriend() {
+	private async deleteRelation() {
 		try {
 			const token = getAuthToken();
 			if (!token) {
@@ -354,7 +324,6 @@ export class profil {
 			await fetch(`/api/friend/${this.relation.id}`, {
 				method: 'DELETE',
 				headers: {
-					'Content-Type': 'application/json',
 					'x-access-token': token,
 				},
 			})
@@ -378,7 +347,6 @@ export class profil {
 			await fetch(`/api/friend`, {
 				method: 'POST',
 				headers: {
-					'Content-Type': 'application/json',
 					'x-access-token': token,
 				},
 				body: JSON.stringify({
@@ -406,10 +374,9 @@ export class profil {
 				return;
 			}
 
-			await fetch(`/api/friend/${this.relation.id}`, {
-				method: 'PUT',
+			await fetch(`/api/friend/accept/${this.relation.id}`, {
+				method: 'POST',
 				headers: {
-					'Content-Type': 'application/json',
 					'x-access-token': token,
 				},
 			})
@@ -420,20 +387,75 @@ export class profil {
 		}
 	}
 
-	private async blockUser() {
+	private async handleBlock() {
 
-		//reload la relation
-		this.relation = await loadRelation(this.me.user, this.user.username);
+		if (this.relation) {
+			const myState = this.relation.user_1 == this.me.username ? this.relation.user1_state : this.relation.user2_state;
+			const userState = this.relation.user_1 == this.user.username ? this.relation.user1_state : this.relation.user2_state;
 
-		// si l'utilisateur était bloqueé mettre normal normal
+			if (myState == 'angry' && userState == 'blocked')
+				this.deleteRelation();
+			else {
+				const whichuser = this.relation.user_1 == this.user.username ? 'user1_state': 'user2_state';
+				this.changeRelationToBlocked(whichuser)
+			}
+		}
+		else {
+			this.blockUser(this.me.username, this.user.username)
+			// creer la relation et bloquer directement via app.friensvc.handleBlock
+		}
+	}
 
-		// sinon le bloquer mettre blocked et angry
+	private async changeRelationToBlocked(state: string) {
 
+		try {
+			const token = getAuthToken();
+			if (!token) {
+				alert('❌ Authentication token not found');
+				window.history.pushState({}, '', '/login');
+				window.dispatchEvent(new PopStateEvent('popstate'));
+				return;
+			}
 
-
-
+			await fetch(`/api/friend/block/?relationid=${this.relation.id}`, {
+				method: 'POST',
+				headers: {
+					'x-access-token': token,
+				},
+				body: JSON.stringify({
+					userState: state
+				})
+			})
+			this.addFriendBtn.textContent = 'remove friend'
+		}
+		catch (err) {
+			console.error(`error dans changeRelationToBlocked`)
+		}
 
 	}
 
+	private async blockUser(angry: string, blocked: string) {
 
+		try {
+			const token = getAuthToken();
+			if (!token) {
+				alert('❌ Authentication token not found');
+				window.history.pushState({}, '', '/login');
+				window.dispatchEvent(new PopStateEvent('popstate'));
+				return;
+			}
+
+			await fetch(`/api/friend/blockUser?angry=${angry}&blocked=${blocked}`, {
+				method: 'POST',
+				headers: {
+					'x-access-token': token,
+				},
+			})
+			this.addFriendBtn.textContent = 'debloquer'
+		}
+		catch (err) {
+			console.error(`error dans blockUser appel api`)
+		}
+
+	}
 }

@@ -124,18 +124,36 @@ export class FriendService {
 	}
 
 	// blocked == 'user1_state' | 'user2_state'
-	async blockUser(blocked: string, relationId: number) {
+	async blockRelation(blocked: string, relationId: number) {
 
 		try {
+			const angry = blocked == 'user1_state' ? 'user2_state' : 'user1_state';
+
 			await new Promise<void>((resolve, reject) => {
 				this.db.run(
-					`UPDATE friends SET ${blocked} = 'blocked' WHERE id = ?`,
+					`UPDATE friends SET ${angry} = 'angry', ${blocked} = 'blocked' WHERE id = ?`,
 					[ relationId ],
 					(err: any) => {	err ? reject(err) : resolve();})
 			});
 		}
 		catch (err: any) {
 			console.log(`on deny la relation; friends(${relationId}) `)
+		}
+	}
+
+	async blockUser(angry: string, blocked: string) {
+
+		try {
+			await new Promise<void>((resolve, reject) => {
+				this.db.run(
+					`INSERT INTO friends (user_1, user_2, user1_state, user2_state) VALUES (?, ?, ?, ?)`,
+					[ angry, blocked, 'angry', 'blocked' ],
+					(err: any) => {
+					err ? reject(err) : resolve();
+			})});
+		}
+		catch (err: any) {
+			console.log(`pblm creer la relation en bloquant ${blocked}`)
 		}
 	}
 
