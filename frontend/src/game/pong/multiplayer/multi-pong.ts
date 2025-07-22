@@ -66,6 +66,7 @@ export class MultiPong {
 
         this.setupCanvas();
         this.setupEventListeners();
+        logStartGame(this.data.id); // start ici
         this.startGameLoop();
 
         // on resize si la taille de la fenetre change
@@ -238,7 +239,7 @@ export class MultiPong {
         const gameLoop = async () => {
             if (this.keys['enter']) {
                 this.start = true;
-                logStartGame(this.data.id);
+                // logStartGame(this.data.id);
             }
             if (this.start && !this.end)
                 this.update();

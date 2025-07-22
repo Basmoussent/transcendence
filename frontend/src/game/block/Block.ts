@@ -71,6 +71,7 @@ export class Block {
 		this.loadUsername();
 		this.setupCanvas();
 		this.setupEventListeners();
+		logStartGame(this.data.id); // start ici
 		this.startGameLoop();
 	}
 
@@ -254,7 +255,7 @@ export class Block {
 			// 	users_needed: 1
 			// });
 
-			logStartGame(this.data.id);
+			// logStartGame(this.data.id);
 
 			// Créer les briques
 			this.bricks = [];

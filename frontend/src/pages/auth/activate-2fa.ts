@@ -3,7 +3,6 @@ import { fetchMe, update2FAState, userInfo } from '../social/utils';
 import { addEvent } from '../../utils/eventManager';
 import { t } from '../../utils/translations';
 
-// Exemple de page /tfa pour activer la 2FA
 export function render2FA() {
   const htmlContent = `
     <div class="tfa-wrapper">

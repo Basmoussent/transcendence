@@ -73,6 +73,7 @@ export class Block1v1 {
 
 		this.setupCanvas();
 		this.setupEventListeners();
+		logStartGame(this.data.id); // start ici
 		this.startGameLoop();
 	}
 
@@ -236,7 +237,7 @@ export class Block1v1 {
 			this.ball1.reset(this.width / 2, this.height - 100, 4, -4);
 			this.ball2.reset(this.width / 2, 100, -4, 4);
 			this.status = true;
-			logStartGame(this.data.id);
+			// logStartGame(this.data.id);
 
 			// Créer les briques
 			this.bricks = [];
