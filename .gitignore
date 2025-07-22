@@ -46,3 +46,5 @@ backend/data/*
 docker/nginx/logs/*
 
 task.csv
+
+notes.txt

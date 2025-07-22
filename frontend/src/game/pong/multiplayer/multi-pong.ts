@@ -75,8 +75,8 @@ export class MultiPong {
     }
 
     private async loadInfo(uuid: string): Promise<any> {
-            let tmp = await this.retrieveGameInfo(uuid)
-            // console.log("this data", this.data)
+            let tmp = await this.retrieveGameInfo(uuid);
+
             return tmp;
     }
 
@@ -238,7 +238,7 @@ export class MultiPong {
         const gameLoop = async () => {
             if (this.keys['enter']) {
                 this.start = true;
-                 logStartGame(this.data.id);
+                logStartGame(this.data.id);
             }
             if (this.start && !this.end)
                 this.update();

@@ -213,6 +213,7 @@ export class Room {
 	}
 
 	private gameTypeChanged() {
+		console.log('gametypechanged')
 		this.ws.send(JSON.stringify({
 			type: 'game_type',
 			name: this.gameTypeSelect.value,
