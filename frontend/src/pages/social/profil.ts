@@ -85,6 +85,7 @@ export class profil {
 
 	}
 
+	///TODO changer pour regarder par rapport aux id
 	private async updateInfo() {
 		// console.log("🔍 updateInfo - stats:", this.stats);
 		// console.log("🔍 updateInfo - user:", this.user);

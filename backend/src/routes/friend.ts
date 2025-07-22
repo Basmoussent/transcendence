@@ -115,6 +115,7 @@ async function friendRoutes(app: FastifyInstance) {
 	})
 
 
+	///////TODO  on prend les id pas les username
 	app.post('/relation', async function (request: FastifyRequest, reply: FastifyReply) {
 
 		try {

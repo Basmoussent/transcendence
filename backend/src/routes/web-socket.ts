@@ -67,8 +67,8 @@ async function webSocketRoutes(app: FastifyInstance) {
 	// 	}
 	// });
 
-	app.get('/chat', { websocket: true }, (socket: WebSocket, req: FastifyRequest) => {
-		handleChat(app, socket, req);
+	app.get('/chat', { websocket: true }, async (socket: WebSocket, req: FastifyRequest) => {
+		await handleChat(app, socket, req);
 	});
 
 	app.get('/alive', { websocket: true }, (connection: WebSocket, req: FastifyRequest) => {

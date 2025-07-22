@@ -33,13 +33,13 @@ export class FriendService {
 		return Promise.resolve(null); 
 	}
 
-	async getRelations(username: string) {
+	async getRelations(userid: number) {
 
 		try {
 			const relations = await new Promise<Relation[] | null>((resolve, reject) => {
 				this.db.all(
 					'SELECT * FROM friends WHERE user_1 = ? OR user_2 = ?',
-					[ username, username ],
+					[ userid, userid ],
 					(err: any, rows: Relation[] | undefined) => {
 					err ? reject(err) : resolve(rows || null); }
 				);
@@ -47,18 +47,18 @@ export class FriendService {
 			return relations;
 		}
 		catch (err: any) {
-			console.log(`le user ${username} n'a pas de relations`)
+			console.log(`le user ${userid} n'a pas de relations`)
 		}
 		return Promise.resolve(null); 
 	}
 
-	async searchRelation(user1: string, user2: string) {
+	async searchRelation(id1: number, id2: number) {
 
 		try {
 			const relation = await new Promise<Relation | null>((resolve, reject) => {
 				this.db.get(
 					'SELECT * FROM friends WHERE (user_1 = ? AND user_2 = ?) OR (user_1 = ? AND user_2 = ?) ',
-					[ user1, user2, user2, user1],
+					[ id1, id2, id2, id1],
 					(err: any, row: Relation | undefined) => {
 					err ? reject(err) : resolve(row || null); }
 				);
@@ -66,7 +66,7 @@ export class FriendService {
 			return relation;
 		}
 		catch (err: any) {
-			console.log(`il n'y a pas de relations entre ${user1} et ${user2}`)
+			console.log(`il n'y a pas de relations entre ${id1} et ${id2}`)
 		}
 		return Promise.resolve(null); 
 	}
