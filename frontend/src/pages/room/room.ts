@@ -82,9 +82,11 @@ export class Room {
 
 	private setupPing() {
 		setInterval(() => {
-			this.ws.send(JSON.stringify({
-				type: 'ping'
-			}));
+			if (this.ws.readyState === WebSocket.OPEN) {
+				this.ws.send(JSON.stringify({
+					type: 'ping'
+				}));
+			}
 		}, 10000);
 	}
 	
@@ -105,7 +107,7 @@ export class Room {
 		};
 
 		this.ws.onerror = (error) => console.error(`${this.username} onerror ${this.uuid}:`, error);
-		this.ws.onclose = (event) => console.log(`close le socket ${this.username} car :`, event.code, event.reason);
+		this.ws.onclose = (event) => console.log(` ${this.username} car :`, event.code, event.reason);
 		
 		this.ws.onmessage = (event) => {
 			try {

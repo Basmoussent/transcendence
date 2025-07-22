@@ -91,9 +91,11 @@ export class matchmaking {
 
 	private setupPing() {
 		setInterval(() => {
-			this.ws.send(JSON.stringify({
-				type: 'ping'
-			}));
+			if (this.ws.readyState === WebSocket.OPEN) {
+				this.ws.send(JSON.stringify({
+					type: 'ping'
+				}));
+			}
 		}, 10000);
 	}
 	private async joinIt() {

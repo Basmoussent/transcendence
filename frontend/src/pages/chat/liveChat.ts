@@ -581,8 +581,10 @@ async function fetchUserRelations(userid: number): Promise<Relation[]|null> {
 
 function setupPing(ws: WebSocket) {
 	setInterval(() => {
-		ws.send(JSON.stringify({
-			type: 'ping'
-		}));
+		if (ws.readyState === WebSocket.OPEN) {
+			ws.send(JSON.stringify({
+				type: 'ping'
+			}));
+		}
 	}, 10000);	
 }
