@@ -5,6 +5,7 @@ import { getAuthToken } from '../../../utils/auth';
 import { PADDLE_OFFSET, Player, PADDLE1_COLOR, PADDLE2_COLOR, PADDLE3_COLOR, PADDLE4_COLOR } from "../const";
 import { addEvent } from '../../../utils/eventManager';
 import { t } from '../../../utils/translations';
+import { logStartGame } from "../../../game/gameUtils";
 
 export interface Game {
 	id: number,
@@ -65,6 +66,7 @@ export class MultiPong {
 
         this.setupCanvas();
         this.setupEventListeners();
+        logStartGame(this.data.id); // start ici
         this.startGameLoop();
 
         // on resize si la taille de la fenetre change
@@ -74,8 +76,8 @@ export class MultiPong {
     }
 
     private async loadInfo(uuid: string): Promise<any> {
-            let tmp = await this.retrieveGameInfo(uuid)
-            // console.log("this data", this.data)
+            let tmp = await this.retrieveGameInfo(uuid);
+
             return tmp;
     }
 
@@ -235,8 +237,10 @@ export class MultiPong {
         const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
         const gameLoop = async () => {
-            if (this.keys['enter'])
+            if (this.keys['enter']) {
                 this.start = true;
+                // logStartGame(this.data.id);
+            }
             if (this.start && !this.end)
                 this.update();
             this.render();
@@ -257,16 +261,28 @@ export class MultiPong {
         this.ctx.globalAlpha = 0.2;
         this.ctx.fillStyle = 'white';
         this.ctx.font = '48px gaming'; // changer police
-        this.ctx.fillText(t('pong.pressEnterToStart'), this.width / 2 - 150, this.height / 2 - 30);
-        this.ctx.fillText(t('pong.toStart'), this.width / 2 - 100, this.height / 2 + 50);
+        this.ctx.fillText(t('pong.pressEnterToStart'), this.width / 2 - 190, this.height / 2 - 100);
+        this.ctx.fillText(t('pong.toStart'), this.width / 2 - 140, this.height / 2 - 50);
+        this.ctx.fillStyle = PADDLE1_COLOR;
+        this.ctx.fillText("PLAYER 1: W/S KEYS", this.width / 2 - 280, this.height / 2 + 20);
+        this.ctx.fillStyle = PADDLE2_COLOR;
+        this.ctx.fillText("PLAYER 2: ARROW KEYS", this.width / 2 - 330, this.height / 2 + 70);
+        if (this.paddles[2]) {
+            this.ctx.fillStyle = PADDLE3_COLOR;
+            this.ctx.fillText("PLAYER 3: K/L KEYS", this.width / 2 - 280, this.height / 2 + 120);
+        }
+        if (this.paddles[3]) {
+            this.ctx.fillStyle = PADDLE3_COLOR;
+            this.ctx.fillText("PLAYER 4: 5/6 KEYS", this.width / 2 - 280, this.height / 2 + 170);
+        }
         this.ctx.globalAlpha = 1;
-    }
+}
 
     private displayEndMsg(): void {
         this.ctx.globalAlpha = 0.2;
         this.ctx.fillStyle = 'white';
-        this.ctx.font = '48px gaming'; // changer police
-        this.ctx.fillText("GAME OVER", this.width / 2 - 150, this.height / 2 - 30);
+        this.ctx.font = '48px gaming';
+        this.ctx.fillText(`${this.winner} WINS`, this.width / 2, this.height / 2);
         this.ctx.globalAlpha = 1;
     }
 

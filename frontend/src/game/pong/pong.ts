@@ -195,14 +195,18 @@ export class Pong {
 
 	private displayStartMsg(): void {
 		this.ctx.globalAlpha = 0.2;
-		this.ctx.fillStyle = 'white';
-		this.ctx.font = '48px gaming'; // changer police
-		this.ctx.fillText(t('pong.pressEnterToStart'), this.width / 2 - 150, this.height / 2 - 30);
-		this.ctx.fillText(t('pong.toStart'), this.width / 2 - 100, this.height / 2 + 50);
+        this.ctx.fillStyle = 'white';
+        this.ctx.font = '48px gaming'; // changer police
+        this.ctx.fillText(t('pong.pressEnterToStart'), this.width / 2 - 190, this.height / 2 - 100);
+        this.ctx.fillText(t('pong.toStart'), this.width / 2 - 140, this.height / 2 - 50);
+        this.ctx.fillStyle = PADDLE1_COLOR;
+        this.ctx.fillText("PLAYER 1: W/S KEYS", this.width / 2 - 280, this.height / 2 + 20);
+        this.ctx.fillStyle = PADDLE2_COLOR;
+        this.ctx.fillText("PLAYER 2: ARROW KEYS", this.width / 2 - 330, this.height / 2 + 70);
 		this.ctx.globalAlpha = 1;
-		}
+	}
 
-		private drawLine(): void {
+	private drawLine(): void {
 		this.ctx.globalAlpha = 0.2;
 		this.ctx.beginPath();
 		this.ctx.moveTo(this.width / 2, 30);
@@ -225,8 +229,8 @@ export class Pong {
 	private displayEndMsg(): void {
         this.ctx.globalAlpha = 0.2;
         this.ctx.fillStyle = 'white';
-        this.ctx.font = '48px gaming'; // changer police
-        this.ctx.fillText("GAME OVER", this.width / 2 - 150, this.height / 2 - 30);
+        this.ctx.font = '48px gaming';
+        this.ctx.fillText(`${this.winner} WINS`, this.width / 2, this.height / 2);
         this.ctx.globalAlpha = 1;
     }
 

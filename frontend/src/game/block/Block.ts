@@ -1,4 +1,4 @@
-import { fetchUsername, logEndGame, postGame } from "../gameUtils.ts";
+import { fetchUsername, logEndGame, logStartGame, postGame } from "../gameUtils.ts";
 import { Ball, Paddle, brick, createRandomBrick, PowerUp, PowerUpType, getPowerUpFromBrick } from "./blockUtils.ts";
 import { getAuthToken } from '../../utils/auth.ts'
 import { addEvent } from '../../utils/eventManager.ts';
@@ -19,7 +19,7 @@ export interface Game {
 export class Block {
 	private canvas: HTMLCanvasElement;
 	private ctx: CanvasRenderingContext2D;
-	private uuid: number;
+	private uuid: string;
 	private width: number;
 	private height: number;
 	private status: boolean;
@@ -33,14 +33,6 @@ export class Block {
 	private paddle: Paddle;
 	private bricks: brick[] = [];
 	private keys: { [key: string]: boolean };
-	
-	// Effets de power-ups
-	private widePaddleActive: boolean = false;
-	private widePaddleTimer: number = 0;
-	private fastBallActive: boolean = false;
-	private fastBallTimer: number = 0;
-	private slowBallActive: boolean = false;
-	private slowBallTimer: number = 0;
 
 	private data: any;
   
@@ -55,7 +47,7 @@ export class Block {
 		this.width = canvas.width;
 		this.height = canvas.height;
 		this.winner = 'nil';
-		this.uuid = -1;
+		this.uuid = uuid;
 		this.win = false;
 		this.lost = false;
 		this.username = "ko";
@@ -68,13 +60,26 @@ export class Block {
 		this.brickWidth = 0;
 		this.brickHeight = 0;
 
-		this.retrieveGameInfo(uuid);
+
+		this.asyncInit();
+	}
+
+	public async asyncInit(): Promise<void> {
+		this.data = await this.loadInfo(this.uuid);
+        console.log("data dans asyncInit", this.data);
 
 		this.loadUsername();
 		this.setupCanvas();
 		this.setupEventListeners();
+		logStartGame(this.data.id); // start ici
 		this.startGameLoop();
 	}
+
+	private async loadInfo(uuid: string): Promise<any> {
+            let tmp = await this.retrieveGameInfo(uuid);
+            
+            return tmp;
+    }
 
 	private async loadUsername() {
 		try {
@@ -123,7 +128,7 @@ export class Block {
 
 		const result = await response.json();
 
-		this.data = {
+		const data = {
 			id: result.game.id,
 			uuid: result.game.uuid,
 			game_type: result.game.game_type,
@@ -135,7 +140,9 @@ export class Block {
 			ai: result.game.ai,
 		}
 
-		console.log(`les infos de la game => ${JSON.stringify(this.data, null, 12)}`)
+		console.log(`les infos de la game => ${JSON.stringify(data, null, 12)}`)
+
+		return data;
 	}
   
 	private setupCanvas(): void {
@@ -156,14 +163,59 @@ export class Block {
 		this.ball.x = this.width / 2;
 		this.ball.y = this.height - 100;
 	}
-  
-	private startGameLoop(): void {
-		const gameLoop = () => {
+
+	private async startGameLoop(): Promise<void> {
+		const gameLoop = async () => {
 			this.update();
 			this.render();
+
+			if (this.win || this.lost) {
+				this.logGame();
+        		const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+
+				await sleep(3000);
+
+                window.history.pushState({}, '', '/main');
+                window.dispatchEvent(new PopStateEvent('popstate'));
+                return;
+			}
 			requestAnimationFrame(gameLoop);
 		};
 		gameLoop();
+	}
+
+	private async logGame() {
+
+		try {
+			const token = getAuthToken();
+			if (!token) {
+				alert('❌ Token d\'authentification manquant');
+				window.history.pushState({}, '', '/login');
+				window.dispatchEvent(new PopStateEvent('popstate'));
+				return -1;
+			}
+
+			const response = await fetch(`/api/games/finish/${this.uuid}`, {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+					'x-access-token': token,
+				},
+				body: JSON.stringify({
+					winner: this.winner
+				})
+			});
+		
+			if (response.ok) {
+				const result = await response.json();
+				console.log("la game de room est log", result);
+			}
+			else 
+				console.error("erreur pour log la game de room");
+		}
+		catch (err) {
+			console.error("pblm dans Block.ts pour log la game")
+		}
 	}
 
 	private displayStartMsg(): void {
@@ -171,7 +223,7 @@ export class Block {
 		
 		this.ctx.globalAlpha = 0.8;
 		this.ctx.fillStyle = 'white';
-		this.ctx.font = '32px Arial';
+		this.ctx.font = '32px gaming';
 		this.ctx.textAlign = 'center';
 		this.ctx.fillText(t('block.pressEnterToStart'), this.width / 2, this.height / 2);
 		this.ctx.globalAlpha = 1;
@@ -197,15 +249,17 @@ export class Block {
 			this.ball.reset(this.width / 2, this.height - 100, 4, -4);
 			this.status = true;
 
-			this.uuid = await postGame({
-				game_type: "block",
-				player1: this.username,
-				users_needed: 1
-			});
+			// this.uuid = await postGame({
+			// 	game_type: "block",
+			// 	player1: this.username,
+			// 	users_needed: 1
+			// });
+
+			// logStartGame(this.data.id);
 
 			// Créer les briques
 			this.bricks = [];
-			for (let i = 0; i < 100; i++) {
+			for (let i = 0; i < 1; i++) {
 				this.bricks.push(createRandomBrick(i, i % 20, Math.floor(i / 20)));
 			}
 		}
@@ -254,9 +308,9 @@ export class Block {
 		// Fin de partie
 		if (this.win || this.lost) {
 			this.status = false;
-			await logEndGame(this.uuid, this.winner);
-			this.win = false;
-			this.lost = false;
+			// await logEndGame(this.data.id, this.winner);
+			// this.win = false;
+			// this.lost = false;
 		}
 
 		// Déplacer la balle
@@ -280,9 +334,6 @@ export class Block {
 	private drawPaddle(): void {
 		// Couleur de la paddle selon les effets actifs
 		let paddleColor = '#84AD8A';
-		if (this.widePaddleActive) {
-			paddleColor = '#4444FF'; // Bleu quand agrandie
-		}
 		
 		this.ctx.fillStyle = paddleColor;
 		this.ctx.fillRect(
@@ -304,11 +355,6 @@ export class Block {
 	private drawBall(): void {
 		// Couleur de la balle selon les effets actifs
 		let ballColor = '#FF8600';
-		if (this.fastBallActive) {
-			ballColor = '#FFFF44'; // Jaune quand rapide
-		} else if (this.slowBallActive) {
-			ballColor = '#FF44FF'; // Magenta quand lente
-		}
 		
 		this.ctx.beginPath();
 		this.ctx.arc(this.ball.x, this.ball.y, this.ball.radius, 0, Math.PI * 2);
@@ -328,9 +374,13 @@ export class Block {
 		this.ctx.fillStyle = '#1a1a2e';
 		this.ctx.fillRect(0, 0, this.width, this.height);
 		
-		// Dessiner les éléments
-		this.renderBricks();
-		this.drawPaddle();
 		this.drawBall();
+		this.drawPaddle();
+		if (this.status) {
+			// Dessiner les éléments
+			this.renderBricks();
+		}
+		else
+			this.displayStartMsg();
 	}
 }

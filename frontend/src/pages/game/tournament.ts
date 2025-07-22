@@ -1386,10 +1386,60 @@ document.addEventListener('input', function(event: Event) {
   }
 };
 
+function cleanStart() {
+  tournamentData = {
+    players: [],
+    matches: {},
+    currentRound: 'qf',
+    inLobby: true
+  };
+  
+  document.querySelectorAll('.player').forEach(player => {
+    player.classList.remove('winner');
+    player.classList.add('empty');
+    const scoreElement = player.querySelector('.player-score');
+    if (scoreElement) scoreElement.textContent = '0';
+  });
+  
+  for (let i = 1; i <= 8; i++) {
+    const playerElement = document.querySelector('[data-player="' + i + '"] .player-name');
+    if (playerElement) {
+      playerElement.textContent = 'Player ' + i;
+      playerElement.parentElement?.classList.add('empty');
+    }
+  }
+  
+  document.querySelectorAll('[data-winner-from]').forEach(element => {
+    const winnerFrom = element.getAttribute('data-winner-from');
+    const nameElement = element.querySelector('.player-name');
+    if (nameElement && winnerFrom) {
+      nameElement.textContent = 'Winner ' + winnerFrom.toUpperCase();
+      element.classList.add('empty');
+    }
+  });
+  
+  document.querySelectorAll('.play-match-btn').forEach(btn => {
+    if (btn instanceof HTMLButtonElement) {
+      btn.disabled = true;
+    }
+  });
+  
+  const championElement = document.getElementById('championName');
+  if (championElement) championElement.textContent = 'TBD';
+  
+  const bracketContainer = document.getElementById('bracket-container');
+  const emptyState = document.getElementById('empty-state');
+  if (bracketContainer) bracketContainer.style.display = 'none';
+  if (emptyState) emptyState.style.display = 'flex';
+  
+  updateLobbyDisplay();
+}
+
 export function initializeTournamentEvents() {
   console.log("test");
   generateQuarterFinals();
-  updateLobbyDisplay();
+  // updateLobbyDisplay();
+  cleanStart();
 
   const homeBtn = document.getElementById('homeBtn');
 
@@ -1401,4 +1451,3 @@ export function initializeTournamentEvents() {
   }
 
 }
-

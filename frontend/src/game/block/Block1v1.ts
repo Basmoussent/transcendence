@@ -2,6 +2,10 @@ import { brick, Ball, Paddle, createRandomBrick } from "./blockUtils.ts";
 import { getAuthToken } from '../../utils/auth.ts'
 import { addEvent } from '../../utils/eventManager.ts';
 import { t } from '../../utils/translations.ts'
+import { logStartGame } from "../gameUtils.ts";
+
+const PADDLE1_COLOR = '#84AD8A';
+const PADDLE2_COLOR = '#84A6AD';
 
 export interface Game {
 	id: number,
@@ -33,6 +37,7 @@ export class Block1v1 {
 	private keys: { [key: string]: boolean };
 
 	private data: any;
+	private uuid: string;
 
 	constructor(canvas: HTMLCanvasElement, uuid: string) {
 		this.canvas = canvas;
@@ -40,8 +45,6 @@ export class Block1v1 {
 
 		if (!context)
 			throw new Error('Could not get 2D context');
-
-		this.retrieveGameInfo(uuid);
 
 		this.ctx = context;
 		this.width = canvas.width;
@@ -60,11 +63,17 @@ export class Block1v1 {
 
 		this.keys = {};
 		this.bricks = [];
+
+		this.uuid = uuid;
 	}
 
-	public init(): void {
+	public async asyncInit(): Promise<void> {
+		this.data = await this.loadInfo(this.uuid);
+        console.log("data dans asyncInit", this.data);
+
 		this.setupCanvas();
 		this.setupEventListeners();
+		logStartGame(this.data.id); // start ici
 		this.startGameLoop();
 	}
 
@@ -79,6 +88,12 @@ export class Block1v1 {
 			this.keys[e.key.toLowerCase()] = false;
 		});
 	}
+
+	private async loadInfo(uuid: string): Promise<any> {
+            let tmp = await this.retrieveGameInfo(uuid);
+            
+            return tmp;
+    }
 
 	private async retrieveGameInfo(uuid: string) {
 	
@@ -100,12 +115,12 @@ export class Block1v1 {
 
 		if (!response.ok) {
 			const errorData = await response.json();
-			throw new Error(errorData.details || "pblm recuperer les infos de la game le multipong");
+			throw new Error(errorData.details || "pblm recuperer les infos de la game de block");
 		}
 
 		const result = await response.json();
 
-		this.data = {
+		const data = {
 			id: result.game.id,
 			uuid: result.game.uuid,
 			game_type: result.game.game_type,
@@ -117,7 +132,9 @@ export class Block1v1 {
 			ai: result.game.ai,
 		}
 
-		console.log(`les infos de la game => ${JSON.stringify(this.data, null, 12)}`)
+		console.log(`les infos de la game => ${JSON.stringify(data, null, 12)}`)
+
+		return data;
 	}
   
 	private setupCanvas(): void {
@@ -144,11 +161,22 @@ export class Block1v1 {
 		this.ball2.x = this.width / 2;
 		this.ball2.y = 100;
 	}
-  
-	private startGameLoop(): void {
-		const gameLoop = () => {
+	
+	private async startGameLoop(): Promise<void> {
+		const gameLoop = async () => {
 			this.update();
 			this.render();
+
+			if (this.winner !== "nobody") {
+				this.logGame();
+        		const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+
+				await sleep(3000);
+
+                window.history.pushState({}, '', '/main');
+                window.dispatchEvent(new PopStateEvent('popstate'));
+                return;
+			}
 			requestAnimationFrame(gameLoop);
 		};
 		gameLoop();
@@ -157,12 +185,25 @@ export class Block1v1 {
 	private displayStartMsg(): void {
 		if (this.status) return;
 		
+		// Ligne de séparation
+		this.ctx.strokeStyle = '#ffffff';
+		this.ctx.lineWidth = 2;
+		this.ctx.setLineDash([10, 10]);
+		this.ctx.beginPath();
+		this.ctx.moveTo(0, this.height / 2);
+		this.ctx.lineTo(this.width, this.height / 2);
+		this.ctx.stroke();
+		this.ctx.setLineDash([]);
+
 		this.ctx.globalAlpha = 0.8;
 		this.ctx.fillStyle = 'white';
-		this.ctx.font = '32px Arial';
+		this.ctx.font = '32px gaming';
 		this.ctx.textAlign = 'center';
-		this.ctx.fillText(t('block.pressEnterToStart'), this.width / 2, this.height / 2);
+		this.ctx.fillText(t('block.pressEnterToStart'), this.width / 2, this.height / 2 - 40);
+
+		this.ctx.fillStyle = PADDLE1_COLOR;
 		this.ctx.fillText(t('block.player1Controls'), this.width / 2, this.height / 2 + 40);
+		this.ctx.fillStyle = PADDLE2_COLOR;
 		this.ctx.fillText(t('block.player2Controls'), this.width / 2, this.height / 2 + 80);
 		this.ctx.globalAlpha = 1;
 	}
@@ -196,6 +237,7 @@ export class Block1v1 {
 			this.ball1.reset(this.width / 2, this.height - 100, 4, -4);
 			this.ball2.reset(this.width / 2, 100, -4, 4);
 			this.status = true;
+			// logStartGame(this.data.id);
 
 			// Créer les briques
 			this.bricks = [];
@@ -257,7 +299,7 @@ export class Block1v1 {
 		}
 		// Joueur 2 perd si balle 2 touche le haut
 		if (this.ball2.y - this.ball2.radius <= 0) {
-			this.winner = "Player 1";
+			this.winner = "Player 3";
 			return true;
 		}
 		return false;
@@ -316,36 +358,61 @@ export class Block1v1 {
 		this.ctx.fillStyle = '#1a1a2e';
 		this.ctx.fillRect(0, 0, this.width, this.height);
 		
-		// Ligne de séparation
-		this.ctx.strokeStyle = '#ffffff';
-		this.ctx.lineWidth = 2;
-		this.ctx.setLineDash([10, 10]);
-		this.ctx.beginPath();
-		this.ctx.moveTo(0, this.height / 2);
-		this.ctx.lineTo(this.width, this.height / 2);
-		this.ctx.stroke();
-		this.ctx.setLineDash([]);
-		
 		// Dessiner les éléments
-		this.renderBricks();
-		this.drawPaddle(this.paddle1, '#84AD8A'); // Paddle du bas
-		this.drawPaddle(this.paddle2, '#84A6AD'); // Paddle du haut
-		this.drawBall(this.ball1, '#FF8600'); // Balle du bas
-		this.drawBall(this.ball2, '#FF6B6B'); // Balle du haut
-		
-		// Message de début
-		this.displayStartMsg();
-		
+		if (this.status) {
+			this.renderBricks();
+			this.drawPaddle(this.paddle1, PADDLE1_COLOR); // Paddle du bas
+			this.drawPaddle(this.paddle2, PADDLE2_COLOR); // Paddle du haut
+			this.drawBall(this.ball1, '#FF8600'); // Balle du bas
+			this.drawBall(this.ball2, '#FF6B6B'); // Balle du haut
+		}
+
 		// Afficher le gagnant
 		if (!this.status && this.winner !== "nobody") {
 			this.ctx.globalAlpha = 0.9;
 			this.ctx.fillStyle = 'white';
-					this.ctx.font = '48px Arial';
-		this.ctx.textAlign = 'center';
-		this.ctx.fillText(`${this.winner} ${t('block.wins')}`, this.width / 2, this.height / 2);
-		this.ctx.font = '24px Arial';
-		this.ctx.fillText(t('block.pressEnterToPlayAgain'), this.width / 2, this.height / 2 + 50);
+			this.ctx.font = '48px gaming';
+			this.ctx.textAlign = 'center';
+			this.ctx.fillText(`${this.winner} ${t('block.wins')}`, this.width / 2, this.height / 2);
+			// this.ctx.font = '24px gaming';
+			// this.ctx.fillText(t('block.pressEnterToPlayAgain'), this.width / 2, this.height / 2 + 50);
 			this.ctx.globalAlpha = 1;
+		}
+		else
+			this.displayStartMsg();
+	}
+
+	private async logGame() {
+
+		try {
+			const token = getAuthToken();
+			if (!token) {
+				alert('❌ Token d\'authentification manquant');
+				window.history.pushState({}, '', '/login');
+				window.dispatchEvent(new PopStateEvent('popstate'));
+				return -1;
+			}
+
+			const response = await fetch(`/api/games/finish/${this.uuid}`, {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+					'x-access-token': token,
+				},
+				body: JSON.stringify({
+					winner: this.winner
+				})
+			});
+		
+			if (response.ok) {
+				const result = await response.json();
+				console.log("la game de room est log", result);
+			}
+			else 
+				console.error("erreur pour log la game de room");
+		}
+		catch (err) {
+			console.error("pblm dans Block1v1.ts pour log la game")
 		}
 	}
 }

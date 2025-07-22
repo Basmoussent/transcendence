@@ -213,6 +213,7 @@ export class Room {
 	}
 
 	private gameTypeChanged() {
+		console.log('gametypechanged')
 		this.ws.send(JSON.stringify({
 			type: 'game_type',
 			name: this.gameTypeSelect.value,
@@ -242,6 +243,26 @@ export class Room {
 	private invite() {
 		console.log('doanzdoinazoidnao')
 		// 
+	}
+
+	private setMaxPlayersSelect(max: number) {
+		let currentUsers;
+
+		if (!this.roomData)
+			currentUsers = 0;
+		else
+		currentUsers = this.roomData.users.length;
+
+		this.maxPlayersSelect.innerHTML = '';
+
+		for (let i = currentUsers; i <= max; i++) {
+			if (i > 0) {
+				const option = document.createElement('option');
+				option.value = i.toString();
+				option.textContent = i.toString();
+				this.maxPlayersSelect.appendChild(option);
+			}
+		}
 	}
 
 	private updateUI() {
@@ -281,20 +302,19 @@ export class Room {
 
 		const allReady = this.roomData.users.every(u => u.isReady);
 
+		const canStart = this.roomData.users.length + this.roomData.ai == this.roomData.maxPlayers && allReady;
 		if (this.roomData.host === this.username) {
 
-			this.startBtn.disabled = !allReady;
+			this.startBtn.disabled = !canStart;
 
 			this.roomSettings.classList.remove('hidden')
 			this.getElement('gameActions').classList.remove('hidden');
 
 			if (this.roomData.gameType === 'block') {
 				this.getElement('ai-setting').style.display = 'none';
-				this.maxPlayersSelect.innerHTML = `<label class="text-white/80">Max Players</label>
-									<select class="setting-select" id="maxPlayersSelect">
-										<option value="1">1</option>
-										<option value="2">2</option>
-									</select>`;
+
+				this.setMaxPlayersSelect(2);
+
 				this.maxPlayersSelect.value = String(this.roomData.maxPlayers);
 			}
 			else {
@@ -308,10 +328,8 @@ export class Room {
 				else
 					this.decreaseAiBtn.disabled = false;
 
-				this.maxPlayersSelect.innerHTML = `<option value="1">1</option>
-									<option value="2">2</option>
-									<option value="3">3</option>
-									<option value="4">4</option>`;
+				this.setMaxPlayersSelect(4);
+				
 				this.maxPlayersSelect.value = String(this.roomData.maxPlayers);
 			}
 			

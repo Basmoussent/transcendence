@@ -12,7 +12,7 @@ export function initializeBlock1v1Events(uuid: string) {
 		return;
 	}
 	const game = new Block1v1(canvas, uuid);
-	game.init();
+	game.asyncInit();
 }
 
 function getTemplate() {

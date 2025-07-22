@@ -34,13 +34,20 @@ export function handleAlive(connection: WebSocket, req: FastifyRequest, app: Fas
 							username: username
 						}));
 					} catch (e) {
-						console.error('❌ Authentication error:', e);
-						connection.send(JSON.stringify({ type: 'auth_error', message: 'Invalid or expired token' }));
-						connection.close();
-						return;
+						try {
+							const decoded = app.jwt2fa.verify(data.token) as { user: string; name: string };
+							if (decoded)
+								return ;
+						}
+						catch {
+							console.error('❌ Authentication error:', e);
+							connection.send(JSON.stringify({ type: 'auth_error', message: 'Invalid or expired token' }));
+							connection.close();
+							return;
+						}
 					}
 				} else {
-					connection.send(JSON.stringify({ type: 'auth_error', message: 'Authentication required' }));
+					// connection.send(JSON.stringify({ type: 'auth_error', message: 'Authentication required' }));
 					connection.close();
 					return;
 				}
