@@ -282,20 +282,20 @@ async function userRoutes(app: FastifyInstance) {
 
 	});
 
-	app.get('/user/:username', async function (request: FastifyRequest, reply: FastifyReply) {
+	app.get('/user/id/:id', async function (request: FastifyRequest, reply: FastifyReply) {
 
 		try {
-			const { username } = request.query as { username: string};
+			const { userid } = request.query as { userid: number};
 
-			console.log(`le username    ${username}`)
+			console.log(`le userid    ${userid}`)
 
-			if (!username)
-				throw new Error("missing username in the request query");
+			if (!userid)
+				throw new Error("missing userid in the request query");
 
-			const user = await app.userService.findByUsername(username);
+			const user = await app.userService.findById(userid);
 			console.log("user:", user);
 			return reply.send({
-				message: `info du user ${username}`,
+				message: `info du user ${userid}`,
 				data: user,
 			});
 		}

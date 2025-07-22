@@ -55,7 +55,7 @@ export async function fetchUserInfo(username: string): Promise<UserChat | void> 
 			return;
 		}
 
-		const response = await fetch(`/api/user/username/?username=${username}`, {
+		const response = await fetch(`/api/user/id/?userid=${username}`, {
 			method: 'GET',
 			headers: {
 				'Content-Type': 'application/json',
