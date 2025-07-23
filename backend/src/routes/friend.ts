@@ -143,8 +143,9 @@ async function friendRoutes(app: FastifyInstance) {
 			if (!user1 || !user2)
 				return reply.status(400).send({ error: 'user1 and user2 are required' });
 
-			const user = await app.userService.findByUsername(user2);
-			const history = await app.chatService.retrieveChatHistory(user1, user.id);
+			const user1data = await app.userService.findByUsername(user1);
+			const user2data = await app.userService.findByUsername(user2);
+			const history = await app.chatService.retrieveChatHistory(user1data.id, user2data.id);
 			return reply.send(history);
 		}
 		catch (err: any) {
