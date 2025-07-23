@@ -246,7 +246,7 @@ export const translations = {
       pressEnterToStart: "APPUYEZ SUR ENTRÉE",
       toStart: "POUR COMMENCER",
       player: "Joueur",
-      aiPlayer: "IA"
+      aiPlayer: "Joueur IA"
     }
   },
   en: {
@@ -495,7 +495,7 @@ export const translations = {
       pressEnterToStart: "PRESS ENTER",
       toStart: "TO START",
       player: "Player",
-      aiPlayer: "AI"
+      aiPlayer: "AI Player"
     }
   },
   es: {
@@ -744,7 +744,7 @@ export const translations = {
       pressEnterToStart: "PRESIONA ENTER",
       toStart: "PARA COMENZAR",
       player: "Jugador",
-      aiPlayer: "IA"
+      aiPlayer: "Jugador IA"
     }
   }
 } as const;

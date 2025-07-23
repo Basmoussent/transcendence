@@ -6,6 +6,7 @@ import { PADDLE_OFFSET, Player, PADDLE1_COLOR, PADDLE2_COLOR, PADDLE3_COLOR, PAD
 import { addEvent } from '../../../utils/eventManager';
 import { t } from '../../../utils/translations';
 import { logStartGame } from "../../../game/gameUtils";
+import { fetchUserInfo } from '../../../pages/chat/utils'
 
 export interface Game {
 	id: number,
@@ -61,6 +62,16 @@ export class MultiPong {
         console.log("data dans asyncInit", this.data);
 
         this.paddles = this.initPlayers();
+
+        this.getUsernames();
+
+        console.log("le name de player1 est = ", this.paddles[0].name)
+        console.log("le name de player2 est = ", this.paddles[1].name)
+        if (this.paddles[2])
+            console.log("le name de player3 est = ", this.paddles[2].name)
+        if (this.paddles[3])
+            console.log("le name de player4 est = ", this.paddles[3].name)
+
 
         this.ball = new Ball(this.height, this.width);
 
@@ -122,6 +133,24 @@ export class MultiPong {
         console.log(`les infos de la game => ${JSON.stringify(data, null, 12)}`)
         return (data)
 	}
+
+    private async getUsernames(): Promise<void> {
+        const user1 = await fetchUserInfo(String(this.data.player1));
+        const user2 = await fetchUserInfo(String(this.data.player2));
+        const user3 = await fetchUserInfo(String(this.data.player3));
+        const user4 = await fetchUserInfo(String(this.data.player4));
+
+        // fetchuserinfo renvoie toutes les infos du user
+
+        if (user1)
+            this.paddles[0].name = user1.username;
+        if (user2)
+            this.paddles[1].name = user2.username;
+        if (user3 && this.paddles[2])
+            this.paddles[2].name = user3.username;
+        if (user4 && this.paddles[3])
+            this.paddles[3].name = user4.username;
+    }
 
     private initPlayers(): [Paddle, Paddle | PaddleAI, Player?, Player?] {
 
@@ -264,16 +293,16 @@ export class MultiPong {
         this.ctx.fillText(t('pong.pressEnterToStart'), this.width / 2 - 190, this.height / 2 - 100);
         this.ctx.fillText(t('pong.toStart'), this.width / 2 - 140, this.height / 2 - 50);
         this.ctx.fillStyle = PADDLE1_COLOR;
-        this.ctx.fillText("PLAYER 1: W/S KEYS", this.width / 2 - 280, this.height / 2 + 20);
+        this.ctx.fillText(`${this.paddles[0].name}: W/S KEYS`, this.width / 2 - 280, this.height / 2 + 20);
         this.ctx.fillStyle = PADDLE2_COLOR;
-        this.ctx.fillText("PLAYER 2: ARROW KEYS", this.width / 2 - 330, this.height / 2 + 70);
+        this.ctx.fillText(`${this.paddles[1].name}: ARROW KEYS`, this.width / 2 - 330, this.height / 2 + 70);
         if (this.paddles[2]) {
             this.ctx.fillStyle = PADDLE3_COLOR;
-            this.ctx.fillText("PLAYER 3: K/L KEYS", this.width / 2 - 280, this.height / 2 + 120);
+            this.ctx.fillText(`${this.paddles[2].name}: K/L KEYS`, this.width / 2 - 280, this.height / 2 + 120);
         }
         if (this.paddles[3]) {
             this.ctx.fillStyle = PADDLE3_COLOR;
-            this.ctx.fillText("PLAYER 4: 5/6 KEYS", this.width / 2 - 280, this.height / 2 + 170);
+            this.ctx.fillText(`${this.paddles[3].name}: 5/6 KEYS`, this.width / 2 - 280, this.height / 2 + 170);
         }
         this.ctx.globalAlpha = 1;
 }
