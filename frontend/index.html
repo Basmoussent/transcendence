@@ -79,7 +79,7 @@
     </style>
   </head>
   <body>
-    <div class="language-selector">
+    <div class="language-selector" id="languageSelector" style="display: none;">
       <button class="language-btn fr-flag" onclick="changeLanguage('fr')" title="Français"></button>
       <button class="language-btn en-flag" onclick="changeLanguage('en')" title="English"></button>
       <button class="language-btn es-flag" onclick="changeLanguage('es')" title="Español"></button>
@@ -105,163 +105,177 @@
       window.getAuthToken = getAuthToken;
     </script>
     <script>
+      // Variable pour activer/désactiver la traduction
+      const TRANSLATION_ENABLED = false; // Changez cette valeur pour activer/désactiver la traduction
+      
       let isChangingLanguage = false;
       
-      window.changeLanguage = async function(lang) {
-        if (isChangingLanguage) return;
-        
-        isChangingLanguage = true;
-        
-        
-        try {
-          const authToken = window.getAuthToken();
-          if (authToken) {
-            const response = await fetch('/api/edit/change-language', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'x-access-token': authToken
-            },
-            body: JSON.stringify({ language: lang })
-          });
-
-          if (!response.ok) {
-            console.error('Erreur lors du changement de langue:', response.statusText);
-            isChangingLanguage = false;
-            return;
-          }
-          }
-          
-          sessionStorage.setItem('lang', lang);
-          sessionStorage.setItem('lastPath', window.location.pathname);
-          const lastPath = sessionStorage.getItem('lastPath') || window.location.pathname;
-          window.history.pushState({}, '', lastPath);
-          
-          const buttons = document.querySelectorAll('.language-btn');
-          buttons.forEach(btn => btn.classList.remove('active'));
-          const activeBtn = document.querySelector(`.${lang}-flag`);
-          if (activeBtn) activeBtn.classList.add('active');
-          
-          // Trigger a custom event to notify the SPA router
-          window.dispatchEvent(new PopStateEvent('popstate'));
-          
-          // Reset the flag after a short delay to allow the router to complete
-          setTimeout(() => {
-            isChangingLanguage = false;
-          }, 100);
-          
-        } catch (error) {
-          console.error('Erreur lors du changement de langue:', error);
-          isChangingLanguage = false;
-        }
-      };
-      
-      async function getPreferedLanguage() {
-        try {
-          const authToken = window.getAuthToken();
-          if (!authToken) {
-            return sessionStorage.getItem('lang') || 'en';
-          }
-          const response = await fetch('/api/me', {
-            method: 'GET',
-            headers: {
-              'Content-Type': 'application/json',
-              'x-access-token': authToken
-            }
-          });
-          if (!response) {
-            throw new Error('Erreur lors de la récupération de la langue préférée');
-          }
-          const data = await response.json();
-          console.log('Langue préférée récupérée:', data.user.language);
-          return data.user.language || 'en';
-        } catch (error) {
-          console.error('Erreur lors de la récupération de la langue préférée:', error);
-          return 'en';
+      // Fonction pour afficher/masquer le sélecteur de langue
+      function toggleLanguageSelector() {
+        const selector = document.getElementById('languageSelector');
+        if (TRANSLATION_ENABLED) {
+          selector.style.display = 'flex';
+        } else {
+          selector.style.display = 'none';
         }
       }
-
-      async function ensureSubdomain() {
-        try {
-          // Récupérer la langue préférée de l'utilisateur
-          const preferredLang = await getPreferedLanguage();
-          const currentLang = sessionStorage.getItem('lang') || 'en';
+      
+      if (TRANSLATION_ENABLED) {
+        // Toute la logique de traduction est encapsulée ici
+        window.changeLanguage = async function(lang) {
+          if (isChangingLanguage) return;
           
-          // Si la langue préférée est différente de la langue actuelle, l'appliquer
-          if (currentLang !== preferredLang) {
-            console.log(`Changement de langue automatique: ${currentLang} -> ${preferredLang}`);
-            sessionStorage.setItem('lang', preferredLang);
+          isChangingLanguage = true;
+          
+          try {
+            const authToken = window.getAuthToken();
+            if (authToken) {
+              const response = await fetch('/api/edit/change-language', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'x-access-token': authToken
+              },
+              body: JSON.stringify({ language: lang })
+            });
+
+            if (!response.ok) {
+              console.error('Erreur lors du changement de langue:', response.statusText);
+              isChangingLanguage = false;
+              return;
+            }
+            }
             
-            // Mettre à jour le bouton actif
+            sessionStorage.setItem('lang', lang);
+            sessionStorage.setItem('lastPath', window.location.pathname);
+            const lastPath = sessionStorage.getItem('lastPath') || window.location.pathname;
+            window.history.pushState({}, '', lastPath);
+            
             const buttons = document.querySelectorAll('.language-btn');
             buttons.forEach(btn => btn.classList.remove('active'));
-            const activeBtn = document.querySelector(`.${preferredLang}-flag`);
+            const activeBtn = document.querySelector(`.${lang}-flag`);
             if (activeBtn) activeBtn.classList.add('active');
             
-            // Ne pas déclencher de navigation automatique au chargement initial
-            // La navigation sera déclenchée seulement si on est déjà sur une page
-            if (document.readyState === 'complete') {
-              const currentPath = window.location.pathname;
-              window.history.pushState({}, '', currentPath);
-              window.dispatchEvent(new PopStateEvent('popstate'));
-            }
+            // Trigger a custom event to notify the SPA router
+            window.dispatchEvent(new PopStateEvent('popstate'));
+            
+            // Reset the flag after a short delay to allow the router to complete
+            setTimeout(() => {
+              isChangingLanguage = false;
+            }, 100);
+            
+          } catch (error) {
+            console.error('Erreur lors du changement de langue:', error);
+            isChangingLanguage = false;
           }
-          
-          return preferredLang;
-        } catch (error) {
-          console.error('Erreur dans ensureSubdomain:', error);
-          return sessionStorage.getItem('lang') || 'en';
-        }
-      }
-
-      document.addEventListener('DOMContentLoaded', async () => {
-        // Version simplifiée pour éviter les blocages
-        const buttons = document.querySelectorAll('.language-btn');
-        const currentLang = sessionStorage.getItem('lang') || 'en';
+        };
         
-        // Mettre à jour le bouton actif avec la langue actuelle
-        buttons.forEach(btn => {
-          if (btn.classList.contains(`${currentLang}-flag`)) {
-            btn.classList.add('active');
-          }
-        });
-        
-        // Appel initial de initAlive si déjà loggé
-        window.initAlive && window.initAlive();
-        
-        // Appliquer la langue préférée en arrière-plan (sans bloquer le chargement)
-        setTimeout(async () => {
+        async function getPreferedLanguage() {
           try {
+            const authToken = window.getAuthToken();
+            if (!authToken) {
+              return sessionStorage.getItem('lang') || 'en';
+            }
+            const response = await fetch('/api/me', {
+              method: 'GET',
+              headers: {
+                'Content-Type': 'application/json',
+                'x-access-token': authToken
+              }
+            });
+            if (!response) {
+              throw new Error('Erreur lors de la récupération de la langue préférée');
+            }
+            const data = await response.json();
+            console.log('Langue préférée récupérée:', data.user.language);
+            return data.user.language || 'en';
+          } catch (error) {
+            console.error('Erreur lors de la récupération de la langue préférée:', error);
+            return 'en';
+          }
+        }
+
+        async function ensureSubdomain() {
+          try {
+            // Récupérer la langue préférée de l'utilisateur
             const preferredLang = await getPreferedLanguage();
+            const currentLang = sessionStorage.getItem('lang') || 'en';
+            
+            // Si la langue préférée est différente de la langue actuelle, l'appliquer
             if (currentLang !== preferredLang) {
               console.log(`Changement de langue automatique: ${currentLang} -> ${preferredLang}`);
               sessionStorage.setItem('lang', preferredLang);
               
               // Mettre à jour le bouton actif
+              const buttons = document.querySelectorAll('.language-btn');
               buttons.forEach(btn => btn.classList.remove('active'));
               const activeBtn = document.querySelector(`.${preferredLang}-flag`);
               if (activeBtn) activeBtn.classList.add('active');
               
-              // Recharger la page avec la nouvelle langue
-              window.history.pushState({}, '', window.location.pathname);
-              window.dispatchEvent(new PopStateEvent('popstate'));
+              // Ne pas déclencher de navigation automatique au chargement initial
+              // La navigation sera déclenchée seulement si on est déjà sur une page
+              if (document.readyState === 'complete') {
+                const currentPath = window.location.pathname;
+                window.history.pushState({}, '', currentPath);
+                window.dispatchEvent(new PopStateEvent('popstate'));
+              }
             }
+            
+            return preferredLang;
           } catch (error) {
-            console.error('Erreur lors de la récupération de la langue préférée:', error);
+            console.error('Erreur dans ensureSubdomain:', error);
+            return sessionStorage.getItem('lang') || 'en';
           }
-        }, 100);
-      });
-      
-      // S'assurer que le router se charge même si DOMContentLoaded échoue
-      window.addEventListener('load', () => {
-        // Vérifier que l'app a bien du contenu
-        const app = document.getElementById('app');
-        if (app && !app.innerHTML.trim()) {
-          console.log('App vide détectée, rechargement du router...');
-          // Déclencher le router manuellement
-          window.dispatchEvent(new PopStateEvent('popstate'));
         }
-      });
+
+        document.addEventListener('DOMContentLoaded', async () => {
+          // Afficher le sélecteur de langue si la traduction est activée
+          toggleLanguageSelector();
+          
+          // Version simplifiée pour éviter les blocages
+          const buttons = document.querySelectorAll('.language-btn');
+          const currentLang = sessionStorage.getItem('lang') || 'en';
+          
+          // Mettre à jour le bouton actif avec la langue actuelle
+          buttons.forEach(btn => {
+            if (btn.classList.contains(`${currentLang}-flag`)) {
+              btn.classList.add('active');
+            }
+          });
+          
+          // Appel initial de initAlive si déjà loggé
+          window.initAlive && window.initAlive();
+          
+          // Appliquer la langue préférée en arrière-plan (sans bloquer le chargement)
+          setTimeout(async () => {
+            try {
+              const preferredLang = await getPreferedLanguage();
+              if (currentLang !== preferredLang) {
+                console.log(`Changement de langue automatique: ${currentLang} -> ${preferredLang}`);
+                sessionStorage.setItem('lang', preferredLang);
+                
+                // Mettre à jour le bouton actif
+                buttons.forEach(btn => btn.classList.remove('active'));
+                const activeBtn = document.querySelector(`.${preferredLang}-flag`);
+                if (activeBtn) activeBtn.classList.add('active');
+                
+                // Recharger la page avec la nouvelle langue
+                window.history.pushState({}, '', window.location.pathname);
+                window.dispatchEvent(new PopStateEvent('popstate'));
+              }
+            } catch (error) {
+              console.error('Erreur lors de la récupération de la langue préférée:', error);
+            }
+          }, 100);
+        });
+      } else {
+        // Si la traduction est désactivée, masquer le sélecteur et définir une langue par défaut
+        document.addEventListener('DOMContentLoaded', () => {
+          toggleLanguageSelector();
+          sessionStorage.setItem('lang', 'en'); // Langue par défaut
+          window.initAlive && window.initAlive();
+        });
+      }
       
       // S'assurer que le router se charge même si DOMContentLoaded échoue
       window.addEventListener('load', () => {

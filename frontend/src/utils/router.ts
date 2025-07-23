@@ -18,7 +18,7 @@ import { clearTranslationCache } from './translations';
 
 import { renderMultiPong, initializeMultiPongEvents } from '../pages/pong/multiplayer-pong';
 import { initAlive } from './auth';
-import { renderProfil, initializeProfilEvents } from '../pages/social/renderProfil';
+import { renderProfil, initializeProfilEvents, cleanupProfilInstance } from '../pages/social/renderProfil';
 import { render2FA, initialize2FAEvents } from '../pages/auth/activate-2fa';
 import { render2FALogin } from '../pages/auth/2fa-login';
 import { cleanEvents } from './eventManager';
@@ -138,7 +138,7 @@ export async function router() {
 		'/2fa': () => render2FA(),
 		'/block': (uuid?: string) => renderBlock(uuid!),
 		'/block1v1': (uuid?: string) => renderBlock1v1(uuid!),
-		'/multipong': async (uuid?: string) => await renderMultiPong(uuid!),
+		'/multipong': async (uuid?: string) => await renderMultiPong(uuid!) || '',
 		'/tournament': () => renderTournaments(),
 	};
 
@@ -198,6 +198,11 @@ export async function router() {
 	setTimeout(() => {
 		const init = initEvents[path];
 		const initUuid = initEventsUuid[path];
+		
+		// Nettoyer les instances spécifiques avant de changer de page
+		if (path !== '/profil') {
+			cleanupProfilInstance();
+		}
 		
 		cleanEvents();
 

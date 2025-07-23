@@ -13,7 +13,7 @@ export class profil {
 
 	private homeBtn: HTMLElement;
 	private username: HTMLElement;
-	private avatar: HTMLElement;
+	private avatar: HTMLImageElement;
 	private addFriendBtn: HTMLElement;
 	private blockBtn: HTMLElement;
 	private gamePlayed: HTMLElement;
@@ -26,7 +26,13 @@ export class profil {
 	private online: HTMLElement;
 	private statusDot: HTMLElement;
 
+	// Stocker les références aux fonctions pour pouvoir les supprimer
+	private boundAddFriendHandler: (() => Promise<void>) | null = null;
+	private boundBlockHandler: (() => Promise<void>) | null = null;
+	private boundHomeHandler: (() => void) | null = null;
+
 	constructor (data: any) {
+		console.log("profil constructor");
 
 		this.me = data.me;
 		this.user = data.user;
@@ -38,7 +44,7 @@ export class profil {
 		this.homeBtn = this.getElement('homeBtn');
 		this.username = this.getElement('username');
 		this.addFriendBtn = this.getElement('addFriend');
-		this.avatar = this.getElement('avatar');
+		this.avatar = this.getElement('avatar') as HTMLImageElement;
 		this.blockBtn = this.getElement('blockBtn');
 		this.gamePlayed = this.getElement('gamePlayed');
 		this.winrate = this.getElement('winrate');
@@ -67,24 +73,51 @@ export class profil {
 	}
 
 	private setupEvents() {
-
-		this.homeBtn.addEventListener('click', () => {
+		// Créer les fonctions liées pour pouvoir les supprimer plus tard
+		this.boundHomeHandler = () => {
 			window.history.pushState({}, '', '/main');
 			window.dispatchEvent(new Event('popstate'));
-		});
+		};
 
-		this.addFriendBtn.addEventListener('click', async () => {
+		this.boundAddFriendHandler = async () => {
 			await this.addFriend();
-			this.updateInfo();
-		})
+			await this.updateInfo();
+		};
 
-		this.blockBtn.addEventListener('click', async () => {
-
+		this.boundBlockHandler = async () => {
 			await this.handleBlock();
-			this.updateInfo();
-		})
+			await this.updateInfo();
+		};
 
+		// Supprimer les anciens événements s'ils existent
+		if (this.boundHomeHandler) {
+			this.homeBtn.removeEventListener('click', this.boundHomeHandler);
+		}
+		if (this.boundAddFriendHandler) {
+			this.addFriendBtn.removeEventListener('click', this.boundAddFriendHandler);
+		}
+		if (this.boundBlockHandler) {
+			this.blockBtn.removeEventListener('click', this.boundBlockHandler);
+		}
 
+		// Ajouter les nouveaux événements
+		this.homeBtn.addEventListener('click', this.boundHomeHandler);
+		this.addFriendBtn.addEventListener('click', this.boundAddFriendHandler);
+		console.log("addFriendBtn added");
+		this.blockBtn.addEventListener('click', this.boundBlockHandler);
+	}
+
+	// Méthode pour nettoyer les événements (appelée lors de la destruction)
+	public cleanup() {
+		if (this.boundHomeHandler) {
+			this.homeBtn.removeEventListener('click', this.boundHomeHandler);
+		}
+		if (this.boundAddFriendHandler) {
+			this.addFriendBtn.removeEventListener('click', this.boundAddFriendHandler);
+		}
+		if (this.boundBlockHandler) {
+			this.blockBtn.removeEventListener('click', this.boundBlockHandler);
+		}
 	}
 
 	///TODO changer pour regarder par rapport aux id
@@ -98,27 +131,11 @@ export class profil {
 		if (!this.username || !this.gamePlayed || !this.mmr || !this.winrate || !this.rank || !this.friendsGrid || !this.gameHistory || !this.online || !this.statusDot)
 			console.error("❌ il manque un element");
 
+		// Recharger la relation depuis la DB
 		this.relation = await loadRelation(this.me.username, this.user.username)
 
-		if (this.relation) {
-			const myState = this.relation.user_1 == this.me.username ? this.relation.user1_state : this.relation.user2_state;
-			const userState = this.relation.user_1 == this.user.username ? this.relation.user1_state : this.relation.user2_state;
-
-			if (myState == 'waiting')
-				this.addFriendBtn.textContent = 'cancel'
-
-			else if (myState == 'requested')
-				this.addFriendBtn.textContent = 'accept'
-
-			else if (myState == 'normal')
-				this.addFriendBtn.textContent = 'remove Friend'
-
-			else if (myState == 'angry')
-				this.addFriendBtn.classList.add('hidden');
-
-		}
-		else
-			this.addFriendBtn.textContent = 'ajouter en ami'
+		// Mettre à jour les boutons selon la relation
+		this.updateButtons();
 
 		this.username.textContent = this.user.username;
 		this.avatar.src = "/api/uploads/" + this.user.avatar || '../../public/avatar2.png';
@@ -157,6 +174,47 @@ export class profil {
 		else {
 			console.log("👥 Aucun ami à afficher");
 			this.friendsGrid.innerHTML = '<div class="no-friends">Aucun ami pour le moment</div>';
+		}
+	}
+
+	private updateButtons() {
+		// Réinitialiser les classes et états des boutons
+		this.addFriendBtn.classList.remove('hidden');
+		this.blockBtn.classList.remove('hidden');
+
+		if (this.relation) {
+			const myState = this.relation.user_1 == this.me.username ? this.relation.user1_state : this.relation.user2_state;
+			const userState = this.relation.user_1 == this.user.username ? this.relation.user1_state : this.relation.user2_state;
+
+			console.log(`🔍 Relation trouvée - Mon état: ${myState}, État utilisateur: ${userState}`);
+
+			// Gestion du bouton Add Friend
+			if (myState === 'waiting') {
+				this.addFriendBtn.textContent = 'Annuler la demande';
+			} else if (myState === 'requested') {
+				this.addFriendBtn.textContent = 'Accepter la demande';
+			} else if (myState === 'normal' && userState === 'normal') {
+				this.addFriendBtn.textContent = 'Retirer des amis';
+			} else if (myState === 'angry') {
+				this.addFriendBtn.textContent = 'Débloquer';
+			} else if (userState === 'blocked') {
+				this.addFriendBtn.textContent = 'Utilisateur bloqué';
+				this.addFriendBtn.classList.add('disabled');
+			}
+
+			// Gestion du bouton Block
+			if (myState === 'angry') {
+				this.blockBtn.textContent = 'Débloquer';
+			} else if (userState === 'blocked') {
+				this.blockBtn.textContent = 'Utilisateur bloqué';
+				this.blockBtn.classList.add('disabled');
+			} else {
+				this.blockBtn.textContent = 'Bloquer';
+			}
+		} else {
+			// Aucune relation existante
+			this.addFriendBtn.textContent = 'Ajouter en ami';
+			this.blockBtn.textContent = 'Bloquer';
 		}
 	}
 
@@ -324,16 +382,22 @@ export class profil {
 				return;
 			}
 
-			await fetch(`/api/friend/${this.relation.id}`, {
+			const response = await fetch(`/api/friend/${this.relation.id}`, {
 				method: 'DELETE',
 				headers: {
 					'x-access-token': token,
 				},
-			})
-			this.addFriendBtn.textContent = 'Add Friend'
+			});
+
+			if (response.ok) {
+				console.log('✅ Relation supprimée avec succès');
+				this.relation = null; // Réinitialiser la relation
+			} else {
+				console.error('❌ Erreur lors de la suppression de la relation');
+			}
 		}
 		catch (err) {
-			console.error(`error dans delete friend`)
+			console.error(`❌ Erreur dans deleteRelation:`, err);
 		}
 	}
 
@@ -347,9 +411,10 @@ export class profil {
 				return;
 			}
 
-			await fetch(`/api/friend`, {
+			const response = await fetch(`/api/friend`, {
 				method: 'POST',
 				headers: {
+					'Content-Type': 'application/json',
 					'x-access-token': token,
 				},
 				body: JSON.stringify({
@@ -358,16 +423,22 @@ export class profil {
 					user1_state: 'waiting',
 					user2_state: 'requested',
 				})
-			})
-			this.addFriendBtn.textContent = 'requested'
+			});
+
+			if (response.ok) {
+				console.log('✅ Demande d\'ami créée avec succès');
+				const newRelation = await response.json();
+				this.relation = newRelation;
+			} else {
+				console.error('❌ Erreur lors de la création de la demande d\'ami');
+			}
 		}
 		catch (err) {
-			console.error(`error dans add friend`)
+			console.error(`❌ Erreur dans createFriendRequest:`, err);
 		}
 	}
 
 	private async acceptFriend() {
-
 		try {
 			const token = getAuthToken();
 			if (!token) {
@@ -377,40 +448,48 @@ export class profil {
 				return;
 			}
 
-			await fetch(`/api/friend/accept/${this.relation.id}`, {
+			const response = await fetch(`/api/friend/accept/${this.relation.id}`, {
 				method: 'POST',
 				headers: {
 					'x-access-token': token,
 				},
-			})
-			this.addFriendBtn.textContent = 'remove friend'
+			});
+
+			if (response.ok) {
+				console.log('✅ Demande d\'ami acceptée avec succès');
+				const updatedRelation = await response.json();
+				this.relation = updatedRelation;
+			} else {
+				console.error('❌ Erreur lors de l\'acceptation de la demande d\'ami');
+			}
 		}
 		catch (err) {
-			console.error(`error dans add friend`)
+			console.error(`❌ Erreur dans acceptFriend:`, err);
 		}
 	}
 
 	private async handleBlock() {
-
 		if (this.relation) {
 			const myState = this.relation.user_1 == this.me.username ? this.relation.user1_state : this.relation.user2_state;
 			const userState = this.relation.user_1 == this.user.username ? this.relation.user1_state : this.relation.user2_state;
 
-			if (myState == 'angry' && userState == 'blocked')
-				this.deleteRelation();
-			else {
+			console.log(`🔍 handleBlock - Mon état: ${myState}, État utilisateur: ${userState}`);
+
+			if (myState === 'angry' && userState === 'blocked') {
+				// Débloquer l'utilisateur
+				await this.deleteRelation();
+			} else {
+				// Bloquer l'utilisateur
 				const whichuser = this.relation.user_1 == this.user.username ? 'user1_state': 'user2_state';
-				this.changeRelationToBlocked(whichuser)
+				await this.changeRelationToBlocked(whichuser);
 			}
-		}
-		else {
-			this.blockUser(this.me.username, this.user.username)
-			// creer la relation et bloquer directement via app.friensvc.handleBlock
+		} else {
+			// Créer une nouvelle relation avec blocage
+			await this.blockUser(this.me.username, this.user.username);
 		}
 	}
 
 	private async changeRelationToBlocked(state: string) {
-
 		try {
 			const token = getAuthToken();
 			if (!token) {
@@ -420,25 +499,31 @@ export class profil {
 				return;
 			}
 
-			await fetch(`/api/friend/block/?relationid=${this.relation.id}`, {
+			const response = await fetch(`/api/friend/block/?relationid=${this.relation.id}`, {
 				method: 'POST',
 				headers: {
+					'Content-Type': 'application/json',
 					'x-access-token': token,
 				},
 				body: JSON.stringify({
 					userState: state
 				})
-			})
-			this.addFriendBtn.textContent = 'remove friend'
+			});
+
+			if (response.ok) {
+				console.log('✅ Utilisateur bloqué avec succès');
+				const updatedRelation = await response.json();
+				this.relation = updatedRelation;
+			} else {
+				console.error('❌ Erreur lors du blocage de l\'utilisateur');
+			}
 		}
 		catch (err) {
-			console.error(`error dans changeRelationToBlocked`)
+			console.error(`❌ Erreur dans changeRelationToBlocked:`, err);
 		}
-
 	}
 
 	private async blockUser(angry: string, blocked: string) {
-
 		try {
 			const token = getAuthToken();
 			if (!token) {
@@ -448,17 +533,23 @@ export class profil {
 				return;
 			}
 
-			await fetch(`/api/friend/blockUser?angry=${angry}&blocked=${blocked}`, {
+			const response = await fetch(`/api/friend/blockUser?angry=${angry}&blocked=${blocked}`, {
 				method: 'POST',
 				headers: {
 					'x-access-token': token,
 				},
-			})
-			this.addFriendBtn.textContent = 'debloquer'
+			});
+
+			if (response.ok) {
+				console.log('✅ Utilisateur bloqué avec succès');
+				const newRelation = await response.json();
+				this.relation = newRelation;
+			} else {
+				console.error('❌ Erreur lors du blocage de l\'utilisateur');
+			}
 		}
 		catch (err) {
-			console.error(`error dans blockUser appel api`)
+			console.error(`❌ Erreur dans blockUser:`, err);
 		}
-
 	}
 }

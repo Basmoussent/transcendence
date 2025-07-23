@@ -5,21 +5,7 @@ import './utils/websocketService.ts';
 
 function init() {
 	window.addEventListener('popstate', router);
-	// Listen for language changes to trigger router
 	window.addEventListener('languageChanged', router);
-	
-	window.addEventListener('click', (e) => {
-		const target = e.target as HTMLElement;
-		if (target.matches('a[data-link]')) {
-			e.preventDefault();
-			const href = target.getAttribute('href')!;
-			history.pushState(null, '', href);
-			router();
-		}
-	});
-	
-	// Appeler le router au chargement initial de la page
-	router();
 }
 
 init();
