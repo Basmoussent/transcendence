@@ -1,4 +1,4 @@
-// secret unique a chaque user, faudra stocker dans la bdd a l'activation de la 2fa
+// secret unique a chaque user, faudra stocker dans la bdd
 export function generateBase32Key(length: number = 32): string {
 	const base32Chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
 	let key = '';
