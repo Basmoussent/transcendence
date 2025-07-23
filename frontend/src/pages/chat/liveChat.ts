@@ -87,7 +87,7 @@ export class Chat {
 		this.chatInput.focus();
 		this.setupWsEvents();
 		this.setupClickEvents();
-		this.updateUI();
+		// this.updateUI(); fallait pas appeler la je crois
 		setupPing(this.ws);
 	}
 
