@@ -6,19 +6,24 @@ export function renderTournaments() {
   const html =  `
 
 <div class="tournaments-container">
-  <canvas id="gameCanvas" width="800" height="600"></canvas>
+  <canvas id="gameCanvas" width="900" height="600"></canvas>
 
-  <div class="tournaments-header">
-    <button class="home-button" id="homeBtn" onclick="returnHome()">
+  <div class="tournaments-header" style="display: flex; align-items: center; width: 100%; padding-left: 0; padding-right: 0;">
+    <div style="flex:0 0 auto; display: flex; align-items: center;">
+      
+    </div>
+    <div style="flex:1 1 0; display: flex; align-items: center; justify-content: center;">
+      <h1 class="tournaments-title">
+        <i class="fas fa-trophy"></i>
+        Tournament Lobby
+      </h1>
+    </div>
+    <div class="tournaments-actions" style="flex:0 0 auto; display: flex; gap: 14px; align-items: center;">
+    <button class="btn btn-primary" id="homeBtn" onclick="returnHome()">
         <i class="fas fa-home"></i>
-         ${t('social.home' as any)}
-    </button>
-    <h1 class="tournaments-title">
-      <i class="fas fa-trophy"></i>
-      Tournament Lobby
-    </h1>
-    <div class="tournaments-actions">
-      <button class="btn btn-primary" onclick="addPlayer()">
+        ${t('social.home' as any)}
+      </button>  
+    <button class="btn btn-primary" onclick="addPlayer()">
         <i class="fas fa-user-plus"></i>
         Add Player
       </button>
@@ -191,78 +196,93 @@ export function renderTournaments() {
 <style>
   body {
     margin: 0;
-    padding: 16px 0 0 0;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    padding: 0;
+    background: linear-gradient(135deg, #232526 0%, #414345 100%);
     min-height: 100vh;
-    font-family: 'Arial', sans-serif;
+    font-family: 'Segoe UI', 'Arial', sans-serif;
+    letter-spacing: 0.01em;
   }
 
   .tournaments-container {
     position: relative;
     z-index: 1;
-    padding: 20px;
-    padding-top: 7%;
-    max-width: 1400px;
+    padding: 32px 16px 16px 16px;
+    max-width: 1200px;
     margin: 48px auto 0 auto;
-    color: white;
-    max-height: 100vh;
-    overflow-y: auto;
-    overflow-x: hidden;
+    color: #f5f6fa;
+    min-height: 80vh;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+    border-radius: 24px;
+    background: rgba(30, 32, 38, 0.92);
+    overflow: visible;
   }
 
   .tournaments-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 20px;
-    padding: 10px 20px;
-    background: rgba(0, 0, 0, 0.3);
-    border-radius: 15px;
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    margin-bottom: 32px;
+    padding: 18px 32px;
+    background: rgba(40, 44, 52, 0.85);
+    border-radius: 18px;
+    box-shadow: 0 2px 12px rgba(102, 126, 234, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.07);
   }
 
   .home-button {
     display: flex;
     align-items: center;
     gap: 8px;
-    padding: 10px 20px;
+    padding: 12px 24px;
     border: none;
     border-radius: 10px;
-    background: rgba(255, 255, 255, 0.1);
+    background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
     color: white;
     cursor: pointer;
-    transition: all 0.3s ease;
+    font-size: 1.1rem;
+    font-weight: 600;
+    box-shadow: 0 2px 8px rgba(102, 126, 234, 0.12);
+    transition: all 0.2s;
   }
-
   .home-button:hover {
-    background: rgba(255, 255, 255, 0.2);
-    transform: translateY(-2px);
+    background: linear-gradient(90deg, #764ba2 0%, #667eea 100%);
+    transform: translateY(-2px) scale(1.04);
+    box-shadow: 0 4px 16px rgba(102, 126, 234, 0.18);
   }
 
   #gameCanvas {
     position: absolute;
-    top: 0;
-    left: 0;
-    z-index: 2;
-    width: 100%;
-    height: 100%;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 10;
     opacity: 0;
     pointer-events: none;
-    transition: opacity 0.5s ease;
+    transition: opacity 0.5s cubic-bezier(.4,2,.3,1);
+    background: #181a20;
+    border-radius: 18px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.28);
+    border: 2px solid #667eea;
+    outline: 3px solid #ffd70044;
+    max-width: 98vw;
+    max-height: 90vh;
   }
   #gameCanvas.active {
     opacity: 1;
     pointer-events: auto;
   }
 
+
   .tournaments-title {
-    font-size: 2.5rem;
+    font-size: 2.7rem;
     font-weight: bold;
     margin: 0;
     display: flex;
     align-items: center;
-    gap: 15px;
+    gap: 18px;
+    letter-spacing: 0.02em;
+    color: #ffd700;
+    text-shadow: 0 2px 8px rgba(255, 215, 0, 0.12);
   }
 
   .tournaments-title i {
@@ -270,51 +290,49 @@ export function renderTournaments() {
   }
 
   .tournaments-actions {
-    margin-right: 10%;
+    margin-right: 4%;
     display: flex;
-    gap: 10px;
+    gap: 14px;
   }
 
   .btn {
-    padding: 10px 20px;
+    padding: 12px 28px;
     border: none;
-    border-radius: 8px;
+    border-radius: 10px;
     cursor: pointer;
     font-weight: bold;
-    transition: all 0.3s ease;
+    font-size: 1.08rem;
+    transition: all 0.2s;
+    box-shadow: 0 2px 8px rgba(102, 126, 234, 0.10);
   }
-
   .btn-primary {
-    background: linear-gradient(45deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
     color: white;
   }
-
   .btn-primary:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+    background: linear-gradient(90deg, #764ba2 0%, #667eea 100%);
+    transform: translateY(-2px) scale(1.04);
+    box-shadow: 0 4px 16px rgba(102, 126, 234, 0.18);
   }
-
   .btn-secondary {
-    background: rgba(255, 255, 255, 0.1);
-    color: white;
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    background: rgba(255, 255, 255, 0.08);
+    color: #e0e0e0;
+    border: 1px solid rgba(255, 255, 255, 0.13);
   }
-
   .btn-secondary:hover {
-    background: rgba(255, 255, 255, 0.2);
-    transform: translateY(-2px);
+    background: rgba(255, 255, 255, 0.16);
+    color: #fff;
+    transform: translateY(-2px) scale(1.04);
   }
-
   .btn-success {
-    background: linear-gradient(45deg, #4CAF50 0%, #45a049 100%);
+    background: linear-gradient(90deg, #4CAF50 0%, #45a049 100%);
     color: white;
   }
-
   .btn-success:hover:not(:disabled) {
-    transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(76, 175, 80, 0.4);
+    background: linear-gradient(90deg, #45a049 0%, #4CAF50 100%);
+    transform: translateY(-2px) scale(1.04);
+    box-shadow: 0 4px 16px rgba(76, 175, 80, 0.18);
   }
-
   .btn:disabled {
     opacity: 0.5;
     cursor: not-allowed;
@@ -323,45 +341,51 @@ export function renderTournaments() {
 
   .tournament-info-bar {
     display: flex;
-    gap: 30px;
-    margin-bottom: 30px;
-    padding: 15px 20px;
-    background: rgba(0, 0, 0, 0.2);
-    border-radius: 10px;
-    backdrop-filter: blur(5px);
+    gap: 36px;
+    margin-bottom: 32px;
+    padding: 16px 28px;
+    background: rgba(40, 44, 52, 0.7);
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(102, 126, 234, 0.07);
+    border: 1px solid rgba(255, 255, 255, 0.06);
   }
-
   .info-item {
     display: flex;
     align-items: center;
-    gap: 8px;
-    color: #ccc;
+    gap: 10px;
+    color: #bfc7d5;
+    font-size: 1.08rem;
   }
-
   .info-item i {
     color: #667eea;
   }
 
   /* Lobby Styles */
   .lobby-container {
-    background: rgba(0, 0, 0, 0.2);
-    border-radius: 15px;
-    padding: 30px;
-    margin-bottom: 30px;
-    backdrop-filter: blur(5px);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: transparent;
+    border-radius: 18px;
+    padding: 36px 24px 24px 24px;
+    margin-bottom: 36px;
+    box-shadow: 0 2px 12px rgba(102, 126, 234, 0.10);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    min-height: 420px;
   }
 
   .lobby-title {
     text-align: center;
-    color: #667eea;
-    font-size: 2rem;
+    color: #ffd700;
+    font-size: 2.1rem;
     font-weight: bold;
-    margin: 0 0 25px 0;
+    margin: 0 0 28px 0;
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 15px;
+    text-shadow: 0 2px 8px rgba(255, 215, 0, 0.10);
   }
 
   .lobby-title i {
@@ -370,225 +394,216 @@ export function renderTournaments() {
 
   .players-list {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 15px;
-    margin-bottom: 30px;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 18px;
+    margin-bottom: 32px;
+    width: 100%;
   }
-
   .player-card {
-    background: rgba(255, 255, 255, 0.1);
-    border-radius: 10px;
-    padding: 15px;
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    background: rgba(255, 255, 255, 0.07);
+    border-radius: 12px;
+    padding: 18px 14px;
+    border: 1px solid rgba(255, 255, 255, 0.13);
     display: flex;
     align-items: center;
-    gap: 15px;
-    transition: all 0.3s ease;
+    gap: 18px;
+    transition: all 0.2s;
+    box-shadow: 0 2px 8px rgba(102, 126, 234, 0.08);
   }
-
   .player-card:hover {
-    background: rgba(255, 255, 255, 0.15);
-    transform: translateY(-2px);
+    background: rgba(255, 255, 255, 0.13);
+    transform: translateY(-2px) scale(1.03);
+    box-shadow: 0 4px 16px rgba(102, 126, 234, 0.13);
   }
-
   .player-avatar {
-    width: 50px;
-    height: 50px;
+    width: 54px;
+    height: 54px;
     border-radius: 50%;
-    background: linear-gradient(45deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.5rem;
+    font-size: 1.7rem;
     font-weight: bold;
     color: white;
+    box-shadow: 0 2px 8px rgba(102, 126, 234, 0.13);
   }
-
   .player-info {
     flex: 1;
   }
-
   .player-name {
     font-weight: bold;
-    font-size: 1.1rem;
-    margin-bottom: 5px;
+    font-size: 1.15rem;
+    margin-bottom: 4px;
+    color: #ffd700;
   }
-
   .player-number {
-    color: #ccc;
-    font-size: 0.9rem;
+    color: #bfc7d5;
+    font-size: 0.97rem;
   }
-
   .remove-player {
-    background: rgba(255, 0, 0, 0.2);
-    border: 1px solid rgba(255, 0, 0, 0.3);
+    background: rgba(255, 0, 0, 0.13);
+    border: 1px solid rgba(255, 0, 0, 0.18);
     color: #ff6b6b;
-    padding: 5px 10px;
-    border-radius: 5px;
+    padding: 7px 12px;
+    border-radius: 7px;
     cursor: pointer;
-    transition: all 0.3s ease;
+    font-size: 1.1rem;
+    transition: all 0.2s;
   }
-
   .remove-player:hover {
-    background: rgba(255, 0, 0, 0.3);
+    background: rgba(255, 0, 0, 0.22);
     color: #ff4444;
+    transform: scale(1.07);
   }
-
   .lobby-actions {
     text-align: center;
+    margin-top: 10px;
   }
 
   .bracket-container {
     display: flex;
     flex-direction: row;
-    gap: 40px;
-    padding: 20px;
-    background: rgba(0, 0, 0, 0.2);
-    border-radius: 15px;
-    backdrop-filter: blur(5px);
+    gap: 44px;
+    padding: 24px 12px;
+    background: rgba(40, 44, 52, 0.7);
+    border-radius: 18px;
+    box-shadow: 0 2px 12px rgba(102, 126, 234, 0.10);
     overflow-x: auto;
     align-items: flex-start;
+    border: 1px solid rgba(255, 255, 255, 0.08);
   }
-
   .bracket-round {
-    min-width: 300px;
+    min-width: 320px;
     display: flex;
     flex-direction: column;
-    gap: 20px;
+    gap: 24px;
     flex-shrink: 0;
   }
-
   .round-title {
     text-align: center;
     color: #667eea;
-    font-size: 1.5rem;
+    font-size: 1.45rem;
     font-weight: bold;
     margin: 0;
-    padding-bottom: 15px;
-    border-bottom: 2px solid rgba(102, 126, 234, 0.3);
+    padding-bottom: 16px;
+    border-bottom: 2px solid rgba(102, 126, 234, 0.18);
+    letter-spacing: 0.01em;
   }
-
   .matches {
     display: flex;
     flex-direction: column;
-    gap: 20px;
+    gap: 24px;
     justify-items: center;
   }
-
   .match {
-    background: rgba(0, 0, 0, 0.4);
-    border-radius: 10px;
-    padding: 15px;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    transition: all 0.3s ease;
+    background: rgba(0, 0, 0, 0.38);
+    border-radius: 12px;
+    padding: 18px 12px;
+    border: 1px solid rgba(255, 255, 255, 0.10);
+    transition: all 0.2s;
     width: 100%;
     max-width: none;
+    box-shadow: 0 2px 8px rgba(102, 126, 234, 0.10);
   }
-
   .match:hover {
-    border-color: rgba(102, 126, 234, 0.5);
-    box-shadow: 0 5px 15px rgba(102, 126, 234, 0.2);
+    border-color: rgba(102, 126, 234, 0.22);
+    box-shadow: 0 4px 16px rgba(102, 126, 234, 0.13);
   }
-
   .final-match {
     border: 2px solid #ffd700;
-    background: rgba(255, 215, 0, 0.1);
+    background: rgba(255, 215, 0, 0.10);
   }
-
   .match-players {
     display: flex;
     flex-direction: column;
-    gap: 10px;
-    margin-bottom: 15px;
+    gap: 12px;
+    margin-bottom: 18px;
   }
-
   .player {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 10px;
-    background: rgba(255, 255, 255, 0.05);
-    border-radius: 5px;
+    padding: 12px;
+    background: rgba(255, 255, 255, 0.07);
+    border-radius: 7px;
     border-left: 3px solid #667eea;
+    transition: background 0.2s;
   }
-
   .player.winner {
-    background: rgba(76, 175, 80, 0.2);
+    background: rgba(76, 175, 80, 0.18);
     border-left-color: #4CAF50;
   }
-
+  .player.loser {
+    background: rgba(255, 0, 0, 0.13);
+    border-left-color: #ff6b6b;
+  }
   .player.empty {
     opacity: 0.5;
     font-style: italic;
   }
-
   .player-name {
-    font-weight: bold;
-  }
-
-  .player-score {
-    font-size: 1.2rem;
     font-weight: bold;
     color: #ffd700;
   }
-
+  .player-score {
+    font-size: 1.25rem;
+    font-weight: bold;
+    color: #ffd700;
+  }
   .vs {
     text-align: center;
     font-weight: bold;
     color: #667eea;
-    font-size: 0.9rem;
+    font-size: 1.05rem;
   }
-
   .play-match-btn {
     width: 100%;
-    padding: 8px;
-    background: linear-gradient(45deg, #4CAF50 0%, #45a049 100%);
+    padding: 10px;
+    background: linear-gradient(90deg, #4CAF50 0%, #45a049 100%);
     color: white;
     border: none;
-    border-radius: 5px;
+    border-radius: 7px;
     cursor: pointer;
     font-weight: bold;
-    transition: all 0.3s ease;
+    font-size: 1.08rem;
+    transition: all 0.2s;
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 8px;
+    gap: 10px;
+    box-shadow: 0 2px 8px rgba(76, 175, 80, 0.10);
   }
-
   .play-match-btn:hover:not(:disabled) {
-    transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(76, 175, 80, 0.4);
+    background: linear-gradient(90deg, #45a049 0%, #4CAF50 100%);
+    transform: translateY(-2px) scale(1.04);
+    box-shadow: 0 4px 16px rgba(76, 175, 80, 0.18);
   }
-
   .champion-podium {
     display: flex;
     justify-content: center;
     align-items: center;
-    height: auto;
-    min-height: 150px;
+    min-height: 160px;
   }
-
   .champion-slot {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 15px;
-    padding: 30px;
-    background: linear-gradient(45deg, #ffd700 0%, #ffed4e 100%);
+    gap: 18px;
+    padding: 36px 18px;
+    background: linear-gradient(90deg, #ffd700 0%, #ffed4e 100%);
     color: #333;
-    border-radius: 20px;
+    border-radius: 22px;
     font-weight: bold;
-    font-size: 1.2rem;
-    box-shadow: 0 10px 30px rgba(255, 215, 0, 0.4);
+    font-size: 1.25rem;
+    box-shadow: 0 10px 30px rgba(255, 215, 0, 0.18);
     text-align: center;
     min-width: 180px;
     max-width: 250px;
   }
-
   .champion-slot i {
-    font-size: 3rem;
+    font-size: 3.2rem;
   }
-
   /* Modal Styles */
   .modal {
     display: none;
@@ -596,81 +611,77 @@ export function renderTournaments() {
     z-index: 1000;
     left: 0;
     top: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.8);
-    backdrop-filter: blur(5px);
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.82);
+    backdrop-filter: blur(6px);
   }
-
   .modal-content {
-    background: rgba(0, 0, 0, 0.9);
-    margin: 15% auto;
+    background: rgba(30, 32, 38, 0.98);
+    margin: 12% auto;
     padding: 0;
-    border-radius: 15px;
-    width: 90%;
-    max-width: 400px;
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 18px;
+    width: 92%;
+    max-width: 420px;
+    border: 1px solid rgba(255, 255, 255, 0.13);
+    box-shadow: 0 4px 24px rgba(102, 126, 234, 0.13);
   }
-
   .modal-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 20px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 22px 22px 12px 22px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.10);
   }
-
   .modal-header h3 {
     margin: 0;
-    color: white;
+    color: #ffd700;
+    font-size: 1.3rem;
   }
-
   .close-btn {
     background: none;
     border: none;
-    color: white;
-    font-size: 24px;
+    color: #fff;
+    font-size: 28px;
     cursor: pointer;
-    transition: color 0.3s ease;
+    transition: color 0.2s;
   }
-
   .close-btn:hover {
     color: #667eea;
   }
-
   .modal-body {
-    padding: 20px;
+    padding: 22px;
   }
-
   .modal-body input {
     width: 100%;
-    padding: 12px;
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    border-radius: 8px;
-    background: rgba(255, 255, 255, 0.1);
+    padding: 14px;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.10);
     color: white;
-    font-size: 16px;
-    margin-bottom: 20px;
+    font-size: 1.08rem;
+    margin-bottom: 22px;
     box-sizing: border-box;
+    transition: border 0.2s;
   }
-
+  .modal-body input:focus {
+    border: 1.5px solid #667eea;
+    outline: none;
+  }
   .modal-body input::placeholder {
     color: rgba(255, 255, 255, 0.6);
   }
-
   .modal-actions {
     display: flex;
-    gap: 10px;
+    gap: 12px;
     justify-content: flex-end;
   }
-
   .error-message {
     color: #ff6b6b;
-    font-size: 0.9rem;
+    font-size: 1.01rem;
     margin-top: 10px;
     text-align: center;
   }
-
   .empty-state {
     display: flex;
     justify-content: center;
@@ -678,58 +689,75 @@ export function renderTournaments() {
     min-height: 400px;
     text-align: center;
   }
-
   .empty-state-content {
-    background: rgba(0, 0, 0, 0.3);
-    padding: 40px;
-    border-radius: 15px;
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    max-width: 400px;
+    background: rgba(40, 44, 52, 0.7);
+    padding: 44px 24px;
+    border-radius: 18px;
+    box-shadow: 0 2px 12px rgba(102, 126, 234, 0.10);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    max-width: 420px;
+    margin: 0 auto;
   }
-
   .empty-icon {
-    font-size: 4rem;
+    font-size: 4.2rem;
     color: #ffd700;
-    margin-bottom: 20px;
+    margin-bottom: 22px;
+    text-shadow: 0 2px 8px rgba(255, 215, 0, 0.10);
   }
-
   .empty-state-content h2 {
-    color: white;
-    margin: 0 0 15px 0;
-    font-size: 2rem;
+    color: #ffd700;
+    margin: 0 0 18px 0;
+    font-size: 2.1rem;
+    text-shadow: 0 2px 8px rgba(255, 215, 0, 0.10);
   }
-
   .empty-state-content p {
-    color: #ccc;
-    margin: 0 0 25px 0;
-    font-size: 1.1rem;
+    color: #bfc7d5;
+    margin: 0 0 28px 0;
+    font-size: 1.13rem;
   }
-
-  @media (max-width: 768px) {
+  @media (max-width: 900px) {
     .tournaments-header {
       flex-direction: column;
-      gap: 15px;
-      padding: 8px 8px;
+      gap: 18px;
+      padding: 12px 8px;
     }
-
     .home-button {
       width: 100%;
       justify-content: center;
     }
-
     .tournaments-container {
       margin-top: 16px;
+      padding: 12px 2vw;
     }
     .tournament-info-bar {
       flex-direction: column;
-      gap: 10px;
+      gap: 12px;
+      padding: 10px 8px;
     }
     .matches {
       grid-template-columns: 1fr;
     }
     .players-list {
       grid-template-columns: 1fr;
+    }
+    #gameCanvas {
+      max-width: 98vw;
+      max-height: 60vw;
+    }
+  }
+  @media (max-width: 600px) {
+    .tournaments-title {
+      font-size: 1.3rem;
+    }
+    .lobby-title {
+      font-size: 1.1rem;
+    }
+    .bracket-round {
+      min-width: 180px;
+    }
+    #gameCanvas {
+      max-width: 99vw;
+      max-height: 50vw;
     }
   }
 </style>
