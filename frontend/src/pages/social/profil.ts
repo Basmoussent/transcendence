@@ -43,9 +43,9 @@ export class profil {
 
 		this.homeBtn = this.getElement('homeBtn');
 		this.username = this.getElement('username');
-		this.addFriendBtn = this.getElement('addFriend');
+		this.addFriendBtn = this.getElement('addFriend') as HTMLButtonElement;
 		this.avatar = this.getElement('avatar') as HTMLImageElement;
-		this.blockBtn = this.getElement('blockBtn');
+		this.blockBtn = this.getElement('blockBtn') as HTMLButtonElement;
 		this.gamePlayed = this.getElement('gamePlayed');
 		this.winrate = this.getElement('winrate');
 		this.mmr = this.getElement('mmr');
@@ -444,20 +444,13 @@ export class profil {
 				return;
 			}
 
-			const response = await fetch(`/api/friend/accept/${this.relation.id}`, {
+			await fetch(`/api/friend/accept/${this.relation.id}`, {
 				method: 'POST',
 				headers: {
 					'x-access-token': token,
 				},
 			});
 
-			if (response.ok) {
-				console.log('✅ Demande d\'ami acceptée avec succès');
-				const updatedRelation = await response.json();
-				this.relation = updatedRelation;
-			} else {
-				console.error('❌ Erreur lors de l\'acceptation de la demande d\'ami');
-			}
 		}
 		catch (err) {
 			console.error(`❌ Erreur dans acceptFriend:`, err);
@@ -495,7 +488,7 @@ export class profil {
 				return;
 			}
 
-			const response = await fetch(`/api/friend/block/?relationid=${this.relation.id}`, {
+			await fetch(`/api/friend/block/?relationid=${this.relation.id}`, {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',
@@ -505,14 +498,6 @@ export class profil {
 					userState: state
 				})
 			});
-
-			if (response.ok) {
-				console.log('✅ Utilisateur bloqué avec succès');
-				const updatedRelation = await response.json();
-				this.relation = updatedRelation;
-			} else {
-				console.error('❌ Erreur lors du blocage de l\'utilisateur');
-			}
 		}
 		catch (err) {
 			console.error(`❌ Erreur dans changeRelationToBlocked:`, err);

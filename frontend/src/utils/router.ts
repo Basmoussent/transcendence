@@ -72,6 +72,8 @@ export async function router() {
 				window.dispatchEvent(new PopStateEvent('popstate'));
 				return; 
 			}
+
+			/// pas pouvoir aller sur le profil des gens qui nous bloquent
 		}
 		else {
 
