@@ -1,5 +1,4 @@
 import { t } from '../../utils/translations';
-import { addEvent } from '../../utils/eventManager';
 import { removeAuthToken } from '../../utils/auth';
 
 export class main {
@@ -32,28 +31,28 @@ export class main {
 	}
 
 	private setupEvents() {
-		addEvent(this.profileBtn, 'click', () => {
+		this.profileBtn.addEventListener('click', () => {
 			window.history.pushState({}, '', '/me');
 			window.dispatchEvent(new PopStateEvent('popstate'));
 		});
 		
-		addEvent(this.matchmakingBtn, 'click', () => {
+		this.matchmakingBtn.addEventListener('click', () => {
 			window.history.pushState({}, '', '/matchmaking');
 			window.dispatchEvent(new PopStateEvent('popstate'));
 		});
 
-		addEvent(this.tournamentBtn, 'click', () => {
+		this.tournamentBtn.addEventListener('click', () => {
 			window.history.pushState({}, '', '/tournament');
 			window.dispatchEvent(new PopStateEvent('popstate'));
 		});
 
-		addEvent(this.chatBtn, 'click', () => {
+		this.chatBtn.addEventListener('click', () => {
 			window.history.pushState({}, '', '/chat');
 			window.dispatchEvent(new PopStateEvent('popstate'));
 		});
 
 		
-		addEvent(this.logoutBtn, 'click', async () => {
+		this.logoutBtn.addEventListener('click', async () => {
 			try {
 				console.log('🚪 Tentative de logout...');
 				removeAuthToken();
@@ -77,7 +76,7 @@ export function initializeHomeEvents() {
 	
 	// Gestion du bouton retour au login
 	if (loginBtn) {
-		addEvent(loginBtn, 'click', () => {
+		loginBtn.addEventListener('click', () => {
 			window.history.pushState({}, '', '/login');
 			window.dispatchEvent(new PopStateEvent('popstate'));
 		});

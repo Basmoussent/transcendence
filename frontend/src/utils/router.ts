@@ -21,11 +21,12 @@ import { initAlive } from './auth';
 import { renderProfil, initializeProfilEvents, cleanupProfilInstance } from '../pages/social/renderProfil';
 import { render2FA, initialize2FAEvents } from '../pages/auth/activate-2fa';
 import { render2FALogin } from '../pages/auth/2fa-login';
-import { cleanEvents } from './eventManager';
 
 export async function router() {
 
 	clearTranslationCache();
+	const response = getCallStack();
+	console.log(response);
 	
 	let path = window.location.pathname;
 	const app = document.getElementById('app');
@@ -35,7 +36,7 @@ export async function router() {
 	const token = getAuthToken();
 
 	//TODO recuperer le username grace au token 
-	
+	console.log("je rnetre dans le routeur avec le path : ", path);
 
 	let uuid: string = '';
 	
@@ -206,8 +207,6 @@ export async function router() {
 		if (path !== '/profil') {
 			cleanupProfilInstance();
 		}
-		
-		cleanEvents();
 
 		var el = document.getElementById('app'),
 		elClone = el!.cloneNode(true);
@@ -303,4 +302,11 @@ async function gameExists(uuid: string, token: any) {
 		console.error("atttention a l'erreur dans userExists");
 	}
 
+}
+
+function getCallStack(): string[] {
+  const stack = new Error().stack;
+  if (!stack) return [];
+
+  return stack.split('\n').slice(1).map(line => line.trim());
 }

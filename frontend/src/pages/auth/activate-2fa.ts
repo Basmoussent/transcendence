@@ -1,6 +1,5 @@
 import { getAuthToken } from '../../utils/auth';
 import { fetchMe, update2FAState, userInfo } from '../social/utils';
-import { addEvent } from '../../utils/eventManager';
 import { t } from '../../utils/translations';
 
 export function render2FA() {
@@ -335,7 +334,7 @@ export async function initialize2FAEvents() {
 	}
 
 	if (backBtn) {
-		addEvent(backBtn, 'click', () => {
+		backBtn.addEventListener('click', () => {
 			window.history.pushState({}, '', '/me');
 			window.dispatchEvent(new PopStateEvent('popstate'));
 		});
@@ -367,7 +366,7 @@ export async function initialize2FAEvents() {
 
 	// Gestion de l'activation 2FA
 	if (activateBtn && verificationCode) {
-		addEvent(activateBtn, 'click', async () => {
+		activateBtn.addEventListener('click', async () => {
 			const code = verificationCode.value.trim();
 
 			if (code.length !== 6) {

@@ -174,12 +174,12 @@ async function gameRoutes(app: FastifyInstance) {
 
 				for (const player of players) {
 					try {
-						console.log(`recup stats pour ${player}`)
 						const stats = await app.userService.retrieveStats(player);
-						console.log("stats", stats)
+						console.log("stats juste apers retireve stats",JSON.stringify(stats, null, 42));
 						if (stats) {
-							const totalGames = (stats.pong_games || 0) + (stats.block_games || 0);
-							const totalWins = (stats.pong_wins || 0) + (stats.block_wins || 0);
+							const totalGames = (stats.pong_games) + (stats.block_games);
+							console.log("totalgames = ", totalGames, stats.pong_games, stats.block_games);
+							const totalWins = (stats.pong_wins) + (stats.block_wins);
 							const winrate = totalGames > 0 ? Math.round((totalWins / totalGames) * 100) : 0;
 							
 							totalWinrate += winrate;
@@ -205,7 +205,7 @@ async function gameRoutes(app: FastifyInstance) {
 				}
 
 				const averageWinrate = playerCount > 0 ? Math.round(totalWinrate / playerCount) : 0;
-
+				console.log(averageWinrate, " -- ", playerCount, " -- ", totalWinrate);
 				return {
 					...game,
 					playersWithStats,

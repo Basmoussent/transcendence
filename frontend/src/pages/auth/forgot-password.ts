@@ -1,5 +1,4 @@
 import { t } from '../../utils/translations';
-import { addEvent } from '../../utils/eventManager';
 
 export function renderForgotPassword(): string {
 	return `
@@ -55,14 +54,14 @@ function initializeForgotPasswordEvents() {
 
 	// Gestion du bouton retour au login
 	if (backToLoginBtn) {
-		addEvent(backToLoginBtn, 'click', () => {
+		backToLoginBtn.addEventListener('click', () => {
 			window.history.pushState({}, '', '/login');
 			window.dispatchEvent(new PopStateEvent('popstate'));
 		});
 	}
 
 	if (forgotPasswordForm) {
-		addEvent(forgotPasswordForm, 'submit', (e: any) => {
+		forgotPasswordForm.addEventListener('submit', (e: any) => {
 			e.preventDefault();
 			const email = (document.getElementById('email') as HTMLInputElement).value;
 			

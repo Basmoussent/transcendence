@@ -1,7 +1,6 @@
 import { Game, fetchUsername, fetchUserId, getUuid, postGame } from '../../game/gameUtils'
 import { getAuthToken } from '../../utils/auth';
 import { sanitizeHtml } from '../../utils/sanitizer';
-import { addEvent, cleanEvents } from '../../utils/eventManager';
 
 export interface Available {
 	gameId: number,
@@ -51,7 +50,8 @@ export class matchmaking {
 		this.gameId = 0;
 
 		// Ajouter un listener pour nettoyer quand l'utilisateur quitte la page
-		addEvent(window, 'beforeunload', () => {
+		console.log("matchmaknig jnv;na;ona;o;ae")
+		window.addEventListener('beforeunload', () => {
 			if (this.ws.readyState === WebSocket.OPEN) {
 				this.ws.send(JSON.stringify({
 					type: 'leave'
@@ -101,34 +101,46 @@ export class matchmaking {
 	private async joinIt() {
 		await this.joinRoom(this.gameId);
 	}
+
 	private setupMutationObserver() {
 		const observer = new MutationObserver((mutations) => {
 			mutations.forEach((mutation) => {
-			mutation.addedNodes.forEach((node) => {
-				if (node.nodeType === Node.ELEMENT_NODE) {
-				const element = node as Element;
-				
-				// Gérer les boutons Join
-				const joinButtons = element.querySelectorAll('[id^="join"][id$="Btn"]');
-				joinButtons.forEach((btn) => {
-					const gameId = btn.id.replace('join', '').replace('Btn', '');
-					this.gameId = Number(gameId);
+				mutation.addedNodes.forEach((node) => {
+					if (node.nodeType === Node.ELEMENT_NODE) {
+						const element = node as Element;
 
-					if (!matchmaking.joinBtn.has(Number(gameId))) {
-						console.log("joinBtn before:", matchmaking.joinBtn)
-						matchmaking.joinBtn.set(Number(gameId), btn as HTMLElement);
-						addEvent(btn, 'click', () => {
-							this.joinIt();
+						const joinButtons = element.querySelectorAll('[id^="join"][id$="Btn"]');
+						joinButtons.forEach((btn) => {
+							// Vérifie si le bouton a déjà été traité
+							if ((btn as HTMLElement).dataset.listenerAttached === "true") {
+								return;
+							}
+
+							const gameId = btn.id.replace('join', '').replace('Btn', '');
+							this.gameId = Number(gameId);
+
+							console.log("list join btn", matchmaking.joinBtn);
+							console.log("game ID la", gameId);
+
+							if (!matchmaking.joinBtn.has(Number(gameId))) {
+								console.log("joinBtn before:", matchmaking.joinBtn);
+								matchmaking.joinBtn.set(Number(gameId), btn as HTMLElement);
+
+								btn.addEventListener('click', () => {
+									this.joinIt();
+								});
+
+								// Marquer le bouton comme traité
+								(btn as HTMLElement).dataset.listenerAttached = "true";
+							}
 						});
 					}
 				});
-
-				}
-			});
 			});
 		});
 		observer.observe(document.body, { childList: true, subtree: true });
 	}
+
 
 	private initializeExistingButtons() {
 		// Initialiser les boutons qui existent déjà
@@ -139,7 +151,7 @@ export class matchmaking {
 
 			if (!matchmaking.joinBtn.has(Number(gameId))) {
 				matchmaking.joinBtn.set(Number(gameId), btn as HTMLElement);
-				addEvent(btn, 'click', () => {
+				btn.addEventListener('click', () => {
 					this.joinIt();
 				});
 			}
@@ -150,7 +162,7 @@ export class matchmaking {
 		gameCards.forEach((card) => {
 			const gameId = card.getAttribute('data-game-id');
 			if (gameId) {
-				addEvent(card, 'click', () => {
+				card.addEventListener('click', () => {
 					this.gameId = Number(gameId);
 					this.joinIt();
 				});
@@ -176,16 +188,9 @@ export class matchmaking {
 		return el;
 	}
 
-	private currentOptions(): void {
-		console.log('Game Mode States:', {
-			brick: this.brick,
-			pong: this.pong
-			});
-	}
-
 	private gameOptions(): void {
 
-		addEvent(this.pongBtn, 'click', () => {
+		this.pongBtn.addEventListener('click', () => {
 			if (this.pong)
 				return ;
 
@@ -202,7 +207,7 @@ export class matchmaking {
 			console.log("pongBtn classes:", this.pongBtn.classList);
 		});
 
-		addEvent(this.blockBtn, 'click', () => {
+		this.blockBtn.addEventListener('click', () => {
 			if (this.brick)
 				return ;
 
@@ -219,7 +224,7 @@ export class matchmaking {
 			console.log("blockBtn classes:", this.blockBtn.classList);
 		});
 
-		addEvent(this.homeBtn, 'click', () => {
+		this.homeBtn.addEventListener('click', () => {
 			
 			window.history.pushState({}, '', `/main`);
 			window.dispatchEvent(new PopStateEvent('popstate'));
@@ -232,7 +237,7 @@ export class matchmaking {
 
 	private async launchRoom() {
 
-		addEvent(this.launchBtn, 'click', async () => {
+		this.launchBtn.addEventListener('click', async () => {
 			let tmp = {
 				game_type: this.pong ? "pong" : "block",
 				player1: this.userid,
@@ -259,6 +264,7 @@ export class matchmaking {
 		try {
 			let uuid = await getUuid(gameId);
 
+			this.ws.close();
 			window.history.pushState({}, '', `/room/${uuid}`);
 			window.dispatchEvent(new PopStateEvent('popstate'));
 
@@ -386,7 +392,7 @@ export class matchmaking {
 					player3: sanitizeHtml(game?.player3),
 					player4: sanitizeHtml(game?.player4),
 					users_needed:(sanitizeHtml(game.users_needed)),
-					averageWinrate: game.averageWinrate || 0,
+					averageWinrate: game.averageWinrate,
 					playersWithStats: game.playersWithStats || [],
 					divConverion(): string {
 						// Calculer le nombre de joueurs actuels

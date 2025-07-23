@@ -1,6 +1,5 @@
 import { t } from '../../utils/translations';
 import { getAuthToken, setAuthToken } from '../../utils/auth';
-import { addEvent } from '../../utils/eventManager';
 
 export function renderEditProfil(): string {
 	return `
@@ -147,7 +146,7 @@ function initializeEditProfileEvents() {
 
 	// Gestion de l'upload d'image personnalisée
 	if (customAvatarInput && customAvatarRadio) {
-		addEvent(customAvatarInput, 'change', async (e) => {
+		customAvatarInput.addEventListener('change', async (e) => {
 			const file = (e.target as HTMLInputElement).files?.[0];
 			if (!file) return;
 
@@ -204,7 +203,7 @@ function initializeEditProfileEvents() {
 
 		// Quand on clique sur l'option custom, déclencher l'input file
 		if (customAvatarRadio) {
-			addEvent(customAvatarRadio as HTMLElement, 'change', () => {
+			customAvatarRadio.addEventListener('change', () => {
 				if (customAvatarRadio.checked && customAvatarInput) {
 					customAvatarInput.click();
 				}
@@ -212,7 +211,7 @@ function initializeEditProfileEvents() {
 		}
 	}
 
-	addEvent(editProfilForm, 'submit', async (e) => {
+	editProfilForm?.addEventListener('submit', async (e) => {
 		e.preventDefault();
 		const username = (document.getElementById('username') as HTMLInputElement).value;
 		const selectedAvatar = (document.querySelector('input[name="avatar"]:checked') as HTMLInputElement)?.value || 'avatar.png';

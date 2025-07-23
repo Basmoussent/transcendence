@@ -17,6 +17,7 @@ export async function initializeRoomEvents(uuid: string) {
 		}
 		const username = await fetchUsername();
 		if (username !== undefined) {
+			console.log("je rentre ddans le if roon render");
 			new Room(username, uuid);
 		}
 	} catch (err: any) {

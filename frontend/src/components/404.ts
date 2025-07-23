@@ -1,5 +1,3 @@
-import { addEvent } from '../utils/eventManager';
-
 export function render404() {
 	const htmlContent = `
 		<div class="not-found">
@@ -165,7 +163,7 @@ setTimeout(() => {
 		const backBtn = document.getElementById('backBtn');
 
 		if (backBtn) {
-			addEvent(backBtn, 'click', () => {
+			backBtn.addEventListener('click', () => {
 				window.history.pushState({}, '', '/main');
 				window.dispatchEvent(new PopStateEvent('popstate'));
 			});

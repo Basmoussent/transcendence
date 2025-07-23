@@ -1,6 +1,5 @@
 import { t } from '../../utils/translations';
 import { createAccount } from './class/createAccount';
-import { addEvent } from '../../utils/eventManager';
 
 
 export function initializeCreateAccountEvents() {
@@ -15,7 +14,7 @@ export function initializeCreateAccountEvents() {
 	
 	// Gestion du bouton retour au login
 	if (backToLoginBtn) {
-		addEvent(backToLoginBtn, 'click', () => {
+		backToLoginBtn.addEventListener('click', () => {
 			window.history.pushState({}, '', '/login');
 			window.dispatchEvent(new PopStateEvent('popstate'));
 		});

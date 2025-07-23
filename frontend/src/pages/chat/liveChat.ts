@@ -1,7 +1,6 @@
 import { sanitizeHtml } from '../../utils/sanitizer';
 import { fetchMe, fetchUserInfo, loadMe } from './utils';
 import { getAuthToken } from '../../utils/auth';
-import { addEvent } from '../../utils/eventManager';
 import { t } from '../../utils/translations';
 import { postGame } from '../../game/gameUtils';
 

@@ -1,6 +1,5 @@
 import { t } from '../../utils/translations';
 import { getAuthToken } from '../../utils/auth';
-import { addEvent } from '../../utils/eventManager';
 
 export function renderChangePassword(): string {
 	return `
@@ -67,7 +66,7 @@ function initializeChangePasswordEvents() {
 		});
 	}
 
-	addEvent(changePasswordForm, 'submit', async (e) => {
+	changePasswordForm?.addEventListener('submit', async (e) => {
 		e.preventDefault();
 		const currentPassword = (document.getElementById('currentPassword') as HTMLInputElement).value;
 		const newPassword = (document.getElementById('newPassword') as HTMLInputElement).value;

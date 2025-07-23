@@ -3,7 +3,6 @@ import { Paddle } from "./paddle";
 import { PaddleAI } from "./paddle-ai";
 import { PADDLE_OFFSET, PADDLE1_COLOR, PADDLE2_COLOR } from "./const";
 import { getAuthToken } from '../../utils/auth';
-import { addEvent } from '../../utils/eventManager';
 import { t } from '../../utils/translations';
 import { sanitizeHtml } from '../../utils/sanitizer';
 
@@ -164,11 +163,11 @@ export class Pong {
 
 	// pendant qu'on appuie sur une touche this.keys[touche] = true
 	private setupEventListeners(): void {
-		addEvent(window, 'keydown', (e) => {
+		window.addEventListener('keydown', (e) => {
 			this.keys[e.key.toLowerCase()] = true;
 		});
 
-		addEvent(window, 'keyup', (e) => {
+		window.addEventListener('keyup', (e) => {
 			this.keys[e.key.toLowerCase()] = false;
 		});
 	}

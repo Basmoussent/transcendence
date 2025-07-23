@@ -1,5 +1,4 @@
 import { setAuthToken } from '../../../utils/auth';
-import { addEvent } from '../../../utils/eventManager';
 
 export class login {
 

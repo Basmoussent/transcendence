@@ -139,9 +139,10 @@ export class UserService {
 		return authenticator.check(userInputCode, secret);
 	}
 
-	async retrieveStats(username: string) {
+	async retrieveStats(username: number) {
 		try {
-			const user = await this.findByUsername(username);
+			console.log("retireve stats for ", username);
+			const user = await this.findById(username);
 			if (!user) {
 				return {
 					username: username,
@@ -170,26 +171,17 @@ export class UserService {
 					AND end_time IS NOT NULL`,
 					[user.id.toString(), user.id.toString(), user.id.toString(), user.id.toString(), user.id.toString(), user.id.toString(), user.id.toString()],
 					(err: any, row: any | undefined) => {
-						err ? reject(err) : resolve(row || {
-							pong_games: 0,
-							pong_wins: 0,
-							block_games: 0,
-							block_wins: 0,
-							total_games: 0,
-							total_wins: 0
-						});
+						err ? reject(err) : resolve(row);
 					}
 				);
 			});
-
 			const totalGames = stats.pong_games + stats.block_games || 0;
 			const totalWins = stats.pong_wins + stats.block_wins || 0;
 			const winrate = totalGames > 0 ? (totalWins / totalGames) * 100 : 0;
-			console.log("winrate :", winrate);
+			console.log(`winrate for ${username}:`, winrate);
 			const rating = Math.round(winrate * 10); 
-
 			return {
-				username: username,
+				username: user.username,
 				pong_games: stats.pong_games || 0,
 				pong_wins: stats.pong_wins || 0,
 				block_games: stats.block_games || 0,
