@@ -149,8 +149,8 @@ export const translations = {
     },
     block: {
       pressEnterToStart: "APPUYEZ SUR ENTRÉE POUR COMMENCER",
-      player1Controls: "JOUEUR 1: TOUCHES A/D",
-      player2Controls: "JOUEUR 2: TOUCHES FLÉCHÉES",
+      player1Controls: "TOUCHES A/D",
+      player2Controls: "TOUCHES FLÉCHÉES",
       wins: "GAGNE !",
       pressEnterToPlayAgain: "Appuyez sur ENTRÉE pour rejouer",
       score: "Score :",
@@ -246,7 +246,7 @@ export const translations = {
       pressEnterToStart: "APPUYEZ SUR ENTRÉE",
       toStart: "POUR COMMENCER",
       player: "Joueur",
-      aiPlayer: "IA"
+      aiPlayer: "Joueur IA"
     }
   },
   en: {
@@ -399,8 +399,8 @@ export const translations = {
     },
     block: {
       pressEnterToStart: "PRESS ENTER TO START",
-      player1Controls: "PLAYER 1: A/D KEYS",
-      player2Controls: "PLAYER 2: ARROW KEYS",
+      player1Controls: "A/D KEYS",
+      player2Controls: "ARROW KEYS",
       wins: "WINS!",
       pressEnterToPlayAgain: "Press ENTER to play again",
       score: "Score:",
@@ -495,7 +495,7 @@ export const translations = {
       pressEnterToStart: "PRESS ENTER",
       toStart: "TO START",
       player: "Player",
-      aiPlayer: "AI"
+      aiPlayer: "AI Player"
     }
   },
   es: {
@@ -648,8 +648,8 @@ export const translations = {
     },
     block: {
       pressEnterToStart: "PRESIONA ENTER PARA COMENZAR",
-      player1Controls: "JUGADOR 1: TECLAS A/D",
-      player2Controls: "JUGADOR 2: TECLAS DE FLECHA",
+      player1Controls: "TECLAS A/D",
+      player2Controls: "TECLAS DE FLECHA",
       wins: "¡GANÓ!",
       pressEnterToPlayAgain: "Presiona ENTER para jugar de nuevo",
       score: "Puntuación:",
@@ -744,7 +744,7 @@ export const translations = {
       pressEnterToStart: "PRESIONA ENTER",
       toStart: "PARA COMENZAR",
       player: "Jugador",
-      aiPlayer: "IA"
+      aiPlayer: "Jugador IA"
     }
   }
 } as const;
