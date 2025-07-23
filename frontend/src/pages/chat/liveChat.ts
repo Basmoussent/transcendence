@@ -107,7 +107,7 @@ export class Chat {
 		this.ws.onopen = () => {
 			console.log(`${this.me.username} est connecte au live chat`)
 			console.log("non pite pas ca je veux plus je veux plus");
-			// this.updateUI(); // s'appelle plusieurs fois trop bizarre
+			this.updateUI(); // s'appelle plusieurs fois trop bizarre
 		};
 
 		this.ws.onerror = (error) => {
@@ -174,16 +174,16 @@ export class Chat {
 
 	private setupClickEvents() {
 
-		addEvent(this.sendBtn, 'click', () => this.sendChatMessage());
-		addEvent(this.addFriendBtn, 'click', () => this.sendFriendRequest());
+		this.sendBtn.addEventListener('click', () => this.sendChatMessage());
+		this.addFriendBtn.addEventListener('click', () => this.sendFriendRequest());
 
-		addEvent(this.chatInput, 'keypress', (e: any) => {
+		this.chatInput.addEventListener('keypress', (e: any) => {
 			if (e.key === 'Enter') {
 				e.preventDefault();
 				this.sendChatMessage();
 			}
 		});
-		addEvent(this.homeBtn, 'click', () => {
+		this.homeBtn.addEventListener('click', () => {
 			window.history.pushState({}, '', '/main');
 			window.dispatchEvent(new Event('popstate'));
 		});
@@ -221,7 +221,7 @@ export class Chat {
 		}
 
 		this.tabs.forEach(tab => {
-			addEvent(tab, 'click', () => {
+			tab.addEventListener('click', () => {
 				const tabName = tab.dataset.tab;
 				if (!tabName) return;
 

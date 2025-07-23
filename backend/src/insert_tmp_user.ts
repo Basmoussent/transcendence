@@ -5,9 +5,6 @@ import { generateBase32Key } from './routes/utils';
 import { db } from './database';
 
 
-
-
-
 export async function insert_tmp_user(app: FastifyInstance) {
 
 	const password_hash = await bcrypt.hash('ok', 10);
@@ -18,14 +15,14 @@ export async function insert_tmp_user(app: FastifyInstance) {
 		// Préparation et exécution de la requête SQL d'insertion
 		const stmt = db.getDatabase().prepare(
 			`INSERT INTO users (username, email, password_hash, secret_key)
-				VALUES (?, ?, ?, ?)`
+				VALUES (?, ?, ?, ?) ON CONFLICT(email) DO NOTHING`
 		);
 
 		stmt.run('talan', 'talan@test.com', password_hash, secret_key);
 
 		const stmt2 = db.getDatabase().prepare(
 			`INSERT INTO statistics (username)
-			VALUES (?)`
+			VALUES (?) ON CONFLICT(username) DO NOTHING`
 		);
 
 		stmt2.run('talan');
@@ -41,14 +38,14 @@ export async function insert_tmp_user(app: FastifyInstance) {
 		// Préparation et exécution de la requête SQL d'insertion
 		const stmt = db.getDatabase().prepare(
 			`INSERT INTO users (username, email, password_hash, secret_key)
-				VALUES (?, ?, ?, ?)`
+				VALUES (?, ?, ?, ?) ON CONFLICT(email) DO NOTHING`
 		);
 
 		stmt.run('basem', 'basem@test.com', password_hash, secret_key);
 
 		const stmt2 = db.getDatabase().prepare(
 			`INSERT INTO statistics (username)
-			VALUES (?)`
+			VALUES (?) ON CONFLICT(username) DO NOTHING`
 		);
 
 		stmt2.run('basem');
@@ -64,14 +61,14 @@ export async function insert_tmp_user(app: FastifyInstance) {
 		// Préparation et exécution de la requête SQL d'insertion
 		const stmt = db.getDatabase().prepare(
 			`INSERT INTO users (username, email, password_hash, secret_key)
-				VALUES (?, ?, ?, ?)`
+				VALUES (?, ?, ?, ?) ON CONFLICT(email) DO NOTHING`
 		);
 
 		stmt.run('ines', 'ines@test.com', password_hash, secret_key);
 
 		const stmt2 = db.getDatabase().prepare(
 			`INSERT INTO statistics (username)
-			VALUES (?)`
+			VALUES (?) ON CONFLICT(username) DO NOTHING`
 		);
 
 		stmt2.run('ines');
@@ -87,14 +84,14 @@ export async function insert_tmp_user(app: FastifyInstance) {
 		// Préparation et exécution de la requête SQL d'insertion
 		const stmt = db.getDatabase().prepare(
 			`INSERT INTO users (username, email, password_hash, secret_key)
-				VALUES (?, ?, ?, ?)`
+				VALUES (?, ?, ?, ?) ON CONFLICT(email) DO NOTHING`
 		);
 
 		stmt.run('polo', 'polo@test.com', password_hash, secret_key);
 
 		const stmt2 = db.getDatabase().prepare(
 			`INSERT INTO statistics (username)
-			VALUES (?)`
+			VALUES (?) ON CONFLICT(username) DO NOTHING`
 		);
 
 		stmt2.run('polo');
@@ -111,14 +108,14 @@ export async function insert_tmp_user(app: FastifyInstance) {
 		// Préparation et exécution de la requête SQL d'insertion
 		const stmt = db.getDatabase().prepare(
 			`INSERT INTO users (username, email, password_hash, secret_key)
-				VALUES (?, ?, ?, ?)`
+				VALUES (?, ?, ?, ?) ON CONFLICT(email) DO NOTHING`
 		);
 
 		stmt.run('polo2', 'polo2@test.com', password_hash, secret_key);
 
 		const stmt2 = db.getDatabase().prepare(
 			`INSERT INTO statistics (username)
-			VALUES (?)`
+			VALUES (?) ON CONFLICT(username) DO NOTHING`
 		);
 
 		stmt2.run('polo2');

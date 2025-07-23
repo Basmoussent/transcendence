@@ -13,7 +13,7 @@ export function initializeChatEvents() {
 	console.log('Initializing chat page events');
 	try {
 		const chat = new Chat();
-		(window as any).chatInstance = chat; // Expose l'instance pour la console
+		(window as any).chatInstance = chat;
 	} catch (err: any) {
 		console.log(`erreur initializeChatEvents ${err}`);
 	}

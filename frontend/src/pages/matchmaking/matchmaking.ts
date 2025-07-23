@@ -290,7 +290,7 @@ export class matchmaking {
 				
 				window.history.pushState({}, '', '/login');
 				window.dispatchEvent(new Event('popstate'));
-				console.log("close websocket matchmaking")
+				console.log("close websocket matchmaking notlog")
 				this.ws.close();
 				break;
 			case 'pong':
@@ -349,7 +349,7 @@ export class matchmaking {
 			this.ws.send(JSON.stringify({
 				type: 'leave'
 			}));
-			console.log("close websocket la")
+			console.log("close websocket la matchmaking")
 			this.ws.close();
 		}
 		
