@@ -355,6 +355,7 @@ export class profil {
 				method: 'POST',
 				headers: {
 					'x-access-token': token,
+					'Content-Type': 'application/json',
 				},
 				body: JSON.stringify({
 					user_1: this.me.id,
@@ -428,6 +429,7 @@ export class profil {
 				method: 'POST',
 				headers: {
 					'x-access-token': token,
+					'Content-Type': 'application/json',
 				},
 				body: JSON.stringify({
 					userState: state
