@@ -3,6 +3,7 @@ import { getAuthToken } from '../../utils/auth.ts'
 import { addEvent } from '../../utils/eventManager.ts';
 import { t } from '../../utils/translations.ts'
 import { logStartGame } from "../gameUtils.ts";
+import { fetchUserInfo } from '../../pages/chat/utils'
 
 const PADDLE1_COLOR = '#84AD8A';
 const PADDLE2_COLOR = '#84A6AD';
@@ -26,7 +27,8 @@ export class Block1v1 {
 	private height: number;
 	private winner: string;
 	private status: boolean;
-	private username: string;
+	private name1: string;
+	private name2: string;
 	private brickHeight: number;
 	private brickWidth: number;
 	private ball1: Ball;
@@ -50,7 +52,6 @@ export class Block1v1 {
 		this.width = canvas.width;
 		this.height = canvas.height;
 		this.winner = "nobody";
-		this.username = "ko";
 		this.status = false;
 
 		this.brickWidth = 0;
@@ -69,8 +70,9 @@ export class Block1v1 {
 
 	public async asyncInit(): Promise<void> {
 		this.data = await this.loadInfo(this.uuid);
-        console.log("data dans asyncInit", this.data);
+        	console.log("data dans asyncInit", this.data);
 
+		this.getUsernames();
 		this.setupCanvas();
 		this.setupEventListeners();
 		logStartGame(this.data.id); // start ici
@@ -93,7 +95,19 @@ export class Block1v1 {
             let tmp = await this.retrieveGameInfo(uuid);
             
             return tmp;
-    }
+    	}
+
+	private async getUsernames(): Promise<void> {
+		const user1 = await fetchUserInfo(String(this.data.player1));
+		const user2 = await fetchUserInfo(String(this.data.player2));
+	
+		// fetchuserinfo renvoie toutes les infos du user
+	
+		if (user1)
+		    this.name1 = user1.username;
+		if (user2)
+		    this.name2 = user2.username;
+	}
 
 	private async retrieveGameInfo(uuid: string) {
 	
@@ -202,9 +216,9 @@ export class Block1v1 {
 		this.ctx.fillText(t('block.pressEnterToStart'), this.width / 2, this.height / 2 - 40);
 
 		this.ctx.fillStyle = PADDLE1_COLOR;
-		this.ctx.fillText(t('block.player1Controls'), this.width / 2, this.height / 2 + 40);
+		this.ctx.fillText(`${this.name1}: A/D KEYS`, this.width / 2, this.height / 2 + 40);
 		this.ctx.fillStyle = PADDLE2_COLOR;
-		this.ctx.fillText(t('block.player2Controls'), this.width / 2, this.height / 2 + 80);
+		this.ctx.fillText(`${this.name2}: ARROW KEYS`, this.width / 2, this.height / 2 + 80);
 		this.ctx.globalAlpha = 1;
 	}
 
@@ -294,12 +308,12 @@ export class Block1v1 {
 	private checkGameEnd(): boolean {
 		// Joueur 1 perd si balle 1 touche le bas
 		if (this.ball1.y + this.ball1.radius >= this.height) {
-			this.winner = "Player 2";
+			this.winner = this.name2;
 			return true;
 		}
 		// Joueur 2 perd si balle 2 touche le haut
 		if (this.ball2.y - this.ball2.radius <= 0) {
-			this.winner = "Player 3";
+			this.winner = this.name1;
 			return true;
 		}
 		return false;
@@ -358,11 +372,11 @@ export class Block1v1 {
 		this.ctx.fillStyle = '#1a1a2e';
 		this.ctx.fillRect(0, 0, this.width, this.height);
 		
+		this.drawPaddle(this.paddle1, PADDLE1_COLOR); // Paddle du bas
+		this.drawPaddle(this.paddle2, PADDLE2_COLOR); // Paddle du haut
 		// Dessiner les éléments
 		if (this.status) {
 			this.renderBricks();
-			this.drawPaddle(this.paddle1, PADDLE1_COLOR); // Paddle du bas
-			this.drawPaddle(this.paddle2, PADDLE2_COLOR); // Paddle du haut
 			this.drawBall(this.ball1, '#FF8600'); // Balle du bas
 			this.drawBall(this.ball2, '#FF6B6B'); // Balle du haut
 		}
