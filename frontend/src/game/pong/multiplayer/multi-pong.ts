@@ -62,6 +62,14 @@ export class MultiPong {
 
         this.paddles = this.initPlayers();
 
+        this.paddles[0].name = await this.getUsername(this.data.player1);
+        // faire un get usernamesddddddd
+        // for (let i = 0; i < 4; i++) {
+        //     const paddle = this.paddles[i];
+        //     if (paddle)
+        //         console.log(`'es usernames de tlmd: ${paddle.name}`)
+        // }
+
         this.ball = new Ball(this.height, this.width);
 
         this.setupCanvas();
@@ -73,6 +81,40 @@ export class MultiPong {
         window.addEventListener('resize', () => {
             this.setupCanvas();
         });
+    }
+
+    private async getUsername(playerId: number) {
+        const authToken = getAuthToken()
+		if (!authToken) {
+			alert('❌ Token d\'authentification manquant');
+			window.history.pushState({}, '', '/login');
+			window.dispatchEvent(new PopStateEvent('popstate'));
+			return;
+		}
+
+		const response = await fetch(`/api/games/getName`, {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+				'x-access-token': authToken
+				},
+            body: JSON.stringify({
+                userid: playerId
+            })
+		});
+
+        if (!response.ok) {
+			const errorData = await response.json();
+			throw new Error(errorData.details || "pblm recuperer username multipong");
+		}
+
+		const result = await response.json();
+
+        const name = result.username;
+
+        console.log(`j'ai recup le name : ${name}`);
+
+        return name;
     }
 
     private async loadInfo(uuid: string): Promise<any> {
