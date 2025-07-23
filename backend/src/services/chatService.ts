@@ -52,9 +52,10 @@ export class ChatService {
 			}
 			const chatHistory = await new Promise<any[]>((resolve, reject) => {
 				this.db.all(`
-					SELECT m.*, m.sender_username 
-					FROM messages m 
-					WHERE m.chat_id = ? 
+					SELECT m.*, u.username AS sender_username
+					FROM messages m
+					JOIN users u ON m.sender_id = u.id
+					WHERE m.chat_id = ?
 					ORDER BY m.created_at ASC`,
 					[chatId], (err: any, rows: any[]) => {
 						err ? reject(err) : resolve(rows || []);
@@ -78,21 +79,10 @@ export class ChatService {
 			if (!chatId)
 				throw new Error('Chat not found - users must be friends');
 
-			// On récupère le username du sender pour l'affichage
-			const senderUsername = await new Promise<string | null>((resolve, reject) => {
-				this.db.get(
-					'SELECT username FROM users WHERE id = ?',
-					[senderId],
-					(err: any, row: any) => {
-						err ? reject(err) : resolve(row ? row.username : null);
-					}
-				);
-			});
-
 			const result = await new Promise<any>((resolve, reject) => {
 				this.db.run(
-					'INSERT INTO messages (chat_id, sender_username, content) VALUES (?, ?, ?)',
-					[chatId, senderUsername, message],
+					'INSERT INTO messages (chat_id, sender_id, content) VALUES (?, ?, ?)',
+					[chatId, senderId, message],
 					function(this: any, err: any) {
 						err ? reject(err) : resolve(this);
 					}

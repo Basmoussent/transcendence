@@ -141,13 +141,31 @@ async function friendRoutes(app: FastifyInstance) {
 	app.get('/history', async function (request: FastifyRequest, reply: FastifyReply) {
 
 		try {
-			const { user1, user2 } = request.query as { user1?: string, user2?: string };
+			const { user2 } = request.query as { user2?: string };
+			const token = request.headers['x-access-token'] ? request.headers['x-access-token'] : request.cookies['x-access-token'];
 
-			if (!user1 || !user2)
-				return reply.status(400).send({ error: 'user1 and user2 are required' });
+			if (!token)
+				return reply.status(401).send({ error: 'Token d\'authentification manquant' });
 
-			const user = await app.userService.findByUsername(user2);
-			const history = await app.chatService.retrieveChatHistory(user1, user.id);
+			if (!user2)
+				return reply.status(400).send({ error: 'user2 is required' });
+
+			// Récupérer l'ID de l'utilisateur connecté depuis le token
+			const decoded = app.jwt.verify(token as string) as { user: string, name: string };
+			const user1Username = decoded.name;
+			console.log("user1Username", user1Username);
+			const user1data = await app.userService.findByUsername(user1Username);
+			
+			if (!user1data) {
+				return reply.status(404).send({ error: 'Utilisateur connecté non trouvé' });
+			}
+
+			const user2data = await app.userService.findByUsername(user2);
+			if (!user2data) {
+				return reply.status(404).send({ error: 'Utilisateur 2 non trouvé' });
+			}
+
+			const history = await app.chatService.retrieveChatHistory(user1data.id, user2data.id);
 			return reply.send(history);
 		}
 		catch (err: any) {
@@ -178,7 +196,7 @@ async function friendRoutes(app: FastifyInstance) {
 	app.post('/blockUser', async function (request: FastifyRequest, reply: FastifyReply) {
 
 		try {
-			const { angry, blocked } = request.query as { angry?: string; blocked?: string };
+			const { angry, blocked } = request.query as { angry?: number; blocked?: number };
 
 			if (!angry || !blocked)
 				return reply.status(400).send({ error: 'blocked et angry needed' });

@@ -3,12 +3,21 @@ import { sanitizeHtml } from '../../utils/sanitizer';
 import { t } from '../../utils/translations';
 import { profil } from './profil'
 
+// Stocker l'instance actuelle pour pouvoir la nettoyer
+let currentProfilInstance: profil | null = null;
+
 export async function renderProfil(uuid: string) {
 	return getTemplate(); // => retourne une string HTML
 }
 
 export async function initializeProfilEvents(uuid:string) {
 	try {
+		// Nettoyer l'instance précédente si elle existe
+		if (currentProfilInstance) {
+			currentProfilInstance.cleanup();
+			currentProfilInstance = null;
+		}
+
 		const me = await loadMe();
 		const user = await loadUserInfo(uuid);
 		console.log("online lq voir ", user)
@@ -33,10 +42,19 @@ export async function initializeProfilEvents(uuid:string) {
 
 		await new Promise(resolve => requestAnimationFrame(resolve));
  
-		new profil(data);
+		// Créer et stocker la nouvelle instance
+		currentProfilInstance = new profil(data);
 	}
 	catch (err) {
 		console.log(err);
+	}
+}
+
+// Fonction pour nettoyer l'instance actuelle (appelée lors de la navigation)
+export function cleanupProfilInstance() {
+	if (currentProfilInstance) {
+		currentProfilInstance.cleanup();
+		currentProfilInstance = null;
 	}
 }
 

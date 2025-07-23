@@ -74,8 +74,21 @@ export class FriendService {
 	async createRelation(user_1: string, user_2: string, user1_state: string, user2_state: string) {
 
 		try {
+			const existingRelation = await new Promise<Relation | null>((resolve, reject) => {
+				this.db.get(
+					'SELECT * FROM friends WHERE (user_1 = ? AND user_2 = ?) OR (user_1 = ? AND user_2 = ?) ',
+					[ user_1, user_2, user_2, user_1],
+					(err: any, row: Relation | undefined) => {
+					err ? reject(err) : resolve(row || null); }
+				);
+			});
+			
+			if (existingRelation) {
+				console.log(`Relation déjà existante entre ${user_1} et ${user_2} (ID: ${existingRelation.id})`);
+				return existingRelation; // Retourner la relation existante
+			}
 
-			console.log("444444444444")
+			console.log(`Création d'une nouvelle relation entre ${user_1} et ${user_2}`);
 			await new Promise<void>((resolve, reject) => {
 				this.db.run(
 					'INSERT INTO friends (user_1, user_2, user1_state, user2_state) VALUES (?, ?, ?, ?)',
@@ -84,10 +97,22 @@ export class FriendService {
 						err ? reject(err) : resolve(); }
 				);
 			});
-			console.log(`nouvelle relation entre ${user_1} et ${user_2}`)
+			
+			const newRelation = await new Promise<Relation | null>((resolve, reject) => {
+				this.db.get(
+					'SELECT * FROM friends WHERE (user_1 = ? AND user_2 = ?) OR (user_1 = ? AND user_2 = ?) ',
+					[ user_1, user_2, user_2, user_1],
+					(err: any, row: Relation | undefined) => {
+					err ? reject(err) : resolve(row || null); }
+				);
+			});
+			
+			console.log(`Nouvelle relation créée entre ${user_1} et ${user_2}`);
+			return newRelation;
 		}
 		catch (err: any) {
-			console.log(`fail de creer une relation `)
+			console.log(`Erreur lors de la création de la relation: ${err}`);
+			throw err; // Propager l'erreur pour la gestion en amont
 		}
 	}
 
@@ -141,7 +166,7 @@ export class FriendService {
 		}
 	}
 
-	async blockUser(angry: string, blocked: string) {
+	async blockUser(angry: number, blocked: number) {
 
 		try {
 			await new Promise<void>((resolve, reject) => {
