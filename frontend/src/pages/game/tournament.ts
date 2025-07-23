@@ -944,7 +944,8 @@ function generateQuarterFinals() {
   const playerCount = tournamentData.players.length;
   let matchCount = 0;
   let matchPrefix = 'qf';
-  
+  let players = [...tournamentData.players];
+
   if (playerCount <= 2) {
     matchCount = 1; // Final only
     matchPrefix = 'final';
@@ -952,35 +953,68 @@ function generateQuarterFinals() {
     matchCount = 2; // 2 semi-finals for 4 players
     matchPrefix = 'sf';
   } else {
-    matchCount = 4; // Quarter-finals
+    matchCount = Math.ceil(playerCount / 2); // Quarter-finals
     matchPrefix = 'qf';
   }
-  
+
   for (let i = 1; i <= matchCount; i++) {
     const matchDiv = document.createElement('div');
     matchDiv.className = 'match';
     matchDiv.setAttribute('data-match', matchPrefix + i);
-    
+
     const player1Num = (i - 1) * 2 + 1;
     const player2Num = (i - 1) * 2 + 2;
-    
-    matchDiv.innerHTML = 
+    const player1 = players[player1Num - 1];
+    const player2 = players[player2Num - 1];
+
+    let matchHTML =
       '<div class="match-players">' +
-        '<div class="player player-1" data-player="' + player1Num + '">' +
-          '<span class="player-name">Player ' + player1Num + '</span>' +
+        '<div class="player player-1' + (!player1 ? ' empty' : '') + '" data-player="' + player1Num + '">' +
+          '<span class="player-name">' + (player1 ? player1.displayName : 'Player ' + player1Num) + '</span>' +
           '<span class="player-score">0</span>' +
         '</div>' +
-        '<div class="vs">VS</div>' +
+        '<div class="vs">VS</div>';
+
+    if (player2) {
+      matchHTML +=
         '<div class="player player-2" data-player="' + player2Num + '">' +
-          '<span class="player-name">Player ' + player2Num + '</span>' +
+          '<span class="player-name">' + player2.displayName + '</span>' +
           '<span class="player-score">0</span>' +
-        '</div>' +
-      '</div>' +
-      '<button class="play-match-btn" onclick="playMatch(\'' + matchPrefix + i + '\')" disabled>' +
-        '<i class="fas fa-play"></i>' +
-        'Play Match' +
-      '</button>';
-    
+        '</div>';
+    } else {
+      matchHTML +=
+        '<div class="player player-2 empty" data-player="' + player2Num + '">' +
+          '<span class="player-name">(Qualified)</span>' +
+          '<span class="player-score">-</span>' +
+        '</div>';
+    }
+    matchHTML += '</div>';
+
+    // Si le match a deux joueurs, bouton Play Match, sinon qualification auto
+    if (player1 && player2) {
+      matchHTML +=
+        '<button class="play-match-btn" onclick="playMatch(\'' + matchPrefix + i + '\')" disabled>' +
+          '<i class="fas fa-play"></i>' +
+          'Play Match' +
+        '</button>';
+    } else if (player1 && !player2) {
+      // Qualification automatique pour player1
+      setTimeout(() => {
+        advanceWinner(matchPrefix + i, player1.displayName);
+        // Marquer visuellement la qualification
+        const match = document.querySelector('[data-match="' + matchPrefix + i + '"]');
+        if (match) {
+          const p1 = match.querySelector('.player-1');
+          if (p1) {
+            p1.classList.add('winner');
+            const scoreElement = p1.querySelector('.player-score');
+            if (scoreElement) scoreElement.textContent = 'Qualified';
+          }
+        }
+      }, 100); // Laisser le DOM se mettre à jour
+    }
+
+    matchDiv.innerHTML = matchHTML;
     qfMatchesContainer.appendChild(matchDiv);
   }
   
