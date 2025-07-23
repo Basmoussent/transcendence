@@ -22,7 +22,7 @@ def load_env_file(path):
 load_env_file('/tmp/vault.env')
 
 class VaultManager:
-    def __init__(self, vault_url: str = "http://vault:8200"):
+    def __init__(self, vault_url: str = "https://vault:8200"):
         self.vault_url = vault_url
         self.session = requests.Session()
         self.vault_process = None
@@ -33,7 +33,7 @@ class VaultManager:
         try:
             self.vault_process = subprocess.Popen([
                 "vault", "server", "-config=/vault/config/config.hcl"
-            ], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            ], stdout=subprocess.PIPE, stdout=subprocess.PIPE)
             print(f"Vault server started with PID: {self.vault_process.pid}")
             return True
         except Exception as e:
@@ -54,7 +54,7 @@ class VaultManager:
     def is_vault_running(self) -> bool:
         """Check if Vault is running and responding"""
         try:
-            response = self.session.get(f"{self.vault_url}/v1/sys/health", timeout=5)
+            response = self.session.get(f"{self.vault_url}/v1/sys/health", verify=False, timeout=5)
             return response.status_code in [200, 501, 503]
         except requests.exceptions.RequestException:
             return False
@@ -62,7 +62,7 @@ class VaultManager:
     def is_vault_initialized(self) -> bool:
         """Check if Vault is already initialized"""
         try:
-            response = self.session.get(f"{self.vault_url}/v1/sys/init")
+            response = self.session.get(f"{self.vault_url}/v1/sys/init", verify=False)
             if response.status_code == 200:
                 data = response.json()
                 return data.get('initialized', False)
@@ -73,7 +73,7 @@ class VaultManager:
     def is_vault_sealed(self) -> bool:
         """Check if Vault is sealed"""
         try:
-            response = self.session.get(f"{self.vault_url}/v1/sys/seal-status")
+            response = self.session.get(f"{self.vault_url}/v1/sys/seal-status", verify=False)
             if response.status_code == 200:
                 data = response.json()
                 return data.get('sealed', True)
@@ -87,7 +87,7 @@ class VaultManager:
             response = self.session.post(
                 f"{self.vault_url}/v1/sys/init",
                 json={"secret_shares": 1, "secret_threshold": 1},
-                timeout=30
+                timeout=30, verify=False
             )
             response.raise_for_status()
             return response.json()
@@ -102,7 +102,7 @@ class VaultManager:
             response = self.session.post(
                 f"{self.vault_url}/v1/sys/unseal",
                 json={"key": key},
-                timeout=30
+                timeout=30, verify=False
             )
             response.raise_for_status()
             return True
@@ -117,7 +117,7 @@ class VaultManager:
                 f"{self.vault_url}/v1/sys/mounts/secret",
                 headers={"X-Vault-Token": token},
                 json={"type": "kv", "options": {"version": "2"}},
-                timeout=30
+                timeout=30, verify=False
             )
             return response.status_code in [200, 204, 400]
         except requests.exceptions.RequestException as e:
@@ -132,7 +132,7 @@ class VaultManager:
                 f"{self.vault_url}/v1/secret/data/JWT",
                 headers={"X-Vault-Token": token},
                 json={"data": {"JWT_KEY": jwt_key}},
-                timeout=30
+                timeout=30, verify=False
             )
             response.raise_for_status()
             return True
@@ -148,7 +148,7 @@ class VaultManager:
                 f"{self.vault_url}/v1/secret/data/KEY",
                 headers={"X-Vault-Token": token},
                 json={"data": {"KEY_SECRET": jwt_key}},
-                timeout=30
+                timeout=30, verify=False
             )
             response.raise_for_status()
             return True

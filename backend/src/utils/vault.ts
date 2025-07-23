@@ -2,6 +2,7 @@ import * as dotenv from 'dotenv';
 import * as path from 'path';
 import * as fs from 'fs';
 
+
 const fileToCheck = '/tmp/vault.env';
 
 function waitForFileAndExecute(callback: (envPath: string) => void): void {
@@ -30,13 +31,13 @@ export async function getSecretFromVault(
 	key: string,
 	mountPoint = 'secret'
 ): Promise<string> {
-	const vaultUrl = process.env.VAULT_ADDR || 'http://vault:8200';
+	const vaultUrl = process.env.VAULT_ADDR || 'https://vault:8200';
 
 	// Attente que Vault soit unsealed
 	while (true) {
 		try {
 			const healthResp = await fetch(`${vaultUrl}/v1/sys/health`, {
-				method: 'GET'
+				method: 'GET',
 			});
 
 			if (!healthResp.ok) {

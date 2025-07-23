@@ -13,10 +13,10 @@ up:
 
 status:
 	@echo "\n\033[1;32m=== Services Status ===\033[0m"
-	@echo "\033[1;36mFrontend:\033[0m http://localhost:5173"
-	@echo "\033[1;36mBackend API:\033[0m http://localhost:8000"
-	@echo "\033[1;36mPrometheus:\033[0m http://localhost:9090"
-	@echo "\033[1;36mGrafana:\033[0m http://localhost:3001"
+	@echo "\033[1;36mFrontend:\033[0m https://localhost:2443"
+	@echo "\033[1;36mBackend API:\033[0m https://localhost:8000"
+	@echo "\033[1;36mPrometheus:\033[0m https://localhost:9090"
+	@echo "\033[1;36mGrafana:\033[0m https://localhost:3001"
 	@echo "\n\033[1;32m=== End of Status ===\033[0m\n"
 
 down:

@@ -114,6 +114,7 @@ export async function router() {
 			return;
 		}
 	};
+	
 
 	if (path === '/login' && token) {
 		window.history.pushState({}, '', '/main');
