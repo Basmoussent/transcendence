@@ -1,5 +1,5 @@
 import { t } from '../../utils/translations';
-import { getAuthToken } from '../../utils/auth';
+import { getAuthToken, setAuthToken } from '../../utils/auth';
 import { addEvent } from '../../utils/eventManager';
 
 export function renderEditProfil(): string {
@@ -7,32 +7,32 @@ export function renderEditProfil(): string {
 	<div class="login-container">
 		<main class="login-content">
 			<div class="login-form-container">
-				<h2>${t('profile.edit.title') || 'Modifier le profil'}</h2>
-				<form id="editProfilForm" class="login-form">
-					<div class="form-group">
-						<label for="username">${t('profile.edit.username') || 'Nom d\'utilisateur'}</label>
-						<input id="username" name="username" placeholder="${t('profile.edit.username') || 'Nom d\'utilisateur'}" required autocomplete="username">
-					</div>
-					<div class="form-group">
-						<label for="avatar">${t('profile.edit.avatar') || 'Avatar'}</label>
-						<div class="avatar-selection">
-							<div class="avatar-option custom-upload">
-								<input type="radio" id="customAvatar" name="avatar" value="custom">
-								<label for="customAvatar" class="custom-upload-label">
-									<div class="upload-icon">
-										<i class="fas fa-upload"></i>
-									</div>
-									<span class="upload-text">${t('social.upload')}</span>
-								</label>
-								<input type="file" id="customAvatarInput" accept="image/*" style="display: none;">
+						<h2>${t('profile.edit.title' as any) || 'Modifier le profil'}</h2>
+		<form id="editProfilForm" class="login-form">
+			<div class="form-group">
+				<label for="username">${t('profile.edit.username' as any) || 'Nom d\'utilisateur'}</label>
+				<input id="username" name="username" placeholder="${t('profile.edit.username' as any) || 'Nom d\'utilisateur'}" required autocomplete="username">
+			</div>
+			<div class="form-group">
+				<label for="avatar">${t('profile.edit.avatar' as any) || 'Avatar'}</label>
+				<div class="avatar-selection">
+					<div class="avatar-option custom-upload">
+						<input type="radio" id="customAvatar" name="avatar" value="custom">
+						<label for="customAvatar" class="custom-upload-label">
+							<div class="upload-icon">
+								<i class="fas fa-upload"></i>
 							</div>
-						</div>
+							<span class="upload-text">${t('social.upload' as any)}</span>
+						</label>
+						<input type="file" id="customAvatarInput" accept="image/*" style="display: none;">
 					</div>
-					<button type="submit" class="login-btn">${t('profile.edit.submit') || 'Enregistrer'}</button>
-				</form>
-				<div class="login-options">
-					<button id="backToProfileBtn" class="back-to-profile-btn">
-						${t('profile.edit.backToProfile') || 'Annuler'}
+				</div>
+			</div>
+			<button type="submit" class="login-btn">${t('profile.edit.submit' as any) || 'Enregistrer'}</button>
+		</form>
+		<div class="login-options">
+			<button id="backToProfileBtn" class="back-to-profile-btn">
+				${t('profile.edit.backToProfile' as any) || 'Annuler'}
 					</button>
 				</div>
 			</div>
@@ -153,13 +153,13 @@ function initializeEditProfileEvents() {
 
 			// Vérifier le type de fichier
 			if (!file.type.startsWith('image/')) {
-				alert('❌ ' + t('social.selectValidImage'));
+				alert('❌ ' + t('social.selectValidImage' as any));
 				return;
 			}
 
 			// Vérifier la taille (5MB max)
 			if (file.size > 5 * 1024 * 1024) {
-				alert('❌ ' + t('social.imageTooLarge'));
+				alert('❌ ' + t('social.imageTooLarge' as any));
 				return;
 			}
 
@@ -186,7 +186,10 @@ function initializeEditProfileEvents() {
 				const result = await response.json();
 				
 				if (response.ok) {
-					alert('✅ ' + t('social.avatarUploadSuccess'));
+					// Mettre à jour le token si un nouveau est fourni
+					
+					
+					alert('✅ ' + t('social.avatarUploadSuccess' as any));
 					// Rediriger vers la page de profil avec le router SPA
 					window.history.pushState({}, '', '/me');
 					window.dispatchEvent(new PopStateEvent('popstate'));
@@ -195,16 +198,18 @@ function initializeEditProfileEvents() {
 				}
 			} catch (err) {
 				console.error('Erreur lors de l\'upload:', err);
-				alert('❌ ' + t('social.avatarUploadError'));
+				alert('❌ ' + t('social.avatarUploadError' as any));
 			}
 		});
 
 		// Quand on clique sur l'option custom, déclencher l'input file
-		addEvent(customAvatarRadio, 'change', () => {
-			if (customAvatarRadio.checked) {
-				customAvatarInput.click();
-			}
-		});
+		if (customAvatarRadio) {
+			addEvent(customAvatarRadio as HTMLElement, 'change', () => {
+				if (customAvatarRadio.checked && customAvatarInput) {
+					customAvatarInput.click();
+				}
+			});
+		}
 	}
 
 	addEvent(editProfilForm, 'submit', async (e) => {
@@ -240,6 +245,17 @@ function initializeEditProfileEvents() {
 			if (!response.ok) {
 				alert(`❌ Erreur: ${result.error || 'Erreur inconnue'}`);
 			} else {
+				// Mettre à jour le token si un nouveau est fourni
+				const token = response.headers.get('x-access-token');
+				console.log("token", JSON.stringify(response.headers));
+				if (token) {
+					console.log('🎫 Token reçu dans le header');
+					setAuthToken(token);
+					console.log(`le token des familles `, token)
+				}
+				else
+					console.log('Token attendu dans les cookies');
+				
 				alert('✅ Profil modifié avec succès');
 				window.history.pushState({}, '', '/me');
 				window.dispatchEvent(new PopStateEvent('popstate'));

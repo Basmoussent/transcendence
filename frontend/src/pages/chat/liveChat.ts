@@ -95,6 +95,17 @@ export class Chat {
 		await loadMe(this);
 	}
 
+	// Méthode pour recharger les informations utilisateur (utile après changement de pseudo)
+	public async reloadUserInfo() {
+		await this.loadMe();
+		// Mettre à jour l'interface si un chat est ouvert
+		if (this.receiver) {
+			await this.loadChatHistoryFromAPI(this.receiver);
+		}
+		// Mettre à jour la liste des amis
+		await this.updateFriendAndRequest();
+	}
+
 	private getElement(id: string): HTMLElement {
 		const el = document.getElementById(id);
 		if (!el)
@@ -426,8 +437,8 @@ export class Chat {
 
 	private async loadChatHistoryFromAPI(friendUsername: string) {
 		try {
-			// TODO: protect sql injection
-			const response = await fetch(`/api/friend/history?user1=${this.me.username}&user2=${friendUsername}`, {
+			// L'API utilise maintenant le token pour identifier l'utilisateur connecté
+			const response = await fetch(`/api/friend/history?user2=${friendUsername}`, {
 				method: 'GET',
 				headers: {
 					'Content-Type': 'application/json',

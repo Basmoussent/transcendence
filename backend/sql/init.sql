@@ -65,7 +65,8 @@ CREATE TABLE IF NOT EXISTS chat_history (
 CREATE TABLE IF NOT EXISTS messages (
 	id INTEGER PRIMARY KEY AUTOINCREMENT,
 	chat_id INTEGER REFERENCES chat_history(chat_id),
-	sender_username VARCHAR REFERENCES users(username),
+	-- sender_username VARCHAR REFERENCES users(username),
+	sender_id INTEGER REFERENCES users(id),
 	content TEXT NOT NULL,
 	created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );

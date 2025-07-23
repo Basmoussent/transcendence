@@ -96,7 +96,7 @@ async function handleMessage(message: string, user: UserChat, app: FastifyInstan
 				console.log('je disconnect le user')
 				break;
 			case 'ping':
-				sender.socket.send(JSON.stringify({
+				user.socket.send(JSON.stringify({
 					type: 'pong'
 				}));
 				break;
