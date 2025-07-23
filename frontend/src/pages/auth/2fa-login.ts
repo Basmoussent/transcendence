@@ -1,4 +1,4 @@
-import { getAuthToken } from '../../utils/auth';
+import { getAuthToken, setAuthToken } from '../../utils/auth';
 import { fetchMe2fa } from '../social/utils';
 import { addEvent } from '../../utils/eventManager';
 import { t } from '../../utils/translations';
@@ -245,7 +245,7 @@ export function render2FALogin() {
           if (checkCode.checkCode) {
             const token = responseCode.headers.get("x-access-token");
 
-            sessionStorage.setItem("x-access-token", token!);
+            setAuthToken(token!);
             window.history.pushState({}, '', '/main');
             window.dispatchEvent(new PopStateEvent('popstate'));
           }

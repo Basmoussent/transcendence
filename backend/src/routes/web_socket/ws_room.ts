@@ -116,7 +116,7 @@ export async function handleRoom(app: FastifyInstance, socket: WebSocket, req: F
 
 
 		console.log("req.cookies", req.cookies);
-		const token =  req.cookies['x-access-token'];
+		const token = req.cookies['x-access-token'];
 		console.log("token is ", token);
 			
 		if (!token) {
@@ -128,6 +128,7 @@ export async function handleRoom(app: FastifyInstance, socket: WebSocket, req: F
 		}
 
 		const decoded = app.jwt.verify(token as string) as { user: string; name: string };
+
 		const username = decoded.name;
 
 		const tmp = await app.userService.findByUsername(username);

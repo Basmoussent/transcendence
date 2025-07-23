@@ -72,11 +72,13 @@ export class Room {
 		this.maxPlayersSelect = this.getElement('maxPlayersSelect') as HTMLSelectElement;
 
 		this.token = getAuthToken();
-		console.log('token:', this.token);
 		this.setupPing();
 		this.chatInput.focus();
 		this.setupWsEvents();
+
 		this.setupClickEvents();
+
+		console.log('qwdjioqwdjioqwdjio       token:', this.token);
 
 	}
 
@@ -249,11 +251,6 @@ export class Room {
 		this.ws.close();
 		window.history.pushState({}, '', '/main');
 		window.dispatchEvent(new Event('popstate'));
-	}
-
-	private invite() {
-		console.log('doanzdoinazoidnao')
-		// 
 	}
 
 	private setMaxPlayersSelect(max: number) {
