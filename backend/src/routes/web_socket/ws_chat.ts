@@ -59,10 +59,6 @@ export async function handleChat(app: FastifyInstance, socket: WebSocket, req: F
 			handleMessage(message, user, app);
 		});
 
-		window.addEventListener("load", (event) => {
-			console.log("pro pro pro");
-		});
-
 		socket.on('close', () => {
 			live.delete(user.id);
 		});

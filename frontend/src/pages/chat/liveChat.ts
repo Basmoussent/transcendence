@@ -188,10 +188,6 @@ export class Chat {
 			window.dispatchEvent(new Event('popstate'));
 		});
 
-		window.addEventListener("load", (event) => {
-			console.log("pro pro pro");
-		});
-
 		// Gestion du bouton d'invitation à un jeu
 		const inviteBtn = document.getElementById('inviteGameBtn');
 		const inviteMenu = document.getElementById('inviteGameMenu');
