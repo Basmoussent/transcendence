@@ -213,8 +213,22 @@ function initializeEditProfileEvents() {
 
 	editProfilForm?.addEventListener('submit', async (e) => {
 		e.preventDefault();
+
+		const token = getAuthToken() || "";
+		const response = await fetch('/api/me', {
+			method: 'GET',
+			headers: {
+				'Content-Type': 'application/json',
+				'x-access-token': token }
+		});
+
+		let avatar = "avatar.png";
+		if (response.ok) {
+			const result = await response.json();
+			avatar = result.user?.avatar_url;
+		}
 		const username = (document.getElementById('username') as HTMLInputElement).value;
-		const selectedAvatar = (document.querySelector('input[name="avatar"]:checked') as HTMLInputElement)?.value || 'avatar.png';
+		const selectedAvatar = (document.querySelector('input[name="avatar"]:checked') as HTMLInputElement)?.value || avatar;
 		
 		if (selectedAvatar === 'custom') {
 			return;
