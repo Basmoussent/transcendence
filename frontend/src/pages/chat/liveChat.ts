@@ -199,6 +199,12 @@ export class Chat {
 			window.dispatchEvent(new Event('popstate'));
 		});
 
+		this.chatHeader.addEventListener('click', () => {
+			const name = this.getElement("friendName").innerText;
+			window.history.pushState({}, '', `/profil/${name}`);
+			window.dispatchEvent(new Event('popstate'));
+		});
+
 		// Gestion du bouton d'invitation à un jeu
 		const inviteBtn = document.getElementById('inviteGameBtn');
 		const inviteMenu = document.getElementById('inviteGameMenu');
@@ -402,17 +408,6 @@ export class Chat {
 		this.updateFriendAndRequest()
 	}
 
-	private async playGame(game_type: string) {
-		const game = {
-			game_type: game_type,
-			player1: this.me.username,
-			users_needed: 2
-		}
-		const uuid = await postGame(game);
-		window.history.pushState({}, '', `/room/${uuid}`);
-		window.dispatchEvent(new PopStateEvent('popstate'));
-	}
-
 	private startChatWith(relationId: number, user: UserChat) {
 		
 		this.receiver = user.username;
@@ -426,7 +421,7 @@ export class Chat {
 			<div class="status-dot online"></div>
 		</div>
 		<div class="chat-header-info">
-			<h3>${sanitizeHtml(user.username)}</h3>
+			<h3 id="friendName">${sanitizeHtml(user.username)}</h3>
 			<p>${t('chat.online' as any)}</p>
 		</div>
 		`;
