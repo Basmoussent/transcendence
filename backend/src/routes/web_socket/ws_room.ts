@@ -60,6 +60,8 @@ async function broadcastRoomUpdate(app: FastifyInstance, room: Room) {
 		}
 	}
 
+	console.log(`les users et leur stats${JSON.stringify(usersWithStats, null, 8)}`);
+
 	const averageWinrate = playerCount > 0 ? Math.round(totalWinrate / playerCount) : 0;
 
 	const stateToSend = {
@@ -72,6 +74,8 @@ async function broadcastRoomUpdate(app: FastifyInstance, room: Room) {
 		ai: room.ai,
 		averageWinrate: averageWinrate
 	};
+
+	await app.roomService.updateGame(room);
 
 	const message = JSON.stringify({
 		type: 'room_update',
@@ -87,7 +91,6 @@ async function broadcastRoomUpdate(app: FastifyInstance, room: Room) {
 
 	await broadcastMatchmakingWithWinrates(app, updateMessage);
 
-	await app.roomService.updateGame(room);
 
 }
 
@@ -155,7 +158,7 @@ export async function handleRoom(app: FastifyInstance, socket: WebSocket, req: F
 			rooms.set(uuid!, room);
 		}
 
-		const user = {
+		const user: User = {
 			username: username,
 			id: userid,
 			isReady: false,
@@ -163,8 +166,11 @@ export async function handleRoom(app: FastifyInstance, socket: WebSocket, req: F
 		};
 
 
-		console.log("ce que je cherche");
-		console.log(user);
+
+		console.log(`le user.username ${user.username}`)
+		console.log(`le user.id ${user.id}`)
+
+
 
 
 
@@ -173,9 +179,10 @@ export async function handleRoom(app: FastifyInstance, socket: WebSocket, req: F
 
 		room.users.set(user.id, user);
 
-		
-
 		broadcastSystemMessage(room, `${username} has joined the room.`);
+
+
+		console.log(`la room ressemble a ca ${JSON.stringify({ ...room, users: Object.fromEntries(room.users) }, (key, value) => key === 'socket' ? undefined : value, 8)}`);
 
 		
 		await broadcastRoomUpdate(app, room);

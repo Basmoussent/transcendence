@@ -32,17 +32,13 @@ export class RoomService {
 			fieldsToUpdate.push("game_type = ?");
 			values.push(data.gameType);
 
-			// console.log("ce que je cherche");
-			// console.log(JSON.stringify(data.users, null, 8));
-
 			const users = Array.from((data.users as any).values());
 			
 			for (let i = 0; i < 4; i++) {
 
 				if (users[i]) {
-					console.log("il y a un joueur");
 					fieldsToUpdate.push(`player${i + 1} = ?`);
-					values.push((users[i] as any).userid);
+					values.push((users[i] as any).id);
 				}
 				else {
 					fieldsToUpdate.push(`player${i + 1} = ?`);
@@ -50,11 +46,12 @@ export class RoomService {
 				}
 			}
 
-			fieldsToUpdate.push("users_needed = ?");
 			values.push(data.maxPlayers);
-
-			fieldsToUpdate.push("ai = ?");
 			values.push(data.ai);
+
+
+			console.log(`la requete sql ::::: UPDATE games SET ${fieldsToUpdate.join(", ")}`)
+			console.log(`les values dans l'ordre ${values}`)
 
 			const sql = `UPDATE games SET ${fieldsToUpdate.join(", ")} WHERE uuid = ?`;
 			values.push(data.id);

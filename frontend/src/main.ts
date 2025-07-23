@@ -19,7 +19,8 @@ function init() {
 	});
 	
 	// Appeler le router au chargement initial de la page
-	router();
+	// pour quoi faire zig new
+	// router();
 }
 
 init();
