@@ -70,19 +70,3 @@ CREATE TABLE IF NOT EXISTS messages (
 	content TEXT NOT NULL,
 	created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
-
-CREATE TABLE IF NOT EXISTS statistics (
-	username VARCHAR UNIQUE REFERENCES users(username) ON DELETE CASCADE,
-	mmr INTEGER DEFAULT 800,
-	pong_games INTEGER DEFAULT 0,
-	pong_wins INTEGER DEFAULT 0,
-	block_games INTEGER DEFAULT 0,
-	block_wins INTEGER DEFAULT 0,
-	rating INTEGER
-)
-
--- CREATE TABLE IF NOT EXISTS tournaments (
---   tournaments_id INTEGER PRIMARY KEY AUTOINCREMENT,
---   player_ids VARCHAR NOT NULL,
---   state INTEGER DEFAULT 0
--- )

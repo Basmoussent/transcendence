@@ -19,16 +19,6 @@ export async function insert_tmp_user(app: FastifyInstance) {
 		);
 
 		stmt.run('talan', 'talan@test.com', password_hash, secret_key);
-
-		const stmt2 = db.getDatabase().prepare(
-			`INSERT INTO statistics (username)
-			VALUES (?) ON CONFLICT(username) DO NOTHING`
-		);
-
-		stmt2.run('talan');
-
-		
-
 	} catch (err: any) {
 		console.error('❌ Error inserting user:', err);
 	}
@@ -42,16 +32,6 @@ export async function insert_tmp_user(app: FastifyInstance) {
 		);
 
 		stmt.run('basem', 'basem@test.com', password_hash, secret_key);
-
-		const stmt2 = db.getDatabase().prepare(
-			`INSERT INTO statistics (username)
-			VALUES (?) ON CONFLICT(username) DO NOTHING`
-		);
-
-		stmt2.run('basem');
-
-		
-
 	} catch (err: any) {
 		console.error('❌ Error inserting user:', err);
 	}
@@ -65,16 +45,6 @@ export async function insert_tmp_user(app: FastifyInstance) {
 		);
 
 		stmt.run('ines', 'ines@test.com', password_hash, secret_key);
-
-		const stmt2 = db.getDatabase().prepare(
-			`INSERT INTO statistics (username)
-			VALUES (?) ON CONFLICT(username) DO NOTHING`
-		);
-
-		stmt2.run('ines');
-
-		
-
 	} catch (err: any) {
 		console.error('❌ Error inserting user:', err);
 	}
@@ -88,16 +58,6 @@ export async function insert_tmp_user(app: FastifyInstance) {
 		);
 
 		stmt.run('polo', 'polo@test.com', password_hash, secret_key);
-
-		const stmt2 = db.getDatabase().prepare(
-			`INSERT INTO statistics (username)
-			VALUES (?) ON CONFLICT(username) DO NOTHING`
-		);
-
-		stmt2.run('polo');
-
-		
-
 	} catch (err: any) {
 		console.error('❌ Error inserting user:', err);
 	}
@@ -112,16 +72,6 @@ export async function insert_tmp_user(app: FastifyInstance) {
 		);
 
 		stmt.run('polo2', 'polo2@test.com', password_hash, secret_key);
-
-		const stmt2 = db.getDatabase().prepare(
-			`INSERT INTO statistics (username)
-			VALUES (?) ON CONFLICT(username) DO NOTHING`
-		);
-
-		stmt2.run('polo2');
-
-		
-
 	} catch (err: any) {
 		console.error('❌ Error inserting user:', err);
 	}

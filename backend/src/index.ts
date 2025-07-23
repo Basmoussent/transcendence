@@ -70,7 +70,6 @@ async function setup() {
 	console.log('🔑 Getting JWT secret from Vault...');
 	const jwtSecret = await getSecretFromVault("JWT", "JWT_KEY") || "secret";
 	const jwtSecret2 = await getSecretFromVault("KEY", "KEY_SECRET") || "key_secret";
-	console.log(`JWT = ${jwtSecret} -  KEY_SECRET = ${jwtSecret2} `)
 	console.log('🔑 Registering JWT plugins...');
 	
 	await fastify.register(jwt, {

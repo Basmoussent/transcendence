@@ -165,7 +165,6 @@ class VaultManager:
             dotenv.load_dotenv("/tmp/vault.env")
             JWT = os.getenv('VAULT_JWT_KEY')
             if JWT:
-                print("Utilisation du secret JWT existant :", JWT)
                 return JWT
             else:
                 alphabet = string.ascii_letters + string.digits
@@ -183,7 +182,6 @@ class VaultManager:
             dotenv.load_dotenv("/tmp/vault.env")
             KEY = os.getenv('KEY_SECRET')
             if KEY:
-                print("Utilisation du secret KEY_SECRET existant :", KEY)
                 return KEY
             else:
                 alphabet = string.ascii_letters + string.digits
