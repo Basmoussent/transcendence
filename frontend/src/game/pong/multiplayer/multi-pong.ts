@@ -63,10 +63,12 @@ export class MultiPong {
 
         this.paddles = this.initPlayers();
 
-        // this.paddles[0].name = await this.getUsername(this.data.player1);
-        const user = await fetchUserInfo(String(this.data.player1));
+        const user1 = await fetchUserInfo(String(this.data.player1));
+        const user2 = await fetchUserInfo(String(this.data.player2));
+        const user3 = await fetchUserInfo(String(this.data.player3));
+        const user4 = await fetchUserInfo(String(this.data.player4));
 
-        //fetchuserinfo renvoie toutes les infos du user
+        // fetchuserinfo renvoie toutes les infos du user
 
         if (user == null)
             console.error("les pblms");
@@ -75,12 +77,6 @@ export class MultiPong {
 
         console.log("le name est ttttttttttt         ", this.paddles[0].name)
 
-        // faire un get usernamesddddddd
-        // for (let i = 0; i < 4; i++) {
-        //     const paddle = this.paddles[i];
-        //     if (paddle)
-        //         console.log(`'es usernames de tlmd: ${paddle.name}`)
-        // }
 
         this.ball = new Ball(this.height, this.width);
 
