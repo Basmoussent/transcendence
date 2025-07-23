@@ -70,12 +70,21 @@ export class MultiPong {
 
         // fetchuserinfo renvoie toutes les infos du user
 
-        if (user == null)
-            console.error("les pblms");
+        if (user1)
+            this.paddles[0].name = user1.username;
+        if (user2)
+            this.paddles[1].name = user2.username;
+        if (user3 && this.paddles[2])
+            this.paddles[2].name = user3.username;
+        if (user4 && this.paddles[3])
+            this.paddles[3].name = user4.username;
 
-        this.paddles[0].name = user.username;
-
-        console.log("le name est ttttttttttt         ", this.paddles[0].name)
+        console.log("le name de player1 est = ", this.paddles[0].name)
+        console.log("le name de player2 est = ", this.paddles[1].name)
+        if (this.paddles[2])
+            console.log("le name de player3 est = ", this.paddles[2].name)
+        if (this.paddles[3])
+            console.log("le name de player4 est = ", this.paddles[3].name)
 
 
         this.ball = new Ball(this.height, this.width);
