@@ -205,7 +205,8 @@ async function authRoutes(app: FastifyInstance) {
 								user: {
 									id: user.id,
 									username: user.username,
-									email: user.email
+									email: user.email,
+									language: user.language
 								}
 							}))
 							return;
@@ -223,7 +224,8 @@ async function authRoutes(app: FastifyInstance) {
 								user: {
 									id: user.id,
 									username: user.username,
-									email: user.email
+									email: user.email,
+									language: user.language
 								}
 							}));
 						}
