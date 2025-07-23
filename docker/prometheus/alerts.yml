@@ -1,0 +1,34 @@
+groups:
+  - name: alert-backend
+    rules:
+      - alert: BackendDown
+        expr: up{job="backend"} == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Backend is down"
+          description: "Backend is not responding for more than 1 minute."
+
+  - name: alert-frontend
+    rules:
+      - alert: FrontendDown
+        expr: up{job="frontend"} == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Frontend is down"
+          description: "Frontend is not responding for more than 1 minute."
+
+  - name: alert-node-exporter
+    rules:
+      - alert: NodeExporterDown
+        expr: up{job="node-exporter"} == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Node exporter is down"
+          description: "Node exporter is not responding for more than 1 minute."
+  
