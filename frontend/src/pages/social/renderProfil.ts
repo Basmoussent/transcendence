@@ -839,6 +839,7 @@ async function loadMe() {
 			const userData = {
 				username: sanitizeHtml(result.user?.username),
 				email: sanitizeHtml(result.user?.email),
+				id: result.user.id,
 			};
 			return userData;
 		} else {

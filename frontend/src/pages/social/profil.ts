@@ -338,6 +338,7 @@ export class profil {
 	}
 
 	private async createFriendRequest() {
+
 		try {
 			const token = getAuthToken();
 			if (!token) {
@@ -347,14 +348,17 @@ export class profil {
 				return;
 			}
 
+			console.log("les infos lq teqm")
+			console.log(this.me.id, " ", this.user.id, " ", 'waiting', " ", 'requested');
+			
 			await fetch(`/api/friend`, {
 				method: 'POST',
 				headers: {
 					'x-access-token': token,
 				},
 				body: JSON.stringify({
-					user_1: this.me.username,
-					user_2: this.user.username,
+					user_1: this.me.id,
+					user_2: this.user.id,
 					user1_state: 'waiting',
 					user2_state: 'requested',
 				})

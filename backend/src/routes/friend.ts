@@ -54,10 +54,13 @@ async function friendRoutes(app: FastifyInstance) {
 		}
 	});
 
-	app.post('/', async function (request: FastifyRequest<{ Body: Relation }>, reply: FastifyReply) {
+	app.post('/', async function (request: FastifyRequest, reply: FastifyReply) {
 
 		try {
-			const { user_1, user_2, user1_state, user2_state } = request.body;
+			const { user_1, user_2, user1_state, user2_state } = request.body as { user_1?: number, user_2?: number, user1_state?: string, user2_state?: string };
+
+			console.log("aozdnaiuzndiauzndiazndiuazdiuandi")
+			console.log(user_1, " ", user_2, " ", user1_state, " ", user2_state);
 
 			if (!user_1 || !user_2 || !user1_state || !user2_state)
 				throw new Error("missing fields for a new friendship");

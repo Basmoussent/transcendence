@@ -239,8 +239,6 @@ export class matchmaking {
 				users_needed: 2
 			}
 
-			console.log("daoizndoaizndoaizndoaindoaizndoianzdoiazndoaznodiazn")
-
 			console.log(JSON.stringify(tmp, null, 8))
 
 			var uuid = await postGame(tmp);
