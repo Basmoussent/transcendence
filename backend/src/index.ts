@@ -12,6 +12,7 @@ import { FriendService } from './services/friendService';
 import { GameService } from './services/gameService';
 import { RoomService } from './services/roomService';
 import { ChatService } from './services/chatService';
+import  { insert_tmp_user } from './insert_tmp_user';
 import authRoutes from "./routes/authentication"
 import gameRoutes from './routes/game';
 import editRoutes from './routes/reset-pwd';
@@ -138,6 +139,8 @@ async function setup() {
 	fastify.get('/ping', async () => {
 		return { message: 'pong' };
 	});
+
+	await insert_tmp_user(fastify);
 
 	// Database health check
 	fastify.get('/health/db', async () => {

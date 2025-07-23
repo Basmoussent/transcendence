@@ -83,7 +83,8 @@ export class Room {
 	private setupPing() {
 		setInterval(() => {
 			this.ws.send(JSON.stringify({
-				type: 'ping'
+				type: 'ping',
+				token: this.token
 			}));
 		}, 10000);
 	}

@@ -35,7 +35,9 @@ export class RoomService {
 			const users = Array.from((data.users as any).values());
 			
 			for (let i = 0; i < 4; i++) {
+
 				if (users[i]) {
+					console.log("il y a un joueur");
 					fieldsToUpdate.push(`player${i + 1} = ?`);
 					values.push((users[i] as any).userid);
 				}
