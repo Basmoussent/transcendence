@@ -357,7 +357,7 @@ export class Chat {
 						</div>
 					`;
 				this.friendsList.appendChild(conversationElement);
-				conversationElement.addEventListener('click', () => this.startChatWith(relation.id, friend));
+				conversationElement.addEventListener('click', () => this.startChatWith(friend));
 			}
 			else if ((relation.user_1 == String(this.me.id) && relation.user2_state === 'waiting') ||
 				(relation.user_2 == String(this.me.id) && relation.user1_state === 'waiting')) {

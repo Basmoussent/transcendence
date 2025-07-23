@@ -82,7 +82,7 @@ export function handleAlive(connection: WebSocket, req: FastifyRequest, app: Fas
 		}
 	});
 
-	connection.on('error', async (error) => {
+	connection.on('error', async (error: any) => {
 		console.error('❌ WebSocket error:', error);
 		if (userId) {
 			await redis.del(`${userId}:online`);
