@@ -120,7 +120,7 @@ async function friendRoutes(app: FastifyInstance) {
 	app.post('/relation', async function (request: FastifyRequest, reply: FastifyReply) {
 
 		try {
-			const { user1, user2,} = request.body as { user1?: string, user2?: string };
+			const { user1, user2,} = request.body as { user1?: number, user2?: number };
 
 			if (!user1 || !user2)
 				throw new Error("missing fields pour rechercher la relation");

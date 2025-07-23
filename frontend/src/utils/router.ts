@@ -57,21 +57,31 @@ export async function router() {
 
 		if (path.startsWith('/profil')) {
 
-			const flag = await userExists(uuid, token);
+			const profiluser = await userExists(uuid, token);
 
-			if (!flag) {
+			if (profiluser == null) {
 				window.history.pushState({}, '', '/main');
 				window.dispatchEvent(new PopStateEvent('popstate'));
 				return; 
 			}
 
-			const me = await notMe(uuid, token);
+			const me = await fetchMe(token);
 
-			if (me) {
+			if (me.username == profiluser.username) {
 				window.history.pushState({}, '', '/me');
 				window.dispatchEvent(new PopStateEvent('popstate'));
 				return; 
 			}
+
+			const blocked = await checkThatImNotBlocked(me.id, profiluser.id, token);
+
+			if (blocked) {
+				window.history.pushState({}, '', '/main');
+				window.dispatchEvent(new PopStateEvent('popstate'));
+				return; 
+			}
+
+			
 
 			/// pas pouvoir aller sur le profil des gens qui nous bloquent
 		}
@@ -237,9 +247,7 @@ async function userExists(username: string, token: any) {
 		if (response.ok) {
 			const result = await response.json();
 
-			if (result.data === null)
-				return false
-			return true
+			return result.data
 		}
 	}
 	catch (err) {
@@ -248,7 +256,7 @@ async function userExists(username: string, token: any) {
 
 }
 
-async function notMe(username: string, token: any) {
+async function fetchMe(token: any) {
 
 	try {
 		const response = await fetch(`/api/me`, {
@@ -261,24 +269,12 @@ async function notMe(username: string, token: any) {
 		if (response.ok) {
 			const result = await response.json();
 
-			console.log(JSON.stringify(result, null, 8))
-
-
-
-			console.log("oazndoinazodnao ", result.user.username)
-			
-			if (result.user.username == username) {
-				
-				console.log("debugggggg   ", result.user.username)
-				return true
-			}
-			return false
+			return result.user
 		}
 	}
 	catch (err) {
 		console.error("atttention a l'erreur dans userExists");
 	}
-
 }
 
 async function gameExists(uuid: string, token: any) {
@@ -302,5 +298,40 @@ async function gameExists(uuid: string, token: any) {
 	catch (err) {
 		console.error("atttention a l'erreur dans userExists");
 	}
+}
 
+async function checkThatImNotBlocked(myid: number, profilid: number, token: any) {
+
+	try {
+
+		console.log(myid, " ------- ", profilid)
+		const response = await fetch('/api/friend/relation', {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+				'x-access-token': token},
+			body: JSON.stringify({
+				user1: myid,
+				user2: profilid,
+			})
+		}) 
+
+		if (response.ok) {
+
+			
+			const relation = await response.json();
+
+			if (relation == null)
+				return false
+
+			if ((relation.user_1 == profilid && relation.user1_state == 'angry') || (relation.user_2 == profilid && relation.user2_state == 'angry'))
+				return true;
+			return false;
+		}
+		else 
+			console.error("attention erreur dans checkThatImNotBlocked");
+	}
+	catch (err) {
+		console.error("attention erreur dans checkThatImNotBlocked")
+	}
 }

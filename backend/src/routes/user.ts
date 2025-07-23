@@ -310,7 +310,6 @@ async function userRoutes(app: FastifyInstance) {
 	app.get('/user/username/:username', async function (request: FastifyRequest, reply: FastifyReply) {
 
 		try {
-			const database = db.getDatabase();
 
 			const { username } = request.query as { username?: string };
 
@@ -319,7 +318,6 @@ async function userRoutes(app: FastifyInstance) {
 
 			const user = await app.userService.findByUsername(username);
 			const isOnline = await app.userService.isOnline(user.id);
-			console.log("userççççççççç :", user);
 
 			return reply.send({
 				message: `info du user ${username}`,
