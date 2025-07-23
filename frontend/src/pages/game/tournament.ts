@@ -11,7 +11,7 @@ export function renderTournaments() {
   <div class="tournaments-header">
     <button class="home-button" id="homeBtn" onclick="returnHome()">
         <i class="fas fa-home"></i>
-         ${t('social.home')}
+         ${t('social.home' as any)}
     </button>
     <h1 class="tournaments-title">
       <i class="fas fa-trophy"></i>
@@ -1304,22 +1304,35 @@ document.addEventListener('input', function(event: Event) {
   }
   const match = document.querySelector('[data-match="' + matchId + '"]');
   const players = match!.querySelectorAll('.player');
-  const p1 = players[0].querySelector('.player-name')?.textContent;
-  const p2 = players[1].querySelector('.player-name')?.textContent;
+  
+  // Récupérer les usernames réels au lieu des displayNames
+  const p1DisplayName = players[0].querySelector('.player-name')?.textContent;
+  const p2DisplayName = players[1].querySelector('.player-name')?.textContent;
+  
+  // Trouver les usernames correspondants dans tournamentData.players
+  const p1Data = tournamentData.players.find(p => p.displayName === p1DisplayName);
+  const p2Data = tournamentData.players.find(p => p.displayName === p2DisplayName);
+  
+  const p1Username = p1Data?.username || p1DisplayName || 'Player1';
+  const p2Username = p2Data?.username || p2DisplayName || 'Player2';
+  
   const game = new Pong(canvas);
   if (canvas) {
     canvas.classList.add('active');
   }
-  game.init(p1!, p2!);
-  document?.activeElement?.blur();
-  console.log("game.paddles[0].name :", p1, "game.paddles[1].name :", p2);
+  // Passer les usernames au jeu au lieu des displayNames
+  game.init(p1Username, p2Username);
+  if (document.activeElement instanceof HTMLElement) {
+    document.activeElement.blur();
+  }
+  console.log("game.paddles[0].name :", p1Username, "game.paddles[1].name :", p2Username);
   
   const checkGameEnd = () => {
-    if (game.end) {
-      const p1 = game.paddles[0];
-      const p2 = game.paddles[1];
-      const winner = p1.score > p2.score ? p1.name : p2.name;
-      console.log("p1 :", p1.name, "p2 :", p2.name, "winner :", winner);
+    if ((game as any).end) {
+      const p1 = (game as any).paddles[0];
+      const p2 = (game as any).paddles[1];
+      const winnerUsername = p1.score > p2.score ? p1.name : p2.name;
+      console.log("p1 :", p1.name, "p2 :", p2.name, "winner :", winnerUsername);
       const match = document.querySelector('[data-match="' + matchId + '"]');
       if (match) {
         console.log("match found");
@@ -1338,9 +1351,13 @@ document.addEventListener('input', function(event: Event) {
             scoreElement.textContent = Math.max(p1.score, p2.score).toString();
           }
           
+          // Trouver le displayName correspondant au username gagnant
+          const winnerData = tournamentData.players.find(p => p.username === winnerUsername);
+          const winnerDisplayName = winnerData?.displayName || winnerUsername;
+          
           const winnerNameElement = winnerElement.querySelector('.player-name');
-          if (winnerNameElement && winner) {
-            advanceWinner(matchId, winner);
+          if (winnerNameElement && winnerDisplayName) {
+            advanceWinner(matchId, winnerDisplayName);
           }
         }
 

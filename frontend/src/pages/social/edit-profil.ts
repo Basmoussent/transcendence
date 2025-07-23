@@ -11,7 +11,7 @@ export function renderEditProfil(): string {
 				<form id="editProfilForm" class="login-form">
 					<div class="form-group">
 						<label for="username">${t('profile.edit.username') || 'Nom d\'utilisateur'}</label>
-						<input id="username" name="username" placeholder="${t('profile.edit.username') || 'Nom d\'utilisateur'}" required>
+						<input id="username" name="username" placeholder="${t('profile.edit.username') || 'Nom d\'utilisateur'}" required autocomplete="username">
 					</div>
 					<div class="form-group">
 						<label for="avatar">${t('profile.edit.avatar') || 'Avatar'}</label>

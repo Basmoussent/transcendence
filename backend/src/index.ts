@@ -21,6 +21,7 @@ import friendRoutes from './routes/friend';
 import webSocketRoutes from './routes/web-socket';
 import { getSecretFromVault } from './utils/vault';
 import { createClient } from 'redis';
+import { insert_tmp_user } from './insert_tmp_user';
 
 
 const fastify = Fastify({ logger: { level: 'debug' } });
@@ -141,7 +142,7 @@ async function setup() {
 	});
 
 	await insert_tmp_user(fastify);
-
+	
 	// Database health check
 	fastify.get('/health/db', async () => {
 		try {

@@ -91,9 +91,11 @@ export class matchmaking {
 
 	private setupPing() {
 		setInterval(() => {
-			this.ws.send(JSON.stringify({
-				type: 'ping'
-			}));
+			if (this.ws.readyState === WebSocket.OPEN) {
+				this.ws.send(JSON.stringify({
+					type: 'ping'
+				}));
+			}
 		}, 10000);
 	}
 	private async joinIt() {
@@ -288,6 +290,7 @@ export class matchmaking {
 				
 				window.history.pushState({}, '', '/login');
 				window.dispatchEvent(new Event('popstate'));
+				console.log("close websocket matchmaking notlog")
 				this.ws.close();
 				break;
 			case 'pong':
@@ -346,6 +349,7 @@ export class matchmaking {
 			this.ws.send(JSON.stringify({
 				type: 'leave'
 			}));
+			console.log("close websocket la matchmaking")
 			this.ws.close();
 		}
 		
