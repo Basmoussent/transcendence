@@ -102,6 +102,7 @@ export class Room {
 			console.log(`✅ WebSocket connection established for room ${this.uuid}`);
 			this.ws.send(JSON.stringify({
 				type: 'update_db',
+				token: this.token,
 			}))
 		};
 

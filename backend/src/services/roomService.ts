@@ -32,6 +32,9 @@ export class RoomService {
 			fieldsToUpdate.push("game_type = ?");
 			values.push(data.gameType);
 
+			// console.log("ce que je cherche");
+			// console.log(JSON.stringify(data.users, null, 8));
+
 			const users = Array.from((data.users as any).values());
 			
 			for (let i = 0; i < 4; i++) {

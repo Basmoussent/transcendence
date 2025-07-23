@@ -29,7 +29,7 @@ async function broadcastRoomUpdate(app: FastifyInstance, room: Room) {
 
 	for (const user of room.users.values()) {
 		try {
-			const stats = await app.userService.getUserStats(user.username);
+			const stats = await app.userService.retrieveStats(user.username);
 			if (stats) {
 				const totalGames = (stats.pong_games || 0) + (stats.block_games || 0);
 				const totalWins = (stats.pong_wins || 0) + (stats.block_wins || 0);
@@ -162,16 +162,23 @@ export async function handleRoom(app: FastifyInstance, socket: WebSocket, req: F
 			socket: socket,
 		};
 
+
+		console.log("ce que je cherche");
+		console.log(user);
+
+
+
 		if ((room.users.size + room.ai >= room.maxPlayers) && room.ai >= 1)
 			room.ai -= 1;
 
 		room.users.set(user.id, user);
 
+		
+
 		broadcastSystemMessage(room, `${username} has joined the room.`);
 
 		
 		await broadcastRoomUpdate(app, room);
-		await app.roomService.updateGame(room)
 		socket.on('message', async (message: string) => {
 			try {
 				const data = JSON.parse(message);
