@@ -65,7 +65,6 @@ export class login {
 			console.log('✅ Connexion réussie');
 			console.log('Headers de réponse:', response.headers);
 			
-			// Le token est maintenant dans un cookie, mais on peut aussi le récupérer du header pour la compatibilité
 			const token = response.headers.get('x-access-token');
 			if (token) {
 				console.log('🎫 Token reçu dans le header');
@@ -78,13 +77,14 @@ export class login {
 			if (response.message === "2FA needed") {
 					setTimeout(() => {
 					console.log('🔄 Redirection vers /2fa-login');
+					window.changeLanguage(result.user.language);
 					window.history.pushState({}, '', '/');
 					window.dispatchEvent(new PopStateEvent('popstate'));
 				}, 100);
 			}
 			else {
-				// Attendre un peu pour que les cookies soient bien définis
 				setTimeout(() => {
+					window.changeLanguage(result.user.language);
 					console.log('🔄 Redirection vers /main');
 					window.history.pushState({}, '', '/main');
 					window.dispatchEvent(new PopStateEvent('popstate'));

@@ -105,12 +105,10 @@
       window.getAuthToken = getAuthToken;
     </script>
     <script>
-      // Variable pour activer/désactiver la traduction
-      const TRANSLATION_ENABLED = true; // Changez cette valeur pour activer/désactiver la traduction
+      const TRANSLATION_ENABLED = true;
       
       let isChangingLanguage = false;
       
-      // Fonction pour afficher/masquer le sélecteur de langue
       function toggleLanguageSelector() {
         const selector = document.getElementById('languageSelector');
         if (TRANSLATION_ENABLED) {
@@ -121,7 +119,6 @@
       }
       
       if (TRANSLATION_ENABLED) {
-        // Toute la logique de traduction est encapsulée ici
         window.changeLanguage = async function(lang) {
           if (isChangingLanguage) return;
           
@@ -156,10 +153,8 @@
             const activeBtn = document.querySelector(`.${lang}-flag`);
             if (activeBtn) activeBtn.classList.add('active');
             
-            // Trigger a custom event to notify the SPA router
             window.dispatchEvent(new PopStateEvent('popstate'));
             
-            // Reset the flag after a short delay to allow the router to complete
             setTimeout(() => {
               isChangingLanguage = false;
             }, 100);
@@ -197,23 +192,18 @@
 
         async function ensureSubdomain() {
           try {
-            // Récupérer la langue préférée de l'utilisateur
             const preferredLang = await getPreferedLanguage();
             const currentLang = sessionStorage.getItem('lang') || 'en';
             
-            // Si la langue préférée est différente de la langue actuelle, l'appliquer
             if (currentLang !== preferredLang) {
               console.log(`Changement de langue automatique: ${currentLang} -> ${preferredLang}`);
               sessionStorage.setItem('lang', preferredLang);
               
-              // Mettre à jour le bouton actif
               const buttons = document.querySelectorAll('.language-btn');
               buttons.forEach(btn => btn.classList.remove('active'));
               const activeBtn = document.querySelector(`.${preferredLang}-flag`);
               if (activeBtn) activeBtn.classList.add('active');
               
-              // Ne pas déclencher de navigation automatique au chargement initial
-              // La navigation sera déclenchée seulement si on est déjà sur une page
               if (document.readyState === 'complete') {
                 const currentPath = window.location.pathname;
                 window.history.pushState({}, '', currentPath);
@@ -229,24 +219,19 @@
         }
 
         document.addEventListener('DOMContentLoaded', async () => {
-          // Afficher le sélecteur de langue si la traduction est activée
           toggleLanguageSelector();
           
-          // Version simplifiée pour éviter les blocages
           const buttons = document.querySelectorAll('.language-btn');
           const currentLang = sessionStorage.getItem('lang') || 'en';
           
-          // Mettre à jour le bouton actif avec la langue actuelle
           buttons.forEach(btn => {
             if (btn.classList.contains(`${currentLang}-flag`)) {
               btn.classList.add('active');
             }
           });
           
-          // Appel initial de initAlive si déjà loggé
           window.initAlive && window.initAlive();
           
-          // Appliquer la langue préférée en arrière-plan (sans bloquer le chargement)
           setTimeout(async () => {
             try {
               const preferredLang = await getPreferedLanguage();
@@ -254,12 +239,10 @@
                 console.log(`Changement de langue automatique: ${currentLang} -> ${preferredLang}`);
                 sessionStorage.setItem('lang', preferredLang);
                 
-                // Mettre à jour le bouton actif
                 buttons.forEach(btn => btn.classList.remove('active'));
                 const activeBtn = document.querySelector(`.${preferredLang}-flag`);
                 if (activeBtn) activeBtn.classList.add('active');
                 
-                // Recharger la page avec la nouvelle langue
                 window.history.pushState({}, '', window.location.pathname);
                 window.dispatchEvent(new PopStateEvent('popstate'));
               }
@@ -269,7 +252,6 @@
           }, 100);
         });
       } else {
-        // Si la traduction est désactivée, masquer le sélecteur et définir une langue par défaut
         document.addEventListener('DOMContentLoaded', () => {
           toggleLanguageSelector();
           sessionStorage.setItem('lang', 'en'); // Langue par défaut
@@ -277,9 +259,7 @@
         });
       }
       
-      // S'assurer que le router se charge même si DOMContentLoaded échoue
       window.addEventListener('load', () => {
-        // Vérifier que l'app a bien du contenu
         const app = document.getElementById('app');
         if (app && !app.innerHTML.trim()) {
           console.log('App vide détectée, rechargement du router...');
