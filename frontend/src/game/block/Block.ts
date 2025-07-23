@@ -1,5 +1,5 @@
-import { fetchUsername, logEndGame, logStartGame, postGame } from "../gameUtils.ts";
-import { Ball, Paddle, brick, createRandomBrick, PowerUp, PowerUpType, getPowerUpFromBrick } from "./blockUtils.ts";
+import { fetchUsername, logStartGame } from "../gameUtils.ts";
+import { Ball, Paddle, brick, createRandomBrick } from "./blockUtils.ts";
 import { getAuthToken } from '../../utils/auth.ts'
 import { addEvent } from '../../utils/eventManager.ts';
 import { t } from '../../utils/translations.ts'
@@ -23,6 +23,7 @@ export class Block {
 	private width: number;
 	private height: number;
 	private status: boolean;
+	private end: boolean;
 	private username: string;
 	private winner: string;
 	private win: boolean;
@@ -52,6 +53,7 @@ export class Block {
 		this.lost = false;
 		this.username = "ko";
 		this.status = false;
+		this.end = false;
 
 		this.paddle = new Paddle(0, 0, 8);
 		this.ball = new Ball(0, 0);
@@ -173,7 +175,7 @@ export class Block {
 				this.logGame();
         		const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
-				await sleep(3000);
+				await sleep(2500);
 
                 window.history.pushState({}, '', '/main');
                 window.dispatchEvent(new PopStateEvent('popstate'));
@@ -308,9 +310,7 @@ export class Block {
 		// Fin de partie
 		if (this.win || this.lost) {
 			this.status = false;
-			// await logEndGame(this.data.id, this.winner);
-			// this.win = false;
-			// this.lost = false;
+			this.end = true;
 		}
 
 		// Déplacer la balle
@@ -365,6 +365,17 @@ export class Block {
 		this.ctx.stroke();
 		this.ctx.closePath();
 	}
+
+	private displayEndMsg(): void {
+        this.ctx.globalAlpha = 0.2;
+        this.ctx.fillStyle = 'white';
+        this.ctx.font = '48px gaming';
+		if (this.win)
+        	this.ctx.fillText(`${this.winner} WON`, this.width / 2, this.height / 2);
+		else if (this.lost)
+        	this.ctx.fillText(`LOSER`, this.width / 2, this.height / 2);
+        this.ctx.globalAlpha = 1;
+    }
   
 	private render(): void {
 		// Effacer le canvas
@@ -376,11 +387,14 @@ export class Block {
 		
 		this.drawBall();
 		this.drawPaddle();
+
 		if (this.status) {
 			// Dessiner les éléments
 			this.renderBricks();
 		}
-		else
+		else if (!this.end)
 			this.displayStartMsg();
+		else
+			this.displayEndMsg();
 	}
 }

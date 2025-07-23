@@ -46,9 +46,11 @@ export class RoomService {
 				}
 			}
 
+			fieldsToUpdate.push(`users_needed = ?`);
 			values.push(data.maxPlayers);
-			values.push(data.ai);
 
+			fieldsToUpdate.push(`ai = ?`);
+			values.push(data.ai);
 
 			console.log(`la requete sql ::::: UPDATE games SET ${fieldsToUpdate.join(", ")}`)
 			console.log(`les values dans l'ordre ${values}`)

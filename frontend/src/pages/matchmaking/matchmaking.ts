@@ -69,7 +69,7 @@ export class matchmaking {
 
 		this.ws.onopen = () => {
 			console.log(`${this.username} est arrive sur matchmaking`)
-			// this.updateUI();
+			this.updateUI();
 		}
 
 		this.ws.onerror = (error) => {
