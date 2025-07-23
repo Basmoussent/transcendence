@@ -2,7 +2,6 @@ import * as dotenv from 'dotenv';
 import * as path from 'path';
 import * as fs from 'fs';
 
-
 const fileToCheck = '/tmp/vault.env';
 
 function waitForFileAndExecute(callback: (envPath: string) => void): void {
@@ -32,30 +31,8 @@ export async function getSecretFromVault(
 	mountPoint = 'secret'
 ): Promise<string> {
 	const vaultUrl = process.env.VAULT_ADDR || 'https://vault:8200';
-
+	console.log("vaultUrl", vaultUrl);
 	// Attente que Vault soit unsealed
-	while (true) {
-		try {
-			const healthResp = await fetch(`${vaultUrl}/v1/sys/health`, {
-				method: 'GET',
-			});
-
-			if (!healthResp.ok) {
-				console.log(`Waiting for Vault... status: ${healthResp.status}`);
-				console.log('response body:', await healthResp.text());
-			} else {
-				const data = await healthResp.json();
-				console.log('✅ Vault responded with JWT data:', data);
-				break;
-			}
-		}
-		catch (error) {
-			console.log('❌ Error checking Vault health, retrying...', error);
-		}
-
-		await new Promise((res) => setTimeout(res, 1000));
-	}
-
 	// Recharger les variables d'environnement depuis le fichier vault.env
 	if (fs.existsSync(fileToCheck))
 		dotenv.config({ path: fileToCheck });

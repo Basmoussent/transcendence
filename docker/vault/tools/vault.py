@@ -33,7 +33,7 @@ class VaultManager:
         try:
             self.vault_process = subprocess.Popen([
                 "vault", "server", "-config=/vault/config/config.hcl"
-            ], stdout=subprocess.PIPE, stdout=subprocess.PIPE)
+            ], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
             print(f"Vault server started with PID: {self.vault_process.pid}")
             return True
         except Exception as e:

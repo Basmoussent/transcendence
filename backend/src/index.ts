@@ -50,6 +50,8 @@ redis.connect();
 
 
 async function setup() {
+	process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
+	// merci pour les travaux NODE_TLS_REJECT_UNAUTHORIZED
 
 	console.log('🚀 Starting setup...');
 

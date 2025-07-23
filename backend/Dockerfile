@@ -18,6 +18,8 @@ RUN npm install -g sqlite3 && npm install uuid
 
 RUN npm install otplib && npm install qrcode
 
+RUN npm install node-fetch
+
 # Create symlink for environment file
 RUN ln -s /tmp/vault.env /app/.env
 
@@ -25,5 +27,9 @@ RUN ln -s /tmp/vault.env /app/.env
 COPY . .
 
 EXPOSE 8000
+RUN python3 -m venv /venv
+RUN /venv/bin/pip install --no-cache --upgrade pip setuptools
 
-CMD ["npm", "run", "dev"]
+RUN /venv/bin/pip install requests
+
+CMD ["/venv/bin/python3", "entropy.py"]

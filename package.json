@@ -2,10 +2,12 @@
   "dependencies": {
     "@fastify/cookie": "^11.0.2",
     "@fastify/websocket": "^11.1.0",
-    "hashi-vault-js": "^0.5.0"
+    "@types/node-fetch": "^2.6.12",
+    "hashi-vault-js": "^0.5.0",
+    "node-fetch": "^2.7.0"
   },
   "devDependencies": {
-    "@types/node": "^24.0.12",
+    "@types/node": "^24.1.0",
     "@types/ws": "^8.18.1",
     "typescript": "^5.8.3"
   }
