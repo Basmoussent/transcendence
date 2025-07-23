@@ -477,37 +477,7 @@ async function gameRoutes(app: FastifyInstance) {
 		}
 
 	})
-
-    app.post('/getName', async function (app: FastifyInstance, reply: FastifyReply, request: FastifyRequest) {
-
-		const { userid } = request.body as { userid: number };
-
-		if (!userid)
-			throw new Error("j'ai pas recu de userid dans le body");
-
-		try {
-            let name = await app.userService.findById(userid);
-
-			if (name) {
-				return reply.send({
-					message: 'Username du joueur bien recupere',
-					username: name
-				});
-			}
-			else {
-				return reply.status(500).send({ error: `Erreur lors de la recuperation de l'username du player` });
-			}
-		}
-		catch (err: any) {
-			console.error('erreur GET /games :', err);
-			if (err.name === 'JsonWebTokenError')
-				return reply.status(401).send({ error: 'Token invalide ou expiré' });
-			return reply.status(500).send({ error: 'erreur GET /game/getName', details: err.message });
-		}
-    })
-
 }
-
 
 
 export default gameRoutes;

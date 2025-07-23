@@ -6,6 +6,7 @@ import { PADDLE_OFFSET, Player, PADDLE1_COLOR, PADDLE2_COLOR, PADDLE3_COLOR, PAD
 import { addEvent } from '../../../utils/eventManager';
 import { t } from '../../../utils/translations';
 import { logStartGame } from "../../../game/gameUtils";
+import { fetchUserInfo } from '../../../pages/chat/utils'
 
 export interface Game {
 	id: number,
@@ -62,7 +63,18 @@ export class MultiPong {
 
         this.paddles = this.initPlayers();
 
-        this.paddles[0].name = await this.getUsername(this.data.player1);
+        // this.paddles[0].name = await this.getUsername(this.data.player1);
+        const user = await fetchUserInfo(String(this.data.player1));
+
+        //fetchuserinfo renvoie toutes les infos du user
+
+        if (user == null)
+            console.error("les pblms");
+
+        this.paddles[0].name = user.username;
+
+        console.log("le name est ttttttttttt         ", this.paddles[0].name)
+
         // faire un get usernamesddddddd
         // for (let i = 0; i < 4; i++) {
         //     const paddle = this.paddles[i];
@@ -81,40 +93,6 @@ export class MultiPong {
         window.addEventListener('resize', () => {
             this.setupCanvas();
         });
-    }
-
-    private async getUsername(playerId: number) {
-        const authToken = getAuthToken()
-		if (!authToken) {
-			alert('❌ Token d\'authentification manquant');
-			window.history.pushState({}, '', '/login');
-			window.dispatchEvent(new PopStateEvent('popstate'));
-			return;
-		}
-
-		const response = await fetch(`/api/games/getName`, {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json',
-				'x-access-token': authToken
-				},
-            body: JSON.stringify({
-                userid: playerId
-            })
-		});
-
-        if (!response.ok) {
-			const errorData = await response.json();
-			throw new Error(errorData.details || "pblm recuperer username multipong");
-		}
-
-		const result = await response.json();
-
-        const name = result.username;
-
-        console.log(`j'ai recup le name : ${name}`);
-
-        return name;
     }
 
     private async loadInfo(uuid: string): Promise<any> {
