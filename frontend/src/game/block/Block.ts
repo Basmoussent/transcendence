@@ -260,7 +260,7 @@ export class Block {
 
 			// Créer les briques
 			this.bricks = [];
-			for (let i = 0; i < 1; i++) {
+			for (let i = 0; i < 100; i++) {
 				this.bricks.push(createRandomBrick(i, i % 20, Math.floor(i / 20)));
 			}
 		}
