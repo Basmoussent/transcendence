@@ -2,6 +2,7 @@ import { fetchUsername, logStartGame } from "../gameUtils.ts";
 import { Ball, Paddle, brick, createRandomBrick } from "./blockUtils.ts";
 import { getAuthToken } from '../../utils/auth.ts'
 import { t } from '../../utils/translations.ts'
+import { sanitizeHtml } from "../../utils/sanitizer.ts";
 
 export interface Game {
 	id: number,
@@ -370,7 +371,7 @@ export class Block {
         this.ctx.fillStyle = 'white';
         this.ctx.font = '48px gaming';
 		if (this.win)
-        	this.ctx.fillText(`${this.winner} WON`, this.width / 2, this.height / 2);
+        	this.ctx.fillText(`${sanitizeHtml(this.winner)} WON`, this.width / 2, this.height / 2);
 		else if (this.lost)
         	this.ctx.fillText(`LOSER`, this.width / 2, this.height / 2);
         this.ctx.globalAlpha = 1;

@@ -204,9 +204,9 @@ export class Pong {
         this.ctx.fillText(t('pong.pressEnterToStart'), this.width / 2 - 190, this.height / 2 - 100);
         this.ctx.fillText(t('pong.toStart'), this.width / 2 - 140, this.height / 2 - 50);
         this.ctx.fillStyle = PADDLE1_COLOR;
-        this.ctx.fillText(`${this.paddles[0].name}: W/S KEYS`, this.width / 2 - 280, this.height / 2 + 20);
+        this.ctx.fillText(`${sanitizeHtml(this.paddles[0].name)}: W/S KEYS`, this.width / 2 - 280, this.height / 2 + 20);
         this.ctx.fillStyle = PADDLE2_COLOR;
-        this.ctx.fillText(`${this.paddles[1].name}: ARROW KEYS`, this.width / 2 - 330, this.height / 2 + 70);
+        this.ctx.fillText(`${sanitizeHtml(this.paddles[1].name)}: ARROW KEYS`, this.width / 2 - 330, this.height / 2 + 70);
 		this.ctx.globalAlpha = 1;
 	}
 
@@ -234,7 +234,7 @@ export class Pong {
         this.ctx.globalAlpha = 0.2;
         this.ctx.fillStyle = 'white';
         this.ctx.font = '48px gaming';
-        this.ctx.fillText(`${this.winner} WINS`, this.width / 2, this.height / 2);
+        this.ctx.fillText(`${sanitizeHtml(this.winner)} WINS`, this.width / 2, this.height / 2);
         this.ctx.globalAlpha = 1;
     }
 

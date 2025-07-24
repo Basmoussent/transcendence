@@ -210,7 +210,6 @@ export async function fetchUsername() {
 		console.error("Error rendering profile page:", error); }
 }
 
-
 export async function fetchUserId() {
 	
 	try {
@@ -365,7 +364,7 @@ export async function getUserGameHistory(username: string): Promise<Game[]> {
 				'x-access-token': token,
 			},
 		});
-	
+
 		if (response.ok) {
 			const result = await response.json();
 			console.log("Historique des parties récupéré:", result);
@@ -383,7 +382,7 @@ export async function getUserGameHistory(username: string): Promise<Game[]> {
 				start_time: sanitizeHtml(game.start_time),
 				end_time: sanitizeHtml(game.end_time),
 			}));
-			
+
 			return games;
 		}
 		else {
