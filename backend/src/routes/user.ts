@@ -86,7 +86,7 @@ async function userRoutes(app: FastifyInstance) {
 			if (err.name === 'JsonWebTokenError') {
 				return reply.status(401).send({ error: 'Token invalide ou expiré' });
 			}
-			return reply.status(500).send({ error: 'Erreur serveur interne' });
+			return reply.status(500).send({ error: 'Erreur serveur interne - Token invalide, expiré ou temporaire' });
 		}
 	});
 
