@@ -385,7 +385,7 @@ export class profil {
 			}
 
 			const response = await fetch(`/api/friend/${this.relation.id}`, {
-				method: 'DELETE',
+				method: 'POST',
 				headers: {
 					'x-access-token': token,
 				},

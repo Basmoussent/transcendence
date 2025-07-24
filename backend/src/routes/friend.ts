@@ -95,7 +95,7 @@ async function friendRoutes(app: FastifyInstance) {
 
 	})
 
-	app.delete('/:id', async function (request: FastifyRequest, reply: FastifyReply) {
+	app.post('/:id', async function (request: FastifyRequest, reply: FastifyReply) {
 
 		try {
 			const { id } = request.params as { id?: number };
