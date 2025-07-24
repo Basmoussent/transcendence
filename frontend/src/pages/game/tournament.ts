@@ -1532,6 +1532,11 @@ export function initializeTournamentEvents() {
 			console.log("notify_tournament", data.content);
 		}
 	};
+  setTimeout(() => {
+    (window as any).ws.send(JSON.stringify({
+      type: 'ping',
+    }));
+  }, 10000);
 	generateQuarterFinals();
 	// updateLobbyDisplay();
 	cleanStart();
