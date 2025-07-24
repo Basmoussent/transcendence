@@ -121,24 +121,12 @@ export function renderMain(): string {
 				background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
 			}
 
-			.multiplayer-button {
-				background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
-			}
-
-			.friends-button {
-				background: linear-gradient(135deg, #9b59b6 0%, #8e44ad 100%);
-			}
-
 			.tournament-button {
 				background: linear-gradient(135deg, #f1c40f 0%, #f39c12 100%);
 			}
 
-			.pong-game-button {
-				background: linear-gradient(135deg, #ff8000 0%, #f39c12 100%);
-			}
-
-			.multi-pong-game-button {
-				background: linear-gradient(135deg, #ff8000 0%, #f39c12 100%);
+			.chat-button {
+				background: linear-gradient(135deg, #662C91 0%, #662C91 100%);
 			}
 
 			.logout-button {

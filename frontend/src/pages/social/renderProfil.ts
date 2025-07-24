@@ -110,7 +110,7 @@ export function renderProfil() {
 						</div>
 						<div class="stat-card">
 							<div id="rank" class="stat-number"></div>
-							<div class="stat-label">Rank</div>
+							<div class="stat-label">Rank ;)</div>
 					</div>
 				</div>
 			</div>
@@ -367,7 +367,7 @@ export function renderProfil() {
 
         .profile-avatar {
 		position: absolute;
-		bottom: -30px;
+		bottom: 30px;
 		left: 30px;
 		width: 120px;
 		height: 120px;
