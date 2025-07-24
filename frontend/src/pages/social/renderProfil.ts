@@ -6,10 +6,6 @@ import { profil } from './profil'
 // Stocker l'instance actuelle pour pouvoir la nettoyer
 let currentProfilInstance: profil | null = null;
 
-export async function renderProfil(uuid: string) {
-	return getTemplate(); // => retourne une string HTML
-}
-
 export async function initializeProfilEvents(uuid:string) {
 	try {
 		// Nettoyer l'instance précédente si elle existe
@@ -27,16 +23,15 @@ export async function initializeProfilEvents(uuid:string) {
 			return;
 		}
 
-		const [ stats, friends, relation ] = await Promise.all([
+		const [ stats, relation ] = await Promise.all([
 			loadUserStats(uuid),
-			loadUserFriends(uuid),
 			loadRelation(me.username, user.username)
 		]);
 
-		if (!stats || !friends)
+		if (!stats)
 			console.error("Données manquantes pour afficher le profil");
 
-		const data = { me, user, stats, friends, relation };
+		const data = { me, user, stats, relation };
 
 		console.log(JSON.stringify(data, null, 8))
 
@@ -59,7 +54,7 @@ export function cleanupProfilInstance() {
 }
 
 
-function getTemplate() {
+export function renderProfil() {
 	return `
 		<button class="home-button" id="homeBtn">
 			<i class="fas fa-home"></i>
@@ -168,16 +163,6 @@ function getTemplate() {
 					</div>
 					<div class="activity-time">Il y a 3 jours</div>
 				</div>
-				</div>
-			</div>
-
-			<div class="profile-section friends-section">
-				<div class="section-header">
-				<i class="fas fa-users"></i>
-				<h2>Amis</h2>
-					</div>
-					<div id="friends" class="friends-grid">
-					</div>
 				</div>
 			</div>
 		</div>
@@ -955,35 +940,4 @@ async function loadUserStats(username: string) {
 		return null;
 	}
 
-}
-
-async function loadUserFriends(username: string) {
-	try {
-		const token = getAuthToken();
-		if (!token) {
-			alert('❌ Token d\'authentification manquant');
-			window.history.pushState({}, '', '/login');
-			window.dispatchEvent(new PopStateEvent('popstate'));
-			return null;
-		}
-
-		const response = await fetch(`/api/friend/?username=${username}`, {
-			method: 'GET',
-			headers: {
-				'Content-Type': 'application/json',
-				'x-access-token': token }
-		});
-	
-		if (response.ok) {
-			return await response.json();
-		} else {
-			console.error('gros gros zig');
-			return null;
-		}
-
-	}
-	catch (err) {
-		console.error(`pas réussi a récup les amis de cette personnes zignew que tu es`, err);
-		return null;
-	}
 }

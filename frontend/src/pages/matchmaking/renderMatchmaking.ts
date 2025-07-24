@@ -5,10 +5,6 @@ import { getAuthToken } from '../../utils/auth';
 import { sanitizeHtml } from '../../utils/sanitizer';
 import { t } from '../../utils/translations';
 
-export function renderMatchmaking() {
-	return getTemplate();
-}
-
 export function initializeMatchmakingEvents() {
 	console.log('Initializing matchmaking page events');
 	try {
@@ -23,7 +19,7 @@ export function initializeMatchmakingEvents() {
 	}
 }
 
-const getTemplate = () => {
+export function renderMatchmaking() {
 	const html =  `
 	<div class="flex gap-12 h-screen justify-center items-center px-8 pb-40" id="options-container">
 		<button class="home-button" id="homeBtn">

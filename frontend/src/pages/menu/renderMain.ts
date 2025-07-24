@@ -2,10 +2,6 @@ import { t } from '../../utils/translations';
 import { removeAuthToken } from '../../utils/auth';
 import { main } from './main';
 
-export function renderMain(): string {
-	return getTemplate();
-}
-
 export function initializeMainEvents() {
 	console.log('Initializing main page events');
 	try {
@@ -15,7 +11,7 @@ export function initializeMainEvents() {
 	}
 }
 
-function getTemplate() {
+export function renderMain(): string {
 	return `
 		<div class="main-menu">
 			<div class="menu-container">

@@ -3,9 +3,6 @@ import { Room } from './room';
 import { fetchUsername } from '../../game/gameUtils';
 import { t } from '../../utils/translations';
 
-export function renderRoom(uuid: string) {
-	return getTemplate();
-}
 
 export async function initializeRoomEvents(uuid: string) {
 	console.log('Initializing room page events');
@@ -50,7 +47,7 @@ function showRoomError() {
 	}
 }
 
-const getTemplate = () => {
+export function renderRoom() {
 	return `
 		<button class="home-button" id="homeBtn">
 			<i class="fas fa-home"></i>

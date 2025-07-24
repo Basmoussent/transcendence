@@ -4,11 +4,6 @@ import { Chat } from './liveChat'
 import { t } from '../../utils/translations';
 import './chat.css';
 
-
-export function renderChat() {
-	return getTemplate();
-}
-
 export function initializeChatEvents() {
 	console.log('Initializing chat page events');
 	try {
@@ -19,7 +14,7 @@ export function initializeChatEvents() {
 	}
 }
 
-const getTemplate = () => {
+export function renderChat() {
 	return `
 	<div class="chat-page">
 	<button class="home-button" id="homeBtn">

@@ -7,7 +7,6 @@ export class profil {
 	private me: any;
 	private user: any;
 	private stats: any;
-	private friends: any;
 	private relation: any;
 	private recentGames: any[];
 
@@ -22,7 +21,6 @@ export class profil {
 	private rank: HTMLElement;
 	
 	private gameHistory: HTMLElement;
-	private friendsGrid: HTMLElement;
 	private online: HTMLElement;
 	private statusDot: HTMLElement;
 
@@ -37,7 +35,6 @@ export class profil {
 		this.me = data.me;
 		this.user = data.user;
 		this.stats = data.stats;
-		this.friends = data.friends;
 		this.relation = data.relation;
 		this.recentGames = [];
 
@@ -51,7 +48,6 @@ export class profil {
 		this.mmr = this.getElement('mmr');
 		this.rank = this.getElement('rank');
 		this.gameHistory = this.getElement('gameHistory');
-		this.friendsGrid = this.getElement('friends');
 		this.online = this.getElement('online');
 		this.statusDot = this.getElement('statusDot');
 
@@ -124,11 +120,10 @@ export class profil {
 	private async updateInfo() {
 		// console.log("🔍 updateInfo - stats:", this.stats);
 		// console.log("🔍 updateInfo - user:", this.user);
-		// console.log("🔍 updateInfo - friends:", this.friends);
 
 		console.log("on update les infos")
 
-		if (!this.username || !this.gamePlayed || !this.mmr || !this.winrate || !this.rank || !this.friendsGrid || !this.gameHistory || !this.online || !this.statusDot)
+		if (!this.username || !this.gamePlayed || !this.mmr || !this.winrate || !this.rank || !this.gameHistory || !this.online || !this.statusDot)
 			console.error("❌ il manque un element");
 
 		// Recharger la relation depuis la DB
@@ -157,24 +152,6 @@ export class profil {
 		// Charger les parties récentes
 		await this.loadRecentGames();
 
-		// Vider la grille des amis
-		this.friendsGrid.innerHTML = '';
-
-		// Ajouter les amis
-		if (this.friends && Array.isArray(this.friends)) {
-			console.log(`👥 Ajout de ${this.friends.length} amis`);
-			for (const friend of this.friends) {
-				const tmp = { // a verifier ca
-					username: friend.user_1 !== this.user.username ? friend.user_1 : friend.user_2,
-				};
-				console.log("👤 Ajout ami:", tmp);
-				this.friendsGrid.innerHTML += this.friendCard(tmp);
-			}
-		}
-		else {
-			console.log("👥 Aucun ami à afficher");
-			this.friendsGrid.innerHTML = '<div class="no-friends">Aucun ami pour le moment</div>';
-		}
 	}
 
 	private updateButtons() {

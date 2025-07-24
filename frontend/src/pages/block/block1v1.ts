@@ -1,9 +1,5 @@
 import { Block1v1 } from '../../game/block/Block1v1';
 
-export function renderBlock1v1(uuid: string) {
-	return getTemplate();
-} 
-
 export function initializeBlock1v1Events(uuid: string) {
 	console.log('Initializing block 1v1 game events');
 	const canvas = document.getElementById('blockGameCanvas') as HTMLCanvasElement;
@@ -15,7 +11,7 @@ export function initializeBlock1v1Events(uuid: string) {
 	game.asyncInit();
 }
 
-function getTemplate() {
+export function renderBlock1v1() {
 	return `
 		<div class="block-game-container">
 		<div class="game-wrapper">
