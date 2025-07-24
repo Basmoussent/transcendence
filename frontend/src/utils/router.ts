@@ -30,13 +30,16 @@ export async function router() {
 	const app = document.getElementById('app');
 	if (!app) return;
 
-	const publicRoutes = ['/', '/login', '/create-account', '/forgot-password'];
+	const publicRoutes = ['/', '/login', '/create-account'];
 	const token = getAuthToken();
 
 	//TODO recuperer le username grace au token 
 	console.log("je rnetre dans le routeur avec le path : ", path);
 
 	let uuid: string = '';
+	let tempJwt: boolean = false;
+	let response: any;
+	let data: any;
 	
 	if (path.startsWith('/multipong') || path.startsWith('/block') || path.startsWith('/block1v1') ||
 		path.startsWith('/room') || path.startsWith('/profil')) {
@@ -102,8 +105,8 @@ export async function router() {
 		app.innerHTML = renderLogin();
 		return;
 	}
-	if (!publicRoutes.includes(path) && token) {
-		const response = await fetch('/api/auth/verify', {
+	if (token) {
+		response = await fetch('/api/auth/verify', {
 			method: 'GET',
 			headers: {
 				'Content-Type': 'application/json',
@@ -112,24 +115,36 @@ export async function router() {
 		});
 		const data = await response.json();
 		console.log("api check response:", data);
+		tempJwt = data.temp;
+	}
+	if (!publicRoutes.includes(path) && token && response) {
 		if (response.status === 401) {
 			window.history.pushState({}, '', '/login');
 			app.innerHTML = renderLogin();
 			return;
 		}
-		else if (response.ok && data.temp) {
+		else if (response.ok && tempJwt) {
 			console.log("jvais render2fa login")
 			app.innerHTML = render2FALogin();
 			return;
 		}
 	};
-	
 
-	if (path === '/login' && token) {
-		window.history.pushState({}, '', '/main');
-		app.innerHTML = renderMain();
-		initializeMainEvents();
-		return;
+	console.log("tempJwt:", tempJwt);
+
+	if (path === '/login' && token ) {
+		if (tempJwt) {
+			window.history.pushState({}, '', '/2fa-login');
+			app.innerHTML = render2FALogin();
+			return;
+		}
+		else {
+			console.log("jvais render mai jwt")
+			window.history.pushState({}, '', '/main');
+			app.innerHTML = renderMain();
+			initializeMainEvents();
+			return;
+		}
 	}
 
 	console.log("path:", path);

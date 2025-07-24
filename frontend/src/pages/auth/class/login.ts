@@ -77,7 +77,7 @@ export class login {
 					setTimeout(() => {
 					console.log('🔄 Redirection vers /2fa-login');
 					window.changeLanguage(result.user.language);
-					window.history.pushState({}, '', '/');
+					window.history.pushState({}, '', '/2fa-login');
 					window.dispatchEvent(new PopStateEvent('popstate'));
 				}, 100);
 			}

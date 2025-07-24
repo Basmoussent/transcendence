@@ -70,6 +70,11 @@ export class Pong {
 
 	public init(p1: string, p2: string): { player1: player1, player2: player1 } {
 		console.log('Initializing paddle game...');
+		window.addEventListener("keydown", function(e) {
+			if(["Space","ArrowUp","ArrowDown","ArrowLeft","ArrowRight"].indexOf(e.code) > -1) {
+				e.preventDefault();
+			}
+		}, false);
 		this.setupCanvas();
 		this.setupEventListeners();
 		this.startGameLoop();
