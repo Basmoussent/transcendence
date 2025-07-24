@@ -766,15 +766,7 @@ export function renderTournaments() {
 `;
 
   setTimeout(() => {
-    const homeBtn = document.getElementById('homeBtn');
-	
-		if (homeBtn) {
-			homeBtn.addEventListener('click', () => {
-				window.history.pushState({}, '', '/main');
-				window.dispatchEvent(new PopStateEvent('popstate'));
-			});
-		}
-    
+   
     const canvas = document.getElementById('gameCanvas') as HTMLCanvasElement;
     if (!canvas) {
       console.error('Canvas not found!');
