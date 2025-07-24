@@ -179,7 +179,7 @@ export class MultiPong {
 
         // player4 soit player soit ia soit aucun des deux
         if (players > 0) {
-            paddles.push(new Paddle(100, 20, PADDLE3_COLOR));
+            paddles.push(new Paddle(100, 20, PADDLE4_COLOR));
             players -= 1;
         }
         else if (ai_players > 0) {
