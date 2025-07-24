@@ -65,8 +65,8 @@ export async function logStartGame(gameId:number): Promise<number> {
 			return -1;
 		}
 
-		const response = await fetch('/api/games', {
-			method: 'PUT',
+		const response = await fetch('/api/games/log', {
+			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',
 				'x-access-token': token,
@@ -102,7 +102,7 @@ export async function logEndGame(gameId: number, winner:string) {
 		}
 
 		const response = await fetch('/api/games', {
-			method: 'PUT',
+			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',
 				'x-access-token': token,

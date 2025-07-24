@@ -127,7 +127,7 @@ export async function update2FAState(status: number, userId: number): Promise<bo
 
 	try {
 		const response = await fetch('/api/username/2fa', {
-			method: 'PUT',
+			method: 'POST',
 			headers: {
 				'x-access-token': token,
 				'Content-Type': 'application/json'

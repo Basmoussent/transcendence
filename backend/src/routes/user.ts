@@ -333,7 +333,7 @@ async function userRoutes(app: FastifyInstance) {
 		}
 	})
 
-	app.put('/username/2fa', async function (request: FastifyRequest, reply: FastifyReply) {
+	app.post('/username/2fa', async function (request: FastifyRequest, reply: FastifyReply) {
 		try {
 			const database = db.getDatabase();
 			const { status, userId } = request.body as { status: boolean, userId: number };

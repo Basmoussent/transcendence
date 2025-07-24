@@ -106,7 +106,7 @@ async function gameRoutes(app: FastifyInstance) {
 
 	})
 
-	app.put('/', async function (request: FastifyRequest, reply: FastifyReply) {
+	app.post('/log', async function (request: FastifyRequest, reply: FastifyReply) {
 		try {
 			const database = db.getDatabase();
 
