@@ -159,6 +159,7 @@ export class Chat {
 				this.updateFriendAndRequest();
 				break;
 			case 'updateUI':
+				console.log("j'update mon ui")
 				this.updateUI();
 				break;
 			case 'system_message':
@@ -317,13 +318,13 @@ export class Chat {
 
 		console.log(JSON.stringify(relations, null, 8))
 
+		this.friendsList.innerHTML = '';
+		this.requestsList.innerHTML = '';
+
 		if (!relations || !relations.length) {
 			console.log("t'as pas d'amis mgl")
 			return;
 		}
-
-		this.friendsList.innerHTML = '';
-		this.requestsList.innerHTML = '';
 
 		for (const relation of relations) {
 			console.log("relation", relation)

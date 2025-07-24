@@ -88,6 +88,7 @@ async function handleMessage(message: string, user: UserChat, app: FastifyInstan
 				break;
 
 			case 'deny_friend_request':
+				console.log("je recois quelque chose pour refuser")
 				denyFriend(app, user, data.dest)
 				break;
 
@@ -236,7 +237,7 @@ async function denyFriend(app: FastifyInstance, user: UserChat, friendName: stri
 	}
 	const relation = await app.friendService.searchRelation(user.id, friend.id);
 	if (!relation || relation.id === -1) {
-		console.error(`couldnt find the relation to accept friendship`);
+		console.error(`couldnt find the relation to deny friendship`);
 		return;
 	}
 
@@ -244,6 +245,8 @@ async function denyFriend(app: FastifyInstance, user: UserChat, friendName: stri
 	const message = JSON.stringify({
 		type: 'updateUI'
 	});
+
+	console.log(`je send a ${user.username} et ${friend.username}`)
 	user.socket.send(message)
 	live.get(friend.id)?.socket.send(message);
 }
