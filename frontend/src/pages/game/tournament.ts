@@ -21,7 +21,7 @@ export function renderTournaments() {
       </h1>
     </div>
     <div class="tournaments-actions" style="flex:0 0 auto; display: flex; gap: 14px; align-items: center;">
-    <button class="btn btn-primary" id="homeBtn" onclick="returnHome()">
+    <button class="home-button" id="homeBtn" onclick="returnHome()">
         <i class="fas fa-home"></i>
         ${t('social.home' as any)}
       </button>  
@@ -761,6 +761,27 @@ export function renderTournaments() {
       max-width: 99vw;
       max-height: 50vw;
     }
+  }
+  .home-button {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    padding: 10px 15px;
+    font-size: 1em;
+    border: none;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    z-index: 100;
+  }
+  .home-button:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: translateY(-2px);
   }
 </style>
 `;
@@ -1524,6 +1545,11 @@ export function initializeTournamentEvents() {
       console.log("notify_tournament", data.content);
     }
   };
+  setTimeout(() => {
+    (window as any).ws.send(JSON.stringify({
+      type: 'ping',
+    }));
+  }, 1000);
   generateQuarterFinals();
   // updateLobbyDisplay();
   cleanStart();

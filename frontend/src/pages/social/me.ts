@@ -117,14 +117,14 @@ export async function renderMe() {
 	const tfaButtonIcon = userData.twoFactorEnabled ? 'fa-solid fa-lock-open' : 'fa-solid fa-lock';
 
 	return `
+		<button class="home-button" id="homeBtn">
+			<i class="fas fa-home"></i>
+			${t('social.home' as any)}
+		</button>
 		<div class="profile-wrapper">
 			<div class="profile-stack">
 				<div class="profile-container">
 					<div class="profile-header">
-						<button class="home-button" id="homeBtn">
-								<i class="fas fa-home"></i>
-								${t('social.home')}
-						</button>
 						<div class="profile-avatar">
 							<img src="${avatarUrl}" alt="Profile Avatar" class="avatar-image" onerror="this.src='../../public/avatar.png'">
 							<button class="change-avatar-btn" id="changeAvatarBtn">
@@ -164,7 +164,7 @@ export async function renderMe() {
 							<i class="fas fa-star"></i>
 							<div class="stat-info">
 								<span class="stat-value">${userData.rating}</span>
-								<span class="stat-label">${t('profile.stats.rating')}</span>
+								<span class="stat-label">${t('profile.stats.rating' as any)}</span>
 							</div>
 						</div>
 					</div>
@@ -172,11 +172,11 @@ export async function renderMe() {
 					<div class="profile-actions">
 						<button class="action-button edit-profile">
 							<i class="fas fa-edit"></i>
-							${t('profile.editProfile')}
+							${t('profile.editProfile' as any)}
 						</button>
 						<button class="action-button change-password">
 							<i class="fas fa-key"></i>
-							${t('profile.changePassword')}
+							${t('profile.changePassword' as any)}
 						</button>
 						<button class="action-button TFA-button" id="TFABtn" data-enabled="${userData.twoFactorEnabled}">
 							<i class="fa-solid ${tfaButtonIcon}"></i>
@@ -260,24 +260,25 @@ export async function renderMe() {
 			}
 
 			.home-button {
+				position: fixed;
+				top: 20px;
+				left: 20px;
+				padding: 10px 15px;
+				font-size: 1em;
+				border: none;
+				border-radius: 10px;
+				background: rgba(255, 255, 255, 0.1);
+				color: white;
 				display: flex;
 				align-items: center;
 				gap: 8px;
-				padding: 10px 20px;
-				border: none;
-				border-radius: 10px;
-				background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
-				color: white;
 				cursor: pointer;
-				transition: all 0.2s;
-				font-size: 1.1rem;
-				font-weight: 600;
-				box-shadow: 0 2px 8px rgba(102, 126, 234, 0.12);
+				transition: all 0.3s ease;
+				z-index: 100;
 			}
 			.home-button:hover {
-				background: linear-gradient(90deg, #764ba2 0%, #667eea 100%);
-				transform: translateY(-2px) scale(1.04);
-				box-shadow: 0 4px 16px rgba(102, 126, 234, 0.18);
+				background: rgba(255, 255, 255, 0.2);
+				transform: translateY(-2px);
 			}
 
 			.profile-avatar {

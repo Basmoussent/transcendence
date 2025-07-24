@@ -13,6 +13,10 @@ export function initializeMainEvents() {
 
 export function renderMain(): string {
 	return `
+		<button class="home-button" id="homeBtn">
+			<i class="fas fa-home"></i>
+			Home
+		</button>
 		<div class="main-menu">
 			<div class="menu-container">
 				<h1 class="menu-title">${t('menu.title')}</h1>
@@ -47,6 +51,27 @@ export function renderMain(): string {
 		</div>
 
 		<style>
+			.home-button {
+				position: fixed;
+				top: 20px;
+				left: 20px;
+				padding: 10px 15px;
+				font-size: 1em;
+				border: none;
+				border-radius: 10px;
+				background: rgba(255, 255, 255, 0.1);
+				color: white;
+				display: flex;
+				align-items: center;
+				gap: 8px;
+				cursor: pointer;
+				transition: all 0.3s ease;
+				z-index: 100;
+			}
+			.home-button:hover {
+				background: rgba(255, 255, 255, 0.2);
+				transform: translateY(-2px);
+			}
 			.main-menu {
 				display: flex;
 				justify-content: center;

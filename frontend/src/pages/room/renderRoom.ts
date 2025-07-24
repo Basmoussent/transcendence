@@ -54,24 +54,24 @@ export function renderRoom() {
 			${t('room.home')}
 		</button>
 		
-		<div class="flex-1 flex gap-6 p-6 pt-20">
+		<div class="room-container">
 			<!-- Left Panel - Room Info -->
-			<div class="w-1/3 bg-white/10 backdrop-blur-lg rounded-xl p-6 border border-white/20 shadow-lg">
-				<div class="room-header mb-6">
-					<h1 class="text-2xl font-bold text-white mb-2" id="roomName">${t('room.roomName')}</h1>
-					<div class="flex items-center gap-4 text-white/80">
-						<div class="flex items-center gap-2">
+			<div class="left-panel">
+				<div class="room-header">
+					<h1 class="room-title" id="roomName">${t('room.roomName')}</h1>
+					<div class="room-info">
+						<div class="room-info-item">
 							<i class="fas fa-gamepad"></i>
 							<span id="gameType">Pong</span>
 						</div>
-						<div class="flex items-center gap-2">
+						<div class="room-info-item">
 							<i class="fas fa-users"></i>
 							<span id="playerCount">1/4</span>
 						</div>
 					</div>
 				</div>
 			
-				<div class="room-controls mb-6">
+				<div class="room-controls">
 					<button class="control-btn ready-btn" id="readyBtn">
 						<i class="fas fa-check"></i>
 						${t('room.ready')}
@@ -84,10 +84,10 @@ export function renderRoom() {
 				</div>
 			
 				<div class="room-settings hidden" id="roomSettings">
-					<h3 class="text-lg font-semibold text-white mb-3">${t('room.roomSettings')}</h3>
+					<h3 class="settings-title">${t('room.roomSettings')}</h3>
 					<div class="settings-grid">
 						<div class="setting-item" id="max-player">
-							<label class="text-white/80">${t('room.maxPlayers')}</label>
+							<label class="setting-label">${t('room.maxPlayers')}</label>
 							<select class="setting-select" id="maxPlayersSelect">
 								<option value="1">1</option>
 								<option value="2">2</option>
@@ -96,22 +96,20 @@ export function renderRoom() {
 							</select>
 						</div>
 						<div class="setting-item">
-							<label class="text-white/80">${t('room.gameType')}</label>
+							<label class="setting-label">${t('room.gameType')}</label>
 							<select class="setting-select" id="gameTypeSelect">
 								<option value="pong">Pong</option>
 								<option value="block">Block</option>
 							</select>
 						</div>
 						<div class="setting-item" id="ai-setting">
-							<label class="text-white/80 mb-2 block">${t('room.ai')}</label>
-							<div class="flex items-center gap-3">
-								<button type="button" class="ai-button control-button" id="decreaseAI"
-									class="px-3 py-1 bg-white/10 border border-white/30 text-white rounded-lg hover:bg-white/20 transition">
+							<label class="setting-label ai-label">${t('room.ai')}</label>
+							<div class="ai-controls">
+								<button type="button" class="ai-button" id="decreaseAI">
 									-
 								</button>
-								<span id="aiCount" class="text-white text-lg font-semibold w-6 text-center">0</span>
-								<button type="button" class="ai-button control-button" id="increaseAI"
-									class="px-3 py-1 bg-white/10 border border-white/30 text-white rounded-lg hover:bg-white/20 transition">
+								<span id="aiCount" class="ai-count">0</span>
+								<button type="button" class="ai-button" id="increaseAI">
 									+
 								</button>
 							</div>
@@ -121,7 +119,7 @@ export function renderRoom() {
 			</div>
 			
 			<!-- Center Panel - Players -->
-			<div class="flex-1 bg-white/10 backdrop-blur-lg rounded-xl p-6 border border-white/20 shadow-lg">
+			<div class="center-panel">
 				<div class="flex items-center justify-between mb-6">
 					<h2 class="text-xl font-bold text-white">${t('room.players')}</h2>
 					<div class="status-indicator" id="gameStatus">
@@ -143,10 +141,10 @@ export function renderRoom() {
 			</div>
 			
 			<!-- Right Panel - Chat -->
-			<div class="w-1/3 bg-white/10 backdrop-blur-lg rounded-xl p-6 border border-white/20 shadow-lg flex flex-col">
+			<div class="right-panel">
 				<h2 class="text-xl font-bold text-white mb-4">${t('room.chat')}</h2>
 			
-				<div class="chat-messages flex-1 overflow-y-auto mb-4" id="chatMessages">
+				<div class="chat-messages-container" id="chatMessages">
 					<!-- Chat messages will be dynamically added here -->
 				</div>
 			
@@ -161,6 +159,251 @@ export function renderRoom() {
 	
 
 	<style>
+	.room-container {
+		display: flex;
+		gap: 24px;
+		padding: 24px;
+		padding-top: 80px;
+		min-height: 100vh;
+		box-sizing: border-box;
+	}
+
+	.left-panel,
+	.right-panel {
+		width: 350px;
+		min-width: 300px;
+		max-width: 400px;
+		background: rgba(255, 255, 255, 0.1);
+		backdrop-filter: blur(16px);
+		border-radius: 12px;
+		padding: 24px;
+		border: 1px solid rgba(255, 255, 255, 0.2);
+		box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+		height: fit-content;
+		max-height: calc(100vh - 120px);
+		overflow-y: auto;
+	}
+
+	.center-panel {
+		flex: 1;
+		min-width: 0;
+		background: rgba(255, 255, 255, 0.1);
+		backdrop-filter: blur(16px);
+		border-radius: 12px;
+		padding: 24px;
+		border: 1px solid rgba(255, 255, 255, 0.2);
+		box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+		display: flex;
+		flex-direction: column;
+		height: fit-content;
+		max-height: calc(100vh - 120px);
+	}
+
+	.right-panel {
+		display: flex;
+		flex-direction: column;
+	}
+
+	/* Responsivité pour tablettes */
+	@media (max-width: 1200px) {
+		.left-panel,
+		.right-panel {
+			width: 280px;
+			min-width: 250px;
+		}
+		
+		.room-container {
+			gap: 16px;
+			padding: 16px;
+			padding-top: 70px;
+		}
+	}
+
+	/* Responsivité pour écrans moyens */
+	@media (max-width: 992px) {
+		.room-container {
+			flex-direction: column;
+			gap: 20px;
+			padding: 16px;
+			padding-top: 70px;
+		}
+
+		.left-panel,
+		.right-panel,
+		.center-panel {
+			width: 100%;
+			max-width: none;
+			min-width: 0;
+			max-height: none;
+		}
+
+		.right-panel {
+			order: 3;
+		}
+
+		.center-panel {
+			order: 2;
+		}
+
+		.left-panel {
+			order: 1;
+		}
+
+		.chat-messages-container {
+			max-height: 300px;
+		}
+	}
+
+	/* Responsivité pour mobiles */
+	@media (max-width: 768px) {
+		.room-container {
+			padding: 12px;
+			padding-top: 60px;
+			gap: 16px;
+		}
+
+		.left-panel,
+		.right-panel,
+		.center-panel {
+			padding: 16px;
+			border-radius: 8px;
+		}
+
+		.home-button {
+			top: 10px;
+			left: 10px;
+			padding: 8px 12px;
+			font-size: 0.9em;
+		}
+
+		.players-grid {
+			grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+			gap: 15px;
+		}
+
+		.chat-messages-container {
+			max-height: 250px;
+		}
+	}
+
+	/* Responsivité pour très petits écrans */
+	@media (max-width: 480px) {
+		.room-container {
+			padding: 8px;
+			padding-top: 50px;
+			gap: 12px;
+		}
+
+		.left-panel,
+		.right-panel,
+		.center-panel {
+			padding: 12px;
+		}
+
+		.players-grid {
+			grid-template-columns: 1fr;
+			gap: 12px;
+			min-height: 200px;
+		}
+
+		.player-card {
+			padding: 15px;
+		}
+
+		.control-btn {
+			padding: 10px;
+			font-size: 0.9em;
+		}
+
+		.chat-input {
+			padding: 10px;
+			font-size: 0.9em;
+		}
+
+		.send-btn {
+			padding: 10px 12px;
+		}
+
+		h1 {
+			font-size: 1.5rem !important;
+		}
+
+		h2 {
+			font-size: 1.25rem !important;
+		}
+	}
+
+	.chat-messages-container {
+		flex: 1;
+		max-height: 400px;
+		overflow-y: auto;
+		margin-bottom: 16px;
+		padding: 10px;
+		background: rgba(0, 0, 0, 0.2);
+		border-radius: 10px;
+		border: 1px solid rgba(255, 255, 255, 0.1);
+	}
+
+	/* Nouveaux styles pour les classes personnalisées */
+	.room-header {
+		margin-bottom: 24px;
+	}
+
+	.room-title {
+		font-size: 1.5rem;
+		font-weight: bold;
+		color: white;
+		margin-bottom: 8px;
+	}
+
+	.room-info {
+		display: flex;
+		align-items: center;
+		gap: 16px;
+		color: rgba(255, 255, 255, 0.8);
+	}
+
+	.room-info-item {
+		display: flex;
+		align-items: center;
+		gap: 8px;
+	}
+
+	.room-controls {
+		margin-bottom: 24px;
+	}
+
+	.settings-title {
+		font-size: 1.125rem;
+		font-weight: 600;
+		color: white;
+		margin-bottom: 12px;
+	}
+
+	.setting-label {
+		color: rgba(255, 255, 255, 0.8);
+		margin-bottom: 4px;
+		display: block;
+	}
+
+	.ai-label {
+		margin-bottom: 8px;
+	}
+
+	.ai-controls {
+		display: flex;
+		align-items: center;
+		gap: 12px;
+	}
+
+	.ai-count {
+		color: white;
+		font-size: 1.125rem;
+		font-weight: 600;
+		width: 24px;
+		text-align: center;
+	}
+
 	.home-button {
 		position: fixed;
 		top: 20px;
@@ -184,22 +427,22 @@ export function renderRoom() {
 		transform: translateY(-2px);
 	}
 
-	#chatMessages::-webkit-scrollbar {
+	.chat-messages-container::-webkit-scrollbar {
 		width: 8px;
 	}
 
-	#chatMessages::-webkit-scrollbar-track {
+	.chat-messages-container::-webkit-scrollbar-track {
 		background: rgba(255, 255, 255, 0.05); /* arrière-plan discret */
 		border-radius: 8px;
 	}
 
-	#chatMessages::-webkit-scrollbar-thumb {
+	.chat-messages-container::-webkit-scrollbar-thumb {
 		background-color: rgba(255, 255, 255, 0.3); /* poignée blanche translucide */
 		border-radius: 8px;
 		border: 2px solid rgba(255, 255, 255, 0.1); /* bord flouté */
 	}
 
-	#chatMessages::-webkit-scrollbar-thumb:hover {
+	.chat-messages-container::-webkit-scrollbar-thumb:hover {
 		background-color: rgba(255, 255, 255, 0.5); /* effet hover */
 	}
 
@@ -461,14 +704,6 @@ export function renderRoom() {
 		opacity: 0.5;
 	}
 
-	.chat-messages {
-		max-height: 400px;
-		padding: 10px;
-		background: rgba(0, 0, 0, 0.2);
-		border-radius: 10px;
-		border: 1px solid rgba(255, 255, 255, 0.1);
-	}
-
 	.chat-message {
 		margin-bottom: 15px;
 		padding: 10px;
@@ -553,7 +788,7 @@ export function renderRoom() {
 		to { opacity: 1; }
 	}
 
-	.room-header, .players-grid, .chat-messages {
+	.room-header, .players-grid, .chat-messages-container {
 		animation: fadeIn 0.5s ease-out;
 	}
 	</style>`;

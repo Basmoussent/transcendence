@@ -22,7 +22,7 @@ export function initializeMatchmakingEvents() {
 export function renderMatchmaking() {
 	const html =  `
 	<body style="position:relative; min-height:100vh;">
-		<button class="home-button-fixed" id="homeBtn">
+		<button class="home-button" id="homeBtn">
 			<i class="fas fa-home"></i>
 			Home
 		</button>
@@ -295,11 +295,11 @@ export function renderMatchmaking() {
 		}
 
 		.home-button {
-			position: absolute;
+			position: fixed;
 			top: 20px;
 			left: 20px;
-			padding: 12px 18px;
-			font-size: 1.1em;
+			padding: 10px 15px;
+			font-size: 1em;
 			border: none;
 			border-radius: 10px;
 			background: rgba(255, 255, 255, 0.1);
@@ -309,9 +309,8 @@ export function renderMatchmaking() {
 			gap: 8px;
 			cursor: pointer;
 			transition: all 0.3s ease;
-			box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+			z-index: 100;
 		}
-
 		.home-button:hover {
 			background: rgba(255, 255, 255, 0.2);
 			transform: translateY(-2px);
@@ -608,47 +607,6 @@ export function renderMatchmaking() {
 			to {
 				opacity: 1;
 				transform: translateY(0);
-			}
-		}
-		.home-button-fixed {
-			position: fixed;
-			top: 24px;
-			left: 24px;
-			z-index: 100;
-			padding: 14px 28px;
-			font-size: 1.1em;
-			border: none;
-			border-radius: 14px;
-			background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
-			color: white;
-			display: flex;
-			align-items: center;
-			gap: 10px;
-			cursor: pointer;
-			font-weight: 600;
-			box-shadow: 0 6px 24px rgba(102, 126, 234, 0.18);
-			transition: all 0.2s;
-			outline: none;
-		}
-		.home-button-fixed:hover, .home-button-fixed:focus {
-			background: linear-gradient(90deg, #764ba2 0%, #667eea 100%);
-			transform: translateY(-2px) scale(1.06);
-			box-shadow: 0 12px 32px rgba(102, 126, 234, 0.28);
-		}
-		@media (max-width: 900px) {
-			.home-button-fixed {
-				top: 10px;
-				left: 10px;
-				padding: 10px 16px;
-				font-size: 1em;
-			}
-		}
-		@media (max-width: 600px) {
-			.home-button-fixed {
-				top: 4px;
-				left: 4px;
-				padding: 8px 10px;
-				font-size: 0.95em;
 			}
 		}
 		</style>
