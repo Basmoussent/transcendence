@@ -156,7 +156,7 @@ export class Chat {
 				this.addChatMessage(data.username, data.content);
 				break;
 			case 'notify_tournament':
-				this.addTournamentMessage(data.opponent);
+				this.addChatMessage("system", `Tu t'appretes a jouer contre ${sanitizeHtml(data.opponent)} dans un tournoi`)
 				break;
 			case 'friend_list_update':
 				this.updateFriendAndRequest();

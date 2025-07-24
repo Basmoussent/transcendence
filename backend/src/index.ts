@@ -142,7 +142,7 @@ async function setup() {
 		return { message: 'pong' };
 	});
 
-	// await insert_tmp_user(fastify);
+	await insert_tmp_user(fastify);
 	
 	// Database health check
 	fastify.get('/health/db', async () => {

@@ -257,11 +257,10 @@ async function denyFriend(app: FastifyInstance, user: UserChat, friendName: stri
 }
 
 async function notifyTournament(app: FastifyInstance, user: UserChat, data: any) {
-	console.log("je recois quelque chose pour notifier")
-
-
+	
+	console.log("une game va se lance dans un tournoi, j'envoie la notif aux bons joueurs")
+	
 	for (const user of live.values()) {
-
 		if (user.username == data.user1 || user.username == data.user2) {
 			user.socket.send(JSON.stringify({
 				type: 'notify_tournament',
