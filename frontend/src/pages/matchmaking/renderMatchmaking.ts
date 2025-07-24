@@ -31,20 +31,20 @@ export function renderMatchmaking() {
 				<div id="game-options" class="flex flex-col gap-8 justify-center items-center w-full">
 					
 					<div class="title-section">
-						<h1 class="main-title">Create Game</h1>
-						<p class="subtitle">Choose the game type</p>
+						<h1 class="main-title">${t('matchmaking.createGame' as any)}</h1>
+						<p class="subtitle">${t('matchmaking.chooseGameType' as any)}</p>
 					</div>
 
 					<div class="game-type-section">
-						<h2 class="section-title">Game Type</h2>
+						<h2 class="section-title">${t('matchmaking.gameType' as any)}</h2>
 						<div class="game-type-buttons">
 							<button class="game-type-button pong-button" id="pongBtn">
 								<i class="fas fa-table-tennis"></i>
-								<span>Pong</span>
+								<span>${t('matchmaking.pong' as any)}</span>
 							</button>
 							<button class="game-type-button block-button" id="blockBtn">
 								<i class="fas fa-cubes"></i>
-								<span>Block</span>
+								<span>${t('matchmaking.block' as any)}</span>
 							</button>
 						</div>
 					</div>
@@ -52,11 +52,11 @@ export function renderMatchmaking() {
 					<div class="action-buttons">
 						<button class="action-button launch-button" id="launchBtn">
 							<i class="fas fa-rocket"></i>
-							<span>Launch Room</span>
+							<span>${t('matchmaking.launchRoom' as any)}</span>
 						</button>
 						<button class="action-button reset-button" id="resetBtn">
 							<i class="fas fa-undo"></i>
-							<span>Reset</span>
+							<span>${t('matchmaking.reset' as any)}</span>
 						</button>
 					</div>
 				</div>
@@ -65,8 +65,8 @@ export function renderMatchmaking() {
 
 			<div class="glass-panel w-2/6 flex flex-col gap-5 justify-start items-center py-8 px-6 h-10/12">
 				<div class="join-header">
-					<h1 class="join-title">Join Game</h1>
-					<p class="join-subtitle">Available Rooms</p>
+					<h1 class="join-title">${t('matchmaking.joinTitle' as any)}</h1>
+					<p class="join-subtitle">${t('matchmaking.availableRoomsTitle' as any)}</p>
 				</div>
 
 				<div class="available-games-container" id="available-games">
@@ -75,8 +75,8 @@ export function renderMatchmaking() {
 						<div class="empty-icon">
 							<i class="fas fa-gamepad"></i>
 						</div>
-						<p class="empty-text">No active games</p>
-						<p class="empty-subtext">Create a game to start</p>
+						<p class="empty-text">${t('matchmaking.noActiveGamesText' as any)}</p>
+						<p class="empty-subtext">${t('matchmaking.createGameToStartText' as any)}</p>
 					</div>
 				</div>
 			</div>

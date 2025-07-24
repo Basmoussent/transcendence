@@ -232,7 +232,7 @@ export class Block {
 		this.ctx.fillStyle = 'white';
 		this.ctx.font = '32px gaming';
 		this.ctx.textAlign = 'center';
-		this.ctx.fillText(t('block.pressEnterToStart'), this.width / 2, this.height / 2);
+		this.ctx.fillText("Press Enter to Start", this.width / 2, this.height / 2);
 		this.ctx.globalAlpha = 1;
 	}
 

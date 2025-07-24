@@ -17,7 +17,7 @@ export function renderTournaments() {
     <div style="flex:1 1 0; display: flex; align-items: center; justify-content: center;">
       <h1 class="tournaments-title">
         <i class="fas fa-trophy"></i>
-        Tournament Lobby
+        ${t('game.tournamentLobby' as any)}
       </h1>
     </div>
     <div class="tournaments-actions" style="flex:0 0 auto; display: flex; gap: 14px; align-items: center;">
@@ -27,11 +27,11 @@ export function renderTournaments() {
       </button>  
     <button class="btn btn-primary" onclick="addPlayer()">
         <i class="fas fa-user-plus"></i>
-        Add Player
+        ${t('game.addPlayer' as any)}
       </button>
       <button class="btn btn-secondary" onclick="resetTournament()">
         <i class="fas fa-redo"></i>
-        Reset
+        ${t('game.reset' as any)}
       </button>
     </div>
   </div>
@@ -47,7 +47,7 @@ export function renderTournaments() {
 		</div>
 		<div class="info-item">
 			<i class="fas fa-clock"></i>
-			<span id="tournamentStatus">Waiting for players</span>
+			<span id="tournamentStatus">${t('game.waitingForPlayers' as any)}</span>
 		</div>
 	</div>
 
@@ -55,7 +55,7 @@ export function renderTournaments() {
 	<div class="lobby-container" id="lobby-container">
 		<h2 class="lobby-title">
 			<i class="fas fa-users"></i>
-			Players Lobby
+			${t('game.playersLobby' as any)}
 		</h2>
 		<div class="players-list" id="players-list">
 			<!-- Les joueurs seront ajoutés ici dynamiquement -->
@@ -63,7 +63,7 @@ export function renderTournaments() {
 		<div class="lobby-actions">
 			<button class="btn btn-success" id="startTournamentBtn" onclick="startTournament()" disabled>
 				<i class="fas fa-play"></i>
-				Start Tournament (Need at least 2 players)
+				${t('game.startTournamentBtn' as any)} (Need at least 2 players)
 			</button>
 		</div>
 	</div>
@@ -71,7 +71,7 @@ export function renderTournaments() {
 	<div class="bracket-container" id="bracket-container" style="display: none;">
 		<!-- Quarter Finals - PREMIER TOUR À GAUCHE -->
 		<div class="bracket-round" id="qf-round" style="display: none;">
-			<h3 class="round-title">Quarter Finals</h3>
+			<h3 class="round-title">${t('game.quarterFinals' as any)}</h3>
 			<div class="matches" id="qf-matches">
 				<!-- Les matches seront générés dynamiquement -->
 			</div>
@@ -79,7 +79,7 @@ export function renderTournaments() {
 
 		<!-- Semi Finals -->
 		<div class="bracket-round" id="sf-round" style="display: none;">
-			<h3 class="round-title">Semi Finals</h3>
+			<h3 class="round-title">${t('game.semiFinals' as any)}</h3>
 			<div class="matches">
 				<div class="match" data-match="sf1">
 					<div class="match-players">
@@ -121,7 +121,7 @@ export function renderTournaments() {
 
 		<!-- Final -->
 		<div class="bracket-round" id="final-round" style="display: none;">
-			<h3 class="round-title">Final</h3>
+			<h3 class="round-title">${t('game.final' as any)}</h3>
 			<div class="matches">
 				<div class="match final-match" data-match="final">
 					<div class="match-players">
@@ -145,7 +145,7 @@ export function renderTournaments() {
 
 		<!-- Champion - À DROITE -->
 		<div class="bracket-round" id="champion-round" style="display: none;">
-			<h3 class="round-title">🏆 Champion</h3>
+			<h3 class="round-title">�� ${t('game.champion' as any)}</h3>
 			<div class="champion-podium">
 				<div class="champion-slot">
 					<i class="fas fa-crown"></i>
@@ -159,11 +159,11 @@ export function renderTournaments() {
 	<div id="empty-state" class="empty-state">
 		<div class="empty-state-content">
 			<i class="fas fa-trophy empty-icon"></i>
-			<h2>Tournament Lobby</h2>
+			<h2>${t('game.tournamentLobby' as any)}</h2>
 			<p>Add players to start building your tournament bracket!</p>
 			<button class="btn btn-primary" onclick="addPlayer()">
 				<i class="fas fa-user-plus"></i>
-				Add First Player
+				${t('game.addPlayer' as any)}
 			</button>
 		</div>
 	</div>
