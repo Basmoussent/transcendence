@@ -73,7 +73,12 @@ export class Block1v1 {
 
 	public async asyncInit(): Promise<void> {
 		this.data = await this.loadInfo(this.uuid);
-        	console.log("data dans asyncInit", this.data);
+        console.log("data dans asyncInit", this.data);
+		window.addEventListener("keydown", function(e) {
+			if(["Space","ArrowUp","ArrowDown","ArrowLeft","ArrowRight"].indexOf(e.code) > -1) {
+				e.preventDefault();
+			}
+		}, false);
 
 		this.getUsernames();
 		this.setupCanvas();
