@@ -47,9 +47,6 @@ export class WebSocketService {
 				
 				// Envoyer le premier message d'authentification
 				this.sendAuthMessage();
-				
-				// Démarrer le ping toutes les 10 secondes
-				this.startPingInterval();
 			};
 
 			this.ws.onmessage = (event) => {
