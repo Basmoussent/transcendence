@@ -142,19 +142,22 @@ export class UserService {
 	async retrieveStats(username: number) {
 		try {
 			console.log("retireve stats for ", username);
-			const user = await this.findById(username);
+			let user = await this.findById(username);
 			if (!user) {
-				return {
-					username: username,
-					pong_games: 0,
-					pong_wins: 0,
-					block_games: 0,
-					block_wins: 0,
-					total_games: 0,
-					total_wins: 0,
-					rating: 0,
-					mmr: 0
-				};
+				user = await this.findByUsername(String(username));
+				if (!user) {
+					return {
+						username: username,
+						pong_games: 0,
+						pong_wins: 0,
+						block_games: 0,
+						block_wins: 0,
+						total_games: 0,
+						total_wins: 0,
+						rating: 0,
+						mmr: 0
+					}
+				}
 			}
 
 			const stats = await new Promise<any>((resolve, reject) => {
