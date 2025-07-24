@@ -209,13 +209,21 @@ export async function renderMe() {
 		
 
 		<style>
+			body {
+				margin: 0;
+				padding: 0;
+				min-height: 100vh;
+				background: linear-gradient(135deg, #232526 0%, #414345 100%);
+				font-family: 'Segoe UI', 'Arial', sans-serif;
+				box-sizing: border-box;
+			}
 
 			.profile-wrapper {
 				min-height: 100vh;
 				display: flex;
 				justify-content: center;
-				align-items: flex-start;
-				padding: 20px;
+				align-items: center;
+				padding: 40px 16px 32px 16px;
 				box-sizing: border-box;
 			}
 
@@ -228,75 +236,15 @@ export async function renderMe() {
 				align-items: center;
 			}
 
-			.profile-page {
-				min-height: 100vh;
-				background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-				padding: 20px;
-				position: relative;
-				overflow: auto;
-				display: flex;
-				justify-content: center;
-				align-items: center;
-			}
-
-			.background-circles {
-				position: fixed;
-				top: 0;
-				left: 0;
-				width: 100%;
-				height: 100%;
-				z-index: 1;
-				pointer-events: none;
-			}
-
-			.circle {
-				position: absolute;
-				border-radius: 50%;
-				background: rgba(255, 255, 255, 0.05);
-				backdrop-filter: blur(5px);
-			}
-
-			.circle-1 {
-				width: 300px;
-				height: 300px;
-				top: -100px;
-				left: -100px;
-				background: linear-gradient(135deg, rgba(74, 144, 226, 0.1) 0%, rgba(53, 122, 189, 0.1) 100%);
-			}
-
-			.circle-2 {
-				width: 200px;
-				height: 200px;
-				top: 50%;
-				right: -50px;
-				background: linear-gradient(135deg, rgba(46, 204, 113, 0.1) 0%, rgba(39, 174, 96, 0.1) 100%);
-			}
-
-			.circle-3 {
-				width: 250px;
-				height: 250px;
-				bottom: -100px;
-				left: 20%;
-				background: linear-gradient(135deg, rgba(231, 76, 60, 0.1) 0%, rgba(192, 57, 43, 0.1) 100%);
-			}
-
-			.circle-4 {
-				width: 150px;
-				height: 150px;
-				top: 20%;
-				left: 30%;
-				background: linear-gradient(135deg, rgba(155, 89, 182, 0.1) 0%, rgba(142, 68, 173, 0.1) 100%);
-			}
-
 			.profile-container {
 				position: relative;
 				z-index: 2;
 				width: 100%;
-				background: rgba(255, 255, 255, 0.1);
+				background: rgba(255, 255, 255, 0.13);
 				backdrop-filter: blur(10px);
-				border-radius: 20px;
-				padding: 30px;
-				box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+				border-radius: 24px;
+				padding: 36px 28px 32px 28px;
+				box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.22);
 				border: 1px solid rgba(255, 255, 255, 0.18);
 				animation: fadeIn 0.5s ease-out;
 				overflow: hidden;
@@ -318,15 +266,18 @@ export async function renderMe() {
 				padding: 10px 20px;
 				border: none;
 				border-radius: 10px;
-				background: rgba(255, 255, 255, 0.1);
+				background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
 				color: white;
 				cursor: pointer;
-				transition: all 0.3s ease;
+				transition: all 0.2s;
+				font-size: 1.1rem;
+				font-weight: 600;
+				box-shadow: 0 2px 8px rgba(102, 126, 234, 0.12);
 			}
-
 			.home-button:hover {
-				background: rgba(255, 255, 255, 0.2);
-				transform: translateY(-2px);
+				background: linear-gradient(90deg, #764ba2 0%, #667eea 100%);
+				transform: translateY(-2px) scale(1.04);
+				box-shadow: 0 4px 16px rgba(102, 126, 234, 0.18);
 			}
 
 			.profile-avatar {
@@ -354,7 +305,6 @@ export async function renderMe() {
 				cursor: pointer;
 				transition: all 0.3s ease;
 			}
-
 			.change-avatar-btn:hover {
 				transform: scale(1.1);
 			}
@@ -382,7 +332,6 @@ export async function renderMe() {
 				border-radius: 15px;
 				font-size: 0.9em;
 			}
-
 			.status.online {
 				background: rgba(46, 204, 113, 0.2);
 				color: #2ecc71;
@@ -396,7 +345,7 @@ export async function renderMe() {
 			}
 
 			.stat-card {
-				background: rgba(255, 255, 255, 0.05);
+				background: rgba(255, 255, 255, 0.08);
 				border-radius: 15px;
 				padding: 15px;
 				display: flex;
@@ -450,23 +399,18 @@ export async function renderMe() {
 			.edit-profile {
 				background: linear-gradient(135deg, #4a90e2 0%, #357abd 100%);
 			}
-
 			.change-password {
 				background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
 			}
-
 			.TFA-button {
 				background: linear-gradient(135deg, #f39c12 0%, #d68910 100%);
 			}
-
 			.TFA-button[data-enabled="true"] {
 				background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
 			}
-
 			.logout {
 				background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
 			}
-
 			.action-button:hover {
 				transform: translateY(-2px);
 				box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
@@ -483,85 +427,43 @@ export async function renderMe() {
 				}
 			}
 
-			@media (max-width: 768px) {
+			@media (max-width: 900px) {
 				.profile-wrapper {
-					padding: 10px;
+					padding: 16px 2vw;
 				}
-
 				.profile-container {
-					padding: 20px;
+					padding: 20px 8px 18px 8px;
 				}
-
 				.profile-header {
 					flex-direction: column;
 					text-align: center;
 					gap: 20px;
 				}
-
-				.home-button {
-					width: 100%;
-					justify-content: center;
-				}
-
-				.profile-stats {
-					grid-template-columns: 1fr;
-				}
-
-				.profile-actions {
-					grid-template-columns: 1fr;
-				}
-
 				.username {
 					font-size: 1.8em;
 				}
-
 				.avatar-image {
 					width: 100px;
 					height: 100px;
 				}
-
-				.game-history-container {
-					padding: 20px;
-				}
-
-				.games-list {
-					max-height: 300px;
-				}
 			}
-
-			@media (max-width: 480px) {
+			@media (max-width: 600px) {
 				.profile-wrapper {
 					padding: 5px;
 				}
-
 				.profile-container {
-					padding: 15px;
+					padding: 10px 2px 8px 2px;
 				}
-
 				.username {
 					font-size: 1.5em;
 				}
-
 				.avatar-image {
 					width: 80px;
 					height: 80px;
 				}
-
 				.change-avatar-btn {
 					width: 30px;
 					height: 30px;
-				}
-
-				.game-history-container {
-					padding: 15px;
-				}
-
-				.games-list {
-					max-height: 250px;
-				}
-
-				.game-history-item {
-					padding: 15px;
 				}
 			}
 
