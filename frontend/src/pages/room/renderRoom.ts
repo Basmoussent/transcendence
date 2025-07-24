@@ -378,8 +378,8 @@ const getTemplate = () => {
 		background: rgba(245, 158, 11, 0.1);
 	}
 
-			.player-card.host::before {
-			content: "${t('room.host')}";
+	.player-card.host::before {
+		content: "${t('room.host')}";
 		position: absolute;
 		top: 5px;
 		right: 5px;

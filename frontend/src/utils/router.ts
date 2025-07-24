@@ -80,19 +80,28 @@ export async function router() {
 				return; 
 			}
 
-			
-
 			/// pas pouvoir aller sur le profil des gens qui nous bloquent
 		}
 		else {
 
-			const flag = await gameExists(uuid, token);
+			const game = await gameExists(uuid, token);
 
-			if (!flag) {
+			if (game == null) {
 				window.history.pushState({}, '', '/main');
 				window.dispatchEvent(new PopStateEvent('popstate'));
 				return; 
 			}
+
+			const me = await fetchMe(token);
+
+			console.log("je dis dot dot dot dot")
+
+			if (await imBlockedBySomeone(me.id, game, token)) {
+				window.history.pushState({}, '', '/main');
+				window.dispatchEvent(new PopStateEvent('popstate'));
+				return; 
+			}
+
 		}
 
 	}
@@ -287,9 +296,7 @@ async function gameExists(uuid: string, token: any) {
 		if (response.ok) {
 			const result = await response.json();
 
-			if (result.game === null)
-				return false
-			return true
+			return result.game;
 		}
 	}
 	catch (err) {
@@ -330,5 +337,41 @@ async function checkThatImNotBlocked(myid: number, profilid: number, token: any)
 	}
 	catch (err) {
 		console.error("attention erreur dans checkThatImNotBlocked")
+	}
+}
+
+async function imBlockedBySomeone(id: number, game: any, token: any) {
+
+	try {
+		const response = await fetch(`/api/friend/relations/?userid=${id}`, {
+			method: 'GET',
+			headers: {
+				'Content-Type': 'application/json',
+				'x-access-token': token,
+			},
+		});
+
+		if (response.ok) {
+
+			const relations = await response.json();
+
+			console.log(JSON.stringify(relations, null, 8))
+
+			for (const relation in relations) {
+				if (game.player1 && ((relation.user_1 == game.player1 || relation.user_2 == game.player1) && (relation.user1_state == 'angry' || relation.user2_state == 'angry')))
+					return false
+				if (game.player2 && ((relation.user_1 == game.player2 || relation.user_2 == game.player2) && (relation.user1_state == 'angry' || relation.user2_state == 'angry')))
+					return false
+				if (game.player3 && ((relation.user_1 == game.player3 || relation.user_2 == game.player3) && (relation.user1_state == 'angry' || relation.user2_state == 'angry')))
+					return false
+				if (game.player4 && ((relation.user_1 == game.player4 || relation.user_2 == game.player4) && (relation.user1_state == 'angry' || relation.user2_state == 'angry')))
+					return false
+			}
+			return false;
+		}
+		console.error("olololooooo les problèmes ya pas eu de response zig");
+	}
+	catch (err) {
+		console.error("olololooooo les problèmes");
 	}
 }
