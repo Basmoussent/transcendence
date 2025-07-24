@@ -95,22 +95,6 @@ export class WebSocketService {
 		}
 	}
 
-	private startPingInterval() {
-		// Arrêter l'intervalle existant s'il y en a un
-		this.stopPingInterval();
-		
-		// Démarrer un nouveau ping toutes les 10 secondes
-		this.pingInterval = setInterval(() => {
-			if (this.ws && this.ws.readyState === WebSocket.OPEN) {
-				const pingMessage = {
-					type: 'ping'
-				};
-				this.ws.send(JSON.stringify(pingMessage));
-				console.log('🔄 Ping sent');
-			}
-		}, 10000); // 10 secondes
-	}
-
 	private stopPingInterval() {
 		if (this.pingInterval) {
 			clearInterval(this.pingInterval);

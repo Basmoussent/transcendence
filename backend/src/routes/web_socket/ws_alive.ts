@@ -10,20 +10,22 @@ export function handleAlive(connection: WebSocket, req: FastifyRequest, app: Fas
 	connection.on('message', async (msg: string) => {
 		try {
 			const data = JSON.parse(msg);
-			
+			console.log("ping alive ping alive");
 			if (!authenticated) {
 				// Premier message doit contenir le token
 				if (data.type === 'ping' && data.token) {
 					try {
 						const decoded = app.jwt.verify(data.token) as { user: string; name: string };
+						console.log("ping alive ping alive");
 						const user = await app.userService.findByUsername(decoded.name);
+						console.log("ping alive from ", decoded.name);
 						if (!user) throw new Error('User not found');
 						userId = user.id;
 						username = decoded.name;
 						authenticated = true;
 						
-						await redis.set(`${userId}:online`, '1', { EX: 15 });
-						await redis.set(`${username}:online`, '1', { EX: 15 });
+						await redis.set(`${userId}:online`, '1', { EX: 5 });
+						await redis.set(`${username}:online`, '1', { EX: 5 });
 						console.log(`✅ User ${username} (ID: ${userId}) connected to /alive - Status: ONLINE`);
 						
 						// Confirmation d'authentification
@@ -50,20 +52,6 @@ export function handleAlive(connection: WebSocket, req: FastifyRequest, app: Fas
 					// connection.send(JSON.stringify({ type: 'auth_error', message: 'Authentication required' }));
 					connection.close();
 					return;
-				}
-			} else {
-				// Messages suivants : ping pour maintenir la présence
-				if (data.type === 'ping' && userId && username) {
-					await redis.set(`${userId}:online`, '1', { EX: 15 });
-					await redis.set(`${username}:online`, '1', { EX: 15 });
-					console.log(`🔄 User ${username} (ID: ${userId}) ping - Status: ONLINE`);
-					
-					// Confirmation du ping
-					connection.send(JSON.stringify({ 
-						type: 'pong', 
-						message: 'Ping received',
-						timestamp: Date.now()
-					}));
 				}
 			}
 		} catch (error) {

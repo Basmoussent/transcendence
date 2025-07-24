@@ -25,17 +25,17 @@ interface Relation {
 	user2_state: 'normal' | 'requested' | 'waiting' | 'blocked' | 'angry';
 }
 
-const live = new Map<number, UserChat>();
+export const live = new Map<number, UserChat>();
 
 export async function handleChat(app: FastifyInstance, socket: WebSocket, req: FastifyRequest) {
 	try {
 		const token = req.cookies['x-access-token']; 
 
 		if (!token) {
-			// socket.send(JSON.stringify({
-			// 	type: 'notLog',
-			// 	message: 'the user is not log' }))
-			// return ;
+			socket.send(JSON.stringify({
+				type: 'notLog',
+				message: 'the user is not log' }))
+			return ;
 		}
 
 		const decoded = app.jwt.verify(token as string) as { user: string, name: string };
@@ -51,9 +51,10 @@ export async function handleChat(app: FastifyInstance, socket: WebSocket, req: F
 			socket: socket
 		}
 
-		live.set(user.id, user);
-		// dire a tous ceux dont user.username est ami d'update leur UI
-		// car il est connecte
+		if (!live.get(user.id)) {
+			console.log("user pas encore connecte")
+			live.set(user.id, user);
+		}
 
 		socket.on('message', (message: string) => {
 			handleMessage(message, user, app);
@@ -90,6 +91,10 @@ async function handleMessage(message: string, user: UserChat, app: FastifyInstan
 			case 'deny_friend_request':
 				console.log("je recois quelque chose pour refuser")
 				denyFriend(app, user, data.dest)
+				break;
+
+			case 'notify_tournament':
+				notifyTournament(app, user, data)
 				break;
 
 			case 'disconnection':
@@ -249,4 +254,19 @@ async function denyFriend(app: FastifyInstance, user: UserChat, friendName: stri
 	console.log(`je send a ${user.username} et ${friend.username}`)
 	user.socket.send(message)
 	live.get(friend.id)?.socket.send(message);
+}
+
+async function notifyTournament(app: FastifyInstance, user: UserChat, data: any) {
+	console.log("je recois quelque chose pour notifier")
+
+
+	for (const user of live.values()) {
+
+		if (user.username == data.user1 || user.username == data.user2) {
+			user.socket.send(JSON.stringify({
+				type: 'notify_tournament',
+				opponent: user.username == data.user1 ? data.user2 : data.user1,
+			}));
+		}
+	}
 }

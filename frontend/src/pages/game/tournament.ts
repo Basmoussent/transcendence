@@ -1,6 +1,8 @@
 import { Pong } from '../../game/pong/pong';
 import { sanitizeHtml } from '../../utils/sanitizer';
 import { t } from '../../utils/translations';
+import { live } from '../../routes/web_socket/ws_chat';
+import { getAuthToken } from '@/utils/auth';
 
 export function renderTournaments() {
   const html =  `
@@ -1357,8 +1359,9 @@ document.addEventListener('input', function(event: Event) {
   }
 });
 
-(window as any).startGame = function(matchId: any) {
+  (window as any).startGame = function(matchId: any) {
   console.log('Initializing Pong game...', matchId);
+  
   const canvas = document.getElementById('gameCanvas') as HTMLCanvasElement;
   if (!canvas) {
     console.error('Canvas not found!');
@@ -1377,6 +1380,12 @@ document.addEventListener('input', function(event: Event) {
   
   const p1Username = p1Data?.username || p1DisplayName || 'Player1';
   const p2Username = p2Data?.username || p2DisplayName || 'Player2';
+
+  (window as any).ws.send(JSON.stringify({
+    type: 'notify_tournament',
+    user1: p1Username,
+    user2: p2Username,
+  }));
   
   const game = new Pong(canvas);
   if (canvas) {
@@ -1515,7 +1524,14 @@ function cleanStart() {
 }
 
 export function initializeTournamentEvents() {
-  console.log("test");
+
+  (window as any).ws = new WebSocket(`${window.location.protocol === "https:" ? "wss" : "ws"}://${window.location.host}/api/chat`);
+  (window as any).ws.onmessage = (event: MessageEvent) => {
+    const data = JSON.parse(event.data);
+    if (data.type === 'notify_tournament') {
+      console.log("notify_tournament", data.content);
+    }
+  };
   generateQuarterFinals();
   // updateLobbyDisplay();
   cleanStart();

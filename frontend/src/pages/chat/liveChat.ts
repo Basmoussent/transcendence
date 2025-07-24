@@ -155,6 +155,9 @@ export class Chat {
 				console.log(`les message ${data.content}`)
 				this.addChatMessage(data.username, data.content);
 				break;
+			case 'notify_tournament':
+				this.addTournamentMessage(data.opponent);
+				break;
 			case 'friend_list_update':
 				this.updateFriendAndRequest();
 				break;
@@ -589,4 +592,12 @@ function setupPing(ws: WebSocket) {
 			}));
 		}
 	}, 10000);	
+}
+
+function addTournamentMessage(opponent: string) {
+	const messageElement = document.createElement('div');
+	messageElement.className = 'chat-message system';
+	messageElement.innerHTML = `<div class="chat-message-content">${sanitizeHtml("Tu t'appretes a jouer contre " + opponent + " dans un tournoi")}</div>`;
+	// this.chatMessages.appendChild(messageElement);
+	// this.chatMessages.scrollTop = this.chatMessages.scrollHeight;
 }
