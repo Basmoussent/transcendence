@@ -94,9 +94,8 @@ export async function router() {
 
 			const me = await fetchMe(token);
 
-			console.log("je dis dot dot dot dot")
-
 			if (await imBlockedBySomeone(me.id, game, token)) {
+				console.error(`tu veux rejoindre quoi l'ancien t'es bloque par quelqu'un`)
 				window.history.pushState({}, '', '/main');
 				window.dispatchEvent(new PopStateEvent('popstate'));
 				return; 
@@ -351,27 +350,34 @@ async function imBlockedBySomeone(id: number, game: any, token: any) {
 			},
 		});
 
+		const result = await response.json();
+
 		if (response.ok) {
 
-			const relations = await response.json();
+			const relations = result.relations
 
-			console.log(JSON.stringify(relations, null, 8))
+			console.log(`les relations : ${JSON.stringify(relations, null, 8)}`)
 
-			for (const relation in relations) {
-				if (game.player1 && ((relation.user_1 == game.player1 || relation.user_2 == game.player1) && (relation.user1_state == 'angry' || relation.user2_state == 'angry')))
-					return false
-				if (game.player2 && ((relation.user_1 == game.player2 || relation.user_2 == game.player2) && (relation.user1_state == 'angry' || relation.user2_state == 'angry')))
-					return false
-				if (game.player3 && ((relation.user_1 == game.player3 || relation.user_2 == game.player3) && (relation.user1_state == 'angry' || relation.user2_state == 'angry')))
-					return false
-				if (game.player4 && ((relation.user_1 == game.player4 || relation.user_2 == game.player4) && (relation.user1_state == 'angry' || relation.user2_state == 'angry')))
-					return false
+			const players = [game.player1, game.player2, game.player3, game.player4];
+
+
+			for (const relation of relations) {
+
+				const otherid = id == relation.user_1 ? relation.user_2 : relation.user_1;
+
+				if (players.includes(otherid))
+					if (relation.user1_state == 'angry' || relation.user2_state == 'angry')
+						return true
+
+				console.log("je passe sur une relation")
 			}
 			return false;
 		}
 		console.error("olololooooo les problèmes ya pas eu de response zig");
+		return true;
 	}
 	catch (err) {
 		console.error("olololooooo les problèmes");
+		return true;
 	}
 }
