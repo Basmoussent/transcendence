@@ -30,12 +30,6 @@ export function renderChat() {
 		${t('chat.myFriends' as any)}
 		</h1>
 
-		<!-- Barre de recherche -->
-		<div class="search-bar">
-		<i class="fas fa-search search-icon"></i>
-		<input type="text" class="search-input" id="searchInput" placeholder="${t('chat.searchFriend' as any)}">
-		</div>
-
 		<!-- Onglets -->
 		<div class="tabs">
 		<div class="tab active" data-tab="friends">

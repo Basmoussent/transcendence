@@ -26,7 +26,6 @@ export class Chat {
 
 	// Left Panel
 	private homeBtn!: HTMLButtonElement;
-	private searchInput!: HTMLInputElement;
 	private friendsList!: HTMLElement;
 	private requestsList!: HTMLElement;
 	private addFriendBtn!: HTMLButtonElement;
@@ -66,7 +65,6 @@ export class Chat {
 
 		// Left Panel Elements
 		this.homeBtn = this.getElement('homeBtn') as HTMLButtonElement;
-		this.searchInput = this.getElement('searchInput') as HTMLInputElement;
 		this.friendsList = this.getElement('friendsList');
 		this.requestsList = this.getElement('requestsList');
 		this.addFriendBtn = this.getElement('addFriendBtn') as HTMLButtonElement;
