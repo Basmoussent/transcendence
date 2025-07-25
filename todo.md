@@ -11,14 +11,6 @@
 #	# ◦ Minor module: Supports multiple languages.
 ------------------------------------------------------------------------
 
-
-#	# ◦ Minor module: User and game stats dashboards
-# ◦ Minor module: Support on all devices.
-
-mettre tout els jwt.verify dasn des try and catch
-mettre une verife de jwt dans le routeur
-clean la page /main
-
 8M3m
 
 
