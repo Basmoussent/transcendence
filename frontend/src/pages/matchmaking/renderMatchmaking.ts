@@ -26,8 +26,8 @@ export function renderMatchmaking() {
 			<i class="fas fa-home"></i>
 			Home
 		</button>
-		<div class="flex gap-12 h-screen justify-center items-center px-8 pb-40" id="options-container">
-			<div class="glass-panel w-4/6 flex flex-col gap-10 justify-center items-center px-20 py-16 h-10/12">
+		<div class="flex gap-8 h-screen justify-center items-center px-4 pb-40" id="options-container">
+			<div class="glass-panel w-3/6 flex flex-col gap-10 justify-center items-center px-20 py-16 h-10/12">
 				<div id="game-options" class="flex flex-col gap-8 justify-center items-center w-full">
 					
 					<div class="title-section">
@@ -610,28 +610,30 @@ export function renderMatchmaking() {
 				transform: translateY(0);
 			}
 		}
+
 		.home-button-fixed {
 			position: fixed;
 			top: 24px;
 			left: 24px;
-			z-index: 100;
+			z-index: 1000;
 			padding: 14px 28px;
 			font-size: 1.1em;
-			border: none;
+			border: 1px solid rgba(255, 255, 255, 0.2);
 			border-radius: 14px;
-			background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+			background: rgba(255, 255, 255, 0.1);
+			backdrop-filter: blur(10px);
 			color: white;
 			display: flex;
 			align-items: center;
 			gap: 10px;
 			cursor: pointer;
 			font-weight: 600;
-			box-shadow: 0 6px 24px rgba(102, 126, 234, 0.18);
+			box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
 			transition: all 0.2s;
 			outline: none;
 		}
 		.home-button-fixed:hover, .home-button-fixed:focus {
-			background: linear-gradient(90deg, #764ba2 0%, #667eea 100%);
+			background: rgba(255, 255, 255, 0.2);
 			transform: translateY(-2px) scale(1.06);
 			box-shadow: 0 12px 32px rgba(102, 126, 234, 0.28);
 		}

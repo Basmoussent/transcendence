@@ -56,7 +56,7 @@ export function renderRoom() {
 		
 		<div class="flex-1 flex gap-6 p-6 pt-20">
 			<!-- Left Panel - Room Info -->
-			<div class="w-1/3 bg-white/10 backdrop-blur-lg rounded-xl p-6 border border-white/20 shadow-lg">
+			<div class="w-1/4 bg-white/10 backdrop-blur-lg rounded-xl p-6 border border-white/20 shadow-lg">
 				<div class="room-header mb-6">
 					<h1 class="text-2xl font-bold text-white mb-2" id="roomName">${t('room.roomName')}</h1>
 					<div class="flex items-center gap-4 text-white/80">
@@ -143,7 +143,7 @@ export function renderRoom() {
 			</div>
 			
 			<!-- Right Panel - Chat -->
-			<div class="w-1/3 bg-white/10 backdrop-blur-lg rounded-xl p-6 border border-white/20 shadow-lg flex flex-col">
+			<div class="w-1/4 bg-white/10 backdrop-blur-lg rounded-xl p-6 border border-white/20 shadow-lg flex flex-col">
 				<h2 class="text-xl font-bold text-white mb-4">${t('room.chat')}</h2>
 			
 				<div class="chat-messages flex-1 overflow-y-auto mb-4" id="chatMessages">
