@@ -47,9 +47,6 @@ export class WebSocketService {
 				
 				// Envoyer le premier message d'authentification
 				this.sendAuthMessage();
-				
-				// Démarrer le ping toutes les 10 secondes
-				this.startPingInterval();
 			};
 
 			this.ws.onmessage = (event) => {
@@ -93,22 +90,6 @@ export class WebSocketService {
 				console.log('🔐 Authentication message sent');
 			}
 		}
-	}
-
-	private startPingInterval() {
-		// Arrêter l'intervalle existant s'il y en a un
-		this.stopPingInterval();
-		
-		// Démarrer un nouveau ping toutes les 10 secondes
-		this.pingInterval = setInterval(() => {
-			if (this.ws && this.ws.readyState === WebSocket.OPEN) {
-				const pingMessage = {
-					type: 'ping'
-				};
-				this.ws.send(JSON.stringify(pingMessage));
-				console.log('🔄 Ping sent');
-			}
-		}, 10000); // 10 secondes
 	}
 
 	private stopPingInterval() {

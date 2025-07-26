@@ -2,6 +2,7 @@ import { fetchUsername, logStartGame } from "../gameUtils.ts";
 import { Ball, Paddle, brick, createRandomBrick } from "./blockUtils.ts";
 import { getAuthToken } from '../../utils/auth.ts'
 import { t } from '../../utils/translations.ts'
+import { sanitizeHtml } from "../../utils/sanitizer.ts";
 
 export interface Game {
 	id: number,
@@ -68,6 +69,11 @@ export class Block {
 	public async asyncInit(): Promise<void> {
 		this.data = await this.loadInfo(this.uuid);
         console.log("data dans asyncInit", this.data);
+		window.addEventListener("keydown", function(e) {
+            if(["Space","ArrowUp","ArrowDown","ArrowLeft","ArrowRight"].indexOf(e.code) > -1) {
+                e.preventDefault();
+            }
+        }, false);
 
 		this.loadUsername();
 		this.setupCanvas();
@@ -226,7 +232,7 @@ export class Block {
 		this.ctx.fillStyle = 'white';
 		this.ctx.font = '32px gaming';
 		this.ctx.textAlign = 'center';
-		this.ctx.fillText(t('block.pressEnterToStart'), this.width / 2, this.height / 2);
+		this.ctx.fillText("Press Enter to Start", this.width / 2, this.height / 2);
 		this.ctx.globalAlpha = 1;
 	}
 
@@ -260,7 +266,7 @@ export class Block {
 
 			// Créer les briques
 			this.bricks = [];
-			for (let i = 0; i < 1; i++) {
+			for (let i = 0; i < 100; i++) {
 				this.bricks.push(createRandomBrick(i, i % 20, Math.floor(i / 20)));
 			}
 		}
@@ -370,7 +376,7 @@ export class Block {
         this.ctx.fillStyle = 'white';
         this.ctx.font = '48px gaming';
 		if (this.win)
-        	this.ctx.fillText(`${this.winner} WON`, this.width / 2, this.height / 2);
+        	this.ctx.fillText(`${sanitizeHtml(this.winner)} WON`, this.width / 2, this.height / 2);
 		else if (this.lost)
         	this.ctx.fillText(`LOSER`, this.width / 2, this.height / 2);
         this.ctx.globalAlpha = 1;

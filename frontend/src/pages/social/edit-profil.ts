@@ -280,5 +280,4 @@ function initializeEditProfileEvents() {
 	});
 }
 
-// Exporter la fonction d'initialisation pour qu'elle puisse être appelée après le rendu
 export { initializeEditProfileEvents }; 

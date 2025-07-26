@@ -6,6 +6,7 @@ import { PADDLE_OFFSET, Player, PADDLE1_COLOR, PADDLE2_COLOR, PADDLE3_COLOR, PAD
 import { t } from '../../../utils/translations';
 import { logStartGame } from "../../../game/gameUtils";
 import { fetchUserInfo } from '../../../pages/chat/utils'
+import { sanitizeHtml } from "../../../utils/sanitizer";
 
 export interface Game {
 	id: number,
@@ -287,25 +288,25 @@ export class MultiPong {
         this.ctx.fillText(t('pong.pressEnterToStart'), this.width / 2 - 190, this.height / 2 - 100);
         this.ctx.fillText(t('pong.toStart'), this.width / 2 - 140, this.height / 2 - 50);
         this.ctx.fillStyle = PADDLE1_COLOR;
-        this.ctx.fillText(`${this.paddles[0].name}: W/S KEYS`, this.width / 2 - 280, this.height / 2 + 20);
+        this.ctx.fillText(`${sanitizeHtml(this.paddles[0].name)}: W/S KEYS`, this.width / 2 - 280, this.height / 2 + 20);
         this.ctx.fillStyle = PADDLE2_COLOR;
-        this.ctx.fillText(`${this.paddles[1].name}: ARROW KEYS`, this.width / 2 - 330, this.height / 2 + 70);
+        this.ctx.fillText(`${sanitizeHtml(this.paddles[1].name)}: ARROW KEYS`, this.width / 2 - 330, this.height / 2 + 70);
         if (this.paddles[2]) {
             this.ctx.fillStyle = PADDLE3_COLOR;
-            this.ctx.fillText(`${this.paddles[2].name}: K/L KEYS`, this.width / 2 - 280, this.height / 2 + 120);
+            this.ctx.fillText(`${sanitizeHtml(this.paddles[2].name)}: K/L KEYS`, this.width / 2 - 280, this.height / 2 + 120);
         }
         if (this.paddles[3]) {
             this.ctx.fillStyle = PADDLE3_COLOR;
-            this.ctx.fillText(`${this.paddles[3].name}: 5/6 KEYS`, this.width / 2 - 280, this.height / 2 + 170);
+            this.ctx.fillText(`${sanitizeHtml(this.paddles[3].name)}: 5/6 KEYS`, this.width / 2 - 280, this.height / 2 + 170);
         }
         this.ctx.globalAlpha = 1;
-}
+    }
 
     private displayEndMsg(): void {
         this.ctx.globalAlpha = 0.2;
         this.ctx.fillStyle = 'white';
         this.ctx.font = '48px gaming';
-        this.ctx.fillText(`${this.winner} WINS`, this.width / 2, this.height / 2);
+        this.ctx.fillText(`${sanitizeHtml(this.winner)} WINS`, this.width / 2, this.height / 2);
         this.ctx.globalAlpha = 1;
     }
 

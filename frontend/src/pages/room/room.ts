@@ -77,6 +77,9 @@ export class Room {
 
 		console.log("room constructor")
 
+		// Remplacer l'event listener par un onclick
+		this.readyBtn.onclick = () => this.toggleReadyState();
+
 		this.setupClickEvents();
 
 		console.log('qwdjioqwdjioqwdjio       token:', this.token);
@@ -129,7 +132,6 @@ export class Room {
 		});
 
 		this.sendBtn.addEventListener('click', () => this.sendChatMessage());
-		this.readyBtn.addEventListener('click', () => this.toggleReadyState());
 		this.startBtn.addEventListener('click', () => this.startGame());
 		this.leaveBtn.addEventListener('click', () => this.leaveRoom());
 		this.homeBtn.addEventListener('click', () => this.goHome());
@@ -170,7 +172,8 @@ export class Room {
 				this.ws.close();
 				window.history.pushState({}, '', '/matchmaking');
 				window.dispatchEvent(new Event('popstate'));
-
+				break;
+			case 'pong':
 				break;
 			default:
 				console.warn(`Unknown event type received: ${data.type}`);
@@ -371,11 +374,11 @@ export class Room {
 
 		let pp;
 		if (i === 1)
-			pp = "/api/uploads/frozen.png";
+			pp = "../../public/frozen.png";
 		else if (i === 2)
-			pp = "/api/uploads/fetiche.png";
+			pp = "../../public/fetiche.png";
 		else
-			pp = "/api/uploads/droide.png";
+			pp = "../../public/droide.png";
 
 		return `
 			<div class="player-card ai">

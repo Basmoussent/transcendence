@@ -12,7 +12,6 @@ import { FriendService } from './services/friendService';
 import { GameService } from './services/gameService';
 import { RoomService } from './services/roomService';
 import { ChatService } from './services/chatService';
-import  { insert_tmp_user } from './insert_tmp_user';
 import authRoutes from "./routes/authentication"
 import gameRoutes from './routes/game';
 import editRoutes from './routes/reset-pwd';
@@ -21,7 +20,6 @@ import friendRoutes from './routes/friend';
 import webSocketRoutes from './routes/web-socket';
 import { getSecretFromVault } from './utils/vault';
 import { createClient } from 'redis';
-import { insert_tmp_user } from './insert_tmp_user';
 
 
 const fastify = Fastify({ logger: { level: 'debug' } });
@@ -142,7 +140,6 @@ async function setup() {
 		return { message: 'pong' };
 	});
 
-	await insert_tmp_user(fastify);
 	
 	// Database health check
 	fastify.get('/health/db', async () => {

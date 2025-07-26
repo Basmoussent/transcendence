@@ -22,7 +22,7 @@ export function initializeMatchmakingEvents() {
 export function renderMatchmaking() {
 	const html =  `
 	<body style="position:relative; min-height:100vh;">
-		<button class="home-button-fixed" id="homeBtn">
+		<button class="home-button" id="homeBtn">
 			<i class="fas fa-home"></i>
 			Home
 		</button>
@@ -31,20 +31,20 @@ export function renderMatchmaking() {
 				<div id="game-options" class="flex flex-col gap-8 justify-center items-center w-full">
 					
 					<div class="title-section">
-						<h1 class="main-title">Create Game</h1>
-						<p class="subtitle">Choose the game type</p>
+						<h1 class="main-title">${t('matchmaking.createGame' as any)}</h1>
+						<p class="subtitle">${t('matchmaking.chooseGameType' as any)}</p>
 					</div>
 
 					<div class="game-type-section">
-						<h2 class="section-title">Game Type</h2>
+						<h2 class="section-title">${t('matchmaking.gameType' as any)}</h2>
 						<div class="game-type-buttons">
 							<button class="game-type-button pong-button" id="pongBtn">
 								<i class="fas fa-table-tennis"></i>
-								<span>Pong</span>
+								<span>${t('matchmaking.pong' as any)}</span>
 							</button>
 							<button class="game-type-button block-button" id="blockBtn">
 								<i class="fas fa-cubes"></i>
-								<span>Block</span>
+								<span>${t('matchmaking.block' as any)}</span>
 							</button>
 						</div>
 					</div>
@@ -52,11 +52,11 @@ export function renderMatchmaking() {
 					<div class="action-buttons">
 						<button class="action-button launch-button" id="launchBtn">
 							<i class="fas fa-rocket"></i>
-							<span>Launch Room</span>
+							<span>${t('matchmaking.launchRoom' as any)}</span>
 						</button>
 						<button class="action-button reset-button" id="resetBtn">
 							<i class="fas fa-undo"></i>
-							<span>Reset</span>
+							<span>${t('matchmaking.reset' as any)}</span>
 						</button>
 					</div>
 				</div>
@@ -65,8 +65,8 @@ export function renderMatchmaking() {
 
 			<div class="glass-panel w-2/6 flex flex-col gap-5 justify-start items-center py-8 px-6 h-10/12">
 				<div class="join-header">
-					<h1 class="join-title">Join Game</h1>
-					<p class="join-subtitle">Available Rooms</p>
+					<h1 class="join-title">${t('matchmaking.joinTitle' as any)}</h1>
+					<p class="join-subtitle">${t('matchmaking.availableRoomsTitle' as any)}</p>
 				</div>
 
 				<div class="available-games-container" id="available-games">
@@ -75,8 +75,8 @@ export function renderMatchmaking() {
 						<div class="empty-icon">
 							<i class="fas fa-gamepad"></i>
 						</div>
-						<p class="empty-text">No active games</p>
-						<p class="empty-subtext">Create a game to start</p>
+						<p class="empty-text">${t('matchmaking.noActiveGamesText' as any)}</p>
+						<p class="empty-subtext">${t('matchmaking.createGameToStartText' as any)}</p>
 					</div>
 				</div>
 			</div>
@@ -295,11 +295,11 @@ export function renderMatchmaking() {
 		}
 
 		.home-button {
-			position: absolute;
+			position: fixed;
 			top: 20px;
 			left: 20px;
-			padding: 12px 18px;
-			font-size: 1.1em;
+			padding: 10px 15px;
+			font-size: 1em;
 			border: none;
 			border-radius: 10px;
 			background: rgba(255, 255, 255, 0.1);
@@ -309,9 +309,8 @@ export function renderMatchmaking() {
 			gap: 8px;
 			cursor: pointer;
 			transition: all 0.3s ease;
-			box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+			z-index: 100;
 		}
-
 		.home-button:hover {
 			background: rgba(255, 255, 255, 0.2);
 			transform: translateY(-2px);
@@ -608,47 +607,6 @@ export function renderMatchmaking() {
 			to {
 				opacity: 1;
 				transform: translateY(0);
-			}
-		}
-		.home-button-fixed {
-			position: fixed;
-			top: 24px;
-			left: 24px;
-			z-index: 100;
-			padding: 14px 28px;
-			font-size: 1.1em;
-			border: none;
-			border-radius: 14px;
-			background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
-			color: white;
-			display: flex;
-			align-items: center;
-			gap: 10px;
-			cursor: pointer;
-			font-weight: 600;
-			box-shadow: 0 6px 24px rgba(102, 126, 234, 0.18);
-			transition: all 0.2s;
-			outline: none;
-		}
-		.home-button-fixed:hover, .home-button-fixed:focus {
-			background: linear-gradient(90deg, #764ba2 0%, #667eea 100%);
-			transform: translateY(-2px) scale(1.06);
-			box-shadow: 0 12px 32px rgba(102, 126, 234, 0.28);
-		}
-		@media (max-width: 900px) {
-			.home-button-fixed {
-				top: 10px;
-				left: 10px;
-				padding: 10px 16px;
-				font-size: 1em;
-			}
-		}
-		@media (max-width: 600px) {
-			.home-button-fixed {
-				top: 4px;
-				left: 4px;
-				padding: 8px 10px;
-				font-size: 0.95em;
 			}
 		}
 		</style>

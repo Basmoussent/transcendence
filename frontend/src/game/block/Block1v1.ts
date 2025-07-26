@@ -3,6 +3,7 @@ import { getAuthToken } from '../../utils/auth.ts'
 import { t } from '../../utils/translations.ts'
 import { logStartGame } from "../gameUtils.ts";
 import { fetchUserInfo } from '../../pages/chat/utils'
+import { sanitizeHtml } from "../../utils/sanitizer.ts";
 
 const PADDLE1_COLOR = '#84AD8A';
 const PADDLE2_COLOR = '#84A6AD';
@@ -72,7 +73,12 @@ export class Block1v1 {
 
 	public async asyncInit(): Promise<void> {
 		this.data = await this.loadInfo(this.uuid);
-        	console.log("data dans asyncInit", this.data);
+        console.log("data dans asyncInit", this.data);
+		window.addEventListener("keydown", function(e) {
+			if(["Space","ArrowUp","ArrowDown","ArrowLeft","ArrowRight"].indexOf(e.code) > -1) {
+				e.preventDefault();
+			}
+		}, false);
 
 		this.getUsernames();
 		this.setupCanvas();
@@ -215,12 +221,12 @@ export class Block1v1 {
 		this.ctx.fillStyle = 'white';
 		this.ctx.font = '32px gaming';
 		this.ctx.textAlign = 'center';
-		this.ctx.fillText(t('block.pressEnterToStart'), this.width / 2, this.height / 2 - 40);
+		this.ctx.fillText("Press Enter to Start", this.width / 2, this.height / 2 - 40);
 
 		this.ctx.fillStyle = PADDLE1_COLOR;
-		this.ctx.fillText(`${this.name1}: A/D KEYS`, this.width / 2, this.height / 2 + 40);
+		this.ctx.fillText(`${sanitizeHtml(this.name1)}: A/D KEYS`, this.width / 2, this.height / 2 + 40);
 		this.ctx.fillStyle = PADDLE2_COLOR;
-		this.ctx.fillText(`${this.name2}: ARROW KEYS`, this.width / 2, this.height / 2 + 80);
+		this.ctx.fillText(`${sanitizeHtml(this.name2)}: ARROW KEYS`, this.width / 2, this.height / 2 + 80);
 		this.ctx.globalAlpha = 1;
 	}
 
@@ -389,7 +395,7 @@ export class Block1v1 {
 			this.ctx.fillStyle = 'white';
 			this.ctx.font = '48px gaming';
 			this.ctx.textAlign = 'center';
-			this.ctx.fillText(`${this.winner} ${t('block.wins')}`, this.width / 2, this.height / 2);
+			this.ctx.fillText(`${sanitizeHtml(this.winner)} Wins`, this.width / 2, this.height / 2);
 			// this.ctx.font = '24px gaming';
 			// this.ctx.fillText(t('block.pressEnterToPlayAgain'), this.width / 2, this.height / 2 + 50);
 			this.ctx.globalAlpha = 1;

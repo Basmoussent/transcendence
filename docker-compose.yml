@@ -7,7 +7,7 @@ services:
     ports:
       - '2200:2200'
       - '2443:2443'
-      - '8000:2443'
+      # - '8000:2443'
     volumes:
       - ./docker/nginx/nginx.conf.template:/etc/nginx/templates/nginx.conf.template:ro
       - ./docker/nginx/cors.conf.template:/etc/nginx/templates/includes/cors.conf.template:ro
@@ -28,7 +28,7 @@ services:
       - MODSECURITY_PARANOIA_LEVEL=1
       - MODSECURITY_ANOMALY_SCORE_THRESHOLD=5
       - MODSECURITY_CRS_RULES=on
-      
+
     depends_on:
       - backend
     networks:
@@ -121,13 +121,13 @@ services:
       - grafana_data:/var/lib/grafana
       - ./docker/grafana/provisioning:/etc/grafana/provisioning
     environment:
-      - GF_SECURITY_ADMIN_USER=admin
-      - GF_SECURITY_ADMIN_PASSWORD=admin
       - GF_USERS_ALLOW_SIGN_UP=false
       - GF_DASHBOARDS_MIN_REFRESH_INTERVAL=5s
       - GF_DASHBOARDS_DEFAULT_HOME_DASHBOARD_UID=transcendence
       - GF_SERVER_ROOT_URL=https://localhost:2443/grafana/
-      
+    env_file:
+      - ".env"
+
     depends_on:
       - prometheus
     networks:

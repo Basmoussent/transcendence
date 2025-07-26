@@ -39,7 +39,6 @@ export async function router() {
 	let uuid: string = '';
 	let tempJwt: boolean = false;
 	let response: any;
-	let data: any;
 	
 	if (path.startsWith('/multipong') || path.startsWith('/block') || path.startsWith('/block1v1') ||
 		path.startsWith('/room') || path.startsWith('/profil')) {
@@ -83,7 +82,6 @@ export async function router() {
 				return; 
 			}
 
-			/// pas pouvoir aller sur le profil des gens qui nous bloquent
 		}
 		else {
 
@@ -133,6 +131,7 @@ export async function router() {
 		}
 		else if (response.ok && tempJwt) {
 			console.log("jvais render2fa login")
+			window.history.pushState({}, '', '/2fa-login');
 			app.innerHTML = render2FALogin();
 			return;
 		}
@@ -196,9 +195,8 @@ export async function router() {
 			});
 			const data = await response.json();
 			console.log("response:", data);
-			if (response.ok && data.temp) {
+			if (response.ok && data.temp == false)
 				initAlive();
-			}
 		} catch (e) {
 			console.error('Erreur lors de la vérification du token:', e);
 		}

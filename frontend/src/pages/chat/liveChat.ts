@@ -26,7 +26,6 @@ export class Chat {
 
 	// Left Panel
 	private homeBtn!: HTMLButtonElement;
-	private searchInput!: HTMLInputElement;
 	private friendsList!: HTMLElement;
 	private requestsList!: HTMLElement;
 	private addFriendBtn!: HTMLButtonElement;
@@ -66,7 +65,6 @@ export class Chat {
 
 		// Left Panel Elements
 		this.homeBtn = this.getElement('homeBtn') as HTMLButtonElement;
-		this.searchInput = this.getElement('searchInput') as HTMLInputElement;
 		this.friendsList = this.getElement('friendsList');
 		this.requestsList = this.getElement('requestsList');
 		this.addFriendBtn = this.getElement('addFriendBtn') as HTMLButtonElement;
@@ -155,10 +153,14 @@ export class Chat {
 				console.log(`les message ${data.content}`)
 				this.addChatMessage(data.username, data.content);
 				break;
+			case 'notify_tournament':
+				this.addChatMessage("system", `Tu t'appretes a jouer contre ${sanitizeHtml(data.opponent)} dans un tournoi`)
+				break;
 			case 'friend_list_update':
 				this.updateFriendAndRequest();
 				break;
 			case 'updateUI':
+				console.log("j'update mon ui")
 				this.updateUI();
 				break;
 			case 'system_message':
@@ -317,13 +319,13 @@ export class Chat {
 
 		console.log(JSON.stringify(relations, null, 8))
 
+		this.friendsList.innerHTML = '';
+		this.requestsList.innerHTML = '';
+
 		if (!relations || !relations.length) {
 			console.log("t'as pas d'amis mgl")
 			return;
 		}
-
-		this.friendsList.innerHTML = '';
-		this.requestsList.innerHTML = '';
 
 		for (const relation of relations) {
 			console.log("relation", relation)
@@ -525,7 +527,7 @@ export class Chat {
 				${gameIcon}
 				<div style="flex:1;">
 					<div style="font-weight:bold;font-size:1.08em;color:#3B82F6;margin-bottom:2px;">Invitation à jouer à ${gameLabel}</div>
-					<div style="color:#64748b;font-size:0.98em;margin-bottom:8px;">${isSent ? 'Tu as invité' : username + ' t\'a invité'} à rejoindre une partie.</div>
+					<div style="color:#64748b;font-size:0.98em;margin-bottom:8px;">${isSent ? 'System: Tu as invité' : sanitizeHtml(username) + 'System: t\'a invité'} à rejoindre une partie.</div>
 					<button class="game-invite-link" style="display:inline-block;padding:7px 18px;background:linear-gradient(135deg,#10B981,#3B82F6);color:white;border-radius:8px;font-weight:bold;text-decoration:none;transition:background 0.2s;box-shadow:0 2px 8px rgba(16,185,129,0.10);margin-top:2px;cursor:pointer;" data-uuid="${uuid}" data-link="${link}">Rejoindre la partie</button>
 				</div>
 			</div>
@@ -588,4 +590,12 @@ function setupPing(ws: WebSocket) {
 			}));
 		}
 	}, 10000);	
+}
+
+function addTournamentMessage(opponent: string) {
+	const messageElement = document.createElement('div');
+	messageElement.className = 'chat-message system';
+	messageElement.innerHTML = `<div class="chat-message-content">${sanitizeHtml("Tu t'appretes a jouer contre " + opponent + " dans un tournoi")}</div>`;
+	// this.chatMessages.appendChild(messageElement);
+	// this.chatMessages.scrollTop = this.chatMessages.scrollHeight;
 }

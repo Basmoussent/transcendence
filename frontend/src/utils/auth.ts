@@ -50,22 +50,30 @@ export function isAuthenticated(): boolean {
   return getAuthToken() !== null;
 }
 
-export  function initAlive()
-{
+let socket: WebSocket | null = null;
+
+export function initAlive() {
   console.log("initAlive started");
+
   const authToken = getAuthToken();
   if (!authToken) {
     console.log("No auth token, skipping initAlive");
     return;
   }
 
-  const socket = new WebSocket(`${window.location.protocol === "https:" ? "wss" : "ws"}://${window.location.host}/api/alive`);
+  if (socket && (socket.readyState === WebSocket.OPEN || socket.readyState === WebSocket.CONNECTING)) {
+    console.log("WebSocket already connected or connecting. Skipping new connection.");
+    return;
+  }
+
+  socket = new WebSocket(`${window.location.protocol === "https:" ? "wss" : "ws"}://${window.location.host}/api/alive`);
 
   socket.addEventListener('open', () => {
     console.log('🔌 WebSocket /alive connected');
     socket.send(JSON.stringify({ type: 'ping', token: authToken }));
+    
     const interval = setInterval(() => {
-      if (socket.readyState === WebSocket.OPEN) {
+      if (socket.readyState === WebSocket.OPEN && getAuthToken() !== null) {
         socket.send(JSON.stringify({ type: 'ping', token: authToken }));
       } else {
         clearInterval(interval);
@@ -75,6 +83,7 @@ export  function initAlive()
     socket.addEventListener('close', () => {
       clearInterval(interval);
       console.log('🔌 WebSocket /alive disconnected');
+      socket = null;
     });
   });
 
