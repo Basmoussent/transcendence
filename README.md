@@ -1,4 +1,5 @@
 # Transcendence - 42 School Project
+<img width="1397" height="329" alt="image" src="https://github.com/user-attachments/assets/98d91a4f-3c88-4c9e-8e08-523e76bfc8f7" />
 
 ## 🎮 Overview
 This project involves undertaking tasks you have never done before.
@@ -14,7 +15,8 @@ Look at you now; it’s time to shine!
   frontend/
   ├── src/
   │   ├── game/         # Logique du jeu Pong
-  │   ├── utils/        # Fonctions utilitaires
+  │   ├── utils/        # Fonctions utilitaires![Uploading image.png…]()
+
   │   ├── services/     # Services (API, WebSocket)
   │   └── components/   # Composants UI réutilisables
   ├── Dockerfile
